@@ -10,3 +10,9 @@ Pour un enrouleur de 1 po de diamètre. Ça fais 3 po par tour.
 3 po par tour, donc il faut 4 tour minutes.
 
 Mon moteur doit être capable de au moins soulever 10 lb, gros minimum. Ça serait bien 20 lb.
+
+Mon moteur a un angle de 1.8 degree, donc 200 step. A 1000 rpm comme vitesse moyenne en general pour un stepper, ca fais 200 000 step par minutes. Soit 3333 step par seconde. Donc 3.33 step par millisecond, donc 1 step à tous les 300 microsecondes.
+
+1000 rpm, c'est 16.67 rotations par secondes...
+
+Ah c'est le TB6600 qui fuck les affaires en rajoutant des microsteps!!!
