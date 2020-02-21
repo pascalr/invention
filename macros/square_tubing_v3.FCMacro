@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+
+# Macro Begin: /home/pascalr/invention/macros/square_tubing_v3.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
+import FreeCAD
+import PartDesign
+import PartDesignGui
+import Sketcher
+
+App.activeDocument().Body.newObject('Sketcher::SketchObject','Sketch')
+App.activeDocument().Sketch.Support = (App.activeDocument().XY_Plane, [''])
+App.activeDocument().Sketch.MapMode = 'FlatFace'
+App.ActiveDocument.recompute()
+#Gui.activeDocument().setEdit('Sketch')
+#Gui.activateWorkbench('SketcherWorkbench')
+#ActiveSketch = App.ActiveDocument.getObject('Sketch')
+#tv = Show.TempoVis(App.ActiveDocument)
+#if ActiveSketch.ViewObject.HideDependent:
+#  objs = tv.get_all_dependent(ActiveSketch)
+#  objs = filter(lambda x: not x.TypeId.startswith("TechDraw::"), objs)
+#  objs = filter(lambda x: not x.TypeId.startswith("Drawing::"), objs)
+#  tv.hide(objs)
+#if ActiveSketch.ViewObject.ShowSupport:
+#  tv.show([ref[0] for ref in ActiveSketch.Support if not ref[0].isDerivedFrom("PartDesign::Plane")])
+#if ActiveSketch.ViewObject.ShowLinks:
+#  tv.show([ref[0] for ref in ActiveSketch.ExternalGeometry])
+#tv.hide(ActiveSketch)
+#ActiveSketch.ViewObject.TempoVis = tv
+#del(tv)
+#
+#ActiveSketch = App.ActiveDocument.getObject('Sketch')
+#if ActiveSketch.ViewObject.RestoreCamera:
+#  ActiveSketch.ViewObject.TempoVis.saveCamera()
+#
+geoList = []
+geoList.append(Part.LineSegment(App.Vector(-9.035622,8.150827,0),App.Vector(8.660254,8.150827,0)))
+geoList.append(Part.LineSegment(App.Vector(8.660254,8.150827,0),App.Vector(8.660254,-10.081287,0)))
+geoList.append(Part.LineSegment(App.Vector(8.660254,-10.081287,0),App.Vector(-9.035622,-10.081287,0)))
+geoList.append(Part.LineSegment(App.Vector(-9.035622,-10.081287,0),App.Vector(-9.035622,8.150827,0)))
+App.ActiveDocument.Sketch.addGeometry(geoList,False)
+conList = []
+conList.append(Sketcher.Constraint('Coincident',0,2,1,1))
+conList.append(Sketcher.Constraint('Coincident',1,2,2,1))
+conList.append(Sketcher.Constraint('Coincident',2,2,3,1))
+conList.append(Sketcher.Constraint('Coincident',3,2,0,1))
+conList.append(Sketcher.Constraint('Horizontal',0))
+conList.append(Sketcher.Constraint('Horizontal',2))
+conList.append(Sketcher.Constraint('Vertical',1))
+conList.append(Sketcher.Constraint('Vertical',3))
+App.ActiveDocument.Sketch.addConstraint(conList)
+
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(0,1,2.502575)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(1,2,2.502575)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(2,2,2.148657)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(0,2,2.148657)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Symmetric',4,3,5,3,-1,1)) 
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Equal',0,1)) 
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('DistanceX',3,2,1,1,18.347265)) 
+App.ActiveDocument.Sketch.setDatum(14,App.Units.Quantity('12.700000 mm'))
+App.ActiveDocument.recompute()
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.movePoint(3,0,App.Vector(-6.613908,-0.035945,0),1)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.movePoint(3,0,App.Vector(5.391778,-1.078355,0),1)
+#Gui.getDocument('Unnamed').resetEdit()
+#ActiveSketch = App.ActiveDocument.getObject('Sketch')
+#tv = ActiveSketch.ViewObject.TempoVis
+#if tv:
+#  tv.restore()
+#ActiveSketch.ViewObject.TempoVis = None
+#del(tv)
+#
+#Gui.activateWorkbench('PartDesignWorkbench')
+App.getDocument('Unnamed').recompute()
+App.getDocument("Unnamed").removeObject("Sketch")
+App.getDocument("Unnamed").recompute()
+App.getDocument("invention").recompute()
+App.getDocument("jig_linear_tracks_v2").recompute()
+App.getDocument("plateforme_transversale_v2").recompute()
+App.getDocument("rail_lineaire").recompute()
+# Macro End: /home/pascalr/invention/macros/square_tubing_v3.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++

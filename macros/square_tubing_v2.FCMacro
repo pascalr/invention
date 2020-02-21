@@ -1,0 +1,121 @@
+# -*- coding: utf-8 -*-
+
+# Macro Begin: /home/pascalr/invention/macros/square_tubing_v2.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
+import FreeCAD
+import PartDesign
+import PartDesignGui
+import Sketcher
+
+App.newDocument("Unnamed")
+#App.setActiveDocument("Unnamed")
+#App.ActiveDocument=App.getDocument("Unnamed")
+#Gui.ActiveDocument=Gui.getDocument("Unnamed")
+#Gui.activeDocument().activeView().viewDefaultOrientation()
+App.activeDocument().addObject('PartDesign::Body','Body')
+#Gui.activateView('Gui::View3DInventor', True)
+#Gui.activeView().setActiveObject('pdbody', App.activeDocument().Body)
+App.activeDocument().Body.newObject('Sketcher::SketchObject','Sketch')
+App.activeDocument().Sketch.Support = (App.activeDocument().XY_Plane, [''])
+App.activeDocument().Sketch.MapMode = 'FlatFace'
+App.ActiveDocument.recompute()
+#Gui.activeDocument().setEdit('Sketch')
+#Gui.activateWorkbench('SketcherWorkbench')
+#ActiveSketch = App.ActiveDocument.getObject('Sketch')
+#tv = Show.TempoVis(App.ActiveDocument)
+#if ActiveSketch.ViewObject.HideDependent:
+#  objs = tv.get_all_dependent(ActiveSketch)
+#  objs = filter(lambda x: not x.TypeId.startswith("TechDraw::"), objs)
+#  objs = filter(lambda x: not x.TypeId.startswith("Drawing::"), objs)
+#  tv.hide(objs)
+#if ActiveSketch.ViewObject.ShowSupport:
+#  tv.show([ref[0] for ref in ActiveSketch.Support if not ref[0].isDerivedFrom("PartDesign::Plane")])
+#if ActiveSketch.ViewObject.ShowLinks:
+#  tv.show([ref[0] for ref in ActiveSketch.ExternalGeometry])
+#tv.hide(ActiveSketch)
+#ActiveSketch.ViewObject.TempoVis = tv
+#del(tv)
+#
+#ActiveSketch = App.ActiveDocument.getObject('Sketch')
+#if ActiveSketch.ViewObject.RestoreCamera:
+#  ActiveSketch.ViewObject.TempoVis.saveCamera()
+#
+geoList = []
+geoList.append(Part.LineSegment(App.Vector(-15.524110,12.976975,0),App.Vector(14.076266,12.976975,0)))
+geoList.append(Part.LineSegment(App.Vector(14.076266,12.976975,0),App.Vector(14.076266,-13.727710,0)))
+geoList.append(Part.LineSegment(App.Vector(14.076266,-13.727710,0),App.Vector(-15.524110,-13.727710,0)))
+geoList.append(Part.LineSegment(App.Vector(-15.524110,-13.727710,0),App.Vector(-15.524110,12.976975,0)))
+App.ActiveDocument.Sketch.addGeometry(geoList,False)
+conList = []
+conList.append(Sketcher.Constraint('Coincident',0,2,1,1))
+conList.append(Sketcher.Constraint('Coincident',1,2,2,1))
+conList.append(Sketcher.Constraint('Coincident',2,2,3,1))
+conList.append(Sketcher.Constraint('Coincident',3,2,0,1))
+conList.append(Sketcher.Constraint('Horizontal',0))
+conList.append(Sketcher.Constraint('Horizontal',2))
+conList.append(Sketcher.Constraint('Vertical',1))
+conList.append(Sketcher.Constraint('Vertical',3))
+App.ActiveDocument.Sketch.addConstraint(conList)
+
+App.ActiveDocument.recompute()
+geoList = []
+geoList.append(Part.LineSegment(App.Vector(-19.315464,16.819124,0),App.Vector(19.590075,16.819124,0)))
+geoList.append(Part.LineSegment(App.Vector(19.590075,16.819124,0),App.Vector(19.590075,-19.580231,0)))
+geoList.append(Part.LineSegment(App.Vector(19.590075,-19.580231,0),App.Vector(-19.315464,-19.580231,0)))
+geoList.append(Part.LineSegment(App.Vector(-19.315464,-19.580231,0),App.Vector(-19.315464,16.819124,0)))
+App.ActiveDocument.Sketch.addGeometry(geoList,False)
+conList = []
+conList.append(Sketcher.Constraint('Coincident',4,2,5,1))
+conList.append(Sketcher.Constraint('Coincident',5,2,6,1))
+conList.append(Sketcher.Constraint('Coincident',6,2,7,1))
+conList.append(Sketcher.Constraint('Coincident',7,2,4,1))
+conList.append(Sketcher.Constraint('Horizontal',4))
+conList.append(Sketcher.Constraint('Horizontal',6))
+conList.append(Sketcher.Constraint('Vertical',5))
+conList.append(Sketcher.Constraint('Vertical',7))
+App.ActiveDocument.Sketch.addConstraint(conList)
+
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Symmetric',1,2,0,1,-1,1)) 
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Symmetric',5,2,4,1,-1,1)) 
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('DistanceX',4,1,4,2,38.212011)) 
+App.ActiveDocument.Sketch.setDatum(18,App.Units.Quantity('12.700000 mm'))
+App.ActiveDocument.recompute()
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Equal',5,4)) 
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.movePoint(1,2,App.Vector(4.314284,-4.901145,0),0)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('DistanceX',0,2,4,2,2.035716)) 
+App.ActiveDocument.Sketch.setDatum(20,App.Units.Quantity('1.587500 mm'))
+App.ActiveDocument.recompute()
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.movePoint(0,1,App.Vector(-4.513244,7.633348,0),0)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.movePoint(0,1,App.Vector(-4.337630,4.516197,0),0)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('DistanceX',0,2,4,2,1.587500)) 
+App.ActiveDocument.recompute()
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('DistanceY',0,2,4,2,1.833803)) 
+App.ActiveDocument.Sketch.setDatum(21,App.Units.Quantity('1.590000 mm'))
+App.ActiveDocument.recompute()
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(4,1,1.796051)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(0,1,1.346331)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(2,2,1.155931)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(6,2,1.389651)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(5,2,1.643651)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(1,2,1.400184)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(0,2,1.275769)
+App.ActiveDocument.recompute()
+App.ActiveDocument.Sketch.fillet(4,2,1.527965)
+App.ActiveDocument.recompute()
+# Macro End: /home/pascalr/invention/macros/square_tubing_v2.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
