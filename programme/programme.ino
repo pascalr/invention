@@ -1,17 +1,18 @@
 // Programme pour ma machine a cuisiner!
+// Version 2, controler par mon application web!
 
 // INPUT PINS
 // buttons
-#define startPin 4
-#define stopPin 7
+//#define startPin 4
+//#define stopPin 7
 #define limitSwitchPin 12
-#define referenceButtonPin 13
-#define plusPin 10
-#define minusPin 9
+//#define referenceButtonPin 13
+//#define plusPin 10
+//#define minusPin 9
 // potentionmeterss
-#define potPin 2
+//#define potPin 2
 // switches
-#define manualSwitchPin 11
+//#define manualSwitchPin 11
 
 // OUTPUT PINS
 #define motorEnabledPin 8
@@ -26,43 +27,34 @@
 #define RICE_POSITION_X 50000
 #define RICE_COOKER_POSITION_X 50000
 
-#define DISPLAY_TIME_INTERVAL 10000000
+#define CW true
+#define CCW false
 
-String input = "";
-
-bool verbose = false;
+#define AXIS_X 1
+#define AXIS_Y 2
+#define AXIS_Z 3
 
 unsigned long previousTime = micros();
-unsigned long previousDisplayTime = micros();
-
-long timeInterval = 0;
-long minTimeInterval = 20;
-int potVal = 0;
-bool motorStep = false;
-bool isMotorEnabled = false;
-
-int oldStartButtonState = 0;
-int oldStopButtonState = 0;
-int oldReferenceButtonState = 0;
 
 unsigned long positionX = 0;
-bool isReferenced = false;
-bool isClockwise = true;
 
-bool eStop() {
-  bool val = digitalRead(stopPin) == HIGH;
-  if (val) {
-    setMotorEnabled(false);
-  }
-  return val;
-}
+bool motorStep = false;
+
+bool isMotorEnabled = false;
+bool isClockwise = true;
+bool isManualMode = true;
+
+bool isReferenced = false;
+bool isReferencing = false;
+
+int selectedAxis = 0; // Only one axis is selected at a time (X, Y, Z or W) in manual mode
+
+int selectedSpeed = 300;
 
 // setters for output pins
 void setMotorEnabled(bool value) {
-  Serial.print("\n*** Motor enabled is set to:");
-  Serial.print(value);
-  Serial.print("\n");
   digitalWrite(motorEnabledPin, value ? LOW : HIGH);
+  digitalWrite(ledPin, value ? HIGH : LOW)
   isMotorEnabled = value;
 }
 
@@ -82,7 +74,6 @@ void moveX(int destinationX) {
   setMotorEnabled(true);
   setMotorDirection(positionX < destinationX);
   while ((isClockwise && positionX < destinationX) || (!isClockwise && positionX > destinationX)) {
-    if (eStop) {return}
     turnOneStep();
     delayMicroseconds(FAST_SPEED_DELAY);
   }
@@ -95,24 +86,6 @@ void turnOneStep() {
   positionX = isClockwise ? positionX + 1 : positionX - 1;
 }
 
-void doReference() {
-  Serial.print("Doing referencing...");
-  setMotorEnabled(true);
-  while (true) {  // while noStop()
-    if (eStop) {return}
-    bool limitSwitchActivated = digitalRead(limitSwitchPin);
-    if (limitSwitchActivated) {
-      positionX = 0;
-      moveX(HOME_POSITION_X);
-      isReferenced = true;
-      return;
-    } else {  // Turn motor at slow speed
-      turnOneStep();
-      delayMicroseconds(SLOW_SPEED_DELAY);
-    }
-  }
-}
-
 void setup() {
 
   //Initiate Serial communication.
@@ -122,83 +95,72 @@ void setup() {
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   pinMode(motorEnabledPin, OUTPUT);
-  // Set the spinning direction CW/CCW:
-  digitalWrite(dirPin, HIGH);
+  
   setMotorEnabled(false);
- // digitalWrite(motorEnabledPin, HIGH);
+  setMotorDirection(CW);
 }
 
 void loop() {
-  //Serial.print(digitalRead(referenceButtonPin));
-  //Serial.print('\n');
   unsigned long currentTime = micros();
-  potVal = analogRead(potPin);
-  if (potVal < minTimeInterval) {
-    timeInterval = minTimeInterval;
-  } else {
-    timeInterval = potVal;
-  }
 
   if (Serial.available() > 0) {
     // read the incoming byte:
-    input = Serial.readString();
+    String input = Serial.readString();
 
-    Serial.print("I received: ");
+    Serial.print("Cmd: ");
     Serial.println(input);
     if (input == "riz\n") {
       cookRice();
-    } else if (input == "stop\n") {
+    } else if (input == "x\n") {
+      selectedAxis = selectedAxis == AXIS_X ? 0 : AXIS_X;
+    } else if (input == "y\n") {
+      selectedAxis = selectedAxis == AXIS_Y ? 0 : AXIS_Y;
+    } else if (input == "z\n") {
+      selectedAxis = selectedAxis == AXIS_Z ? 0 : AXIS_Z;
+    } else if (input == "v\n") { // speed
+      // TODO: check only if the fist char is a v, then read the rest of the string as a int to get the value of the speed
+    } else if (input == "s\n") { // stop
       setMotorEnabled(false);
+    } else if (input == "0\n") { // reference
+      isReferencing = true;
+    } else if (input == "?\n") { // debug info
+      printDebugInfo();
+    } else if (input == "+\n") {
+      setMotorEnabled(true);
+      setMotorDirection(CW);
+    } else if (input == "-\n") {
+      setMotorEnabled(true);
+      setMotorDirection(CCW);
+    } else if (input == "m\n") { // manual
     }
   }
 
-  int startButtonState = digitalRead(startPin);
-  int stopButtonState = digitalRead(stopPin);
-  int referenceButtonState = digitalRead(referenceButtonPin);
-
-  // start button is pressed
-  if (isReferenced && oldStartButtonState == HIGH && startButtonState == LOW) {
-    setMotorEnabled(true);
-  }
-
-  // stop button is pressed
-  if (oldStopButtonState == HIGH && stopButtonState == LOW) {
-    setMotorEnabled(false);
-  }
-
-  // reference button is pressed
-  if (oldReferenceButtonState == HIGH && referenceButtonState == LOW) {
-    doReference();
-  }
-
-  if (isMotorEnabled) {
-    if (currentTime - previousTime > timeInterval) {
+  if (isReferencing) {
+    bool limitSwitchActivated = digitalRead(limitSwitchPin);
+    if (limitSwitchActivated) {
+      positionX = 0;
+      //moveX(HOME_POSITION_X);
+      isReferenced = true;
+      isReferencing = false;
+    } else {
       turnOneStep();
-      previousTime = currentTime;
+      delayMicroseconds(SLOW_SPEED_DELAY);
     }
+  } else if (isReferenced && isMotorEnabled && currentTime - previousTime > selectedSpeed) {
+    turnOneStep();
+    previousTime = currentTime;
   }
+}
 
-  oldStartButtonState = startButtonState;
-  oldStopButtonState = stopButtonState;
-  oldReferenceButtonState = referenceButtonState;
-
-  // Display debug info
-  if (verbose || currentTime - previousDisplayTime > DISPLAY_TIME_INTERVAL) {
-    Serial.print("\n* ");
-    Serial.print((currentTime - previousTime)/1000000);
-    Serial.print(" s *\n");
-    Serial.print("start\n");
-    Serial.print(startButtonState);
-    Serial.print("\nstop\n");
-    Serial.print(stopButtonState);
-    Serial.print("\npot\n");
-    Serial.print(potVal);
-    Serial.print("\nstep\n");
-    Serial.print(motorStep);
-    Serial.print("\nen\n");
-    Serial.print(isMotorEnabled);
-    Serial.print("\nX\n");
-    Serial.print(positionX);
-    previousDisplayTime = currentTime;
-  }
+void printDebugInfo() {
+  Serial.println("* In *");
+  Serial.print("Axis: ");
+  Serial.println(selectedAxis);
+  Serial.print("Speed: ");
+  Serial.println(selectedAxis);
+  Serial.println("* Out *");
+  Serial.print("Enabled: ");
+  Serial.println(digitalRead(motorEnabledPin));
+  Serial.print("Dir: ");
+  Serial.println(digitalRead(dirPin));
 }
