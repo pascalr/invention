@@ -1,18 +1,16 @@
 // Programme pour ma machine a cuisiner!
 // Version 2, controler par mon application web!
 
+// gcode tutorial
+// https://www.simplify3d.com/support/articles/3d-printing-gcode-tutorial/
+
+#define GCODE_HOME_ROUTINE "G28"
+// GCODE G28 home routine
+// G28 X Y ; home X and Y axes
+// G28 Z ; home Z axis only
+
 // INPUT PINS
-// buttons
-//#define startPin 4
-//#define stopPin 7
 #define limitSwitchPin 12
-//#define referenceButtonPin 13
-//#define plusPin 10
-//#define minusPin 9
-// potentionmeterss
-//#define potPin 2
-// switches
-//#define manualSwitchPin 11
 
 // OUTPUT PINS
 #define motorEnabledPin 8
@@ -54,7 +52,7 @@ int selectedSpeed = 300;
 // setters for output pins
 void setMotorEnabled(bool value) {
   digitalWrite(motorEnabledPin, value ? LOW : HIGH);
-  digitalWrite(ledPin, value ? HIGH : LOW)
+  digitalWrite(ledPin, value ? HIGH : LOW);
   isMotorEnabled = value;
 }
 
@@ -90,6 +88,7 @@ void setup() {
 
   //Initiate Serial communication.
   Serial.begin(9600);
+  Serial.println("Setup...");
   
   pinMode(ledPin, OUTPUT);
   pinMode(stepPin, OUTPUT);
@@ -98,40 +97,42 @@ void setup() {
   
   setMotorEnabled(false);
   setMotorDirection(CW);
+  Serial.println("Done");
 }
 
 void loop() {
   unsigned long currentTime = micros();
 
   if (Serial.available() > 0) {
-    // read the incoming byte:
     String input = Serial.readString();
+    input[input.length()-1] = '\0'; // remove trailing newline char
 
     Serial.print("Cmd: ");
     Serial.println(input);
     if (input == "riz\n") {
       cookRice();
-    } else if (input == "x\n") {
+    } else if (input == "x") {
       selectedAxis = selectedAxis == AXIS_X ? 0 : AXIS_X;
-    } else if (input == "y\n") {
+    } else if (input == "y") {
       selectedAxis = selectedAxis == AXIS_Y ? 0 : AXIS_Y;
-    } else if (input == "z\n") {
+    } else if (input == "z") {
       selectedAxis = selectedAxis == AXIS_Z ? 0 : AXIS_Z;
-    } else if (input == "v\n") { // speed
+    } else if (input == "v") { // speed
       // TODO: check only if the fist char is a v, then read the rest of the string as a int to get the value of the speed
-    } else if (input == "s\n") { // stop
+    } else if (input == "s") { // stop
       setMotorEnabled(false);
-    } else if (input == "0\n") { // reference
+    } else if (input == GCODE_HOME_ROUTINE) {
+      setMotorEnabled(true);
       isReferencing = true;
-    } else if (input == "?\n") { // debug info
+    } else if (input == "?") { // debug info
       printDebugInfo();
-    } else if (input == "+\n") {
+    } else if (input == "+") {
       setMotorEnabled(true);
       setMotorDirection(CW);
-    } else if (input == "-\n") {
+    } else if (input == "-") {
       setMotorEnabled(true);
       setMotorDirection(CCW);
-    } else if (input == "m\n") { // manual
+    } else if (input == "m") { // manual
     }
   }
 
@@ -140,6 +141,7 @@ void loop() {
     if (limitSwitchActivated) {
       positionX = 0;
       //moveX(HOME_POSITION_X);
+      setMotorEnabled(false);
       isReferenced = true;
       isReferencing = false;
     } else {
