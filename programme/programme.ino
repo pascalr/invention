@@ -1,11 +1,17 @@
 // Programme pour ma machine a cuisiner!
 
 // INPUT PINS
+// buttons
 #define startPin 4
 #define stopPin 7
-#define potPin 2
 #define limitSwitchPin 12
 #define referenceButtonPin 13
+#define plusPin 10
+#define minusPin 9
+// potentionmeterss
+#define potPin 2
+// switches
+#define manualSwitchPin 11
 
 // OUTPUT PINS
 #define motorEnabledPin 8
@@ -18,10 +24,17 @@
 #define FAST_SPEED_DELAY 100
 #define HOME_POSITION_X 20000
 #define RICE_POSITION_X 50000
-#define RICE_COOKER_POSITION_X 100000
+#define RICE_COOKER_POSITION_X 50000
+
+#define DISPLAY_TIME_INTERVAL 10000000
+
+String input = "";
 
 bool verbose = false;
+
 unsigned long previousTime = micros();
+unsigned long previousDisplayTime = micros();
+
 long timeInterval = 0;
 long minTimeInterval = 20;
 int potVal = 0;
@@ -36,6 +49,14 @@ unsigned long positionX = 0;
 bool isReferenced = false;
 bool isClockwise = true;
 
+bool eStop() {
+  bool val = digitalRead(stopPin) == HIGH;
+  if (val) {
+    setMotorEnabled(false);
+  }
+  return val;
+}
+
 // setters for output pins
 void setMotorEnabled(bool value) {
   Serial.print("\n*** Motor enabled is set to:");
@@ -45,20 +66,27 @@ void setMotorEnabled(bool value) {
   isMotorEnabled = value;
 }
 
+void setMotorDirection(bool clockwise) {
+  digitalWrite(dirPin, clockwise ? LOW : HIGH);
+  delayMicroseconds(SLOW_SPEED_DELAY);
+}
+
 void cookRice() {
+  Serial.print("Preparing to cook rice!");
   moveX(RICE_POSITION_X);
   delay(2);
   moveX(RICE_COOKER_POSITION_X);
 }
 
 void moveX(int destinationX) {
-  bool isClockwise = positionX < destinationX; // clockwise?
-  digitalWrite(dirPin, isClockwise ? LOW : HIGH);
-  delayMicroseconds(SLOW_SPEED_DELAY);
+  setMotorEnabled(true);
+  setMotorDirection(positionX < destinationX);
   while ((isClockwise && positionX < destinationX) || (!isClockwise && positionX > destinationX)) {
+    if (eStop) {return}
     turnOneStep();
     delayMicroseconds(FAST_SPEED_DELAY);
   }
+  setMotorEnabled(false);
 }
 
 void turnOneStep() {
@@ -70,12 +98,12 @@ void turnOneStep() {
 void doReference() {
   Serial.print("Doing referencing...");
   setMotorEnabled(true);
-  while (true) {
+  while (true) {  // while noStop()
+    if (eStop) {return}
     bool limitSwitchActivated = digitalRead(limitSwitchPin);
     if (limitSwitchActivated) {
       positionX = 0;
       moveX(HOME_POSITION_X);
-      setMotorEnabled(false);
       isReferenced = true;
       return;
     } else {  // Turn motor at slow speed
@@ -111,6 +139,19 @@ void loop() {
     timeInterval = potVal;
   }
 
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    input = Serial.readString();
+
+    Serial.print("I received: ");
+    Serial.println(input);
+    if (input == "riz\n") {
+      cookRice();
+    } else if (input == "stop\n") {
+      setMotorEnabled(false);
+    }
+  }
+
   int startButtonState = digitalRead(startPin);
   int stopButtonState = digitalRead(stopPin);
   int referenceButtonState = digitalRead(referenceButtonPin);
@@ -142,20 +183,22 @@ void loop() {
   oldReferenceButtonState = referenceButtonState;
 
   // Display debug info
-  if (verbose) {
-    Serial.print("\n----------------------- Loop ");
-    Serial.print(currentTime - previousTime);
-    Serial.print(" --------------------------\n");
-    Serial.print("startButtonState\n");
+  if (verbose || currentTime - previousDisplayTime > DISPLAY_TIME_INTERVAL) {
+    Serial.print("\n* ");
+    Serial.print((currentTime - previousTime)/1000000);
+    Serial.print(" s *\n");
+    Serial.print("start\n");
     Serial.print(startButtonState);
-    Serial.print("\nstopButtonState\n");
+    Serial.print("\nstop\n");
     Serial.print(stopButtonState);
-    Serial.print("\npotVal\n");
+    Serial.print("\npot\n");
     Serial.print(potVal);
-    Serial.print("\nmotorStep\n");
+    Serial.print("\nstep\n");
     Serial.print(motorStep);
-    Serial.print("\nisMotorEnabled\n");
+    Serial.print("\nen\n");
     Serial.print(isMotorEnabled);
-    Serial.print("\n\n\n\n\n\n");
+    Serial.print("\nX\n");
+    Serial.print(positionX);
+    previousDisplayTime = currentTime;
   }
 }
