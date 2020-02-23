@@ -117,8 +117,10 @@ void loop() {
       selectedAxis = selectedAxis == AXIS_Y ? 0 : AXIS_Y;
     } else if (input == "z") {
       selectedAxis = selectedAxis == AXIS_Z ? 0 : AXIS_Z;
-    } else if (input == "v") { // speed
-      // TODO: check only if the fist char is a v, then read the rest of the string as a int to get the value of the speed
+    } else if (input.charAt(0) == 'v') { // speed
+      Serial.println(input.substring(1));
+      Serial.println(input.substring(1).toInt());
+      selectedSpeed = input.substring(1).toInt();
     } else if (input == "s") { // stop
       setMotorEnabled(false);
     } else if (input == GCODE_HOME_ROUTINE) {
@@ -159,7 +161,7 @@ void printDebugInfo() {
   Serial.print("Axis: ");
   Serial.println(selectedAxis);
   Serial.print("Speed: ");
-  Serial.println(selectedAxis);
+  Serial.println(selectedSpeed);
   Serial.println("* Out *");
   Serial.print("Enabled: ");
   Serial.println(digitalRead(motorEnabledPin));
