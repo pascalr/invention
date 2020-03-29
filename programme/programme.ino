@@ -165,11 +165,16 @@ void loop() {
     } else if (input == "?") { // debug info
       printDebugInfo();
     } else if (input == "+") {
-      setMotorEnabled(true);
       setMotorDirection(CW);
-    } else if (input == "-") {
       setMotorEnabled(true);
+    } else if (input == "t") {
+      setMotorDirection(CW);
+      setMotorEnabled(true);
+      delayMicroseconds(2000000);
+      setMotorEnabled(false);
+    } else if (input == "-") {
       setMotorDirection(CCW);
+      setMotorEnabled(true);
     } else if (input == "m") { // manual
     }
   }
