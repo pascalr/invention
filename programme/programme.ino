@@ -49,9 +49,9 @@
 #define limitSwitchPin 12
 
 // OUTPUT PINS
-#define motorEnabledPin 8
-#define dirPin 2
-#define stepPin 3
+#define Y_MOTOR_ENABLED_PIN 8
+#define Y_DIR_PIN 2
+#define Y_STEP_PIN 3
 #define ledPin 13
 
 // CONSTANTS
@@ -68,9 +68,25 @@
 #define AXIS_Y 2
 #define AXIS_Z 3
 
+struct axis
+{
+   int position;
+   int speed;
+   int enabledPin;
+   int dirPin;
+   int stepPin;
+};
+
+typedef struct axis Axis;
+
+Axis axisX, axisY, axisZ, axisW;
+
 unsigned long previousTime = micros();
 
 unsigned long positionX = 0;
+unsigned long positionY = 0;
+unsigned long positionZ = 0;
+unsigned long positionW = 0;
 
 bool motorStep = false;
 
@@ -85,15 +101,20 @@ int selectedAxis = 0; // Only one axis is selected at a time (X, Y, Z or W) in m
 
 int selectedSpeed = 300;
 
+int destX = -1; // destination required by the user
+int destY = -1; // destination required by the user
+int destZ = -1; // destination required by the user
+int destW = -1; // destination required by the user
+
 // setters for output pins
-void setMotorEnabled(bool value) {
-  digitalWrite(motorEnabledPin, value ? LOW : HIGH);
+void setMotorsEnabled(bool value) {
+  digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
   digitalWrite(ledPin, value ? HIGH : LOW);
   isMotorEnabled = value;
 }
 
-void setMotorDirection(bool clockwise) {
-  digitalWrite(dirPin, clockwise ? LOW : HIGH);
+void setMotorsDirection(bool clockwise) {
+  digitalWrite(axisY.dirPin, clockwise ? LOW : HIGH);
   delayMicroseconds(SLOW_SPEED_DELAY);
 }
 
@@ -105,19 +126,27 @@ void cookRice() {
 }
 
 void moveX(int destinationX) {
-  setMotorEnabled(true);
-  setMotorDirection(positionX < destinationX);
+  setMotorsEnabled(true);
+  setMotorsDirection(positionX < destinationX);
   while ((isClockwise && positionX < destinationX) || (!isClockwise && positionX > destinationX)) {
     turnOneStep();
     delayMicroseconds(FAST_SPEED_DELAY);
   }
-  setMotorEnabled(false);
+  setMotorsEnabled(false);
 }
 
 void turnOneStep() {
-  digitalWrite(stepPin, motorStep ? HIGH : LOW);
+  digitalWrite(Y_STEP_PIN, motorStep ? HIGH : LOW);
   motorStep = !motorStep;
   positionX = isClockwise ? positionX + 1 : positionX - 1;
+}
+
+void setupAxis(Axis axis) {
+  axis.position = -1;
+  
+  pinMode(axis.stepPin, OUTPUT);
+  pinMode(axis.dirPin, OUTPUT);
+  pinMode(axis.enabledPin, OUTPUT);
 }
 
 void setup() {
@@ -125,15 +154,41 @@ void setup() {
   //Initiate Serial communication.
   Serial.begin(9600);
   Serial.println("Setup...");
-  
+
   pinMode(ledPin, OUTPUT);
-  pinMode(stepPin, OUTPUT);
-  pinMode(dirPin, OUTPUT);
-  pinMode(motorEnabledPin, OUTPUT);
+
+  axisY.speed = 300;
+  axisY.enabledPin = 8;
+  axisY.dirPin = 2;
+  axisY.stepPin = 3;
   
-  setMotorEnabled(false);
-  setMotorDirection(CW);
+  setupAxis(axisY);
+  
+  setMotorsEnabled(false);
+  setMotorsDirection(CW);
   Serial.println("Done");
+}
+
+int parseNextNumber(String str) {
+  int i;
+  for (i = 0; i < str.length(); i++) {
+    if (str[i] < '0' || str[i] > '9') {break;}
+  }
+  return str.substring(0,i).toInt();
+}
+
+void parseMove(String cmd) {
+  for (int i = 0; i < cmd.length(); i++) {
+    if (cmd[i] == "X") {
+      destX = parseNextNumber(cmd.substring(i+1));
+    } else if (cmd[i] == "Y") {
+      destY = parseNextNumber(cmd.substring(i+1));
+    } else if (cmd[i] == "Z") {
+      destZ = parseNextNumber(cmd.substring(i+1));
+    } else if (cmd[i] == "W") {
+      destW = parseNextNumber(cmd.substring(i+1));
+    }
+  }
 }
 
 void loop() {
@@ -147,6 +202,8 @@ void loop() {
     Serial.println(input);
     if (input == "riz\n") {
       cookRice();
+    } else if (input[0] == "M") {
+      parseMove(input.substring(1));
     } else if (input == "x") {
       selectedAxis = selectedAxis == AXIS_X ? 0 : AXIS_X;
     } else if (input == "y") {
@@ -158,23 +215,27 @@ void loop() {
       Serial.println(input.substring(1).toInt());
       selectedSpeed = input.substring(1).toInt();
     } else if (input == "s") { // stop
-      setMotorEnabled(false);
+      setMotorsEnabled(false);
+      destX = -1;
+      destY = -1;
+      destZ = -1;
+      destW = -1;
     } else if (input == GCODE_HOME_ROUTINE) {
-      setMotorEnabled(true);
+      setMotorsEnabled(true);
       isReferencing = true;
     } else if (input == "?") { // debug info
       printDebugInfo();
     } else if (input == "+") {
-      setMotorDirection(CW);
-      setMotorEnabled(true);
+      setMotorsDirection(CW);
+      setMotorsEnabled(true);
     } else if (input == "t") {
-      setMotorDirection(CW);
-      setMotorEnabled(true);
+      setMotorsDirection(CW);
+      setMotorsEnabled(true);
       delayMicroseconds(2000000);
-      setMotorEnabled(false);
+      setMotorsEnabled(false);
     } else if (input == "-") {
-      setMotorDirection(CCW);
-      setMotorEnabled(true);
+      setMotorsDirection(CCW);
+      setMotorsEnabled(true);
     } else if (input == "m") { // manual
     }
   }
@@ -183,8 +244,11 @@ void loop() {
     bool limitSwitchActivated = digitalRead(limitSwitchPin);
     if (limitSwitchActivated) {
       positionX = 0;
+      positionY = 0;
+      positionZ = 0;
+      positionW = 0;
       //moveX(HOME_POSITION_X);
-      setMotorEnabled(false);
+      setMotorsEnabled(false);
       isReferenced = true;
       isReferencing = false;
     } else {
@@ -216,7 +280,7 @@ void printDebugInfo() {
   Serial.println(digitalRead(limitSwitchPin));
   Serial.println("* Out *");
   Serial.print("Enabled: ");
-  Serial.println(digitalRead(motorEnabledPin));
+  Serial.println(digitalRead(Y_MOTOR_ENABLED_PIN));
   Serial.print("Dir: ");
-  Serial.println(digitalRead(dirPin));
+  Serial.println(digitalRead(Y_DIR_PIN));
 }
