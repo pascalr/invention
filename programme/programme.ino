@@ -34,115 +34,70 @@
 #include <GSM3ShieldV1PinManagement.h>
 #include <GSM3ShieldV1AccessProvider.h>
 
-// Programme pour ma machine a cuisiner!
-// Version 2, controler par mon application web!
-
-// gcode tutorial
-// https://www.simplify3d.com/support/articles/3d-printing-gcode-tutorial/
-
-#define GCODE_HOME_ROUTINE "G28"
-// GCODE G28 home routine
-// G28 X Y ; home X and Y axes
-// G28 Z ; home Z axis only
-
-// INPUT PINS
-#define limitSwitchPin 12
-
 // OUTPUT PINS
-#define Y_MOTOR_ENABLED_PIN 8
-#define Y_DIR_PIN 2
-#define Y_STEP_PIN 3
 #define ledPin 13
 
 // CONSTANTS
 #define SLOW_SPEED_DELAY 500
 #define FAST_SPEED_DELAY 100
-#define HOME_POSITION_X 20000
-#define RICE_POSITION_X 50000
-#define RICE_COOKER_POSITION_X 50000
 
 #define CW true
 #define CCW false
 
-#define AXIS_X 1
-#define AXIS_Y 2
-#define AXIS_Z 3
-
 struct axis
 {
    int position;
+   int destination;
    int speed;
    int enabledPin;
    int dirPin;
    int stepPin;
+   int limitSwitchPin;
+   unsigned long previousStepTime;
+   bool isStepHigh;
+   bool isMotorEnabled;
+   bool isClockwise;
+   bool isReferenced;
+   bool isReferencing;
 };
 
 typedef struct axis Axis;
 
-Axis axisX, axisY, axisZ, axisW;
+Axis axisX, axisY, axisZ, axisW, oups;
 
-unsigned long previousTime = micros();
-
-unsigned long positionX = 0;
-unsigned long positionY = 0;
-unsigned long positionZ = 0;
-unsigned long positionW = 0;
-
-bool motorStep = false;
-
-bool isMotorEnabled = false;
-bool isClockwise = true;
-bool isManualMode = true;
-
-bool isReferenced = false;
-bool isReferencing = false;
-
-int selectedAxis = 0; // Only one axis is selected at a time (X, Y, Z or W) in manual mode
-
-int selectedSpeed = 300;
-
-int destX = -1; // destination required by the user
-int destY = -1; // destination required by the user
-int destZ = -1; // destination required by the user
-int destW = -1; // destination required by the user
+unsigned long currentTime;
 
 // setters for output pins
 void setMotorsEnabled(bool value) {
   digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
+  axisY.isMotorEnabled = value;
+  
   digitalWrite(ledPin, value ? HIGH : LOW);
-  isMotorEnabled = value;
 }
 
 void setMotorsDirection(bool clockwise) {
   digitalWrite(axisY.dirPin, clockwise ? LOW : HIGH);
+  axisY.isClockwise = clockwise;
+  
   delayMicroseconds(SLOW_SPEED_DELAY);
 }
 
-void cookRice() {
-  Serial.print("Preparing to cook rice!");
-  moveX(RICE_POSITION_X);
-  delay(2);
-  moveX(RICE_COOKER_POSITION_X);
+void turnOneStep(Axis axis) {
+  digitalWrite(axis.stepPin, axis.isStepHigh ? LOW : HIGH);
+  axis.isStepHigh = !axis.isStepHigh;
+  axis.position = axis.position + (axis.isClockwise ? 1 : -1);
 }
 
-void moveX(int destinationX) {
-  setMotorsEnabled(true);
-  setMotorsDirection(positionX < destinationX);
-  while ((isClockwise && positionX < destinationX) || (!isClockwise && positionX > destinationX)) {
-    turnOneStep();
-    delayMicroseconds(FAST_SPEED_DELAY);
-  }
-  setMotorsEnabled(false);
-}
-
-void turnOneStep() {
-  digitalWrite(Y_STEP_PIN, motorStep ? HIGH : LOW);
-  motorStep = !motorStep;
-  positionX = isClockwise ? positionX + 1 : positionX - 1;
-}
-
-void setupAxis(Axis axis) {
+void setupAxis(Axis axis, int speed) {
   axis.position = -1;
+  axis.destination = -1;
+  axis.previousStepTime = micros();
+  axis.isStepHigh = false;
+  axis.isMotorEnabled = false;
+  axis.isClockwise = false;
+  axis.isReferenced = false;
+  axis.isReferencing = false;
+  axis.speed = speed;
   
   pinMode(axis.stepPin, OUTPUT);
   pinMode(axis.dirPin, OUTPUT);
@@ -155,44 +110,72 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Setup...");
 
+  // ************* PIN LAYOUT **************
   pinMode(ledPin, OUTPUT);
-
-  axisY.speed = 300;
+  
   axisY.enabledPin = 8;
   axisY.dirPin = 2;
   axisY.stepPin = 3;
+  axisY.limitSwitchPin = 12;
+  // ***************************************
   
-  setupAxis(axisY);
+  setupAxis(axisY, 300);
   
   setMotorsEnabled(false);
   setMotorsDirection(CW);
   Serial.println("Done");
 }
 
-int parseNextNumber(String str) {
+int numberLength(String str) {
   int i;
   for (i = 0; i < str.length(); i++) {
     if (str[i] < '0' || str[i] > '9') {break;}
   }
-  return str.substring(0,i).toInt();
+  return i;
 }
 
 void parseMove(String cmd) {
   for (int i = 0; i < cmd.length(); i++) {
-    if (cmd[i] == "X") {
-      destX = parseNextNumber(cmd.substring(i+1));
-    } else if (cmd[i] == "Y") {
-      destY = parseNextNumber(cmd.substring(i+1));
-    } else if (cmd[i] == "Z") {
-      destZ = parseNextNumber(cmd.substring(i+1));
-    } else if (cmd[i] == "W") {
-      destW = parseNextNumber(cmd.substring(i+1));
+    int nbLength = numberLength(cmd.substring(i+1));
+    axisByLetter(cmd[i]).destination = cmd.substring(i+1,i+1+nbLength).toInt();
+    i = i+nbLength;
+  }
+}
+
+void handleAxis(Axis axis) {
+  if (axis.isReferencing) {
+    if (digitalRead(axis.limitSwitchPin)) {
+      axis.position = 0;
+      setMotorsEnabled(false);
+      axis.isReferenced = true;
+      axis.isReferencing = false;
+    } else {
+      turnOneStep(axis);
+      delayMicroseconds(SLOW_SPEED_DELAY);
     }
+  } else if (axis.isReferenced && axis.isMotorEnabled && currentTime - axis.previousStepTime > axis.speed &&
+            (axis.isClockwise && axis.position < axis.destination) || (!axis.isClockwise && axis.position > axis.destination)) {
+    turnOneStep(axis);
+    axis.previousStepTime = currentTime;
+  }
+}
+
+Axis axisByLetter(char letter) {
+  if (letter == 'X' || letter == 'x') {
+    return axisX;
+  } else if (letter == 'Y' || letter == 'y') {
+    return axisY;
+  } else if (letter == 'Z' || letter == 'z') {
+    return axisZ;
+  } else if (letter == 'W' || letter == 'w') {
+    return axisW;
+  } else {
+    return oups;
   }
 }
 
 void loop() {
-  unsigned long currentTime = micros();
+  currentTime = micros();
 
   if (Serial.available() > 0) {
     String input = Serial.readString();
@@ -200,87 +183,76 @@ void loop() {
 
     Serial.print("Cmd: ");
     Serial.println(input);
-    if (input == "riz\n") {
-      cookRice();
-    } else if (input[0] == "M") {
+    if (input[0] == "M") {
+      setMotorsEnabled(true);
       parseMove(input.substring(1));
-    } else if (input == "x") {
-      selectedAxis = selectedAxis == AXIS_X ? 0 : AXIS_X;
-    } else if (input == "y") {
-      selectedAxis = selectedAxis == AXIS_Y ? 0 : AXIS_Y;
-    } else if (input == "z") {
-      selectedAxis = selectedAxis == AXIS_Z ? 0 : AXIS_Z;
-    } else if (input.charAt(0) == 'v') { // speed
-      Serial.println(input.substring(1));
-      Serial.println(input.substring(1).toInt());
-      selectedSpeed = input.substring(1).toInt();
+    } else if (input.charAt(0) == 'V') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
+      axisByLetter(input.charAt(1)).speed = input.substring(2).toInt();
     } else if (input == "s") { // stop
       setMotorsEnabled(false);
-      destX = -1;
-      destY = -1;
-      destZ = -1;
-      destW = -1;
-    } else if (input == GCODE_HOME_ROUTINE) {
+    } else if (input == "H") { // home reference (eg. H, or HX, or HY, ...)
       setMotorsEnabled(true);
-      isReferencing = true;
+      if (input.length() == 1) {
+        axisX.isReferencing = true;
+        axisY.isReferencing = true;
+        axisZ.isReferencing = true;
+        axisW.isReferencing = true;
+      } else {
+        axisByLetter(input.charAt(1)).isReferencing = true;
+      }
     } else if (input == "?") { // debug info
       printDebugInfo();
     } else if (input == "+") {
       setMotorsDirection(CW);
       setMotorsEnabled(true);
-    } else if (input == "t") {
-      setMotorsDirection(CW);
-      setMotorsEnabled(true);
-      delayMicroseconds(2000000);
-      setMotorsEnabled(false);
     } else if (input == "-") {
       setMotorsDirection(CCW);
       setMotorsEnabled(true);
-    } else if (input == "m") { // manual
     }
   }
 
-  if (isReferencing) {
-    bool limitSwitchActivated = digitalRead(limitSwitchPin);
-    if (limitSwitchActivated) {
-      positionX = 0;
-      positionY = 0;
-      positionZ = 0;
-      positionW = 0;
-      //moveX(HOME_POSITION_X);
-      setMotorsEnabled(false);
-      isReferenced = true;
-      isReferencing = false;
-    } else {
-      turnOneStep();
-      delayMicroseconds(SLOW_SPEED_DELAY);
-    }
-  } else if (isReferenced && isMotorEnabled && currentTime - previousTime > selectedSpeed) {
-    turnOneStep();
-    previousTime = currentTime;
-  }
+  handleAxis(axisY);
 }
 
 void printDebugInfo() {
   Serial.println("***");
-  Serial.print("Axis: ");
-  Serial.println(selectedAxis);
+  printDebugAxis(axisY, "Y");
+}
+
+void printDebugAxis(Axis axis, String name) {
+  Serial.print("Axis ");
+  Serial.println(name);
+  
+  Serial.print("Pos: ");
+  Serial.println(axis.position);
+  Serial.print("Dest: ");
+  Serial.println(axis.destination);
   Serial.print("Speed: ");
-  Serial.println(selectedSpeed);
-  Serial.print("PositionX: ");
-  Serial.println(positionX);
-  Serial.print("Is manual mode: ");
-  Serial.println(isManualMode);
-  Serial.print("isReferenced: ");
-  Serial.println(isReferenced);
-  Serial.print("isReferencing: ");
-  Serial.println(isReferencing);
-  Serial.println("* In *");
-  Serial.print("Limit switch pin: ");
-  Serial.println(digitalRead(limitSwitchPin));
-  Serial.println("* Out *");
+  Serial.println(axis.speed);
+
+  Serial.print("CW: ");
+  Serial.println(axis.isClockwise);
+  Serial.print("Referenced: ");
+  Serial.println(axis.isReferenced);
+  Serial.print("Referencing: ");
+  Serial.println(axis.isReferencing);
   Serial.print("Enabled: ");
-  Serial.println(digitalRead(Y_MOTOR_ENABLED_PIN));
-  Serial.print("Dir: ");
-  Serial.println(digitalRead(Y_DIR_PIN));
+  Serial.println(axis.isMotorEnabled);
+  Serial.print("Step: ");
+  Serial.println(axis.isStepHigh);
+
+  Serial.print("PIN enabled: ");
+  Serial.println(digitalRead(axis.enabledPin));
+  Serial.print("PIN dir: ");
+  Serial.println(digitalRead(axis.dirPin));
+  Serial.print("PIN step: ");
+  Serial.println(digitalRead(axis.stepPin));
+  Serial.print("PIN limit switch: ");
+  Serial.println(digitalRead(axis.limitSwitchPin));
+}
+
+void printAxis(Axis axis) {
+  Serial.print(axis.position);
+  Serial.print(",");
+  Serial.print(digitalRead(axis.limitSwitchPin));
 }
