@@ -69,7 +69,8 @@ unsigned long currentTime;
 
 // setters for output pins
 void setMotorsEnabled(bool value) {
-  digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
+  digitalWrite(axisY.enabledPin, LOW); // FIXME: ALWAYS ENABLED
+  // FIXME: digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
   axisY.isMotorEnabled = value;
   
   digitalWrite(ledPin, value ? HIGH : LOW);
