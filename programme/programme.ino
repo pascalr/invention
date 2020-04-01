@@ -38,7 +38,7 @@
 #define ledPin 13
 
 // CONSTANTS
-#define SLOW_SPEED_DELAY 500
+#define SLOW_SPEED_DELAY 10000
 #define FAST_SPEED_DELAY 100
 
 #define CW true
@@ -59,6 +59,7 @@ struct axis
    bool isClockwise;
    bool isReferenced;
    bool isReferencing;
+   char name;
 };
 
 typedef struct axis Axis;
@@ -69,8 +70,8 @@ unsigned long currentTime;
 
 // setters for output pins
 void setMotorsEnabled(bool value) {
-  digitalWrite(axisY.enabledPin, LOW); // FIXME: ALWAYS ENABLED
-  // FIXME: digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
+  //digitalWrite(axisY.enabledPin, LOW); // FIXME: ALWAYS ENABLED
+  digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
   axisY.isMotorEnabled = value;
   
   digitalWrite(ledPin, value ? HIGH : LOW);
@@ -83,13 +84,14 @@ void setMotorsDirection(bool clockwise) {
   delayMicroseconds(SLOW_SPEED_DELAY);
 }
 
-void turnOneStep(Axis axis) {
+void turnOneStep(Axis& axis) {
   digitalWrite(axis.stepPin, axis.isStepHigh ? LOW : HIGH);
   axis.isStepHigh = !axis.isStepHigh;
   axis.position = axis.position + (axis.isClockwise ? 1 : -1);
 }
 
-void setupAxis(Axis axis, int speed) {
+void setupAxis(Axis& axis, char name, int speed) {
+  axis.name = name;
   axis.position = -1;
   axis.destination = -1;
   axis.previousStepTime = micros();
@@ -120,7 +122,7 @@ void setup() {
   axisY.limitSwitchPin = 12;
   // ***************************************
   
-  setupAxis(axisY, 300);
+  setupAxis(axisY, 'Y', 3000);
   
   setMotorsEnabled(false);
   setMotorsDirection(CW);
@@ -138,14 +140,19 @@ int numberLength(String str) {
 void parseMove(String cmd) {
   for (int i = 0; i < cmd.length(); i++) {
     int nbLength = numberLength(cmd.substring(i+1));
-    axisByLetter(cmd[i]).destination = cmd.substring(i+1,i+1+nbLength).toInt();
+    Axis& axis = axisByLetter(cmd[i]);
+    axis.destination = cmd.substring(i+1,i+1+nbLength).toInt();
+    setMotorsDirection(axis.destination > axis.position);
     i = i+nbLength;
   }
 }
 
-void handleAxis(Axis axis) {
+void handleAxis(Axis& axis) {
   if (axis.isReferencing) {
-    if (digitalRead(axis.limitSwitchPin)) {
+    //Serial.println(digitalRead(axis.limitSwitchPin));
+    if (!digitalRead(axis.limitSwitchPin)) {
+      Serial.print("Done referencing axis ");
+      Serial.println(axis.name);
       axis.position = 0;
       setMotorsEnabled(false);
       axis.isReferenced = true;
@@ -155,13 +162,13 @@ void handleAxis(Axis axis) {
       delayMicroseconds(SLOW_SPEED_DELAY);
     }
   } else if (axis.isReferenced && axis.isMotorEnabled && currentTime - axis.previousStepTime > axis.speed &&
-            (axis.isClockwise && axis.position < axis.destination) || (!axis.isClockwise && axis.position > axis.destination)) {
+            ((axis.isClockwise && axis.position < axis.destination) || (!axis.isClockwise && axis.position > axis.destination))) {
     turnOneStep(axis);
     axis.previousStepTime = currentTime;
   }
 }
 
-Axis axisByLetter(char letter) {
+Axis& axisByLetter(char letter) {
   if (letter == 'X' || letter == 'x') {
     return axisX;
   } else if (letter == 'Y' || letter == 'y') {
@@ -180,18 +187,19 @@ void loop() {
 
   if (Serial.available() > 0) {
     String input = Serial.readString();
-    input[input.length()-1] = '\0'; // remove trailing newline char
+    input.remove(input.length()-1);
 
     Serial.print("Cmd: ");
     Serial.println(input);
-    if (input[0] == "M") {
+    if (input.charAt(0) == 'M') {
       setMotorsEnabled(true);
       parseMove(input.substring(1));
     } else if (input.charAt(0) == 'V') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
       axisByLetter(input.charAt(1)).speed = input.substring(2).toInt();
-    } else if (input == "s") { // stop
+    } else if (input.charAt(0) == 's') { // stop
       setMotorsEnabled(false);
-    } else if (input == "H") { // home reference (eg. H, or HX, or HY, ...)
+    } else if (input.charAt(0) == 'H') { // home reference (eg. H, or HX, or HY, ...)
+      Serial.println("Referencing...");
       setMotorsEnabled(true);
       if (input.length() == 1) {
         axisX.isReferencing = true;
@@ -217,12 +225,12 @@ void loop() {
 
 void printDebugInfo() {
   Serial.println("***");
-  printDebugAxis(axisY, "Y");
+  printDebugAxis(axisY);
 }
 
-void printDebugAxis(Axis axis, String name) {
+void printDebugAxis(Axis& axis) {
   Serial.print("Axis ");
-  Serial.println(name);
+  Serial.println(axis.name);
   
   Serial.print("Pos: ");
   Serial.println(axis.position);
@@ -252,7 +260,7 @@ void printDebugAxis(Axis axis, String name) {
   Serial.println(digitalRead(axis.limitSwitchPin));
 }
 
-void printAxis(Axis axis) {
+void printAxis(Axis& axis) {
   Serial.print(axis.position);
   Serial.print(",");
   Serial.print(digitalRead(axis.limitSwitchPin));

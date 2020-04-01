@@ -27,3 +27,35 @@ Mon moteur a un angle de 1.8 degree, donc 200 step. A 1000 rpm comme vitesse moy
 Ah c'est le TB6600 qui fuck les affaires en rajoutant des microsteps!!!
 
 https://www.thingiverse.com/thing:321077/comments
+
+Motor wiring:
+https://www.orientalmotor.com/stepper-motors/technology/unipolar-bipolar-connections.html
+
+Cable drums.
+
+Un tour de plus pour que le cable reste en tension.
+
+A typical drum has a 4" diameter which means that each full wind (4 quarter turns) will give about 12.5 inches of lift height. Usually about 1 extra wind is added so the cable stays in tension. You should end up using about 7.5 to 8 turns for a 7' door and about 1 additional turn for an 8' door.
+
+Mon déplacement est de 60" - à peu près 10" (la hauteur de roue à roue). Donc 50" de déplacement.
+
+Mon diamètre de drum est de 1.25" - 1/16" = 1.1875"
+1.1875" * PI = 3.73"
+
+50" / 3.73" = 13.4
+
+Un tour de plus est rajouter pour maintenir de la tension.
+
+Donc 14.5 tour.
+
+Pour l'instant, le poids est de 2.5 kg. Il reste risque d'être de 4-5 kg sans charge.
+
+Après un angle de 360 degrés * 14.5 = 5220 degrés, il doit exercé pouvoir soulever une charge de 4 kg.
+
+Une force de 4 kg (8.82 lbs) est appliqué sur le drum à 0.59375" (rayon du drum). Donc un moment de 5.24 lb*po doit être engendré par le ressort après 5220 degrés (91.1 radians).
+
+Mon drum est de 
+
+Double torsion springs can be used when twice the force is required or when you need an even distribution of torque
+
+Torsion springs should be deflected in the direction that closes the coils
