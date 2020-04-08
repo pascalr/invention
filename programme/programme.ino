@@ -46,9 +46,9 @@
 
 struct axis
 {
-   int position;
-   int destination;
-   int speed;
+   unsigned long position;
+   unsigned long destination;
+   unsigned int speed;
    int enabledPin;
    int dirPin;
    int stepPin;
@@ -137,6 +137,15 @@ int numberLength(String str) {
   return i;
 }
 
+void parseSpeed(String cmd) {
+  for (int i = 0; i < cmd.length(); i++) {
+    int nbLength = numberLength(cmd.substring(i+1));
+    Axis& axis = axisByLetter(cmd[i]);
+    axis.speed = cmd.substring(i+1,i+1+nbLength).toInt();
+    i = i+nbLength;
+  }
+}
+
 void parseMove(String cmd) {
   for (int i = 0; i < cmd.length(); i++) {
     int nbLength = numberLength(cmd.substring(i+1));
@@ -191,14 +200,18 @@ void loop() {
 
     Serial.print("Cmd: ");
     Serial.println(input);
-    if (input.charAt(0) == 'M') {
+    if (input.charAt(0) == 'M' || input.charAt(0) == 'm') {
       setMotorsEnabled(true);
       parseMove(input.substring(1));
-    } else if (input.charAt(0) == 'V') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
-      axisByLetter(input.charAt(1)).speed = input.substring(2).toInt();
-    } else if (input.charAt(0) == 's') { // stop
-      setMotorsEnabled(false);
-    } else if (input.charAt(0) == 'H') { // home reference (eg. H, or HX, or HY, ...)
+    } else if (input.charAt(0) == 'V' || input.charAt(0) == 'v') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
+      parseSpeed(input.substring(1));
+    } else if (input.charAt(0) == 's' || input.charAt(0) == 'S') { // stop
+      //setMotorsEnabled(false);
+      axisX.destination = axisX.position;
+      axisY.destination = axisY.position;
+      axisZ.destination = axisZ.position;
+      axisW.destination = axisW.position;
+    } else if (input.charAt(0) == 'H' || input.charAt(0) == 'h') { // home reference (eg. H, or HX, or HY, ...)
       Serial.println("Referencing...");
       setMotorsEnabled(true);
       if (input.length() == 1) {
