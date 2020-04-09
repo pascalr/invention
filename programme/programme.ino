@@ -122,7 +122,7 @@ void setup() {
   axisY.limitSwitchPin = 12;
   // ***************************************
   
-  setupAxis(axisY, 'Y', 3000);
+  setupAxis(axisY, 'Y', 500);
   
   setMotorsEnabled(false);
   setMotorsDirection(CW);
