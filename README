@@ -1,10 +1,3 @@
-Une poulie conique si jamais le cable ne s'enroule pas bien autour.
-Ouin mais c'est de la marde parce que ça ferait une vitesse pas constante. Laisse tomber!
-
-IMPROVEMENTS:
-
-Rapprocher le chariot du fond. Mettre les bushing directement sur le fer angle du coin au lieu d'une petite plaque déportée.
-
 ----
 
 Charge maximale: 2 kg (un grand pot rempli d'eau)
@@ -74,6 +67,10 @@ Acheter truc pour tie-wrapper les fils.
 Acheter Un bouton arrêt d'urgence.
 Acheter d'autres limit switch. (3 par axes p-ê, référence et out-of-bonds)
 Le out-of-bounds plus tard, quand le ressort va être installer, sinon bye bye limit switch haha.
+Acheter #8-32 X 0.75"
+Acheter #10-24
 
 TODO: Un test de résistance du truc pour tenir les cables.
+Spécifier la charge maximale.
 
+https://medium.com/@machadogj/arduino-and-node-js-via-serial-port-bcf9691fab6a
