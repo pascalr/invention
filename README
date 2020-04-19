@@ -57,8 +57,6 @@ Aimants avec ce que l'ingrédient est dessus mes pots.
 
 https://addison-electronique.com/produits/filage/fils-et-accessoires/terminaux-borniers-et-connecteurs/
 
-Acheter des borniers pour la connection des moteurs et switchs.
-Acheter une boite de jonction pour le moteur en haut, avec borniers surtout! Au pire je fabrique une boite de jonction moi-même en tôle pour cacher les connections. Encore mieux avec mon imprimante 3d. Encore mieux, acheter qqchose qui existe déjà.
 Acheter bande d'acier (strapping).
 Acheter tôle.
 Acheter 50 ft de broche plus grosse (2 formats p-ê)
@@ -74,3 +72,5 @@ TODO: Un test de résistance du truc pour tenir les cables.
 Spécifier la charge maximale.
 
 https://medium.com/@machadogj/arduino-and-node-js-via-serial-port-bcf9691fab6a
+
+Un cable drum avec un centre hexagonal pour pouvoir etre entrainer pour tourner tout en pouvant se deplacer, comme ca ca suivrait le cable en meme temps.
