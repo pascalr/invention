@@ -38,7 +38,7 @@
 #define ledPin 13
 
 // CONSTANTS
-#define SLOW_SPEED_DELAY 10000
+#define SLOW_SPEED_DELAY 2000
 #define FAST_SPEED_DELAY 100
 
 #define CW true
@@ -126,7 +126,7 @@ void setup() {
   // ***************************************
   
   setupAxis(axisY, 'Y', 500);
-  axisY.maxPosition = 28000;
+  axisY.maxPosition = 999999;
   
   setMotorsEnabled(false);
   setMotorsDirection(CW);
@@ -222,6 +222,7 @@ void loop() {
       axisW.forceRotation = false;
     } else if (input.charAt(0) == 'H' || input.charAt(0) == 'h') { // home reference (eg. H, or HX, or HY, ...)
       Serial.println("Referencing...");
+      setMotorsDirection(CCW);
       setMotorsEnabled(true);
       if (input.length() == 1) {
         axisX.isReferencing = true;
