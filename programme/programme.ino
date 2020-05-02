@@ -70,18 +70,17 @@ Axis axisX, axisY, axisZ, axisW, oups;
 
 unsigned long currentTime;
 
-// setters for output pins
-void setMotorsEnabled(bool value) {
-  digitalWrite(axisY.enabledPin, LOW); // FIXME: ALWAYS ENABLED
+void setMotorEnabled(Axis& axis, bool value) {
+  digitalWrite(axis.enabledPin, LOW); // FIXME: ALWAYS ENABLED
   //digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
-  axisY.isMotorEnabled = value;
+  axis.isMotorEnabled = value;
   
   digitalWrite(ledPin, value ? HIGH : LOW);
 }
 
-void setMotorsDirection(bool clockwise) {
-  digitalWrite(axisY.dirPin, clockwise ? LOW : HIGH);
-  axisY.isClockwise = clockwise;
+void setMotorDirection(Axis& axis, bool clockwise) {
+  digitalWrite(axis.dirPin, clockwise ? LOW : HIGH);
+  axis.isClockwise = clockwise;
   
   delayMicroseconds(SLOW_SPEED_DELAY);
 }
@@ -119,17 +118,34 @@ void setup() {
   // ************* PIN LAYOUT **************
   pinMode(ledPin, OUTPUT);
   
+  axisX.enabledPin = 8;
+  axisX.dirPin = 10;
+  axisX.stepPin = 11;
+  axisX.limitSwitchPin = 12;
+
   axisY.enabledPin = 8;
   axisY.dirPin = 2;
   axisY.stepPin = 3;
   axisY.limitSwitchPin = 12;
+
+  axisZ.enabledPin = 8;
+  axisZ.dirPin = 7;
+  axisZ.stepPin = 6;
+  axisZ.limitSwitchPin = 12;
   // ***************************************
-  
+
+  setupAxis(axisX, 'X', 500);
   setupAxis(axisY, 'Y', 500);
-  axisY.maxPosition = 999999;
+  setupAxis(axisZ, 'Z', 500);
   
-  setMotorsEnabled(false);
-  setMotorsDirection(CW);
+  axisX.maxPosition = 999999;
+  axisY.maxPosition = 999999;
+  axisZ.maxPosition = 999999;
+  
+  setMotorEnabled(axisX,false);
+  setMotorEnabled(axisY,false);
+  setMotorEnabled(axisZ,false);
+  
   Serial.println("Done");
 }
 
@@ -156,7 +172,8 @@ void parseMove(String cmd) {
     Axis& axis = axisByLetter(cmd[i]);
     axis.destination = cmd.substring(i+1,i+1+nbLength).toInt();
     if (axis.destination > axis.maxPosition) {axis.destination = axis.maxPosition;}
-    setMotorsDirection(axis.destination > axis.position);
+    setMotorEnabled(axis, true);
+    setMotorDirection(axis, axis.destination > axis.position);
     i = i+nbLength;
   }
 }
@@ -168,7 +185,7 @@ void handleAxis(Axis& axis) {
       Serial.print("Done referencing axis ");
       Serial.println(axis.name);
       axis.position = 0;
-      setMotorsEnabled(false);
+      setMotorEnabled(axis, false);
       axis.isReferenced = true;
       axis.isReferencing = false;
     } else {
@@ -206,7 +223,6 @@ void loop() {
     Serial.print("Cmd: ");
     Serial.println(input);
     if (input.charAt(0) == 'M' || input.charAt(0) == 'm') {
-      setMotorsEnabled(true);
       parseMove(input.substring(1));
     } else if (input.charAt(0) == 'V' || input.charAt(0) == 'v') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
       parseSpeed(input.substring(1));
@@ -222,34 +238,47 @@ void loop() {
       axisW.forceRotation = false;
     } else if (input.charAt(0) == 'H' || input.charAt(0) == 'h') { // home reference (eg. H, or HX, or HY, ...)
       Serial.println("Referencing...");
-      setMotorsDirection(CCW);
-      setMotorsEnabled(true);
       if (input.length() == 1) {
         axisX.isReferencing = true;
         axisY.isReferencing = true;
         axisZ.isReferencing = true;
         axisW.isReferencing = true;
+        setMotorDirection(axisX, CCW);
+        setMotorDirection(axisY, CCW);
+        setMotorDirection(axisZ, CCW);
+        setMotorEnabled(axisX, true);
+        setMotorEnabled(axisY, true);
+        setMotorEnabled(axisZ, true);
       } else {
-        axisByLetter(input.charAt(1)).isReferencing = true;
+        Axis& axis = axisByLetter(input.charAt(1));
+        axis.isReferencing = true;
+        setMotorDirection(axis, CCW);
+        setMotorEnabled(axis, true);
       }
     } else if (input == "?") { // debug info
       printDebugInfo();
     } else if (input.charAt(0) == '+') {
-      setMotorsDirection(CW);
-      axisByLetter(input.charAt(1)).forceRotation = true;
-      setMotorsEnabled(true);
+      Axis& axis = axisByLetter(input.charAt(1));
+      setMotorDirection(axis,CW);
+      axis.forceRotation = true;
+      setMotorEnabled(axis,true);
     } else if (input.charAt(0) == '-') {
-      setMotorsDirection(CCW);
-      axisByLetter(input.charAt(1)).forceRotation = true;
-      setMotorsEnabled(true);
+      Axis& axis = axisByLetter(input.charAt(1));
+      setMotorDirection(axis,CCW);
+      axis.forceRotation = true;
+      setMotorEnabled(axis, true);
     }
   }
 
+  handleAxis(axisX);
   handleAxis(axisY);
+  handleAxis(axisZ);
 }
 
 void printDebugInfo() {
+  printDebugAxis(axisX);
   printDebugAxis(axisY);
+  printDebugAxis(axisZ);
 }
 
 void printDebugAxis(Axis& axis) {
