@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+
+# Macro Begin: /home/pascalr/invention/macros/FourHoles.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
+import FreeCAD
+import Sketcher
+
+geoList = []
+geoList.append(Part.LineSegment(App.Vector(-17.667292,19.752318,0),App.Vector(17.555857,19.752318,0)))
+geoList.append(Part.LineSegment(App.Vector(17.555857,19.752318,0),App.Vector(17.555857,-19.893488,0)))
+geoList.append(Part.LineSegment(App.Vector(17.555857,-19.893488,0),App.Vector(-17.667292,-19.893488,0)))
+geoList.append(Part.LineSegment(App.Vector(-17.667292,-19.893488,0),App.Vector(-17.667292,19.752318,0)))
+App.ActiveDocument.Sketch.addGeometry(geoList,True)
+conList = []
+conList.append(Sketcher.Constraint('Coincident',0,2,1,1))
+conList.append(Sketcher.Constraint('Coincident',1,2,2,1))
+conList.append(Sketcher.Constraint('Coincident',2,2,3,1))
+conList.append(Sketcher.Constraint('Coincident',3,2,0,1))
+conList.append(Sketcher.Constraint('Horizontal',0))
+conList.append(Sketcher.Constraint('Horizontal',2))
+conList.append(Sketcher.Constraint('Vertical',1))
+conList.append(Sketcher.Constraint('Vertical',3))
+App.ActiveDocument.Sketch.addConstraint(conList)
+
+App.ActiveDocument.Sketch.addGeometry(Part.Circle(App.Vector(17.555857,19.757477,0),App.Vector(0,0,1),6.211689),False)
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Coincident',4,3,0,2)) 
+App.ActiveDocument.Sketch.addGeometry(Part.Circle(App.Vector(-17.667292,19.762636,0),App.Vector(0,0,1),5.967781),False)
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Coincident',5,3,0,1)) 
+App.ActiveDocument.Sketch.addGeometry(Part.Circle(App.Vector(-17.667292,-19.888329,0),App.Vector(0,0,1),4.364973),False)
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Coincident',6,3,2,2)) 
+App.ActiveDocument.Sketch.addGeometry(Part.Circle(App.Vector(17.405972,-20.056638,0),App.Vector(0,0,1),7.960098),False)
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Coincident',7,3,1,2)) 
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Equal',7,4)) 
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Equal',4,5)) 
+App.ActiveDocument.Sketch.addConstraint(Sketcher.Constraint('Equal',5,6)) 
+# Macro End: /home/pascalr/invention/macros/FourHoles.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
