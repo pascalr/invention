@@ -1,0 +1,4 @@
+obj = App.ActiveDocument.addObject("App::FeaturePython", "App__FeaturePython")
+obj.Label = "THREAD"
+obj.addProperty("App::PropertyLength","Length","THREAD","Length of the thread").Length=1.0
+obj.addProperty("App::PropertyFloat","TPI","THREAD","Number of teeth per inch").Length=1.0
