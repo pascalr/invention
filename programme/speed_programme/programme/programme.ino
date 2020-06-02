@@ -8,9 +8,6 @@
 #define CW true
 #define CCW false
 
-// Linear axes units are mm. Rotary axes units are degrees.
-#define CALC_STEPS_PER_UNIT(MOTOR_STEPS_PER_TURN, MICROSTEPPING, DISTANCE_PER_TURN)  (MOTOR_STEPS_PER_TURN * MICROSTEPPING / DISTANCE_PER_TURN)
-
 class Axis {
   public:
     Axis() {
@@ -25,7 +22,7 @@ class Axis {
     int stepPin;
     int limitSwitchPin;
     unsigned long previousStepTime;
-    double stepsPerUnit;
+    double stepsPerUnit; // Linear axes units are mm. Rotary axes units are degrees.
     bool isStepHigh;
     bool isMotorEnabled;
     bool isClockwise;
@@ -56,6 +53,20 @@ class HorizontalAxis: public Axis {
 
 Axis axisY, axisT, axisW, oups;
 HorizontalAxis axisX;
+
+Axis& axisByLetter(char letter) {
+  if (letter == 'X' || letter == 'x') {
+    return axisX;
+  } else if (letter == 'Y' || letter == 'y') {
+    return axisY;
+  } else if (letter == 'Z' || letter == 'z') {
+    return axisT;
+  } else if (letter == 'W' || letter == 'w') {
+    return axisW;
+  } else {
+    return oups;
+  }
+}
 
 unsigned long currentTime;
 
@@ -131,9 +142,11 @@ void setup() {
   axisY.maxPosition = 999999;
   axisT.maxPosition = 999999;
 
-  axisX.stepsPerUnit = CALC_STEPS_PER_UNIT(200, 8, 2.625*25.4*3.1416);
-  axisY.stepsPerUnit = CALC_STEPS_PER_UNIT(200, 8, 1.25*25.4*3.1416);
-  axisT.stepsPerUnit = CALC_STEPS_PER_UNIT(200, 8, 360*61/12);
+  // Linear axes units are mm. Rotary axes units are degrees.
+  // Number of steps per turn of the motor * microstepping / distance per turn
+  axisX.stepsPerUnit = 200 * 8 / (1.25*25.4*3.1416);
+  axisY.stepsPerUnit = 200 * 8 / (2.625*25.4*3.1416);
+  axisT.stepsPerUnit = 200 * 8 / (360*61/12);
   
   setMotorEnabled(axisX,false);
   setMotorEnabled(axisY,false);
@@ -178,6 +191,7 @@ void handleAxis(Axis& axis) {
       Serial.print("Done referencing axis ");
       Serial.println(axis.name);
       axis.position = 0;
+      axis.destination = 0;
       setMotorEnabled(axis, false);
       axis.isReferenced = true;
       axis.isReferencing = false;
@@ -193,20 +207,6 @@ void handleAxis(Axis& axis) {
     } else {
       axis.previousStepTime = axis.previousStepTime + axis.speed; // This is more accurate to ensure all the motors are synchronysed
     }
-  }
-}
-
-Axis& axisByLetter(char letter) {
-  if (letter == 'X' || letter == 'x') {
-    return axisX;
-  } else if (letter == 'Y' || letter == 'y') {
-    return axisY;
-  } else if (letter == 'Z' || letter == 'z') {
-    return axisT;
-  } else if (letter == 'W' || letter == 'w') {
-    return axisW;
-  } else {
-    return oups;
   }
 }
 
@@ -343,6 +343,11 @@ void printDebugAxis(Axis& axis) {
   Serial.print(axis.name);
   Serial.print(": ");
   Serial.println(digitalRead(axis.limitSwitchPin));
+
+  Serial.print("-stepsPerUnit ");
+  Serial.print(axis.name);
+  Serial.print(": ");
+  Serial.println(axis.stepsPerUnit);
 }
 
 void printAxis(Axis& axis) {
