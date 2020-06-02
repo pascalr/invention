@@ -10,9 +10,32 @@
 
 class Axis {
   public:
+  
     Axis() {
-      
     }
+
+    void turnOneStep() {
+      digitalWrite(stepPin, isStepHigh ? LOW : HIGH);
+      isStepHigh = !isStepHigh;
+      position = position + (isClockwise ? 1 : -1);
+    }
+    
+    void setMotorEnabled(bool value) {
+      digitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
+      //digitalWrite(enabledPin, value ? LOW : HIGH);
+      isMotorEnabled = value;
+    
+      digitalWrite(ledPin, value ? HIGH : LOW);
+    }
+
+    void setMotorDirection(bool clockwise) {
+      digitalWrite(dirPin, clockwise ? LOW : HIGH);
+      isClockwise = clockwise;
+      
+      delayMicroseconds(SLOW_SPEED_DELAY);
+    }
+  
+  //private:
     unsigned long position;
     unsigned long destination;
     unsigned long maxPosition;
@@ -70,27 +93,6 @@ Axis& axisByLetter(char letter) {
 
 unsigned long currentTime;
 
-void setMotorEnabled(Axis& axis, bool value) {
-  digitalWrite(axis.enabledPin, LOW); // FIXME: ALWAYS ENABLED
-  //digitalWrite(axisY.enabledPin, value ? LOW : HIGH);
-  axis.isMotorEnabled = value;
-  
-  digitalWrite(ledPin, value ? HIGH : LOW);
-}
-
-void setMotorDirection(Axis& axis, bool clockwise) {
-  digitalWrite(axis.dirPin, clockwise ? LOW : HIGH);
-  axis.isClockwise = clockwise;
-  
-  delayMicroseconds(SLOW_SPEED_DELAY);
-}
-
-void turnOneStep(Axis& axis) {
-  digitalWrite(axis.stepPin, axis.isStepHigh ? LOW : HIGH);
-  axis.isStepHigh = !axis.isStepHigh;
-  axis.position = axis.position + (axis.isClockwise ? 1 : -1);
-}
-
 void setupAxis(Axis& axis, char name, int speed) {
   axis.name = name;
   axis.position = -1;
@@ -144,13 +146,13 @@ void setup() {
 
   // Linear axes units are mm. Rotary axes units are degrees.
   // Number of steps per turn of the motor * microstepping / distance per turn
-  axisX.stepsPerUnit = 200 * 8 / (1.25*25.4*3.1416);
-  axisY.stepsPerUnit = 200 * 8 / (2.625*25.4*3.1416);
-  axisT.stepsPerUnit = 200 * 8 / (360*61/12);
+  axisX.stepsPerUnit = 200 * 16 / (1.25*25.4*3.1416);
+  axisY.stepsPerUnit = 200 * 16 / (2.625*25.4*3.1416);
+  axisT.stepsPerUnit = 200 * 16 / (360*61/12);
   
-  setMotorEnabled(axisX,false);
-  setMotorEnabled(axisY,false);
-  setMotorEnabled(axisT,false);
+  axisX.setMotorEnabled(false);
+  axisY.setMotorEnabled(false);
+  axisT.setMotorEnabled(false);
   
   Serial.println("Done");
 }
@@ -178,8 +180,8 @@ void parseMove(String cmd) {
     Axis& axis = axisByLetter(cmd[i]);
     axis.destination = cmd.substring(i+1,i+1+nbLength).toInt() * axis.stepsPerUnit;
     if (axis.destination > axis.maxPosition) {axis.destination = axis.maxPosition;}
-    setMotorEnabled(axis, true);
-    setMotorDirection(axis, axis.destination > axis.position);
+    axis.setMotorEnabled(true);
+    axis.setMotorDirection(axis.destination > axis.position);
     i = i+nbLength;
   }
 }
@@ -192,16 +194,16 @@ void handleAxis(Axis& axis) {
       Serial.println(axis.name);
       axis.position = 0;
       axis.destination = 0;
-      setMotorEnabled(axis, false);
+      axis.setMotorEnabled(false);
       axis.isReferenced = true;
       axis.isReferencing = false;
     } else {
-      turnOneStep(axis);
+      axis.turnOneStep();
       delayMicroseconds(SLOW_SPEED_DELAY);
     }
   } else if (axis.isReferenced && axis.isMotorEnabled && currentTime - axis.previousStepTime > axis.speed && (axis.forceRotation ||
             ((axis.isClockwise && axis.position < axis.destination) || (!axis.isClockwise && axis.position > axis.destination)))) {
-    turnOneStep(axis);
+    axis.turnOneStep();
     if (currentTime - axis.previousStepTime > 2*axis.speed) {
       axis.previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
     } else {
@@ -240,30 +242,30 @@ void loop() {
         axisY.isReferencing = true;
         axisT.isReferencing = true;
         axisW.isReferencing = true;
-        setMotorDirection(axisX, CCW);
-        setMotorDirection(axisY, CCW);
-        setMotorDirection(axisT, CCW);
-        setMotorEnabled(axisX, true);
-        setMotorEnabled(axisY, true);
-        setMotorEnabled(axisT, true);
+        axisX.setMotorDirection(CCW);
+        axisY.setMotorDirection(CCW);
+        axisT.setMotorDirection(CCW);
+        axisX.setMotorEnabled(true);
+        axisY.setMotorEnabled(true);
+        axisT.setMotorEnabled(true);
       } else {
         Axis& axis = axisByLetter(input.charAt(1));
         axis.isReferencing = true;
-        setMotorDirection(axis, CCW);
-        setMotorEnabled(axis, true);
+        axis.setMotorDirection(CCW);
+        axis.setMotorEnabled(true);
       }
     } else if (input == "?") { // debug info
       printDebugInfo();
     } else if (input.charAt(0) == '+') {
       Axis& axis = axisByLetter(input.charAt(1));
-      setMotorDirection(axis,CW);
+      axis.setMotorDirection(CW);
       axis.forceRotation = true;
-      setMotorEnabled(axis,true);
+      axis.setMotorEnabled(true);
     } else if (input.charAt(0) == '-') {
       Axis& axis = axisByLetter(input.charAt(1));
-      setMotorDirection(axis,CCW);
+      axis.setMotorDirection(CCW);
       axis.forceRotation = true;
-      setMotorEnabled(axis, true);
+      axis.setMotorEnabled(true);
     }
   }
 
