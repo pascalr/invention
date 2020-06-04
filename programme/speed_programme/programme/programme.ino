@@ -8,6 +8,8 @@
 #define CW true
 #define CCW false
 
+#define RAYON 380
+
 class Axis {
   public:
   
@@ -38,6 +40,10 @@ class Axis {
       setMotorEnabled(true);
     }
 
+    double getPositionUnit() {
+      return position/stepsPerUnit;
+    }
+
     void stop() {
       //setMotorsEnabled(false);
       destination = position;
@@ -48,6 +54,13 @@ class Axis {
       digitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
       position = position + (isClockwise ? 1 : -1);
+    }
+
+    void setDestinationUnit(unsigned long dest) {
+      destination = dest * stepsPerUnit;
+      if (destination > maxPosition) {destination = maxPosition;}
+      setMotorEnabled(true);
+      setMotorDirection(destination > position);
     }
     
     void setMotorEnabled(bool value) {
@@ -87,30 +100,34 @@ class Axis {
     }
 
     void handleAxis(unsigned long currentTime) {
+      unsigned int delay = getDelay();
       if (isReferencing) {
         moveToReference();
-      } else if (isReferenced && isMotorEnabled && currentTime - previousStepTime > speed && (forceRotation ||
+      } else if (isReferenced && isMotorEnabled && currentTime - previousStepTime > delay && (forceRotation ||
                 ((isClockwise && position < destination) || (!isClockwise && position > destination)))) {
         turnOneStep();
-        if (currentTime - previousStepTime > 2*speed) {
+        if (currentTime - previousStepTime > 2*delay) {
           previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
         } else {
-          previousStepTime = previousStepTime + speed; // This is more accurate to ensure all the motors are synchronysed
+          previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
         }
       }
     }
   
   //protected:
-    unsigned long position;
-    unsigned long destination;
-    unsigned long maxPosition;
-    unsigned int speed;
+    unsigned long position; // position in steps
+    unsigned long destination; // destination in steps
+    unsigned long maxPosition;  // max position in steps
+    unsigned int speed; // speed in microseconds
+    double stepsPerUnit; // Linear axes units are mm. Rotary axes units are degrees.
+    
     int enabledPin;
     int dirPin;
     int stepPin;
     int limitSwitchPin;
+    
     unsigned long previousStepTime;
-    double stepsPerUnit; // Linear axes units are mm. Rotary axes units are degrees.
+    
     bool isStepHigh;
     bool isMotorEnabled;
     bool isClockwise;
@@ -132,12 +149,20 @@ class HorizontalAxis: public Axis {
     HorizontalAxis(char theName, int theSpeed) : Axis(theName,theSpeed) {
       
     }
+
+    void setRotationAxis(Axis* axis) {
+      m_rotation_axis = axis;
+    }
   
-  unsigned int getDelay() {
-    // Vx = r* W * sin(theta)
-    // TODO: The speed is not fixed.
-    return speed;
-  }
+    unsigned int getDelay() {
+      double theta = m_rotation_axis->getPositionUnit();
+      // Vx = r* W * sin(theta)
+      // TODO: The speed is not fixed.
+      return speed;
+    }
+
+  private:
+    Axis* m_rotation_axis;
 };
 
 class VerticalAxis: public Axis {
@@ -192,6 +217,8 @@ void setup() {
   axisX = new HorizontalAxis('X',500);
   axisY = new VerticalAxis('Y',500);
   axisT = new Axis('Z', 500);
+
+  axisX->setRotationAxis(axisT);
   
   axisT->enabledPin = 8;
   axisT->dirPin = 10;
@@ -241,22 +268,27 @@ void parseSpeed(String cmd) {
     Axis* axis = axisByLetter(cmd[i]);
     if (axis) {
       axis->speed = cmd.substring(i+1,i+1+nbLength).toInt();
-      i = i+nbLength;
     }
+    i = i+nbLength;
   }
 }
 
 void parseMove(String cmd) {
   for (int i = 0; i < cmd.length(); i++) {
     int nbLength = numberLength(cmd.substring(i+1));
-    Axis* axis = axisByLetter(cmd[i]);
-    if (axis) {
-      axis->destination = cmd.substring(i+1,i+1+nbLength).toInt() * axis->stepsPerUnit;
-      if (axis->destination > axis->maxPosition) {axis->destination = axis->maxPosition;}
-      axis->setMotorEnabled(true);
-      axis->setMotorDirection(axis->destination > axis->position);
-      i = i+nbLength;
+    if (cmd[i] == 'Z' || cmd[i] == 'z') {
+      int destination = cmd.substring(i+1,i+1+nbLength).toInt();
+      if (destination > 0 && destination <= RAYON) {
+        double angle = asin(destination / RAYON) * 180.0 / PI;
+        axisT->setDestinationUnit(angle);
+      }
+    } else {
+      Axis* axis = axisByLetter(cmd[i]);
+      if (axis) {
+        axis->setDestinationUnit(cmd.substring(i+1,i+1+nbLength).toInt());
+      }
     }
+    i = i+nbLength;
   }
 }
 
