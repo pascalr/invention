@@ -1,4 +1,6 @@
 #include "axis.h"
+#include "setup.h"
+#include "common.h" 
 
 // CONSTANTS
 #define SLOW_SPEED_DELAY 2000
@@ -32,16 +34,7 @@ Axis* axisT;
 VerticalAxis* axisY;
 HorizontalAxis* axisX;
 
-Axis* axisByLetter(char letter) {
-  if (letter == 'X' || letter == 'x') {
-    return axisX;
-  } else if (letter == 'Y' || letter == 'y') {
-    return axisY;
-  } else if (letter == 'Z' || letter == 'z') {
-    return axisT;
-  }
-  return NULL;
-}
+Axis* axes[NB_AXES];
 
 void setup() {
 
@@ -49,84 +42,26 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Setup...");
 
-  // ************* PIN LAYOUT **************
-  writer = new ArduinoWriter();
-
   // FIXME: Do you need to delete?
   // The setup function is only ran once
-  axisX = new HorizontalAxis(writer, 'X',500);
-  axisY = new VerticalAxis(writer, 'Y',500);
-  axisT = new Axis(writer, 'Z', 500);
-
-  axisX->setRotationAxis(axisT);
-  
-  axisT->enabledPin = 8;
-  axisT->dirPin = 10;
-  axisT->stepPin = 11;
-  axisT->limitSwitchPin = 12;
-
-  axisX->enabledPin = 8;
-  axisX->dirPin = 2;
-  axisX->stepPin = 3;
-  axisX->limitSwitchPin = 12;
-
-  axisY->enabledPin = 8;
-  axisY->dirPin = 7;
-  axisY->stepPin = 6;
-  axisY->limitSwitchPin = 12;
-  // ***************************************
-  
-  axisX->setupPins();
-  axisY->setupPins();
-  axisT->setupPins();
-
-  // Linear axes units are mm. Rotary axes units are degrees.
-  // Number of steps per turn of the motor * microstepping / distance per turn
-  // The value is multiplied by two because we have to write LOW then HIGH for one step
-  axisX->stepsPerUnit = 200 * 2 * 8 / (1.25*25.4*3.1416);
-  axisY->stepsPerUnit = 200 * 2 * 8 / (2.625*25.4*3.1416);
-  axisT->stepsPerUnit = 200 * 2 * 8 / (360*12/61);
-  
-  axisX->setMotorEnabled(false);
-  axisY->setMotorEnabled(false);
-  axisT->setMotorEnabled(false);
+  writer = new ArduinoWriter();
+  axisX = new HorizontalAxis(writer, 'X');
+  axisY = new VerticalAxis(writer, 'Y');
+  axisT = new Axis(writer, 'T');
+  axes[0] = axisX;
+  axes[1] = axisY;
+  axes[2] = axisT;
+  setupAxes(writer, axisX, axisY, axisT);
   
   Serial.println("Done");
-}
-
-int numberLength(String str) {
-  int i;
-  for (i = 0; i < str.length(); i++) {
-    if (str[i] < '0' || str[i] > '9') {break;}
-  }
-  return i;
 }
 
 void parseSpeed(String cmd) {
   for (int i = 0; i < cmd.length(); i++) {
     int nbLength = numberLength(cmd.substring(i+1));
-    Axis* axis = axisByLetter(cmd[i]);
+    Axis* axis = axisByLetter(axes, cmd[i]);
     if (axis) {
       axis->speed = cmd.substring(i+1,i+1+nbLength).toInt();
-    }
-    i = i+nbLength;
-  }
-}
-
-void parseMove(String cmd) {
-  for (int i = 0; i < cmd.length(); i++) {
-    int nbLength = numberLength(cmd.substring(i+1));
-    if (cmd[i] == 'Z' || cmd[i] == 'z') {
-      int destination = cmd.substring(i+1,i+1+nbLength).toInt();
-      if (destination > 0 && destination <= RAYON) {
-        double angle = asin(destination / RAYON) * 180.0 / PI;
-        axisT->setDestinationUnit(angle);
-      }
-    } else {
-      Axis* axis = axisByLetter(cmd[i]);
-      if (axis) {
-        axis->setDestinationUnit(cmd.substring(i+1,i+1+nbLength).toInt());
-      }
     }
     i = i+nbLength;
   }
@@ -142,7 +77,7 @@ void loop() {
     Serial.print("Cmd: ");
     Serial.println(input);
     if (input.charAt(0) == 'M' || input.charAt(0) == 'm') {
-      parseMove(input.substring(1));
+      parseMove(axes, input.substring(1));
     } else if (input.charAt(0) == 'V' || input.charAt(0) == 'v') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
       parseSpeed(input.substring(1));
     } else if (input.charAt(0) == 's' || input.charAt(0) == 'S') { // stop
@@ -157,7 +92,7 @@ void loop() {
         axisY->startReferencing();
         axisT->startReferencing();
       } else {
-        Axis* axis = axisByLetter(input.charAt(1));
+        Axis* axis = axisByLetter(axes, input.charAt(1));
         if (axis) {
           axis->startReferencing();
         }
@@ -165,12 +100,12 @@ void loop() {
     } else if (input == "?") { // debug info
       printDebugInfo();
     } else if (input.charAt(0) == '+') {
-      Axis* axis = axisByLetter(input.charAt(1));
+      Axis* axis = axisByLetter(axes, input.charAt(1));
       if (axis) {
         axis->rotate(CW);
       }
     } else if (input.charAt(0) == '-') {
-      Axis* axis = axisByLetter(input.charAt(1));
+      Axis* axis = axisByLetter(axes, input.charAt(1));
       if (axis) {
         axis->rotate(CCW);
       }

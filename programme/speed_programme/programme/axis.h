@@ -6,6 +6,15 @@
 #define CW true
 #define CCW false
 
+#define NB_AXES 3
+
+#ifndef LOW
+#define LOW 0
+#define HIGH 1
+#define INPUT 0
+#define OUTPUT 1
+#endif
+
 class Writer {
   public:
     virtual void doPinMode(int pin, bool type) = 0;
@@ -18,18 +27,18 @@ class Writer {
 class Axis {
   public:
   
-    Axis(Writer* writer, char theName, int theSpeed) {
+    Axis(Writer* writer, char theName) {
       m_writer = writer;
       name = theName;
       position = -1;
       destination = -1;
-      previousStepTime = micros();
+      previousStepTime = 0;
       isStepHigh = false;
       isMotorEnabled = false;
       isClockwise = false;
       isReferenced = false;
       isReferencing = false;
-      speed = theSpeed;
+      speed = 500;
       forceRotation = false;
       maxPosition = 999999;
     }
@@ -153,7 +162,7 @@ class Axis {
 // The horizontal axis adjusts it's speed to compensate the rotary axis
 class HorizontalAxis: public Axis {
   public:
-    HorizontalAxis(Writer* theWriter, char theName, int theSpeed) : Axis(theWriter, theName,theSpeed) {
+    HorizontalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
       
     }
 
@@ -174,7 +183,7 @@ class HorizontalAxis: public Axis {
 
 class VerticalAxis: public Axis {
   public:
-    VerticalAxis(Writer* theWriter, char theName, int theSpeed) : Axis(theWriter, theName,theSpeed) {
+    VerticalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
       
     }
 
