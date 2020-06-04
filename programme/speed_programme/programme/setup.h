@@ -31,9 +31,9 @@ void setupAxes(Writer* writer, HorizontalAxis* axisX, VerticalAxis* axisY, Axis*
   // Linear axes units are mm. Rotary axes units are degrees.
   // Number of steps per turn of the motor * microstepping / distance per turn
   // The value is multiplied by two because we have to write LOW then HIGH for one step
-  axisX->stepsPerUnit = 200 * 2 * 8 / (1.25*25.4*3.1416);
-  axisY->stepsPerUnit = 200 * 2 * 8 / (2.625*25.4*3.1416);
-  axisT->stepsPerUnit = 200 * 2 * 8 / (360*12/61);
+  axisX->setRatio(200 * 2 * 8 / (1.25*25.4*3.1416));
+  axisY->setRatio(200 * 2 * 8 / (2.625*25.4*3.1416));
+  axisT->setRatio(200 * 2 * 8 / (360*12/61));
   
   axisX->setMotorEnabled(false);
   axisY->setMotorEnabled(false);

@@ -46,6 +46,17 @@ class Axis {
       m_destination_steps = 0;
     }
 
+    void setRatio(double ratio) {
+      m_ratio = ratio;
+      stepsPerUnit = ratio;
+    }
+
+    double getSpeed() {
+      double frequency = 1 / getDelay() * 1000000;
+      double theSpeed = frequency / m_ratio;
+      return theSpeed;
+    }
+
     void setupPins() {
       m_writer->doPinMode(stepPin, OUTPUT);
       m_writer->doPinMode(dirPin, OUTPUT);
@@ -143,7 +154,7 @@ class Axis {
     // Linear axes units are mm. Rotary axes units are degrees.
     double destination; // mm or degrees
     double maxPosition; // mm or degrees
-    unsigned int speed; // delay in microseconds
+    double speed; // delay in microseconds
     double stepsPerUnit;
     
     int enabledPin;
@@ -162,7 +173,7 @@ class Axis {
     char name;
 
     // Get the delay untill the next step
-    unsigned int getDelay() {
+    double getDelay() {
       // TODO: The speed is not fixed.
       return speed;
     }
@@ -172,6 +183,8 @@ class Axis {
 
     unsigned long m_position_steps;
     unsigned long m_destination_steps;
+
+    double m_ratio;
     
 };
 

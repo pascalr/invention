@@ -29,7 +29,7 @@ class ConsoleWriter : public Writer {
 
 template <class T>
 void assertNearby(const char* info, T t1, T t2) {
-  cout << ((t1 - t2) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
+  cout << ((t1 - t2) < 0.5 && (t2 - t1) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " (" << info << ")";
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
@@ -68,20 +68,6 @@ void testParseMove(Axis** axes) {
   assertTest(20.0, AXIS('X')->getDestination());
 }
 
-void testNumberLength() {
-  cout << "Testing numberLength" << endl;
-  assertTest(1, numberLength("8"));
-  assertTest(2, numberLength("12"));
-  assertTest(3, numberLength("456"));
-  cout << "Testing numberLength ignores letter at the beginning" << endl;
-  assertTest(3, numberLength("abc456"));
-}
-
-void testNextNumber() {
-  cout << "Testing nextNumber" << endl;
-  //assertTest(20.0, nextNumber("MX20"));
-}
-
 void testAtof() {
   cout << "Testing atof, I hope it discards letters after the number" << endl;
   assertTest(20.0, atof("20.0Y10.0"));
@@ -100,6 +86,11 @@ void testStop(Axis* axis) {
   assertTest(false, axis->forceRotation);
 }
 
+void testSpeed(Axis* axis) {
+  cout << "Testing speed" << endl;
+  assertNearby("speed", 10.0, axis->getSpeed());
+}
+
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
@@ -112,9 +103,8 @@ int main (int argc, char *argv[]) {
   Axis* axes[] = {axisX, axisY, axisT};
   
   testAxisByLetter(axes);
-  testNumberLength();
-  testNextNumber();
   testParseMove(axes);
   testAtof();
   testStop(axisX);
+  testSpeed(axisT);
 }
