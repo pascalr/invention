@@ -201,7 +201,7 @@ void setup() {
   // Number of steps per turn of the motor * microstepping / distance per turn
   axisX.stepsPerUnit = 200 * 16 / (1.25*25.4*3.1416);
   axisY.stepsPerUnit = 200 * 16 / (2.625*25.4*3.1416);
-  axisT.stepsPerUnit = 200 * 16 / (360*61/12);
+  axisT.stepsPerUnit = 200 * 16 / (360*12/61);
   
   axisX.setMotorEnabled(false);
   axisY.setMotorEnabled(false);
