@@ -48,7 +48,10 @@ void testParseMove(Axis** axes) {
   cout << "Testing parseMove" << endl;
   char msg[] = "MX10";
   parseMove(axes, msg);
-  assertTest(10.0, AXIS('X')->getPositionUnit());
+  assertTest(10.0, AXIS('X')->getDestination());
+  char msg2[] = "MX20";
+  parseMove(axes, msg2);
+  assertTest(20.0, AXIS('X')->getDestination());
 }
 
 void testNumberLength() {
@@ -62,7 +65,12 @@ void testNumberLength() {
 
 void testNextNumber() {
   cout << "Testing nextNumber" << endl;
-  assertTest(20.0, nextNumber("MX20"));
+  //assertTest(20.0, nextNumber("MX20"));
+}
+
+void testAtof() {
+  cout << "Testing atof, I hope it discards letters after the number" << endl;
+  assertTest(20.0, atof("20.0Y10.0"));
 }
 
 int main (int argc, char *argv[]) {
@@ -80,9 +88,5 @@ int main (int argc, char *argv[]) {
   testNumberLength();
   testNextNumber();
   testParseMove(axes);
-
-  cout << "All the axes names: " << endl;
-  for (int i = 0; i < NB_AXES ; i++) {
-    cout << axes[i]->name << endl;
-  }
+  testAtof();
 }

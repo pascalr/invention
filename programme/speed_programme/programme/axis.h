@@ -57,25 +57,35 @@ class Axis {
       setMotorEnabled(true);
     }
 
-    double getPositionUnit() {
-      return position/stepsPerUnit;
+    double getPosition() {
+      return m_position_steps / stepsPerUnit;
+    }
+
+    double getDestination() {
+      return destination;
     }
 
     void stop() {
       //setMotorsEnabled(false);
-      destination = position;
+      setDestination(getPosition());
       forceRotation = false;
     }
 
     void turnOneStep() {
       m_writer->doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
-      position = position + (isClockwise ? 1 : -1);
+      m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
     }
 
-    void setDestinationUnit(unsigned long dest) {
-      destination = dest * stepsPerUnit;
+    void setPosition(double pos) {
+      position = pos;
+      m_position_steps = pos * stepsPerUnit;
+    }
+
+    void setDestination(double dest) {
+      destination = dest;
       if (destination > maxPosition) {destination = maxPosition;}
+      m_destination_steps = dest * stepsPerUnit;
       setMotorEnabled(true);
       setMotorDirection(destination > position);
     }
@@ -101,8 +111,8 @@ class Axis {
       m_writer->doPrint("Done referencing axis ");
       char theName[] = {name, '\0'};
       m_writer->doPrintLn(theName);
-      position = 0;
-      destination = 0;
+      setPosition(0);
+      setDestination(0);
       setMotorEnabled(false);
       isReferenced = true;
       isReferencing = false;
@@ -129,11 +139,12 @@ class Axis {
     }
   
   //protected:
-    unsigned long position; // position in steps
-    unsigned long destination; // destination in steps
-    unsigned long maxPosition;  // max position in steps
-    unsigned int speed; // speed in microseconds
-    double stepsPerUnit; // Linear axes units are mm. Rotary axes units are degrees.
+    // Linear axes units are mm. Rotary axes units are degrees.
+    unsigned long position; // mm or degrees
+    unsigned long destination; // mm or degrees
+    unsigned long maxPosition; // mm or degrees
+    unsigned int speed; // delay in microseconds
+    double stepsPerUnit;
     
     int enabledPin;
     int dirPin;
@@ -158,6 +169,9 @@ class Axis {
     
   protected:
     Writer* m_writer;
+
+    unsigned long m_position_steps;
+    unsigned long m_destination_steps;
     
 };
 
@@ -173,7 +187,7 @@ class HorizontalAxis: public Axis {
     }
   
     unsigned int getDelay() {
-      double theta = m_rotation_axis->getPositionUnit();
+      double theta = m_rotation_axis->getPosition();
       // Vx = r* W * sin(theta)
       // TODO: The speed is not fixed.
       return speed;
@@ -192,13 +206,7 @@ class VerticalAxis: public Axis {
     /*void moveToReference() {
       //Serial.println(digitalRead(axis.limitSwitchPin));
       if (!digitalRead(limitSwitchPin)) {
-        Serial.print("Done referencing axis ");
-        Serial.println(name);
-        position = 0;
-        destination = 0;
-        setMotorEnabled(false);
-        isReferenced = true;
-        isReferencing = false;
+        axis->referenceReached();
       } else {
         turnOneStep();
         delayMicroseconds(SLOW_SPEED_DELAY);
