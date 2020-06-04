@@ -34,6 +34,35 @@ class Axis {
       
       delayMicroseconds(SLOW_SPEED_DELAY);
     }
+
+    void referenceReached() {
+      Serial.print("Done referencing axis ");
+      Serial.println(name);
+      position = 0;
+      destination = 0;
+      setMotorEnabled(false);
+      isReferenced = true;
+      isReferencing = false;
+    }
+
+    // Only the vertical axis moves in order to do a reference
+    void moveToReference() {
+      referenceReached();
+    }
+
+    void handleAxis(unsigned long currentTime) {
+      if (isReferencing) {
+        moveToReference();
+      } else if (isReferenced && isMotorEnabled && currentTime - previousStepTime > speed && (forceRotation ||
+                ((isClockwise && position < destination) || (!isClockwise && position > destination)))) {
+        turnOneStep();
+        if (currentTime - previousStepTime > 2*speed) {
+          previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
+        } else {
+          previousStepTime = previousStepTime + speed; // This is more accurate to ensure all the motors are synchronysed
+        }
+      }
+    }
   
   //private:
     unsigned long position;
@@ -74,7 +103,31 @@ class HorizontalAxis: public Axis {
   }
 };
 
-Axis axisY, axisT, axisW, oups;
+class VerticalAxis: public Axis {
+  public:
+    VerticalAxis() : Axis {} {
+      
+    }
+
+    /*void moveToReference() {
+      //Serial.println(digitalRead(axis.limitSwitchPin));
+      if (!digitalRead(limitSwitchPin)) {
+        Serial.print("Done referencing axis ");
+        Serial.println(name);
+        position = 0;
+        destination = 0;
+        setMotorEnabled(false);
+        isReferenced = true;
+        isReferencing = false;
+      } else {
+        turnOneStep();
+        delayMicroseconds(SLOW_SPEED_DELAY);
+      }
+    }*/
+};
+
+Axis axisT, axisW, oups;
+VerticalAxis axisY;
 HorizontalAxis axisX;
 
 Axis& axisByLetter(char letter) {
@@ -186,32 +239,6 @@ void parseMove(String cmd) {
   }
 }
 
-void handleAxis(Axis& axis) {
-  if (axis.isReferencing) {
-    //Serial.println(digitalRead(axis.limitSwitchPin));
-    if (!digitalRead(axis.limitSwitchPin)) {
-      Serial.print("Done referencing axis ");
-      Serial.println(axis.name);
-      axis.position = 0;
-      axis.destination = 0;
-      axis.setMotorEnabled(false);
-      axis.isReferenced = true;
-      axis.isReferencing = false;
-    } else {
-      axis.turnOneStep();
-      delayMicroseconds(SLOW_SPEED_DELAY);
-    }
-  } else if (axis.isReferenced && axis.isMotorEnabled && currentTime - axis.previousStepTime > axis.speed && (axis.forceRotation ||
-            ((axis.isClockwise && axis.position < axis.destination) || (!axis.isClockwise && axis.position > axis.destination)))) {
-    axis.turnOneStep();
-    if (currentTime - axis.previousStepTime > 2*axis.speed) {
-      axis.previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
-    } else {
-      axis.previousStepTime = axis.previousStepTime + axis.speed; // This is more accurate to ensure all the motors are synchronysed
-    }
-  }
-}
-
 void loop() {
   currentTime = micros();
 
@@ -269,9 +296,9 @@ void loop() {
     }
   }
 
-  handleAxis(axisX);
-  handleAxis(axisY);
-  handleAxis(axisT);
+  axisX.handleAxis(currentTime);
+  axisY.handleAxis(currentTime);
+  axisT.handleAxis(currentTime);
 }
 
 void printDebugInfo() {
