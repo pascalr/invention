@@ -56,30 +56,19 @@ void setup() {
   Serial.println("Done");
 }
 
-void parseSpeed(String cmd) {
-  for (int i = 0; i < cmd.length(); i++) {
-    int nbLength = numberLength(cmd.substring(i+1));
-    Axis* axis = axisByLetter(axes, cmd[i]);
-    if (axis) {
-      axis->speed = cmd.substring(i+1,i+1+nbLength).toInt();
-    }
-    i = i+nbLength;
-  }
-}
-
 void loop() {
   unsigned long currentTime = micros();
 
   if (Serial.available() > 0) {
     String input = Serial.readString();
+    char msg[256] = {0};
+    input.toCharArray(msg, 256);
     input.remove(input.length()-1);
 
     Serial.print("Cmd: ");
     Serial.println(input);
     if (input.charAt(0) == 'M' || input.charAt(0) == 'm') {
-      parseMove(axes, input.substring(1));
-    } else if (input.charAt(0) == 'V' || input.charAt(0) == 'v') { // speed (eg. VX300 -> axis X speed 300 microseconds delay per step)
-      parseSpeed(input.substring(1));
+      parseMove(axes, msg+1);
     } else if (input.charAt(0) == 's' || input.charAt(0) == 'S') { // stop
       //setMotorsEnabled(false);
       axisX->stop();

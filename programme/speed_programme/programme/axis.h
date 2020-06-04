@@ -15,6 +15,8 @@
 #define OUTPUT 1
 #endif
 
+#define AXIS(t) (axisByLetter(axes, t))
+
 class Writer {
   public:
     virtual void doPinMode(int pin, bool type) = 0;
