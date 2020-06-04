@@ -6,6 +6,8 @@
 
 using namespace std;
 
+// FIXME: Il faudrait que j'utilse char array et non String, parce que String c'est seulement sur Arduino et je veux pouvoir debugger...
+
 class ArduinoWriter : public Writer {
   public:
     void doPinMode(int pin, bool type) {
@@ -17,10 +19,10 @@ class ArduinoWriter : public Writer {
     double doDigitalRead(int pin) {
       return digitalRead(pin);
     }
-    void doPrint(String theString) {
+    void doPrint(const char* theString) {
       Serial.print(theString);
     }
-    void doPrintLn(String theString) {
+    void doPrintLn(const char* theString) {
       Serial.println(theString);
     }
 };

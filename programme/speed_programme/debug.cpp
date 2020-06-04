@@ -1,10 +1,9 @@
 #include <iostream>
 
-#include "programme.ino"
-
 using namespace std;
 
-class ConsoleWriter : public Writer {
+//class ConsoleWriter : public Writer {
+class ConsoleWriter {
   public:
     void doPinMode(int pin, bool type) {
       cout << "pinMode(";
@@ -18,15 +17,16 @@ class ConsoleWriter : public Writer {
     double doDigitalRead(int pin) {
       cout << "Output sentence";
     }
-    void doPrint(String theString) {
+    void doPrint(string theString) {
       cout << "Output sentence";
     }
-    void doPrintLn(String theString) {
+    void doPrintLn(string theString) {
       cout << "Output sentence";
     }
 };
 
 int main (int argc, char *argv[]) {
-  Axis* axis;
-  std::cout << "Debugging..." << endl;
+  //Axis* axis;
+  char name = 'A':
+  std::cout << "Debugging..." << ""+A << endl;
 }

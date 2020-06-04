@@ -11,8 +11,8 @@ class Writer {
     virtual void doPinMode(int pin, bool type) = 0;
     virtual void doDigitalWrite(int pin, bool value) = 0;
     virtual double doDigitalRead(int pin) = 0;
-    virtual void doPrint(String theString) = 0;
-    virtual void doPrintLn(String theString) = 0;
+    virtual void doPrint(const char* theString) = 0;
+    virtual void doPrintLn(const char* theString) = 0;
 };
 
 class Axis {
@@ -88,7 +88,8 @@ class Axis {
 
     void referenceReached() {
       m_writer->doPrint("Done referencing axis ");
-      m_writer->doPrintLn(""+name);
+      char theName[] = {name, '\0'};
+      m_writer->doPrintLn(theName);
       position = 0;
       destination = 0;
       setMotorEnabled(false);
