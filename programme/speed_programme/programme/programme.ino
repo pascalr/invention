@@ -10,10 +10,53 @@
 
 #define RAYON 380
 
+class Writer {
+  public:
+    virtual void doPinMode(int pin, bool type) = 0;
+    virtual void doDigitalWrite(int pin, bool value) = 0;
+    virtual double doDigitalRead(int pin) = 0;
+    virtual void doPrint(String theString) = 0;
+    virtual void doPrintLn(String theString) = 0;
+};
+
+class ArduinoWriter : public Writer {
+  public:
+    void doPinMode(int pin, bool type) {
+      pinMode(pin, type);
+    }
+    void doDigitalWrite(int pin, bool value) {
+      digitalWrite(pin, value);
+    }
+    double doDigitalRead(int pin) {
+      return digitalRead(pin);
+    }
+    void doPrint(String theString) {
+      Serial.print(theString);
+    }
+    void doPrintLn(String theString) {
+      Serial.println(theString);
+    }
+};
+
+class ConsoleWriter : public Writer {
+  public:
+    void doPinMode(int pin, bool type) {
+    }
+    void doDigitalWrite(int pin, bool value) {
+    }
+    void doDigitalRead() {
+    }
+    void doPrint() {
+    }
+    void doPrintLn() {
+    }
+};
+
 class Axis {
   public:
   
-    Axis(char theName, int theSpeed) {
+    Axis(Writer* writer, char theName, int theSpeed) {
+      m_writer = writer;
       name = theName;
       position = -1;
       destination = -1;
@@ -29,9 +72,9 @@ class Axis {
     }
 
     void setupPins() {
-      pinMode(stepPin, OUTPUT);
-      pinMode(dirPin, OUTPUT);
-      pinMode(enabledPin, OUTPUT);
+      m_writer->doPinMode(stepPin, OUTPUT);
+      m_writer->doPinMode(dirPin, OUTPUT);
+      m_writer->doPinMode(enabledPin, OUTPUT);
     }
 
     void rotate(bool direction) {
@@ -51,7 +94,7 @@ class Axis {
     }
 
     void turnOneStep() {
-      digitalWrite(stepPin, isStepHigh ? LOW : HIGH);
+      m_writer->doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
       position = position + (isClockwise ? 1 : -1);
     }
@@ -64,15 +107,15 @@ class Axis {
     }
     
     void setMotorEnabled(bool value) {
-      digitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
+      m_writer->doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(enabledPin, value ? LOW : HIGH);
       isMotorEnabled = value;
     
-      digitalWrite(ledPin, value ? HIGH : LOW);
+      m_writer->doDigitalWrite(ledPin, value ? HIGH : LOW);
     }
 
     void setMotorDirection(bool clockwise) {
-      digitalWrite(dirPin, clockwise ? LOW : HIGH);
+      m_writer->doDigitalWrite(dirPin, clockwise ? LOW : HIGH);
       isClockwise = clockwise;
       
       delayMicroseconds(SLOW_SPEED_DELAY);
@@ -85,8 +128,8 @@ class Axis {
     }
 
     void referenceReached() {
-      Serial.print("Done referencing axis ");
-      Serial.println(name);
+      m_writer->doPrint("Done referencing axis ");
+      m_writer->doPrintLn(""+name);
       position = 0;
       destination = 0;
       setMotorEnabled(false);
@@ -141,12 +184,16 @@ class Axis {
       // TODO: The speed is not fixed.
       return speed;
     }
+    
+  protected:
+    Writer* m_writer;
+    
 };
 
 // The horizontal axis adjusts it's speed to compensate the rotary axis
 class HorizontalAxis: public Axis {
   public:
-    HorizontalAxis(char theName, int theSpeed) : Axis(theName,theSpeed) {
+    HorizontalAxis(Writer* theWriter, char theName, int theSpeed) : Axis(theWriter, theName,theSpeed) {
       
     }
 
@@ -167,7 +214,7 @@ class HorizontalAxis: public Axis {
 
 class VerticalAxis: public Axis {
   public:
-    VerticalAxis(char theName, int theSpeed) : Axis(theName,theSpeed) {
+    VerticalAxis(Writer* theWriter, char theName, int theSpeed) : Axis(theWriter, theName,theSpeed) {
       
     }
 
@@ -188,6 +235,7 @@ class VerticalAxis: public Axis {
     }*/
 };
 
+Writer* writer;
 Axis* axisT;
 VerticalAxis* axisY;
 HorizontalAxis* axisX;
@@ -205,6 +253,8 @@ Axis* axisByLetter(char letter) {
 
 void setup() {
 
+  writer = new ArduinoWriter();
+
   //Initiate Serial communication.
   Serial.begin(9600);
   Serial.println("Setup...");
@@ -214,9 +264,9 @@ void setup() {
 
   // FIXME: Do you need to delete?
   // The setup function is only ran once
-  axisX = new HorizontalAxis('X',500);
-  axisY = new VerticalAxis('Y',500);
-  axisT = new Axis('Z', 500);
+  axisX = new HorizontalAxis(writer, 'X',500);
+  axisY = new VerticalAxis(writer, 'Y',500);
+  axisT = new Axis(writer, 'Z', 500);
 
   axisX->setRotationAxis(axisT);
   
@@ -425,3 +475,6 @@ void printAxis(Axis* axis) {
   Serial.print(",");
   Serial.print(digitalRead(axis->limitSwitchPin));
 }
+
+int main (int argc, char *argv[]) {
+} 
