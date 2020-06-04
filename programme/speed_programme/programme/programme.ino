@@ -11,8 +11,8 @@
 class Axis {
   public:
   
-    Axis(char name, int speed) {
-      name = name;
+    Axis(char theName, int theSpeed) {
+      name = theName;
       position = -1;
       destination = -1;
       previousStepTime = micros();
@@ -21,7 +21,7 @@ class Axis {
       isClockwise = false;
       isReferenced = false;
       isReferencing = false;
-      speed = speed;
+      speed = theSpeed;
       forceRotation = false;
       maxPosition = 999999;
     }
@@ -129,7 +129,7 @@ class Axis {
 // The horizontal axis adjusts it's speed to compensate the rotary axis
 class HorizontalAxis: public Axis {
   public:
-    HorizontalAxis(char name, int speed) : Axis {name,speed} {
+    HorizontalAxis(char theName, int theSpeed) : Axis(theName,theSpeed) {
       
     }
   
@@ -142,7 +142,7 @@ class HorizontalAxis: public Axis {
 
 class VerticalAxis: public Axis {
   public:
-    VerticalAxis(char name, int speed) : Axis {name,speed} {
+    VerticalAxis(char theName, int theSpeed) : Axis(theName,theSpeed) {
       
     }
 
