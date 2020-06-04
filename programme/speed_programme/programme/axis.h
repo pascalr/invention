@@ -32,7 +32,6 @@ class Axis {
     Axis(Writer* writer, char theName) {
       m_writer = writer;
       name = theName;
-      position = -1;
       destination = -1;
       previousStepTime = 0;
       isStepHigh = false;
@@ -43,6 +42,8 @@ class Axis {
       speed = 500;
       forceRotation = false;
       maxPosition = 999999;
+      m_position_steps = 0;
+      m_destination_steps = 0;
     }
 
     void setupPins() {
@@ -77,17 +78,17 @@ class Axis {
       m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
     }
 
-    void setPosition(double pos) {
-      position = pos;
-      m_position_steps = pos * stepsPerUnit;
+    void setPositionSteps(double posSteps) {
+      m_position_steps = posSteps;
     }
 
     void setDestination(double dest) {
+      
       destination = dest;
       if (destination > maxPosition) {destination = maxPosition;}
       m_destination_steps = dest * stepsPerUnit;
       setMotorEnabled(true);
-      setMotorDirection(destination > position);
+      setMotorDirection(m_destination_steps > m_position_steps);
     }
     
     void setMotorEnabled(bool value) {
@@ -111,7 +112,7 @@ class Axis {
       m_writer->doPrint("Done referencing axis ");
       char theName[] = {name, '\0'};
       m_writer->doPrintLn(theName);
-      setPosition(0);
+      setPositionSteps(0);
       setDestination(0);
       setMotorEnabled(false);
       isReferenced = true;
@@ -128,7 +129,7 @@ class Axis {
       if (isReferencing) {
         moveToReference();
       } else if (isReferenced && isMotorEnabled && currentTime - previousStepTime > delay && (forceRotation ||
-                ((isClockwise && position < destination) || (!isClockwise && position > destination)))) {
+                ((isClockwise && m_position_steps < m_destination_steps) || (!isClockwise && m_position_steps > m_destination_steps)))) {
         turnOneStep();
         if (currentTime - previousStepTime > 2*delay) {
           previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
@@ -140,9 +141,8 @@ class Axis {
   
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.
-    unsigned long position; // mm or degrees
-    unsigned long destination; // mm or degrees
-    unsigned long maxPosition; // mm or degrees
+    double destination; // mm or degrees
+    double maxPosition; // mm or degrees
     unsigned int speed; // delay in microseconds
     double stepsPerUnit;
     

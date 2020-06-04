@@ -28,6 +28,20 @@ class ConsoleWriter : public Writer {
 };
 
 template <class T>
+void assertNearby(const char* info, T t1, T t2) {
+  cout << ((t1 - t2) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
+  cout << " (" << info << ")";
+  cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
+}
+
+template <class T>
+void assertTest(const char* info, T t1, T t2) {
+  cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
+  cout << " (" << info << ")";
+  cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
+}
+
+template <class T>
 void assertTest(T t1, T t2) {
   cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
@@ -73,6 +87,19 @@ void testAtof() {
   assertTest(20.0, atof("20.0Y10.0"));
 }
 
+void testStop(Axis* axis) {
+  cout << "Testing stop" << endl;
+  axis->referenceReached();
+  axis->setPositionSteps(10.0*axis->stepsPerUnit);
+  axis->setDestination(20.0);
+  axis->stop();
+  assertNearby("position", 10.0, axis->getPosition());
+  assertNearby("destination", 10.0, axis->getDestination());
+  axis->forceRotation = true;
+  axis->stop();
+  assertTest(false, axis->forceRotation);
+}
+
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
@@ -89,4 +116,5 @@ int main (int argc, char *argv[]) {
   testNextNumber();
   testParseMove(axes);
   testAtof();
+  testStop(axisX);
 }

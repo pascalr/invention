@@ -116,7 +116,7 @@ void printDebugAxis(Axis* axis) {
   Serial.print("-Pos ");
   Serial.print(axis->name);
   Serial.print(": ");
-  Serial.println(axis->position);
+  Serial.println(axis->getPosition());
   
   Serial.print("-Dest ");
   Serial.print(axis->name);
@@ -185,7 +185,7 @@ void printDebugAxis(Axis* axis) {
 }
 
 void printAxis(Axis* axis) {
-  Serial.print(axis->position);
+  Serial.print(axis->getPosition());
   Serial.print(",");
   Serial.print(digitalRead(axis->limitSwitchPin));
 }
