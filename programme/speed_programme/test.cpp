@@ -27,22 +27,22 @@ class ConsoleWriter : public Writer {
     }
 };
 
-template <class T>
-void assertNearby(const char* info, T t1, T t2) {
+template <class P>
+void assertNearby(const char* info, P t1, P t2) {
   cout << ((t1 - t2) < 0.5 && (t2 - t1) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " (" << info << ")";
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
-template <class T>
-void assertTest(const char* info, T t1, T t2) {
+template <class P>
+void assertTest(const char* info, P t1, P t2) {
   cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " (" << info << ")";
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
-template <class T>
-void assertTest(T t1, T t2) {
+template <class P>
+void assertTest(P t1, P t2) {
   cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
@@ -59,13 +59,20 @@ void testAxisByLetter(Axis** axes) {
 // MX10 should move axis X 10mm
 // MZ269 should move the axis T and the axis X
 void testParseMove(Axis** axes) {
+  for (int i = 0; i < NB_AXES; i++) {
+    axes[i]->referenceReached();
+  }
   cout << "Testing parseMove" << endl;
   char msg[] = "MX10";
   parseMove(axes, msg);
-  assertTest(10.0, AXIS('X')->getDestination());
+  assertTest(msg, 10.0, AXIS('X')->getDestination());
   char msg2[] = "MX20";
   parseMove(axes, msg2);
-  assertTest(20.0, AXIS('X')->getDestination());
+  assertTest(msg2, 20.0, AXIS('X')->getDestination());
+  char msg3[] = "MZ100";
+  parseMove(axes, msg3);
+  assertTest("MZ100,X", 20.0, AXIS('X')->getDestination());
+  assertTest("MZ100,T", 20.0, AXIS('T')->getDestination());
 }
 
 void testAtof() {

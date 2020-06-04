@@ -97,6 +97,7 @@ class Axis {
       
       destination = dest;
       if (destination > maxPosition) {destination = maxPosition;}
+      if (destination < 0) {destination = 0;}
       m_destination_steps = dest * stepsPerUnit;
       setMotorEnabled(true);
       setMotorDirection(m_destination_steps > m_position_steps);

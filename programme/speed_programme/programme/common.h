@@ -21,7 +21,7 @@ void parseMove(Axis** axes, const char* cmd) {
   for (int i = 0; cmd[i] != '\0'; i++) {
 
     double destination = atof(cmd+i+1);
-    
+
     if (cmd[i] == 'Z' || cmd[i] == 'z') {
 
       Axis* axisT = axisByLetter(axes, 'T');      
@@ -31,7 +31,7 @@ void parseMove(Axis** axes, const char* cmd) {
         axisT->setDestination(angle);
 
         HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
-        int shouldGoForward = axisX->getPosition() < axisX->maxPosition / 2 ? 1 : -1;
+        int shouldGoForward = axisX->getPosition() < axisX->maxPosition / 2 ? -1 : 1;
         double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
         axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
       }
