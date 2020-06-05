@@ -46,14 +46,13 @@ class Axis {
       m_destination_steps = 0;
     }
 
-    void setRatio(double ratio) {
-      m_ratio = ratio;
+    void setStepsPerUnit(double ratio) {
       stepsPerUnit = ratio;
     }
 
     double getSpeed() {
       double frequency = 1 / getDelay() * 1000000;
-      double theSpeed = frequency / m_ratio;
+      double theSpeed = frequency / stepsPerUnit;
       return theSpeed;
     }
 
@@ -184,9 +183,6 @@ class Axis {
 
     unsigned long m_position_steps;
     unsigned long m_destination_steps;
-
-    double m_ratio;
-    
 };
 
 // The horizontal axis adjusts it's speed to compensate the rotary axis
