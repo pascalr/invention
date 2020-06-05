@@ -2,9 +2,9 @@
 #include <cstring>
 #include <math.h>
 
-#include "programme/axis.h"
-#include "programme/setup.h"
-#include "programme/common.h"
+#include "../axis.h"
+#include "../setup.h"
+#include "../common.h"
 
 using namespace std;
 
