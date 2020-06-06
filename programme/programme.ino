@@ -39,8 +39,8 @@ Axis* axes[NB_AXES];
 void setup() {
 
   //Initiate Serial communication.
-  //Serial.begin(9600);
-  Serial.begin(115200);
+  Serial.begin(9600);
+  //Serial.begin(115200);
   Serial.println("Setup...");
 
   // FIXME: Do you need to delete?
