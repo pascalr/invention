@@ -39,7 +39,8 @@ Axis* axes[NB_AXES];
 void setup() {
 
   //Initiate Serial communication.
-  Serial.begin(9600);
+  //Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Setup...");
 
   // FIXME: Do you need to delete?
@@ -113,6 +114,7 @@ void printDebugInfo() {
 }
 
 void printDebugAxis(Axis* axis) {
+  // TODO: Turn the axis into a char[], then print the char[], so I can debug too.
   Serial.print("-Pos ");
   Serial.print(axis->name);
   Serial.print(": ");
