@@ -2,3 +2,4 @@ machine/meshes/*
 a.out
 capture.jpg
 vision/CMakeFiles/
+vision/CMakeCache.txt
