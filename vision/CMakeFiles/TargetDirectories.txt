@@ -1,3 +1,0 @@
-/home/pascalr/invention/vision/CMakeFiles/rebuild_cache.dir
-/home/pascalr/invention/vision/CMakeFiles/DetectChessboard.dir
-/home/pascalr/invention/vision/CMakeFiles/edit_cache.dir
