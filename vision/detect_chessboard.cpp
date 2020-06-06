@@ -7,7 +7,9 @@
 
 // The camera will be used to do a refencing.
 // The pi will be directly connect to a arduino (safely watchout never 5v just 3v3).
-//
+// The rotating axis is referenced when it is farther than the middle.
+// The vertical axis is referenced when it it higher than the middle (put another 8 by 8 grid on the other side would be the simplest)
+// The horizontal axis is referenced when the squares are bigger than some threshold, offset for zero.
 
 using namespace cv;
 using namespace std;
@@ -49,7 +51,7 @@ int main(int, char**)
 
         cvtColor(frame, gray, COLOR_BGR2GRAY);
         bool patternfound = findChessboardCorners(gray, patternsize, corners,
-          CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);
+          CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
 
         if(patternfound) {
           cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(2, 30, 0.1));
