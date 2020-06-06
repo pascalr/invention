@@ -5,13 +5,23 @@
 #include <iostream>
 #include <stdio.h>
 
+// The camera will be used to do a refencing.
+// The pi will be directly connect to a arduino (safely watchout never 5v just 3v3).
+//
+
 using namespace cv;
 using namespace std;
 int main(int, char**)
 {
+
+    vector<Point2f> corners; //this will be filled by the detected corners
+    Size patternsize(7,7); //interior number of corners
+    Mat gray;
+
     Mat frame;
     //--- INITIALIZE VIDEOCAPTURE
     VideoCapture cap;
+
     // open the default camera using default API
     // cap.open(0);
     // OR advance usage: select any API backend
@@ -36,6 +46,19 @@ int main(int, char**)
             cerr << "ERROR! blank frame grabbed\n";
             break;
         }
+
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+        bool patternfound = findChessboardCorners(gray, patternsize, corners,
+          CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);
+
+        if(patternfound) {
+          cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(2, 30, 0.1));
+          //cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1),
+           // TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+         
+          drawChessboardCorners(frame, patternsize, Mat(corners), patternfound);
+	}
+
         // show live and wait for a key with timeout long enough to show images
         imshow("Live", frame);
         if (waitKey(5) >= 0)
@@ -87,5 +110,39 @@ int main(int argc, char** argv )
   imshow("Display Image", img);
   waitKey(0);
   return 0;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+#include <wiringPi.h>
+int main (void)
+{
+  wiringPiSetup () ;
+  pinMode (0, OUTPUT) ;
+  for (;;)
+  {
+    digitalWrite (0, HIGH) ; delay (500) ;
+    digitalWrite (0,  LOW) ; delay (500) ;
+  }
+  return 0 ;
 }
 */
