@@ -3,3 +3,6 @@ a.out
 capture.jpg
 vision/CMakeFiles/
 vision/CMakeCache.txt
+vision/Makefile
+vision/cmake_install.cmake
+vision/DetectChessboard
