@@ -91,9 +91,9 @@ void loop() {
     parseInput(input, writer, axes);
   }
 
-  axisX->handleAxis(currentTime);
-  axisY->handleAxis(currentTime);
-  axisT->handleAxis(currentTime);
+  for (int i = 0; axes[i] != NULL; i++) {
+    axes[i]->handleAxis(currentTime);
+  }
 }
 
 /* https://arduino.stackexchange.com/questions/1013/how-do-i-split-an-incoming-string
