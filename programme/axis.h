@@ -21,7 +21,9 @@ class Writer {
     virtual void doDigitalWrite(int pin, bool value) = 0;
     virtual double doDigitalRead(int pin) = 0;
     virtual void doPrint(const char* theString) = 0;
+    virtual void doPrint(char val) = 0;
     virtual void doPrintLn(const char* theString) = 0;
+    virtual void doPrintLn(double val) = 0;
 };
 
 class Axis {

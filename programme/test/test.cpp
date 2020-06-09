@@ -22,8 +22,14 @@ class ConsoleWriter : public Writer {
     void doPrint(const char* theString) {
       cout << theString;
     }
+    void doPrint(char val) {
+      cout << val;
+    }
     void doPrintLn(const char* theString) {
       cout << theString << endl;
+    }
+    void doPrintLn(double val) {
+      cout << val << endl;
     }
 };
 
@@ -101,7 +107,7 @@ void testSpeed(Axis* axis) {
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
-  Writer* writer = new ConsoleWriter();
+  ConsoleWriter* writer = new ConsoleWriter();
   HorizontalAxis* axisX = new HorizontalAxis(writer, 'X');
   VerticalAxis* axisY = new VerticalAxis(writer, 'Y');
   Axis* axisT = new Axis(writer, 'T');

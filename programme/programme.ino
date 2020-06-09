@@ -21,11 +21,21 @@ class ArduinoWriter : public Writer {
     double doDigitalRead(int pin) {
       return digitalRead(pin);
     }
+
     void doPrint(const char* theString) {
       Serial.print(theString);
     }
+
+    void doPrint(char val) {
+      Serial.print(val);
+    }
+
     void doPrintLn(const char* theString) {
       Serial.println(theString);
+    }
+
+    void doPrintLn(double val) {
+      Serial.println(val);
     }
 };
 
@@ -78,40 +88,7 @@ void loop() {
     int size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
     input[size] = 0; // Add the final 0 to end the C string
 
-    Serial.print("Cmd: ");
-    Serial.println(input);
-    if (input[0] == 'M' || input[0] == 'm') {
-      parseMove(axes, input+1);
-    } else if (input[0] == 's' || input[0] == 'S') { // stop
-      //setMotorsEnabled(false);
-      axisX->stop();
-      axisY->stop();
-      axisT->stop();
-    } else if (input[0] == 'H' || input[0] == 'h') { // home reference (eg. H, or HX, or HY, ...)
-      Serial.println("Referencing...");
-      if (size == 1) {
-        axisX->startReferencing();
-        axisY->startReferencing();
-        axisT->startReferencing();
-      } else {
-        Axis* axis = axisByLetter(axes, input[1]);
-        if (axis) {
-          axis->startReferencing();
-        }
-      }
-    } else if (input == "?") { // debug info
-      printDebugInfo();
-    } else if (input[0] == '+') {
-      Axis* axis = axisByLetter(axes, input[1]);
-      if (axis) {
-        axis->rotate(CW);
-      }
-    } else if (input[0] == '-') {
-      Axis* axis = axisByLetter(axes, input[1]);
-      if (axis) {
-        axis->rotate(CCW);
-      }
-    }
+    parseInput(input, size, writer, axes);
   }
 
   axisX->handleAxis(currentTime);
@@ -149,88 +126,3 @@ while (command != 0)
     // Find the next command in input string
     command = strtok(0, "&");
 }*/
-
-void printDebugInfo() {
-  printDebugAxis(axisX);
-  printDebugAxis(axisY);
-  printDebugAxis(axisT);
-}
-
-void printDebugAxis(Axis* axis) {
-  // TODO: Turn the axis into a char[], then print the char[], so I can debug too.
-  Serial.print("-Pos ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->getPosition());
-  
-  Serial.print("-Dest ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->destination);
-  
-  Serial.print("-Speed ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->speed);
-
-  Serial.print("-CW ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->isClockwise);
-  
-  Serial.print("-Referenced ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->isReferenced);
-  
-  Serial.print("-Referencing ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->isReferencing);
-  
-  Serial.print("-Enabled ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->isMotorEnabled);
-  
-  Serial.print("-Step ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->isStepHigh);
-
-  Serial.print("-Force ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->forceRotation);
-
-  Serial.print("-PIN enabled ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(digitalRead(axis->enabledPin));
-  
-  Serial.print("-PIN dir ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(digitalRead(axis->dirPin));
-  
-  Serial.print("-PIN step ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(digitalRead(axis->stepPin));
-  
-  Serial.print("-PIN limit switch ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(digitalRead(axis->limitSwitchPin));
-
-  Serial.print("-stepsPerUnit ");
-  Serial.print(axis->name);
-  Serial.print(": ");
-  Serial.println(axis->stepsPerUnit);
-}
-
-void printAxis(Axis* axis) {
-  Serial.print(axis->getPosition());
-  Serial.print(",");
-  Serial.print(digitalRead(axis->limitSwitchPin));
-}
