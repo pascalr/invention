@@ -8,7 +8,7 @@
 #endif
 
 Axis* axisByLetter(Axis** axes, char letter) {
-  for (int i = 0; i < NB_AXES; i++) {
+  for (int i = 0; axes[i] != NULL; i++) {
     if (toupper(letter) == axes[i]->name) {
       return axes[i];
     }

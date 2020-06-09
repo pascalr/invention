@@ -6,9 +6,9 @@
 #define SLOW_SPEED_DELAY 2000
 #define FAST_SPEED_DELAY 100
 
-using namespace std;
+#define MAX_INPUT_CHUNK_SIZE 256
 
-// FIXME: Il faudrait que j'utilse char array et non String, parce que String c'est seulement sur Arduino et je veux pouvoir debugger...
+using namespace std;
 
 class ArduinoWriter : public Writer {
   public:
@@ -33,8 +33,10 @@ Writer* writer;
 Axis* axisT;
 VerticalAxis* axisY;
 HorizontalAxis* axisX;
+Axis* axisA;
+Axis* axisB;
 
-Axis* axes[NB_AXES];
+Axis* axes[10];
 
 void setup() {
 
@@ -49,10 +51,15 @@ void setup() {
   axisX = new HorizontalAxis(writer, 'X');
   axisY = new VerticalAxis(writer, 'Y');
   axisT = new Axis(writer, 'T');
+  axisA = new Axis(writer, 'A');
+  axisB = new Axis(writer, 'B');
   axes[0] = axisX;
   axes[1] = axisY;
   axes[2] = axisT;
-  setupAxes(writer, axisX, axisY, axisT);
+  axes[3] = axisA;
+  axes[4] = axisB;
+  axes[5] = NULL;
+  setupAxes(writer, axes);
   
   Serial.println("Done");
 }
@@ -61,10 +68,15 @@ void loop() {
   unsigned long currentTime = micros();
 
   if (Serial.available() > 0) {
-    String input = Serial.readString();
+    /*String input = Serial.readString();
     char msg[256] = {0};
     input.toCharArray(msg, 256);
-    input.remove(input.length()-1);
+    input.remove(input.length()-1);*/
+
+    // Get next command from Serial (add 1 for final 0)
+    char input[MAX_INPUT_CHUNK_SIZE + 1];
+    byte size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
+    input[size] = 0; // Add the final 0 to end the C string
 
     Serial.print("Cmd: ");
     Serial.println(input);
@@ -106,6 +118,37 @@ void loop() {
   axisY->handleAxis(currentTime);
   axisT->handleAxis(currentTime);
 }
+
+/* https://arduino.stackexchange.com/questions/1013/how-do-i-split-an-incoming-string
+ // Calculate based on max input size expected for one command
+#define INPUT_SIZE 30
+...
+
+// Get next command from Serial (add 1 for final 0)
+char input[INPUT_SIZE + 1];
+byte size = Serial.readBytes(input, INPUT_SIZE);
+// Add the final 0 to end the C string
+input[size] = 0;
+
+// Read each command pair 
+char* command = strtok(input, "&");
+while (command != 0)
+{
+    // Split the command in two values
+    char* separator = strchr(command, ':');
+    if (separator != 0)
+    {
+        // Actually split the string in 2: replace ':' with 0
+        *separator = 0;
+        int servoId = atoi(command);
+        ++separator;
+        int position = atoi(separator);
+
+        // Do something with servoId and position
+    }
+    // Find the next command in input string
+    command = strtok(0, "&");
+}*/
 
 void printDebugInfo() {
   printDebugAxis(axisX);

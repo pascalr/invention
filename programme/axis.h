@@ -6,8 +6,6 @@
 #define CW true
 #define CCW false
 
-#define NB_AXES 3
-
 #ifndef LOW
 #define LOW 0
 #define HIGH 1
@@ -46,6 +44,9 @@ class Axis {
       m_destination_steps = 0;
     }
 
+    // Linear axes units are mm. Rotary axes units are degrees.
+    // Number of steps per turn of the motor * microstepping / distance per turn
+    // The value is multiplied by two because we have to write LOW then HIGH for one step
     void setStepsPerUnit(double ratio) {
       stepsPerUnit = ratio;
     }

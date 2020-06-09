@@ -59,7 +59,7 @@ void testAxisByLetter(Axis** axes) {
 // MX10 should move axis X 10mm
 // MZ269 should move the axis T and the axis X
 void testParseMove(Axis** axes) {
-  for (int i = 0; i < NB_AXES; i++) {
+  for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->referenceReached();
   }
   cout << "Testing parseMove" << endl;
@@ -105,9 +105,8 @@ int main (int argc, char *argv[]) {
   HorizontalAxis* axisX = new HorizontalAxis(writer, 'X');
   VerticalAxis* axisY = new VerticalAxis(writer, 'Y');
   Axis* axisT = new Axis(writer, 'T');
-  setupAxes(writer, axisX, axisY, axisT);
-
-  Axis* axes[] = {axisX, axisY, axisT};
+  Axis* axes[] = {axisX, axisY, axisT, NULL};
+  setupAxes(writer, axes);
   
   testAxisByLetter(axes);
   testParseMove(axes);
