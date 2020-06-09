@@ -95,6 +95,10 @@ class Axis {
       m_position_steps = posSteps;
     }
 
+    double getPositionSteps() {
+      return m_position_steps;
+    }
+
     void setDestination(double dest) {
       
       destination = dest;
@@ -117,6 +121,8 @@ class Axis {
     }
 
     void startReferencing() {
+      referenceReached(); // FIMXE: Temporaty
+      
       isReferencing = true;
       setMotorDirection(CCW);
       setMotorEnabled(true);

@@ -117,7 +117,8 @@ void printDebugAxis(Axis* axis, Writer* writer) {
   writer->doPrintLn(axis->stepsPerUnit);
 }
 
-void parseInput(char* input, int size, Writer* writer, Axis** axes) {
+void parseInput(const char* input, Writer* writer, Axis** axes) {
+  int size = strlen(input);
   writer->doPrint("Cmd: ");
   writer->doPrintLn(input);
   if (input[0] == 'M' || input[0] == 'm') {

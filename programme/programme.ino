@@ -88,7 +88,7 @@ void loop() {
     int size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
     input[size] = 0; // Add the final 0 to end the C string
 
-    parseInput(input, size, writer, axes);
+    parseInput(input, writer, axes);
   }
 
   axisX->handleAxis(currentTime);

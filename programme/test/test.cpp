@@ -65,10 +65,10 @@ void testAxisByLetter(Axis** axes) {
 // MX10 should move axis X 10mm
 // MZ269 should move the axis T and the axis X
 void testParseMove(Axis** axes) {
+  cout << "Testing parseMove" << endl;
   for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->referenceReached();
   }
-  cout << "Testing parseMove" << endl;
   char msg[] = "MX10";
   parseMove(axes, msg);
   assertTest(msg, 10.0, AXIS('X')->getDestination());
@@ -104,10 +104,23 @@ void testSpeed(Axis* axis) {
   assertNearby("speed", 10.0, axis->getSpeed());
 }
 
+void testParseInput(Writer* writer, Axis** axes) {
+  cout << "Testing parseInput" << endl;
+  Axis* axisX = axisByLetter(axes, 'X');
+  Axis* axisY = axisByLetter(axes, 'Y');
+  axisX->setPositionSteps(100.0);
+  axisY->setPositionSteps(100.0);
+  parseInput("HX", writer, axes);
+  assertTest("HX should reference X", 0.0, axisX->getPositionSteps());
+  assertTest("HX should not refence Y", 100.0, axisY->getPositionSteps());
+  parseInput("H", writer, axes);
+  assertTest("H should reference Y", 0.0, axisY->getPositionSteps());
+}
+
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
-  ConsoleWriter* writer = new ConsoleWriter();
+  Writer* writer = new ConsoleWriter();
   HorizontalAxis* axisX = new HorizontalAxis(writer, 'X');
   VerticalAxis* axisY = new VerticalAxis(writer, 'Y');
   Axis* axisT = new Axis(writer, 'T');
@@ -119,4 +132,5 @@ int main (int argc, char *argv[]) {
   testAtof();
   testStop(axisX);
   testSpeed(axisT);
+  testParseInput(writer, axes);
 }
