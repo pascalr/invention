@@ -6,7 +6,7 @@
 #define SLOW_SPEED_DELAY 2000
 #define FAST_SPEED_DELAY 100
 
-#define MAX_INPUT_CHUNK_SIZE 256
+#define MAX_INPUT_CHUNK_SIZE 254
 
 using namespace std;
 
@@ -75,39 +75,39 @@ void loop() {
 
     // Get next command from Serial (add 1 for final 0)
     char input[MAX_INPUT_CHUNK_SIZE + 1];
-    byte size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
+    int size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
     input[size] = 0; // Add the final 0 to end the C string
 
     Serial.print("Cmd: ");
     Serial.println(input);
-    if (input.charAt(0) == 'M' || input.charAt(0) == 'm') {
-      parseMove(axes, msg+1);
-    } else if (input.charAt(0) == 's' || input.charAt(0) == 'S') { // stop
+    if (input[0] == 'M' || input[0] == 'm') {
+      parseMove(axes, input+1);
+    } else if (input[0] == 's' || input[0] == 'S') { // stop
       //setMotorsEnabled(false);
       axisX->stop();
       axisY->stop();
       axisT->stop();
-    } else if (input.charAt(0) == 'H' || input.charAt(0) == 'h') { // home reference (eg. H, or HX, or HY, ...)
+    } else if (input[0] == 'H' || input[0] == 'h') { // home reference (eg. H, or HX, or HY, ...)
       Serial.println("Referencing...");
-      if (input.length() == 1) {
+      if (size == 1) {
         axisX->startReferencing();
         axisY->startReferencing();
         axisT->startReferencing();
       } else {
-        Axis* axis = axisByLetter(axes, input.charAt(1));
+        Axis* axis = axisByLetter(axes, input[1]);
         if (axis) {
           axis->startReferencing();
         }
       }
     } else if (input == "?") { // debug info
       printDebugInfo();
-    } else if (input.charAt(0) == '+') {
-      Axis* axis = axisByLetter(axes, input.charAt(1));
+    } else if (input[0] == '+') {
+      Axis* axis = axisByLetter(axes, input[1]);
       if (axis) {
         axis->rotate(CW);
       }
-    } else if (input.charAt(0) == '-') {
-      Axis* axis = axisByLetter(axes, input.charAt(1));
+    } else if (input[0] == '-') {
+      Axis* axis = axisByLetter(axes, input[1]);
       if (axis) {
         axis->rotate(CCW);
       }
