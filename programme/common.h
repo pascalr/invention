@@ -166,6 +166,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
   } else if (cmd == 'w' || cmd == 'W') { // wait or sleep for some time
     double waitTime = atof(input + cursor);
     while (isNumberSymbol(input[cursor])) {cursor++;}
+    delay(waitTime);
   } else if (cmd == '?') {
     for (int i = 0; axes[i] != NULL; i++) {
       printDebugAxis(axes[i], writer);
