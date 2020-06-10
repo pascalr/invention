@@ -70,8 +70,12 @@ void loop() {
     if (inputCursor >= inputSize) { 
       inputCursor = 0;
       inputSize = Serial.readBytes(input, sizeof(byte));
+      
+      if (input[inputSize-1] == '\n') {inputSize--;}
+      if (input[inputSize-1] == '\r') {inputSize--;}
+      
       input[inputSize] = 0; // Add the final 0 to end the C string
-      if (input[inputSize] == '\n') {input[inputSize-1] = 0;}
+      
     } else {
       // Should not received another command exept stop.
       int cmd = Serial.read();

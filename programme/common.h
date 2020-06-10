@@ -126,15 +126,17 @@ void printDebugAxis(Axis* axis, Writer* writer) {
 int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
 
   // Should the cursor passed to the function be a pointer?
-
-  int cursor = oldCursor;
+  int cursor = oldCursor + 1;
   int size = strlen(input);
-  
-  writer->doPrint("Cmd: ");
-  writer->doPrintLn(input);
+  char cmd = input[oldCursor];
 
-  char cmd = input[cursor];
-  cursor++;
+  char* scmd = &cmd;
+  writer->doPrint("Cmd: ");
+  writer->doPrintLn(&cmd);
+  /*char sint[5];
+  itoa(cmd, sint, 10);
+  writer->doPrintLn(sint);*/
+  
   if (cmd == 'M' || cmd == 'm') {
     cursor = parseMove(axes, input, cursor);
   } else if (cmd == 's' || cmd == 'S') { // stop
