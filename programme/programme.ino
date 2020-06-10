@@ -6,8 +6,6 @@
 #define SLOW_SPEED_DELAY 2000
 #define FAST_SPEED_DELAY 100
 
-#define MAX_INPUT_SIZE 1024
-
 using namespace std;
 
 class ArduinoWriter : public Writer {
@@ -39,16 +37,16 @@ class ArduinoWriter : public Writer {
     }
 };
 
-Writer* writer;
-Axis* axisT;
-VerticalAxis* axisY;
-HorizontalAxis* axisX;
-Axis* axisA;
-Axis* axisB;
+ArduinoWriter writer = ArduinoWriter();
+Axis axisT = Axis(&writer, 'T');
+VerticalAxis axisY = VerticalAxis(&writer, 'Y');
+HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
+Axis axisA = Axis(&writer, 'A');
+Axis axisB = Axis(&writer, 'B');
 
-Axis* axes[10];
+Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, NULL};
 
-char input[MAX_INPUT_SIZE];
+char input[sizeof(byte)+1];
 
 void setup() {
 
@@ -57,21 +55,7 @@ void setup() {
   //Serial.begin(115200);
   Serial.println("Setup...");
 
-  // FIXME: Do you need to delete?
-  // The setup function is only ran once
-  writer = new ArduinoWriter();
-  axisX = new HorizontalAxis(writer, 'X');
-  axisY = new VerticalAxis(writer, 'Y');
-  axisT = new Axis(writer, 'T');
-  axisA = new Axis(writer, 'A');
-  axisB = new Axis(writer, 'B');
-  axes[0] = axisX;
-  axes[1] = axisY;
-  axes[2] = axisT;
-  axes[3] = axisA;
-  axes[4] = axisB;
-  axes[5] = NULL;
-  setupAxes(writer, axes);
+  setupAxes(&writer, axes);
   
   Serial.println("Done");
 }
@@ -89,7 +73,7 @@ void loop() {
     byte size = Serial.readBytes(input, sizeof(byte));
     input[size] = 0; // Add the final 0 to end the C string
 
-    parseInput(input, writer, axes);
+    parseInput(input, &writer, axes);
   }
 
   for (int i = 0; axes[i] != NULL; i++) {
