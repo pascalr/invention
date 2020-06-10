@@ -48,11 +48,13 @@ Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, NULL};
 
 char input[sizeof(byte)+1];
 
+int inputCursor = 0;
+byte inputSize = 0;
+
 void setup() {
 
   //Initiate Serial communication.
-  Serial.begin(9600);
-  //Serial.begin(115200);
+  Serial.begin(115200);
   Serial.println("Setup...");
 
   setupAxes(&writer, axes);
@@ -61,23 +63,40 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentTime = micros();
-
+  
   if (Serial.available() > 0) {
-    /*String input = Serial.readString();
-    char msg[256] = {0};
-    input.toCharArray(msg, 256);
-    input.remove(input.length()-1);*/
 
-    // Get next command from Serial (add 1 for final 0)
-    byte size = Serial.readBytes(input, sizeof(byte));
-    input[size] = 0; // Add the final 0 to end the C string
-
-    parseInput(input, &writer, axes);
+    // If we are done doing the commands, get another one.
+    if (inputCursor >= inputSize) { 
+      inputCursor = 0;
+      inputSize = Serial.readBytes(input, sizeof(byte));
+      input[inputSize] = 0; // Add the final 0 to end the C string
+    } else {
+      // Should not received another command exept stop.
+      int cmd = Serial.read();
+      if (cmd == 's' || cmd == 'S') {
+        for (int i = 0; axes[i] != NULL; i++) {
+          axes[i]->stop();
+        }
+      } else if (cmd == '?') {
+        for (int i = 0; axes[i] != NULL; i++) {
+          printDebugAxis(axes[i], &writer);
+        }
+      } else {
+        Serial.println("Error received command while previous was not finished.");
+      }
+    }
+    
   }
 
+  unsigned long currentTime = micros();
+  bool stillWorking = false;
   for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->handleAxis(currentTime);
+    stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
+  }
+
+  if (!stillWorking && inputCursor < inputSize) {
+    inputCursor = parseInput(input, &writer, axes, inputCursor);
   }
 }
 

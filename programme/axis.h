@@ -44,6 +44,15 @@ class Axis {
       maxPosition = 999999;
       m_position_steps = 0;
       m_destination_steps = 0;
+      m_is_working = false;
+    }
+
+    bool isWorking() {
+      return m_is_working;
+    }
+
+    void setIsWorking(bool val) {
+      m_is_working = val;
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -123,9 +132,9 @@ class Axis {
     void startReferencing() {
       referenceReached(); // FIMXE: Temporaty
       
-      /*isReferencing = true;
+      isReferencing = true;
       setMotorDirection(CCW);
-      setMotorEnabled(true);*/
+      setMotorEnabled(true);
     }
 
     void referenceReached() {
@@ -140,14 +149,15 @@ class Axis {
     }
 
     // Only the vertical axis moves in order to do a reference
-    void moveToReference() {
+    bool moveToReference() {
       referenceReached();
     }
 
-    void handleAxis(unsigned long currentTime) {
+    // Returns true if the axis is still working.
+    bool handleAxis(unsigned long currentTime) {
       unsigned int delay = getDelay();
       if (isReferencing) {
-        moveToReference();
+        return moveToReference();
       } else if (isReferenced && isMotorEnabled && currentTime - previousStepTime > delay && (forceRotation ||
                 ((isClockwise && m_position_steps < m_destination_steps) || (!isClockwise && m_position_steps > m_destination_steps)))) {
         turnOneStep();
@@ -156,7 +166,9 @@ class Axis {
         } else {
           previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
         }
+        return true;
       }
+      return false;
     }
   
   //protected:
@@ -192,6 +204,8 @@ class Axis {
 
     unsigned long m_position_steps;
     unsigned long m_destination_steps;
+
+    bool m_is_working; // FIXME: Probably useless
 };
 
 // The horizontal axis adjusts it's speed to compensate the rotary axis

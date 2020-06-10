@@ -17,8 +17,13 @@ Axis* axisByLetter(Axis** axes, char letter) {
   return NULL;
 }
 
-void parseMove(Axis** axes, const char* cmd) {
-  for (int i = 0; cmd[i] != '\0'; i++) {
+int parseMove(Axis** axes, const char* cmd, int oldCursor) {
+  int i;
+  for (i = oldCursor; cmd[i] != '\0'; i++) {
+
+    if (cmd[i] == ';' || cmd[i] == '\n') {
+      return i+1;
+    }
 
     double destination = atof(cmd+i+1);
 
@@ -42,6 +47,7 @@ void parseMove(Axis** axes, const char* cmd) {
       }
     }
   }
+  return i;
 }
 
 void printDebugAxis(Axis* axis, Writer* writer) {
@@ -117,44 +123,60 @@ void printDebugAxis(Axis* axis, Writer* writer) {
   writer->doPrintLn(axis->stepsPerUnit);
 }
 
-void parseInput(const char* input, Writer* writer, Axis** axes) {
+int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
+
+  // Should the cursor passed to the function be a pointer?
+
+  int cursor = oldCursor;
   int size = strlen(input);
+  
   writer->doPrint("Cmd: ");
   writer->doPrintLn(input);
-  if (input[0] == 'M' || input[0] == 'm') {
-    parseMove(axes, input+1);
-  } else if (input[0] == 's' || input[0] == 'S') { // stop
-    //setMotorsEnabled(false);
+
+  char cmd = input[cursor];
+  cursor++;
+  if (cmd == 'M' || cmd == 'm') {
+    cursor = parseMove(axes, input, cursor);
+  } else if (cmd == 's' || cmd == 'S') { // stop
     for (int i = 0; axes[i] != NULL; i++) {
       axes[i]->stop();
     }
-  } else if (input[0] == 'H' || input[0] == 'h') { // home reference (eg. H, or HX, or HY, ...)
+    cursor = size; // Disregard everything else after the stop command.
+  } else if (cmd == 'H' || cmd == 'h') { // home reference (eg. H, or HX, or HY, ...)
     writer->doPrintLn("Referencing...");
     if (size == 1) {
       for (int i = 0; axes[i] != NULL; i++) {
         axes[i]->startReferencing();
       }
     } else {
-      Axis* axis = axisByLetter(axes, input[1]);
+      Axis* axis = axisByLetter(axes, input[cursor]);
+      cursor++;
       if (axis) {
         axis->startReferencing();
       }
+      // TODO: Handle error
     }
-  } else if (input[0] == '?') { // debug info
+  } else if (cmd == '?') {
     for (int i = 0; axes[i] != NULL; i++) {
       printDebugAxis(axes[i], writer);
     }
-  } else if (input[0] == '+') {
-    Axis* axis = axisByLetter(axes, input[1]);
+  } else if (cmd == '+') {
+    Axis* axis = axisByLetter(axes, input[cursor]);
+    cursor++;
     if (axis) {
       axis->rotate(CW);
     }
-  } else if (input[0] == '-') {
-    Axis* axis = axisByLetter(axes, input[1]);
+    // TODO: Handle error
+  } else if (cmd == '-') {
+    Axis* axis = axisByLetter(axes, input[cursor]);
+    cursor++;
     if (axis) {
       axis->rotate(CCW);
     }
+    // TODO: Handle error
   }
+
+  return cursor;
 }
 
 #endif
