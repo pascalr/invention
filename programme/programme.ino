@@ -6,7 +6,7 @@
 #define SLOW_SPEED_DELAY 2000
 #define FAST_SPEED_DELAY 100
 
-#define MAX_INPUT_CHUNK_SIZE 254
+#define MAX_INPUT_SIZE 1024
 
 using namespace std;
 
@@ -48,14 +48,13 @@ Axis* axisB;
 
 Axis* axes[10];
 
+char input[MAX_INPUT_SIZE];
+
 void setup() {
 
   //Initiate Serial communication.
-  //Serial.begin(9600);
-  Serial.begin(115200);
-
-  //delay(100); // Wait before printing otherwise it outputs weird characters at the beginning somtetimes.
-  
+  Serial.begin(9600);
+  //Serial.begin(115200);
   Serial.println("Setup...");
 
   // FIXME: Do you need to delete?
@@ -87,12 +86,8 @@ void loop() {
     input.remove(input.length()-1);*/
 
     // Get next command from Serial (add 1 for final 0)
-    char input[MAX_INPUT_CHUNK_SIZE + 1];
-    int size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
+    byte size = Serial.readBytes(input, sizeof(byte));
     input[size] = 0; // Add the final 0 to end the C string
-    if (input[size-1] == '\n') {input[size-1] = 0;}
-
-    Serial.println(size);
 
     parseInput(input, writer, axes);
   }
