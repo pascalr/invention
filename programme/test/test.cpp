@@ -138,8 +138,9 @@ void testParseInput(Writer* writer, Axis** axes) {
   Axis* axisY = axisByLetter(axes, 'Y');
   axisX->setPositionSteps(100.0);
   axisY->setPositionSteps(100.0);
+  int cursor;
 
-  int cursor = parseInput("HX", writer, axes, 0);
+  cursor = parseInput("HX", writer, axes, 0);
   assertTest("HX should reference X", 0.0, axisX->getPositionSteps());
   assertTest("HX should not refence Y", 100.0, axisY->getPositionSteps());
   assertTest("Should increase the cursor by 2", 2, cursor);
@@ -151,6 +152,19 @@ void testParseInput(Writer* writer, Axis** axes) {
   assertTest("H should reference Y", 0.0, axisY->getPositionSteps());
   assertTest("Should increase the cursor by 1", 1, cursor);
 
+}
+
+void testHandleAxis(Writer* writer, Axis** axes) {
+  cout << "Testing handleAxis" << endl;
+
+  Axis* axis = axisByLetter(axes, 'X');
+  axis->referenceReached();
+  unsigned long time_us = 100;
+
+  assertTest("Should not be working at first", false, axis->handleAxis(time_us));
+
+  parseMove(axes, "X10", 0);
+  assertTest("After a move it should work", true, axis->handleAxis(time_us));
 }
 
 int main (int argc, char *argv[]) {
@@ -169,4 +183,5 @@ int main (int argc, char *argv[]) {
   testStop(&axisX);
   testSpeed(&axisT);
   testParseInput(&writer, axes);
+  testHandleAxis(&writer, axes);
 }

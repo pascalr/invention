@@ -114,7 +114,6 @@ class Axis {
       if (destination > maxPosition) {destination = maxPosition;}
       if (destination < 0) {destination = 0;}
       m_destination_steps = dest * stepsPerUnit;
-      setMotorEnabled(true);
       setMotorDirection(m_destination_steps > m_position_steps);
     }
     
@@ -143,7 +142,7 @@ class Axis {
       m_writer->doPrintLn(theName);
       setPositionSteps(0);
       setDestination(0);
-      setMotorEnabled(false);
+      setMotorEnabled(true);
       isReferenced = true;
       isReferencing = false;
     }
@@ -158,13 +157,16 @@ class Axis {
       unsigned int delay = getDelay();
       if (isReferencing) {
         return moveToReference();
-      } else if (isReferenced && isMotorEnabled && currentTime - previousStepTime > delay && (forceRotation ||
-                ((isClockwise && m_position_steps < m_destination_steps) || (!isClockwise && m_position_steps > m_destination_steps)))) {
-        turnOneStep();
-        if (currentTime - previousStepTime > 2*delay) {
-          previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
-        } else {
-          previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
+      } else if (isReferenced && isMotorEnabled && (forceRotation ||
+                ((isClockwise && m_position_steps < m_destination_steps) ||
+                (!isClockwise && m_position_steps > m_destination_steps)))) {
+        if (currentTime - previousStepTime > delay) {
+          turnOneStep();
+          if (currentTime - previousStepTime > 2*delay) {
+            previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
+          } else {
+            previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
+          }
         }
         return true;
       }

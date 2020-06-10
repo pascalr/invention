@@ -34,16 +34,19 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
       if (destination > 0 && destination <= RAYON && axisT) {
         double angle = asin(destination / RAYON) * 180.0 / PI;
         axisT->setDestination(angle);
+        axisT->setMotorEnabled(true);
 
         HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
         int shouldGoForward = axisX->getPosition() < axisX->maxPosition / 2 ? -1 : 1;
         double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
         axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
+        axisX->setMotorEnabled(true);
       }
     } else {
       Axis* axis = axisByLetter(axes, cmd[i]);
       if (axis) {
         axis->setDestination(destination);
+        axis->setMotorEnabled(true);
       } else if(!isDigitOrDot(cmd[i])) {
         return i; // End of move command, stop
       }
