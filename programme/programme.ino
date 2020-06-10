@@ -71,6 +71,7 @@ void loop() {
       inputCursor = 0;
       inputSize = Serial.readBytes(input, sizeof(byte));
       input[inputSize] = 0; // Add the final 0 to end the C string
+      if (input[inputSize] == '\n') {input[inputSize-1] = 0;}
     } else {
       // Should not received another command exept stop.
       int cmd = Serial.read();
