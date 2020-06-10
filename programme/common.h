@@ -17,13 +17,13 @@ Axis* axisByLetter(Axis** axes, char letter) {
   return NULL;
 }
 
+bool isDigitOrDot(char c) {
+  return (c >= '0' && c <= '9') || c == '.';
+}
+
 int parseMove(Axis** axes, const char* cmd, int oldCursor) {
   int i;
   for (i = oldCursor; cmd[i] != '\0'; i++) {
-
-    if (cmd[i] == ';' || cmd[i] == '\n') {
-      return i+1;
-    }
 
     double destination = atof(cmd+i+1);
 
@@ -44,6 +44,8 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
       Axis* axis = axisByLetter(axes, cmd[i]);
       if (axis) {
         axis->setDestination(destination);
+      } else if(!isDigitOrDot(cmd[i])) {
+        return i; // End of move command, stop
       }
     }
   }

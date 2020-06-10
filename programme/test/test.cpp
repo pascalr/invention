@@ -86,19 +86,26 @@ void testAxisByLetter(Axis** axes) {
 // MZ269 should move the axis T and the axis X
 void testParseMove(Axis** axes) {
   cout << "Testing parseMove" << endl;
+
+  int cursor;
+
   for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->referenceReached();
   }
-  char msg[] = "MX10";
-  parseMove(axes, msg, 1);
+
+  char msg[] = "X10";
+  cursor = parseMove(axes, msg, 0);
   assertTest(msg, 10.0, AXIS('X')->getDestination());
-  char msg2[] = "MX20";
-  parseMove(axes, msg2, 1);
+  assertTest("Cursor should go forward", 3, cursor);
+  char msg2[] = "Y20X20";
+  cursor = parseMove(axes, msg2, 0);
   assertTest(msg2, 20.0, AXIS('X')->getDestination());
-  char msg3[] = "MZ100";
-  parseMove(axes, msg3, 1);
-  assertTest("MZ100,X", 20.0, AXIS('X')->getDestination());
-  assertTest("MZ100,T", 20.0, AXIS('T')->getDestination());
+  assertTest(msg2, 20.0, AXIS('Y')->getDestination());
+  assertTest("Cursor should go forward", 6, cursor);
+  char msg3[] = "Z100";
+  cursor = parseMove(axes, msg3, 0);
+  assertTest("Z100,X", 20.0, AXIS('X')->getDestination());
+  assertTest("Z100,T", 20.0, AXIS('T')->getDestination());
 }
 
 void testAtof() {
