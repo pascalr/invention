@@ -17,8 +17,8 @@ Axis* axisByLetter(Axis** axes, char letter) {
   return NULL;
 }
 
-bool isDigitOrDot(char c) {
-  return (c >= '0' && c <= '9') || c == '.';
+bool isNumberSymbol(char c) {
+  return (c >= '0' && c <= '9') || c == '.' || c == '-';
 }
 
 int parseMove(Axis** axes, const char* cmd, int oldCursor) {
@@ -47,7 +47,7 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
       if (axis) {
         axis->setDestination(destination);
         axis->setMotorEnabled(true);
-      } else if(!isDigitOrDot(cmd[i])) {
+      } else if(!isNumberSymbol(cmd[i])) {
         return i; // End of move command, stop
       }
     }
@@ -163,6 +163,9 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
       }
       // TODO: Handle error
     }
+  } else if (cmd == 'w' || cmd == 'W') { // wait or sleep for some time
+    double waitTime = atof(input + cursor);
+    while (isNumberSymbol(input[cursor])) {cursor++;}
   } else if (cmd == '?') {
     for (int i = 0; axes[i] != NULL; i++) {
       printDebugAxis(axes[i], writer);
