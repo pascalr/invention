@@ -132,9 +132,9 @@ class Axis {
     void startReferencing() {
       referenceReached(); // FIMXE: Temporaty
       
-      isReferencing = true;
+      /*isReferencing = true;
       setMotorDirection(CCW);
-      setMotorEnabled(true);
+      setMotorEnabled(true);*/
     }
 
     void referenceReached() {
