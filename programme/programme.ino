@@ -46,7 +46,7 @@ Axis axisB = Axis(&writer, 'B');
 
 Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, NULL};
 
-char input[sizeof(byte)+1];
+char input[256];
 
 int inputCursor = 0;
 byte inputSize = 0;
@@ -69,7 +69,7 @@ void loop() {
     // If we are done doing the commands, get another one.
     if (inputCursor >= inputSize) { 
       inputCursor = 0;
-      inputSize = Serial.readBytes(input, sizeof(byte));
+      inputSize = Serial.readBytes(input, 254);
       
       if (input[inputSize-1] == '\n') {inputSize--;}
       if (input[inputSize-1] == '\r') {inputSize--;}
