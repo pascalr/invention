@@ -51,8 +51,11 @@ Axis* axes[10];
 void setup() {
 
   //Initiate Serial communication.
-  Serial.begin(9600);
-  //Serial.begin(115200);
+  //Serial.begin(9600);
+  Serial.begin(115200);
+
+  //delay(100); // Wait before printing otherwise it outputs weird characters at the beginning somtetimes.
+  
   Serial.println("Setup...");
 
   // FIXME: Do you need to delete?
@@ -87,6 +90,9 @@ void loop() {
     char input[MAX_INPUT_CHUNK_SIZE + 1];
     int size = Serial.readBytes(input, MAX_INPUT_CHUNK_SIZE);
     input[size] = 0; // Add the final 0 to end the C string
+    if (input[size-1] == '\n') {input[size-1] = 0;}
+
+    Serial.println(size);
 
     parseInput(input, writer, axes);
   }

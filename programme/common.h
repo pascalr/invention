@@ -140,7 +140,7 @@ void parseInput(const char* input, Writer* writer, Axis** axes) {
         axis->startReferencing();
       }
     }
-  } else if (input == "?") { // debug info
+  } else if (input[0] == '?') { // debug info
     for (int i = 0; axes[i] != NULL; i++) {
       printDebugAxis(axes[i], writer);
     }
