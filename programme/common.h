@@ -197,14 +197,15 @@ int parseInput(char* input, Writer* writer, Axis** axes, int oldCursor) {
   }
 
   writer->doPrint("Cmd: ");
-  if (cursor < size) {
+  writer->doPrintLn(input+oldCursor);
+  /*if (cursor < size) {
     char tmp = input[cursor];
     input[cursor] = '\0';
     writer->doPrintLn(input+oldCursor);
     input[cursor] = tmp;
   } else {
     writer->doPrintLn(input+oldCursor);
-  }
+  }*/
   
   /*char sint[5];
   itoa(cmd, sint, 10);

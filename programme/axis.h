@@ -48,44 +48,44 @@ class Axis {
       m_is_working = false;
     }
 
-    bool isWorking() {
+    virtual bool isWorking() {
       return m_is_working;
     }
 
-    void setIsWorking(bool val) {
+    virtual void setIsWorking(bool val) {
       m_is_working = val;
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
     // The value is multiplied by two because we have to write LOW then HIGH for one step
-    void setStepsPerUnit(double ratio) {
+    virtual void setStepsPerUnit(double ratio) {
       stepsPerUnit = ratio;
     }
 
-    double getStepsPerUnit() {
+    virtual double getStepsPerUnit() {
       return stepsPerUnit;
     }
 
-    double getSpeed() {
+    virtual double getSpeed() {
       double frequency = 1 / getDelay() * 1000000;
       double theSpeed = frequency / stepsPerUnit;
       return theSpeed;
     }
 
-    void setupPins() {
+    virtual void setupPins() {
       m_writer->doPinMode(stepPin, OUTPUT);
       m_writer->doPinMode(dirPin, OUTPUT);
       m_writer->doPinMode(enabledPin, OUTPUT);
     }
 
-    void rotate(bool direction) {
+    virtual void rotate(bool direction) {
       setMotorDirection(direction);
       forceRotation = true;
       setMotorEnabled(true);
     }
 
-    double getPosition() {
+    virtual double getPosition() {
       return m_position_steps / stepsPerUnit;
     }
 
@@ -97,13 +97,13 @@ class Axis {
       return m_destination_steps;
     }
 
-    void stop() {
+    virtual void stop() {
       //setMotorsEnabled(false);
       setDestination(getPosition());
       forceRotation = false;
     }
 
-    void turnOneStep() {
+    virtual void turnOneStep() {
       m_writer->doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
       m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
@@ -114,7 +114,7 @@ class Axis {
       //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
     }
 
-    void turnOneStepAndUpdateFollowingAxis() {
+    virtual void turnOneStepAndUpdateFollowingAxis() {
       if (m_following_axis) {
         
         unsigned long oldPosition = getPosition();
@@ -127,15 +127,15 @@ class Axis {
       }
     }
 
-    void setPositionSteps(double posSteps) {
+    virtual void setPositionSteps(double posSteps) {
       m_position_steps = posSteps;
     }
 
-    double getPositionSteps() {
+    virtual double getPositionSteps() {
       return m_position_steps;
     }
 
-    void setDestination(double dest) {
+    virtual void setDestination(double dest) {
       
       destination = dest;
       if (destination > maxPosition) {destination = maxPosition;}
@@ -144,18 +144,18 @@ class Axis {
       setMotorDirection(m_destination_steps > m_position_steps);
     }
     
-    void setMotorEnabled(bool value) {
+    virtual void setMotorEnabled(bool value) {
       m_writer->doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(enabledPin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
 
-    void setMotorDirection(bool clockwise) {
+    virtual void setMotorDirection(bool clockwise) {
       m_writer->doDigitalWrite(dirPin, clockwise ? LOW : HIGH);
       isClockwise = clockwise;
     }
 
-    void startReferencing() {
+    virtual void startReferencing() {
       referenceReached(); // FIMXE: Temporaty
       
       /*isReferencing = true;
@@ -163,7 +163,7 @@ class Axis {
       setMotorEnabled(true);*/
     }
 
-    void referenceReached() {
+    virtual void referenceReached() {
       m_writer->doPrint("Done referencing axis ");
       char theName[] = {name, '\0'};
       m_writer->doPrintLn(theName);
@@ -175,7 +175,7 @@ class Axis {
     }
 
     // Only the vertical axis moves in order to do a reference
-    bool moveToReference() {
+    virtual bool moveToReference() {
       referenceReached();
     }
 
@@ -226,12 +226,12 @@ class Axis {
     char name;
 
     // Get the delay untill the next step
-    double getDelay() {
+    virtual double getDelay() {
       // TODO: The speed is not fixed.
       return speed;
     }
 
-    void setFollowingAxis(Axis* axis) {
+    virtual void setFollowingAxis(Axis* axis) {
       m_following_axis = axis;
     }
 
@@ -252,77 +252,46 @@ class Axis {
     bool m_is_working; // FIXME: Probably useless
 };
 
-// The horizontal axis adjusts it's speed to compensate the rotary axis
-class HorizontalAxis: public Axis {
-  public:
-    HorizontalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
-      
-    }
-
-    /*void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
-
-      //setDestination(getDestination() + position - oldPosition);
-
-      //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
-
-      // OPTIMIZE: This can probably be done with only one cos.
-      double deltaX = (RAYON * cos(m_rotation_axis_beginning_position * PI / 180)) - (RAYON * cos(position * PI / 180));
-      m_rotation_position = deltaX * ((int)m_should_go_forward);
-      //setDestination(getDestination() + (deltaX * (int)m_should_go_forward));
-    }*/
-
-    double getDestination() {
-      return Axis::getDestination() + m_rotation_position;
-    }
-
-    double getDestinationSteps() {
-      if (m_rotation_axis) {
-        return Axis::getDestinationSteps() + m_rotation_position * m_rotation_axis->getStepsPerUnit();
-      }
-      return Axis::getDestinationSteps();
-    }
-
-    void updateShouldGoForward() {
-      m_should_go_forward = getPosition() < maxPosition / 2;
-    }
-
-    void setRotationAxis(Axis* axis) {
-      m_rotation_axis = axis;
-    }
-
-    void prepare(unsigned long time) {
-      Axis::prepare(time);
-
-      if (m_rotation_axis) {
-        m_rotation_axis_beginning_position = m_rotation_axis->getPosition();
-      }
-    }
-  
-    unsigned int getDelay() {
-      double theta = m_rotation_axis->getPosition();
-      // Vx = r* W * sin(theta)
-      // TODO: The speed is not fixed.
-      return speed;
-    }
-
-  private:
-    Axis* m_rotation_axis;
-    bool m_should_go_forward;
-    double m_rotation_position;
-    double m_rotation_axis_beginning_position;
-};
-
 // The ZAxis is the TAxis.
 class ZAxis : public Axis {
   public:
-    ZAxis(Writer* theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
+    ZAxis(Writer* theWriter, char theName, Axis* hAxis) : Axis(theWriter, theName) {
       m_horizontal_axis = hAxis;
     }
     virtual bool handleAxis(unsigned long currentTime) {
-      Axis::handleAxis(currentTime);
+      unsigned int delay = getDelay();
+      double destSteps = getDestinationSteps();
+      if (isReferencing) {
+        return moveToReference();
+      } else if (isReferenced && isMotorEnabled && (forceRotation ||
+                ((isClockwise && m_position_steps < destSteps) ||
+                (!isClockwise && m_position_steps > destSteps)))) {
+        unsigned long deltaTime = currentTime - previousStepTime;
+        if (deltaTime > delay) {
+          turnOneStepAndUpdateFollowingAxis();
+          // TODO: Instead of this, call a function named prepareToMove, that updates the previousStepTime
+          if (deltaTime > 2*delay) {
+            previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
+          } else {
+            previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+
+    double getDestinationSteps() {
+      return m_destination_angle * stepsPerUnit;
+    }
+
+    void setDestination(double dest) {
+      Axis::setDestination(dest);
+      m_destination_angle = asin(dest / RAYON) * 180.0 / PI;
     }
   private:
-    HorizontalAxis* m_horizontal_axis;
+    Axis* m_horizontal_axis;
+    double m_destination_angle;
 };
 
 class VerticalAxis: public Axis {

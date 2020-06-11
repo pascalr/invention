@@ -105,7 +105,6 @@ void testParseMove(Axis** axes) {
   //char msg3[] = "Z100";
   //cursor = parseMove(axes, msg3, 0);
   //assertTest("Z100,X", 20.0, AXIS('X')->getDestination());
-  //assertTest("Z100,T", 20.0, AXIS('T')->getDestination());
 }
 
 void testAtof() {
@@ -171,7 +170,7 @@ void testMoveZ(Writer* writer, Axis** axes) {
   cout << "Test move Z" << endl;
 
   Axis* axisX = axisByLetter(axes, 'X');
-  Axis* axisT = axisByLetter(axes, 'T');
+  Axis* axisZ = axisByLetter(axes, 'Z');
   
   for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->prepare(0);
@@ -180,13 +179,14 @@ void testMoveZ(Writer* writer, Axis** axes) {
   cout << "Test move Z" << endl;
 
   parseInput("MZ380", writer, axes, 0);
-  assertTest("Destination T", 90.0, axisT->getDestination());
-  int steps = axisT->getDestinationSteps();
+  assertTest("Destination Z", 380.0, axisZ->getDestination());
+  assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
+  int steps = axisZ->getDestinationSteps();
 
   for (int i = 0; i < steps; i++) {
-    axisT->turnOneStepAndUpdateFollowingAxis();
+    axisZ->turnOneStepAndUpdateFollowingAxis();
   }
-  assertTest("Position T", 90.0, axisT->getPosition());
+  assertTest("Position Z", 90.0, axisZ->getPosition());
   assertTest("Destination steps X", RAYON, axisX->getDestination());
 
 }
@@ -195,18 +195,17 @@ int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
   SilentWriter writer = SilentWriter();
-  HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
+  Axis axisX = Axis(&writer, 'X');
   VerticalAxis axisY = VerticalAxis(&writer, 'Y');
-  Axis axisT = Axis(&writer, 'T');
-  axisX.setRotationAxis(&axisT);
-  Axis* axes[] = {&axisX, &axisY, &axisT, NULL};
+  ZAxis axisZ = ZAxis(&writer, 'Z', &axisX);
+  Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
   
   testAxisByLetter(axes);
   testParseMove(axes);
   testAtof();
   testStop(&axisX);
-  testSpeed(&axisT);
+  testSpeed(&axisX);
   testParseInput(&writer, axes);
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
