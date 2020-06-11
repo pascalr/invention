@@ -261,7 +261,7 @@ class HorizontalAxis: public Axis {
       //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
 
       double deltaX = (RAYON * cos(oldPosition * PI / 180)) - (RAYON * cos(position * PI / 180)); // OPTIMIZE: This can probably be done with only one cos.
-      setDestination(getDestination() + (deltaX * (int)m_should_go_forward));
+      /*setDestination(getDestination() + (deltaX * (int)m_should_go_forward));*/
     }
 
     void updateShouldGoForward() {

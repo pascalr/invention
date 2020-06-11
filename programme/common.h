@@ -145,19 +145,12 @@ void printDebugAxis(Axis* axis, Writer* writer) {
   writer->doPrintLn(axis->stepsPerUnit);
 }
 
-int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
+int parseInput(char* input, Writer* writer, Axis** axes, int oldCursor) {
 
   // Should the cursor passed to the function be a pointer?
   int cursor = oldCursor + 1;
   int size = strlen(input);
   char cmd = input[oldCursor];
-
-  char* scmd = &cmd;
-  writer->doPrint("Cmd: ");
-  writer->doPrintLn(&cmd);
-  /*char sint[5];
-  itoa(cmd, sint, 10);
-  writer->doPrintLn(sint);*/
   
   if (cmd == 'M' || cmd == 'm') {
     cursor = parseMove(axes, input, cursor);
@@ -205,6 +198,15 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     }
     // TODO: Handle error
   }
+
+  char tmp = input[cursor];
+  input[cursor] = '\0';
+  writer->doPrint("Cmd: ");
+  writer->doPrintLn(input+oldCursor);
+  input[cursor] = tmp;
+  /*char sint[5];
+  itoa(cmd, sint, 10);
+  writer->doPrintLn(sint);*/
 
   return cursor;
 }
