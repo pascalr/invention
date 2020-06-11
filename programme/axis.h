@@ -105,7 +105,7 @@ class Axis {
       m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
     }
 
-    void followedAxisMoved(double oldPosition, double position, unsigned long deltaTime, double followedStepsPerUnit) {
+    virtual void followedAxisMoved(double oldPosition, double position, unsigned long deltaTime, double followedStepsPerUnit) {
       //setDestination(getDestination() + position - oldPosition);
       //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
     }

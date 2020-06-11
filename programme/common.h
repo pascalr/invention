@@ -32,7 +32,7 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
       Axis* axisT = axisByLetter(axes, 'T');
       HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
             
-      if (destination > 0 && destination <= RAYON && axisT && axisX) {
+      if (destination >= 0 && destination <= RAYON && axisT && axisX) {
         double angle = asin(destination / RAYON) * 180.0 / PI;
         axisT->setDestination(angle);
         axisT->setMotorEnabled(true);
