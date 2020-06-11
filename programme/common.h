@@ -89,7 +89,7 @@ void printDebugAxis(Axis* axis, Writer* writer) {
   writer->doPrint("-CW ");
   writer->doPrint(axis->name);
   writer->doPrint(": ");
-  writer->doPrintLn(axis->isClockwise);
+  writer->doPrintLn(axis->isForward);
   
   writer->doPrint("-Referenced ");
   writer->doPrint(axis->name);
@@ -184,14 +184,14 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     Axis* axis = axisByLetter(axes, input[cursor]);
     cursor++;
     if (axis) {
-      axis->rotate(CW);
+      axis->rotate(FORWARD);
     }
     // TODO: Handle error
   } else if (cmd == '-') {
     Axis* axis = axisByLetter(axes, input[cursor]);
     cursor++;
     if (axis) {
-      axis->rotate(CCW);
+      axis->rotate(REVERSE);
     }
     // TODO: Handle error
   }

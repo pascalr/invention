@@ -169,7 +169,7 @@ void testHandleAxis(Writer* writer, Axis** axes) {
 void testMoveZ(Writer* writer, Axis** axes) {
   cout << "Test move Z" << endl;
 
-  Axis* axisX = axisByLetter(axes, 'X');
+  HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
   Axis* axisZ = axisByLetter(axes, 'Z');
   
   for (int i = 0; axes[i] != NULL; i++) {
@@ -179,15 +179,26 @@ void testMoveZ(Writer* writer, Axis** axes) {
   cout << "Test move Z" << endl;
 
   parseInput("MZ380", writer, axes, 0);
-  assertTest("Destination Z", 380.0, axisZ->getDestination());
+  assertNearby("Destination Z", 380.0, axisZ->getDestination());
   //assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
-  int steps = axisZ->getDestinationSteps();
 
+  cout << "---------------------------------------------------------------" << endl;  
+  int steps = axisZ->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
     axisZ->turnOneStep();
   }
-  assertTest("Position Z", 380.0, axisZ->getPosition());
-  assertTest("Destination steps X", RAYON, axisX->getDestination());
+  assertNearby("Position Z", 380.0, axisZ->getPosition());
+
+  assertNearby("Destination X", RAYON, axisX->getDestination());
+  //assertTest("Destination steps X", 380.0, axisX->getDestinationSteps());
+
+  assertNearby("Delta Destination X", 380.0, axisX->getDeltaDestination());
+  assertNearby("Position X is zero first", 0.0, axisX->getPosition());
+  steps = axisX->getDestinationSteps();
+  for (int i = 0; i < steps; i++) {
+    axisX->turnOneStep();
+  }
+  assertNearby("Position X", 380.0, axisX->getPosition());
 
 }
 

@@ -3,8 +3,8 @@
 
 #define RAYON 380.0
 
-#define CW true
-#define CCW false
+#define FORWARD true
+#define REVERSE false
 
 #ifndef LOW
 #define LOW 0
@@ -37,7 +37,7 @@ class Axis {
       previousStepTime = 0;
       isStepHigh = false;
       isMotorEnabled = false;
-      isClockwise = false;
+      isForward = true;
       isReferenced = false;
       isReferencing = false;
       speed = 500;
@@ -110,7 +110,7 @@ class Axis {
     virtual void turnOneStep() {
       m_writer->doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
-      m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
+      m_position_steps = m_position_steps + (isForward ? 1 : -1);
     }
 
     virtual void setPositionSteps(double posSteps) {
@@ -121,13 +121,17 @@ class Axis {
       return m_position_steps;
     }
 
+    void updateDirection() {
+      setMotorDirection(getDestinationSteps() > getPositionSteps());
+    }
+
     virtual void setDestination(double dest) {
       
       destination = dest;
       if (destination > maxPosition) {destination = maxPosition;}
       if (destination < 0) {destination = 0;}
       m_destination_steps = dest * stepsPerUnit;
-      setMotorDirection(m_destination_steps > m_position_steps);
+      updateDirection();
     }
     
     virtual void setMotorEnabled(bool value) {
@@ -138,7 +142,7 @@ class Axis {
 
     virtual void setMotorDirection(bool clockwise) {
       m_writer->doDigitalWrite(dirPin, clockwise ? LOW : HIGH);
-      isClockwise = clockwise;
+      isForward = clockwise;
     }
 
     virtual void startReferencing() {
@@ -172,8 +176,8 @@ class Axis {
       if (isReferencing) {
         return moveToReference();
       } else if (isReferenced && isMotorEnabled && (forceRotation ||
-                ((isClockwise && m_position_steps < destSteps) ||
-                (!isClockwise && m_position_steps > destSteps)))) {
+                ((isForward && m_position_steps < destSteps) ||
+                (!isForward && m_position_steps > destSteps)))) {
         unsigned long deltaTime = currentTime - previousStepTime;
         if (deltaTime > delay) {
           turnOneStep();
@@ -205,7 +209,7 @@ class Axis {
     
     bool isStepHigh;
     bool isMotorEnabled;
-    bool isClockwise;
+    bool isForward;
     bool isReferenced;
     bool isReferencing;
     bool forceRotation;
@@ -258,6 +262,11 @@ class HorizontalAxis : public Axis {
     
     void setDeltaDestination(double dest) {
       m_delta_destination = dest;
+      updateDirection();
+    }
+
+    double getDeltaDestination() {
+      return m_delta_destination;
     }
   private:
     double m_delta_destination;
@@ -272,7 +281,7 @@ class ZAxis : public Axis {
 
     virtual void turnOneStep() {
       Axis::turnOneStep();
-      double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : 1);
+      double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? -1 : 1);
       m_horizontal_axis->setDeltaDestination(deltaX);
     }
 
