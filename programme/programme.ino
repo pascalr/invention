@@ -89,7 +89,8 @@ void loop() {
           printDebugAxis(axes[i], &writer);
         }
       } else {
-        Serial.println("Error received command while previous was not finished.");
+        Serial.print("Error received command while previous was not finished: ");
+        Serial.println(cmd);
       }
     }
     
