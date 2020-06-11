@@ -142,7 +142,7 @@ void printDebugAxis(Axis* axis, Writer* writer) {
   writer->doPrintLn(axis->stepsPerUnit);
 }
 
-int parseInput(char* input, Writer* writer, Axis** axes, int oldCursor) {
+int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
 
   // Should the cursor passed to the function be a pointer?
   int cursor = oldCursor + 1;

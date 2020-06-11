@@ -40,7 +40,7 @@ class ArduinoWriter : public Writer {
 ArduinoWriter writer = ArduinoWriter();
 Axis axisT = Axis(&writer, 'T');
 VerticalAxis axisY = VerticalAxis(&writer, 'Y');
-Axis axisX = Axis(&writer, 'X');
+HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
 Axis axisA = Axis(&writer, 'A');
 Axis axisB = Axis(&writer, 'B');
 ZAxis axisZ = ZAxis(&writer, 'Z', &axisX);

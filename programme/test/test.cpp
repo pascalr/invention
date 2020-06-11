@@ -180,13 +180,13 @@ void testMoveZ(Writer* writer, Axis** axes) {
 
   parseInput("MZ380", writer, axes, 0);
   assertTest("Destination Z", 380.0, axisZ->getDestination());
-  assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
+  //assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
   int steps = axisZ->getDestinationSteps();
 
   for (int i = 0; i < steps; i++) {
-    axisZ->turnOneStepAndUpdateFollowingAxis();
+    axisZ->turnOneStep();
   }
-  assertTest("Position Z", 90.0, axisZ->getPosition());
+  assertTest("Position Z", 380.0, axisZ->getPosition());
   assertTest("Destination steps X", RAYON, axisX->getDestination());
 
 }
@@ -195,7 +195,7 @@ int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
   SilentWriter writer = SilentWriter();
-  Axis axisX = Axis(&writer, 'X');
+  HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
   VerticalAxis axisY = VerticalAxis(&writer, 'Y');
   ZAxis axisZ = ZAxis(&writer, 'Z', &axisX);
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};

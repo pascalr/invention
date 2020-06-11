@@ -109,24 +109,6 @@ class Axis {
       m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
     }
 
-    virtual void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
-      //setDestination(getDestination() + position - oldPosition);
-      //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
-    }
-
-    virtual void turnOneStepAndUpdateFollowingAxis() {
-      if (m_following_axis) {
-        
-        unsigned long oldPosition = getPosition();
-        turnOneStep();
-        
-        m_following_axis->followedAxisMoved(oldPosition, getPosition(), getStepsPerUnit());
-        
-      } else {
-        turnOneStep();
-      }
-    }
-
     virtual void setPositionSteps(double posSteps) {
       m_position_steps = posSteps;
     }
@@ -190,7 +172,7 @@ class Axis {
                 (!isClockwise && m_position_steps > destSteps)))) {
         unsigned long deltaTime = currentTime - previousStepTime;
         if (deltaTime > delay) {
-          turnOneStepAndUpdateFollowingAxis();
+          turnOneStep();
           // TODO: Instead of this, call a function named prepareToMove, that updates the previousStepTime
           if (deltaTime > 2*delay) {
             previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
@@ -252,12 +234,51 @@ class Axis {
     bool m_is_working; // FIXME: Probably useless
 };
 
+class HorizontalAxis : public Axis {
+  public:
+    HorizontalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
+      m_delta_destination = 0;
+    }
+
+    double getDestinationSteps() {
+      return Axis::getDestinationSteps() + m_delta_destination * stepsPerUnit;
+    }
+
+    double getDestination() {
+      return Axis::getDestination() + m_delta_destination;
+    }
+    
+    void setDeltaDestination(double dest) {
+      m_delta_destination = dest;
+    }
+  private:
+    double m_delta_destination;
+};
+
 // The ZAxis is the TAxis.
 class ZAxis : public Axis {
   public:
-    ZAxis(Writer* theWriter, char theName, Axis* hAxis) : Axis(theWriter, theName) {
+    ZAxis(Writer* theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
       m_horizontal_axis = hAxis;
     }
+
+    virtual void turnOneStep() {
+      Axis::turnOneStep();
+      double deltaX = getPosition() - m_original_position;
+      m_horizontal_axis->setDeltaDestination(deltaX);
+    }
+
+/*void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
+-
+-      //setDestination(getDestination() + position - oldPosition);
+-
+-      //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
+-
+-      // OPTIMIZE: This can probably be done with only one cos.
+-      double deltaX = (RAYON * cos(m_rotation_axis_beginning_position * PI / 180)) - (RAYON * cos(position * PI / 180));
+-      m_rotation_position = deltaX * ((int)m_should_go_forward);
+-      //setDestination(getDestination() + (deltaX * (int)m_should_go_forward));
+-    }*/
 
     virtual double getPosition() {
       double angle = m_position_steps / stepsPerUnit;
@@ -269,12 +290,14 @@ class ZAxis : public Axis {
     }
 
     void setDestination(double dest) {
+      m_original_position = getPosition();
       Axis::setDestination(dest);
       m_destination_angle = asin(dest / RAYON) * 180.0 / PI;
     }
   private:
-    Axis* m_horizontal_axis;
+    HorizontalAxis* m_horizontal_axis;
     double m_destination_angle;
+    double m_original_position;
 };
 
 class VerticalAxis: public Axis {
