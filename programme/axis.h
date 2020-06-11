@@ -48,6 +48,10 @@ class Axis {
       m_is_working = false;
     }
 
+    virtual void setMaxPosition(double maxP) {
+      maxPosition = maxP;
+    }
+
     virtual bool isWorking() {
       return m_is_working;
     }
@@ -240,6 +244,10 @@ class HorizontalAxis : public Axis {
       m_delta_destination = 0;
     }
 
+    bool shouldGoForward() {
+      return getPosition() < maxPosition / 2;
+    }
+
     double getDestinationSteps() {
       return Axis::getDestinationSteps() + m_delta_destination * stepsPerUnit;
     }
@@ -264,7 +272,7 @@ class ZAxis : public Axis {
 
     virtual void turnOneStep() {
       Axis::turnOneStep();
-      double deltaX = getPosition() - m_original_position;
+      double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : 1);
       m_horizontal_axis->setDeltaDestination(deltaX);
     }
 
