@@ -1,2 +1,2 @@
 #!/bin/bash
-g++ test.cpp && clear && ./a.out
+g++ test.cpp -DDEBUG && clear && ./a.out

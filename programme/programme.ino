@@ -101,6 +101,9 @@ void loop() {
   }
 
   if (!stillWorking && inputCursor < inputSize) {
+    for (int i = 0; axes[i] != NULL; i++) {
+     axes[i]->prepare(currentTime);
+    }
     inputCursor = parseInput(input, &writer, axes, inputCursor);
   }
 }

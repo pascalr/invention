@@ -102,10 +102,10 @@ void testParseMove(Axis** axes) {
   assertTest(msg2, 20.0, AXIS('X')->getDestination());
   assertTest(msg2, 20.0, AXIS('Y')->getDestination());
   assertTest("Cursor should go forward", 6, cursor);
-  char msg3[] = "Z100";
-  cursor = parseMove(axes, msg3, 0);
-  assertTest("Z100,X", 20.0, AXIS('X')->getDestination());
-  assertTest("Z100,T", 20.0, AXIS('T')->getDestination());
+  //char msg3[] = "Z100";
+  //cursor = parseMove(axes, msg3, 0);
+  //assertTest("Z100,X", 20.0, AXIS('X')->getDestination());
+  //assertTest("Z100,T", 20.0, AXIS('T')->getDestination());
 }
 
 void testAtof() {

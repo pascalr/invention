@@ -11,6 +11,7 @@
 #define HIGH 1
 #define INPUT 0
 #define OUTPUT 1
+#define PI 3.1415926535897932384626433832795
 #endif
 
 #define AXIS(t) (axisByLetter(axes, t))
@@ -62,6 +63,10 @@ class Axis {
       stepsPerUnit = ratio;
     }
 
+    double getStepsPerUnit() {
+      return stepsPerUnit;
+    }
+
     double getSpeed() {
       double frequency = 1 / getDelay() * 1000000;
       double theSpeed = frequency / stepsPerUnit;
@@ -98,6 +103,24 @@ class Axis {
       m_writer->doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
       m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
+    }
+
+    void followedAxisMoved(double oldPosition, double position, unsigned long deltaTime, double followedStepsPerUnit) {
+      //setDestination(getDestination() + position - oldPosition);
+      //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
+    }
+
+    void turnOneStepAndUpdateFollowingAxis(unsigned long timeSinceLastStep) {
+      if (m_following_axis) {
+        
+        unsigned long oldPosition = getPosition();
+        turnOneStep();
+        
+        m_following_axis->followedAxisMoved(oldPosition, getPosition(), timeSinceLastStep, getStepsPerUnit());
+        
+      } else {
+        turnOneStep();
+      }
     }
 
     void setPositionSteps(double posSteps) {
@@ -160,9 +183,11 @@ class Axis {
       } else if (isReferenced && isMotorEnabled && (forceRotation ||
                 ((isClockwise && m_position_steps < m_destination_steps) ||
                 (!isClockwise && m_position_steps > m_destination_steps)))) {
-        if (currentTime - previousStepTime > delay) {
-          turnOneStep();
-          if (currentTime - previousStepTime > 2*delay) {
+        unsigned long deltaTime = currentTime - previousStepTime;
+        if (deltaTime > delay) {
+          turnOneStepAndUpdateFollowingAxis(deltaTime);
+          // TODO: Instead of this, call a function named prepareToMove, that updates the previousStepTime
+          if (deltaTime > 2*delay) {
             previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
           } else {
             previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
@@ -200,9 +225,21 @@ class Axis {
       // TODO: The speed is not fixed.
       return speed;
     }
+
+    void setFollowingAxis(Axis* axis) {
+      m_following_axis = axis;
+    }
+
+    // Resets some stuff.
+    void prepare(unsigned long time) {
+      m_following_axis = NULL;
+      previousStepTime = time;
+    }
     
   protected:
     Writer* m_writer;
+
+    Axis* m_following_axis;
 
     unsigned long m_position_steps;
     unsigned long m_destination_steps;
@@ -215,6 +252,20 @@ class HorizontalAxis: public Axis {
   public:
     HorizontalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
       
+    }
+
+    void followedAxisMoved(double oldPosition, double position, unsigned long deltaTime, double followedStepsPerUnit) {
+
+      //setDestination(getDestination() + position - oldPosition);
+
+      //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
+
+      double deltaX = (RAYON * cos(oldPosition * PI / 180)) - (RAYON * cos(position * PI / 180)); // OPTIMIZE: This can probably be done with only one cos.
+      setDestination(getDestination() + (deltaX * (int)m_should_go_forward));
+    }
+
+    void updateShouldGoForward() {
+      m_should_go_forward = getPosition() < maxPosition / 2;
     }
 
     void setRotationAxis(Axis* axis) {
@@ -230,6 +281,7 @@ class HorizontalAxis: public Axis {
 
   private:
     Axis* m_rotation_axis;
+    bool m_should_go_forward;
 };
 
 class VerticalAxis: public Axis {

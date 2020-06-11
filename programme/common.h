@@ -29,7 +29,24 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
 
     if (cmd[i] == 'Z' || cmd[i] == 'z') {
 
-      Axis* axisT = axisByLetter(axes, 'T');      
+      Axis* axisT = axisByLetter(axes, 'T');
+      HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
+            
+      if (destination > 0 && destination <= RAYON && axisT && axisX) {
+        double angle = asin(destination / RAYON) * 180.0 / PI;
+        axisT->setDestination(angle);
+        axisT->setMotorEnabled(true);
+
+        axisT->setFollowingAxis(axisX);
+        axisX->setMotorEnabled(true);
+        axisX->updateShouldGoForward();
+        
+        /*double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
+        axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
+        axisX->setMotorEnabled(true);*/
+      }
+
+      /*Axis* axisT = axisByLetter(axes, 'T');      
       
       if (destination > 0 && destination <= RAYON && axisT) {
         double angle = asin(destination / RAYON) * 180.0 / PI;
@@ -41,7 +58,7 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
         double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
         axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
         axisX->setMotorEnabled(true);
-      }
+      }*/
     } else {
       Axis* axis = axisByLetter(axes, cmd[i]);
       if (axis) {
@@ -166,7 +183,9 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
   } else if (cmd == 'w' || cmd == 'W') { // wait or sleep for some time
     double waitTime = atof(input + cursor);
     while (isNumberSymbol(input[cursor])) {cursor++;}
-    delay(waitTime);
+    #ifndef DEBUG
+      delay(waitTime);
+    #endif
   } else if (cmd == '?') {
     for (int i = 0; axes[i] != NULL; i++) {
       printDebugAxis(axes[i], writer);
