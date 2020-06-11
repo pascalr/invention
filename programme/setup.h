@@ -66,6 +66,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisZ->stepPin = 11;
     axisZ->limitSwitchPin = 12;
     axisZ->setupPins();
+    axisZ->setMaxPosition(RAYON);
   }
 }
 
