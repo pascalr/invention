@@ -89,8 +89,12 @@ class Axis {
       return m_position_steps / stepsPerUnit;
     }
 
-    double getDestination() {
+    virtual double getDestination() {
       return destination;
+    }
+
+    virtual double getDestinationSteps() {
+      return m_destination_steps;
     }
 
     void stop() {
@@ -105,18 +109,18 @@ class Axis {
       m_position_steps = m_position_steps + (isClockwise ? 1 : -1);
     }
 
-    virtual void followedAxisMoved(double oldPosition, double position, unsigned long deltaTime, double followedStepsPerUnit) {
+    virtual void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
       //setDestination(getDestination() + position - oldPosition);
       //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
     }
 
-    void turnOneStepAndUpdateFollowingAxis(unsigned long timeSinceLastStep) {
+    void turnOneStepAndUpdateFollowingAxis() {
       if (m_following_axis) {
         
         unsigned long oldPosition = getPosition();
         turnOneStep();
         
-        m_following_axis->followedAxisMoved(oldPosition, getPosition(), timeSinceLastStep, getStepsPerUnit());
+        m_following_axis->followedAxisMoved(oldPosition, getPosition(), getStepsPerUnit());
         
       } else {
         turnOneStep();
@@ -178,14 +182,15 @@ class Axis {
     // Returns true if the axis is still working.
     bool handleAxis(unsigned long currentTime) {
       unsigned int delay = getDelay();
+      double destSteps = getDestinationSteps();
       if (isReferencing) {
         return moveToReference();
       } else if (isReferenced && isMotorEnabled && (forceRotation ||
-                ((isClockwise && m_position_steps < m_destination_steps) ||
-                (!isClockwise && m_position_steps > m_destination_steps)))) {
+                ((isClockwise && m_position_steps < destSteps) ||
+                (!isClockwise && m_position_steps > destSteps)))) {
         unsigned long deltaTime = currentTime - previousStepTime;
         if (deltaTime > delay) {
-          turnOneStepAndUpdateFollowingAxis(deltaTime);
+          turnOneStepAndUpdateFollowingAxis();
           // TODO: Instead of this, call a function named prepareToMove, that updates the previousStepTime
           if (deltaTime > 2*delay) {
             previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
@@ -231,7 +236,7 @@ class Axis {
     }
 
     // Resets some stuff.
-    void prepare(unsigned long time) {
+    virtual void prepare(unsigned long time) {
       m_following_axis = NULL;
       previousStepTime = time;
     }
@@ -254,14 +259,22 @@ class HorizontalAxis: public Axis {
       
     }
 
-    void followedAxisMoved(double oldPosition, double position, unsigned long deltaTime, double followedStepsPerUnit) {
+    void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
 
       //setDestination(getDestination() + position - oldPosition);
 
       //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
 
-      double deltaX = (RAYON * cos(oldPosition * PI / 180)) - (RAYON * cos(position * PI / 180)); // OPTIMIZE: This can probably be done with only one cos.
-      /*setDestination(getDestination() + (deltaX * (int)m_should_go_forward));*/
+      double deltaX = (RAYON * cos(m_rotation_axis_beginning_position * PI / 180)) - (RAYON * cos(position * PI / 180)); // OPTIMIZE: This can probably be done with only one cos.
+      m_rotation_position = deltaX * ((int)m_should_go_forward);
+      //setDestination(getDestination() + (deltaX * (int)m_should_go_forward));*/
+    }
+
+    double getDestinationSteps() {
+      if (m_rotation_axis) {
+        return Axis::getDestinationSteps() + m_rotation_position * m_rotation_axis->getStepsPerUnit();
+      }
+      return Axis::getDestinationSteps();
     }
 
     void updateShouldGoForward() {
@@ -270,6 +283,14 @@ class HorizontalAxis: public Axis {
 
     void setRotationAxis(Axis* axis) {
       m_rotation_axis = axis;
+    }
+
+    void prepare(unsigned long time) {
+      Axis::prepare(time);
+
+      if (m_rotation_axis) {
+        m_rotation_axis_beginning_position = m_rotation_axis->getPosition();
+      }
     }
   
     unsigned int getDelay() {
@@ -282,6 +303,8 @@ class HorizontalAxis: public Axis {
   private:
     Axis* m_rotation_axis;
     bool m_should_go_forward;
+    double m_rotation_position;
+    double m_rotation_axis_beginning_position;
 };
 
 class VerticalAxis: public Axis {

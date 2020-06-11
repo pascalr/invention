@@ -167,6 +167,29 @@ void testHandleAxis(Writer* writer, Axis** axes) {
   assertTest("After a move it should work", true, axis->handleAxis(time_us));
 }
 
+void testMoveZ(Writer* writer, Axis** axes) {
+  cout << "Test move Z" << endl;
+
+  Axis* axisX = axisByLetter(axes, 'X');
+  Axis* axisT = axisByLetter(axes, 'T');
+  
+  for (int i = 0; axes[i] != NULL; i++) {
+    axes[i]->prepare(0);
+    axes[i]->referenceReached();
+  }
+  cout << "Test move Z" << endl;
+
+  parseInput("MZ100", writer, axes, 0);
+  assertTest("Destination T", 20.0, axisT->getDestination());
+
+  for (int i = 0; i < 1000; i++) {
+    axisT->turnOneStepAndUpdateFollowingAxis();
+  }
+  assertTest("Position steps T", 1000.0, axisT->getPositionSteps());
+  assertTest("Destination steps X", 1.0, axisX->getDestinationSteps());
+
+}
+
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
@@ -174,6 +197,7 @@ int main (int argc, char *argv[]) {
   HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
   VerticalAxis axisY = VerticalAxis(&writer, 'Y');
   Axis axisT = Axis(&writer, 'T');
+  axisX.setRotationAxis(&axisT);
   Axis* axes[] = {&axisX, &axisY, &axisT, NULL};
   setupAxes(&writer, axes);
   
@@ -184,4 +208,5 @@ int main (int argc, char *argv[]) {
   testSpeed(&axisT);
   testParseInput(&writer, axes);
   testHandleAxis(&writer, axes);
+  testMoveZ(&writer, axes);
 }

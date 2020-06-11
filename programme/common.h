@@ -199,11 +199,16 @@ int parseInput(char* input, Writer* writer, Axis** axes, int oldCursor) {
     // TODO: Handle error
   }
 
-  char tmp = input[cursor];
-  input[cursor] = '\0';
   writer->doPrint("Cmd: ");
-  writer->doPrintLn(input+oldCursor);
-  input[cursor] = tmp;
+  if (cursor < size) {
+    char tmp = input[cursor];
+    input[cursor] = '\0';
+    writer->doPrintLn(input+oldCursor);
+    input[cursor] = tmp;
+  } else {
+    writer->doPrintLn(input+oldCursor);
+  }
+  
   /*char sint[5];
   itoa(cmd, sint, 10);
   writer->doPrintLn(sint);*/
