@@ -258,27 +258,10 @@ class ZAxis : public Axis {
     ZAxis(Writer* theWriter, char theName, Axis* hAxis) : Axis(theWriter, theName) {
       m_horizontal_axis = hAxis;
     }
-    virtual bool handleAxis(unsigned long currentTime) {
-      unsigned int delay = getDelay();
-      double destSteps = getDestinationSteps();
-      if (isReferencing) {
-        return moveToReference();
-      } else if (isReferenced && isMotorEnabled && (forceRotation ||
-                ((isClockwise && m_position_steps < destSteps) ||
-                (!isClockwise && m_position_steps > destSteps)))) {
-        unsigned long deltaTime = currentTime - previousStepTime;
-        if (deltaTime > delay) {
-          turnOneStepAndUpdateFollowingAxis();
-          // TODO: Instead of this, call a function named prepareToMove, that updates the previousStepTime
-          if (deltaTime > 2*delay) {
-            previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
-          } else {
-            previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
-          }
-        }
-        return true;
-      }
-      return false;
+
+    virtual double getPosition() {
+      double angle = m_position_steps / stepsPerUnit;
+      return RAYON * sin(angle / 180 * PI);
     }
 
     double getDestinationSteps() {
@@ -299,16 +282,6 @@ class VerticalAxis: public Axis {
     VerticalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
       
     }
-
-    /*void moveToReference() {
-      //Serial.println(digitalRead(axis.limitSwitchPin));
-      if (!digitalRead(limitSwitchPin)) {
-        axis->referenceReached();
-      } else {
-        turnOneStep();
-        delayMicroseconds(SLOW_SPEED_DELAY);
-      }
-    }*/
 };
 
 #endif

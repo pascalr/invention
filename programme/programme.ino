@@ -43,7 +43,7 @@ VerticalAxis axisY = VerticalAxis(&writer, 'Y');
 Axis axisX = Axis(&writer, 'X');
 Axis axisA = Axis(&writer, 'A');
 Axis axisB = Axis(&writer, 'B');
-ZAxis axisZ = ZAxis(&writer, 'X', &axisX);
+ZAxis axisZ = ZAxis(&writer, 'Z', &axisX);
 
 Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
 
