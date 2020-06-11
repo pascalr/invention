@@ -179,14 +179,15 @@ void testMoveZ(Writer* writer, Axis** axes) {
   }
   cout << "Test move Z" << endl;
 
-  parseInput("MZ100", writer, axes, 0);
-  assertTest("Destination T", 20.0, axisT->getDestination());
+  parseInput("MZ380", writer, axes, 0);
+  assertTest("Destination T", 90.0, axisT->getDestination());
+  int steps = axisT->getDestinationSteps();
 
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < steps; i++) {
     axisT->turnOneStepAndUpdateFollowingAxis();
   }
-  assertTest("Position steps T", 1000.0, axisT->getPositionSteps());
-  assertTest("Destination steps X", 1.0, axisX->getDestinationSteps());
+  assertTest("Position T", 90.0, axisT->getPosition());
+  assertTest("Destination steps X", RAYON, axisX->getDestination());
 
 }
 

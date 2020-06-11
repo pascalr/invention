@@ -12,6 +12,7 @@ void setupAxes(Writer* writer, Axis** axes) {
   Axis* axisT = axisByLetter(axes, 'T');
   Axis* axisA = axisByLetter(axes, 'A');
   Axis* axisB = axisByLetter(axes, 'B');
+  Axis* axisZ = axisByLetter(axes, 'Z');
 
   if (axisT) {
     axisT->setStepsPerUnit(200 * 2 * 16 / (360*12/61));
@@ -57,6 +58,15 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisY->stepPin = 6;
     axisY->limitSwitchPin = 12;
     axisY->setupPins();
+  }
+
+  if (axisZ) {
+    axisZ->setStepsPerUnit(200 * 2 * 16 / (360*12/61));
+    axisZ->enabledPin = 8;
+    axisZ->dirPin = 10;
+    axisZ->stepPin = 11;
+    axisZ->limitSwitchPin = 12;
+    axisZ->setupPins();
   }
 }
 

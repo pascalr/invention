@@ -25,9 +25,7 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
   int i;
   for (i = oldCursor; cmd[i] != '\0'; i++) {
 
-    double destination = atof(cmd+i+1);
-
-    if (cmd[i] == 'Z' || cmd[i] == 'z') {
+    /*if (cmd[i] == 'Z' || cmd[i] == 'z') {
 
       Axis* axisT = axisByLetter(axes, 'T');
       HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
@@ -41,9 +39,9 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
         axisX->setMotorEnabled(true);
         axisX->updateShouldGoForward();
         
-        /*double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
+        double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
         axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
-        axisX->setMotorEnabled(true);*/
+        axisX->setMotorEnabled(true);
       }
 
       /*Axis* axisT = axisByLetter(axes, 'T');      
@@ -58,15 +56,14 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
         double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
         axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
         axisX->setMotorEnabled(true);
-      }*/
-    } else {
-      Axis* axis = axisByLetter(axes, cmd[i]);
-      if (axis) {
-        axis->setDestination(destination);
-        axis->setMotorEnabled(true);
-      } else if(!isNumberSymbol(cmd[i])) {
-        return i; // End of move command, stop
       }
+    } else {*/
+    Axis* axis = axisByLetter(axes, cmd[i]);
+    if (axis) {
+      axis->setDestination(atof(cmd+i+1));
+      axis->setMotorEnabled(true);
+    } else if(!isNumberSymbol(cmd[i])) {
+      return i; // End of move command, stop
     }
   }
   return i;

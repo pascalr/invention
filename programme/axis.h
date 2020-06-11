@@ -1,7 +1,7 @@
 #ifndef AXIS_H
 #define AXIS_H
 
-#define RAYON 380
+#define RAYON 380.0
 
 #define CW true
 #define CCW false
@@ -180,7 +180,7 @@ class Axis {
     }
 
     // Returns true if the axis is still working.
-    bool handleAxis(unsigned long currentTime) {
+    virtual bool handleAxis(unsigned long currentTime) {
       unsigned int delay = getDelay();
       double destSteps = getDestinationSteps();
       if (isReferencing) {
@@ -259,15 +259,20 @@ class HorizontalAxis: public Axis {
       
     }
 
-    void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
+    /*void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
 
       //setDestination(getDestination() + position - oldPosition);
 
       //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
 
-      double deltaX = (RAYON * cos(m_rotation_axis_beginning_position * PI / 180)) - (RAYON * cos(position * PI / 180)); // OPTIMIZE: This can probably be done with only one cos.
+      // OPTIMIZE: This can probably be done with only one cos.
+      double deltaX = (RAYON * cos(m_rotation_axis_beginning_position * PI / 180)) - (RAYON * cos(position * PI / 180));
       m_rotation_position = deltaX * ((int)m_should_go_forward);
-      //setDestination(getDestination() + (deltaX * (int)m_should_go_forward));*/
+      //setDestination(getDestination() + (deltaX * (int)m_should_go_forward));
+    }*/
+
+    double getDestination() {
+      return Axis::getDestination() + m_rotation_position;
     }
 
     double getDestinationSteps() {
@@ -305,6 +310,19 @@ class HorizontalAxis: public Axis {
     bool m_should_go_forward;
     double m_rotation_position;
     double m_rotation_axis_beginning_position;
+};
+
+// The ZAxis is the TAxis.
+class ZAxis : public Axis {
+  public:
+    ZAxis(Writer* theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
+      m_horizontal_axis = hAxis;
+    }
+    virtual bool handleAxis(unsigned long currentTime) {
+      Axis::handleAxis(currentTime);
+    }
+  private:
+    HorizontalAxis* m_horizontal_axis;
 };
 
 class VerticalAxis: public Axis {

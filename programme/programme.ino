@@ -43,8 +43,9 @@ VerticalAxis axisY = VerticalAxis(&writer, 'Y');
 HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
 Axis axisA = Axis(&writer, 'A');
 Axis axisB = Axis(&writer, 'B');
+ZAxis axisZ = ZAxis(&writer, 'X', &axisX);
 
-Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, NULL};
+Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
 
 char input[256];
 
