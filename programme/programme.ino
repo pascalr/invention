@@ -88,6 +88,8 @@ void loop() {
         for (int i = 0; axes[i] != NULL; i++) {
           printDebugAxis(axes[i], &writer);
         }
+      } else if (cmd == '\n' || cmd == '\r') {
+        // Ignore
       } else {
         Serial.print("Error received command while previous was not finished: ");
         Serial.println(cmd);
