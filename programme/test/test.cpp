@@ -11,25 +11,25 @@ using namespace std;
 class ConsoleWriter : public Writer {
   public:
     void doPinMode(int pin, bool type) {
-      cout << "pinMode(" << pin << ", " << type << ")" << endl;
+      cerr << "pinMode(" << pin << ", " << type << ")" << endl;
     }
     void doDigitalWrite(int pin, bool value) {
-      cout << "digitalWrite(" << pin << ", " << value << ")" << endl;
+      cerr << "digitalWrite(" << pin << ", " << value << ")" << endl;
     }
     double doDigitalRead(int pin) {
-      cout << "digitalRead(" << pin << ")" << endl;
+      cerr << "digitalRead(" << pin << ")" << endl;
     }
     void doPrint(const char* theString) {
-      cout << theString;
+      cerr << theString;
     }
     void doPrint(char val) {
-      cout << val;
+      cerr << val;
     }
-    void doPrintLn(const char* theString) {
-      cout << theString << endl;
+    void doPrint(double val) {
+      cerr << val;
     }
-    void doPrintLn(double val) {
-      cout << val << endl;
+    void doPrint(long val) {
+      cerr << val;
     }
 };
 
@@ -40,14 +40,6 @@ class SilentWriter : public Writer {
     void doDigitalWrite(int pin, bool value) {
     }
     double doDigitalRead(int pin) {
-    }
-    void doPrint(const char* theString) {
-    }
-    void doPrint(char val) {
-    }
-    void doPrintLn(const char* theString) {
-    }
-    void doPrintLn(double val) {
     }
 };
 
@@ -207,27 +199,30 @@ void testMoveZ(Writer* writer, Axis** axes) {
   }
   assertNearby("Position X", 380.0, axisX->getPosition());
 
-  // MZ0 should bring back the Z to zero.
+  cout << "MZ0 should bring back the Z to zero." << endl;
   parseInput("MZ0", writer, axes, 0);
   assertNearby("Destination Z", 0.0, axisZ->getDestination());
   assertNearby("Axis Z should be in reverse", false, axisZ->isForward);
   assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
   steps = axisZ->getDestinationSteps();
+  assertNearby("Destination X", 0.0, axisX->getDestination());
   for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
     debug();
     axisZ->turnOneStep();
   }
   assertNearby("Position Z", 0.0, axisZ->getPosition());
+  assertNearby("Destination X", 380.0, axisX->getDestination());
 
 }
 
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
-  SilentWriter writer = SilentWriter();
-  HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
-  VerticalAxis axisY = VerticalAxis(&writer, 'Y');
-  ZAxis axisZ = ZAxis(&writer, 'Z', &axisX);
+  //SilentWriter writer = SilentWriter();
+  ConsoleWriter writer = ConsoleWriter();
+  HorizontalAxis axisX = HorizontalAxis(writer, 'X');
+  VerticalAxis axisY = VerticalAxis(writer, 'Y');
+  ZAxis axisZ = ZAxis(writer, 'Z', &axisX);
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
   
@@ -239,4 +234,6 @@ int main (int argc, char *argv[]) {
   testParseInput(&writer, axes);
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
+
+  axisX.serialize();
 }

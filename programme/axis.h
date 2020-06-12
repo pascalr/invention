@@ -21,17 +21,36 @@ class Writer {
     virtual void doPinMode(int pin, bool type) = 0;
     virtual void doDigitalWrite(int pin, bool value) = 0;
     virtual double doDigitalRead(int pin) = 0;
-    virtual void doPrint(const char* theString) = 0;
+    virtual void doPrint(const char* val) = 0;
     virtual void doPrint(char val) = 0;
-    virtual void doPrintLn(const char* theString) = 0;
-    virtual void doPrintLn(double val) = 0;
+    virtual void doPrint(double val) = 0;
+    virtual void doPrint(long val) = 0;
 };
+
+Writer& operator<<(Writer& writer, const char* theString) {
+  writer.doPrint(theString);
+  return writer;
+}
+
+Writer& operator<<(Writer& writer, char val) {
+  writer.doPrint(val);
+  return writer;
+}
+
+Writer& operator<<(Writer& writer, double val) {
+  writer.doPrint(val);
+  return writer;
+}
+
+Writer& operator<<(Writer& writer, long val) {
+  writer.doPrint(val);
+  return writer;
+}
 
 class Axis {
   public:
   
-    Axis(Writer* writer, char theName) {
-      m_writer = writer;
+    Axis(Writer& writer, char theName) : m_writer(writer) {
       name = theName;
       destination = -1;
       previousStepTime = 0;
@@ -60,6 +79,79 @@ class Axis {
       m_is_working = val;
     }
 
+    virtual void serialize() {
+      // TODO: Turn the axis into a char[], then print the char[], so I can debug too.
+      
+      //Writer& writer = *writer;
+      //m_writer << "-Pos " << name << ": " << getPosition() << "\n";
+      m_writer << "-Pos " << name << ": " << 10.0 << "\n";
+      
+      /*m_writer.doPrint("-Dest ");
+      m_writer.doPrint(axis->name);
+      m_writer.doPrint(": ");
+      m_writer.doPrintLn(axis->destination);
+      
+      m_writer.doPrint("-Speed ");
+      m_writer.doPrint(axis->name);
+      m_writer.doPrint(": ");
+      m_writer.doPrintLn(axis->speed);
+    
+      m_writer.doPrint("-CW ");
+      m_writer.doPrint(axis->name);
+      m_writer.doPrint(": ");
+      m_writer.doPrintLn(axis->isForward);
+      
+      m_writer.doPrint("-Referenced ");
+      m_writer.doPrint(axis->name);
+      m_writer.doPrint(": ");
+      m_writer.doPrintLn(axis->isReferenced);
+      
+      m_writer.doPrint("-Referencing ");
+      m_writer.doPrint(axis->name);
+      m_writer.doPrint(": ");
+      m_writer.doPrintLn(axis->isReferencing);
+      
+      writer->doPrint("-Enabled ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(axis->isMotorEnabled);
+      
+      writer->doPrint("-Step ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(axis->isStepHigh);
+    
+      writer->doPrint("-Force ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(axis->forceRotation);
+    
+      writer->doPrint("-PIN enabled ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(writer->doDigitalRead(axis->enabledPin));
+      
+      writer->doPrint("-PIN dir ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(writer->doDigitalRead(axis->dirPin));
+      
+      writer->doPrint("-PIN step ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(writer->doDigitalRead(axis->stepPin));
+      
+      writer->doPrint("-PIN limit switch ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(writer->doDigitalRead(axis->limitSwitchPin));
+    
+      writer->doPrint("-stepsPerUnit ");
+      writer->doPrint(axis->name);
+      writer->doPrint(": ");
+      writer->doPrintLn(axis->stepsPerUnit);*/
+    }
+
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
     // The value is multiplied by two because we have to write LOW then HIGH for one step
@@ -78,9 +170,9 @@ class Axis {
     }
 
     virtual void setupPins() {
-      m_writer->doPinMode(stepPin, OUTPUT);
-      m_writer->doPinMode(dirPin, OUTPUT);
-      m_writer->doPinMode(enabledPin, OUTPUT);
+      m_writer.doPinMode(stepPin, OUTPUT);
+      m_writer.doPinMode(dirPin, OUTPUT);
+      m_writer.doPinMode(enabledPin, OUTPUT);
     }
 
     virtual void rotate(bool direction) {
@@ -108,7 +200,7 @@ class Axis {
     }
 
     virtual void turnOneStep() {
-      m_writer->doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
+      m_writer.doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
     }
@@ -137,14 +229,14 @@ class Axis {
     }
     
     virtual void setMotorEnabled(bool value) {
-      m_writer->doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
+      m_writer.doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(enabledPin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
 
     virtual void setMotorDirection(bool forward) {
       // Maybe add a variable to the axis: isClockwiseForward?
-      m_writer->doDigitalWrite(dirPin, forward ? LOW : HIGH);
+      m_writer.doDigitalWrite(dirPin, forward ? LOW : HIGH);
       isForward = forward;
     }
 
@@ -163,9 +255,10 @@ class Axis {
     }
 
     virtual void referenceReached() {
-      m_writer->doPrint("Done referencing axis ");
+      m_writer.doPrint("Done referencing axis ");
       char theName[] = {name, '\0'};
-      m_writer->doPrintLn(theName);
+      m_writer.doPrint(theName);
+      m_writer.doPrint("\n");
       setPositionSteps(0);
       setDestination(0);
       setMotorEnabled(true);
@@ -239,19 +332,19 @@ class Axis {
     }
     
   protected:
-    Writer* m_writer;
+    Writer& m_writer;
 
     Axis* m_following_axis;
 
     unsigned long m_position_steps;
-    unsigned long m_destination_steps;
+    double m_destination_steps;
 
     bool m_is_working; // FIXME: Probably useless
 };
 
 class HorizontalAxis : public Axis {
   public:
-    HorizontalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
+    HorizontalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
       m_delta_destination = 0;
     }
 
@@ -288,7 +381,7 @@ class HorizontalAxis : public Axis {
 // The ZAxis is the TAxis.
 class ZAxis : public Axis {
   public:
-    ZAxis(Writer* theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
+    ZAxis(Writer& theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
       m_horizontal_axis = hAxis;
     }
 
@@ -340,7 +433,7 @@ class ZAxis : public Axis {
 
 class VerticalAxis: public Axis {
   public:
-    VerticalAxis(Writer* theWriter, char theName) : Axis(theWriter, theName) {
+    VerticalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
       
     }
 };

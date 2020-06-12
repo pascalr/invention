@@ -28,22 +28,23 @@ class ArduinoWriter : public Writer {
       Serial.print(val);
     }
 
-    void doPrintLn(const char* theString) {
-      Serial.println(theString);
+    void doPrint(double val) {
+      Serial.print(val);
     }
 
-    void doPrintLn(double val) {
-      Serial.println(val);
+    void doPrint(long val) {
+      Serial.print(val);
     }
+
 };
 
 ArduinoWriter writer = ArduinoWriter();
-Axis axisT = Axis(&writer, 'T');
-VerticalAxis axisY = VerticalAxis(&writer, 'Y');
-HorizontalAxis axisX = HorizontalAxis(&writer, 'X');
-Axis axisA = Axis(&writer, 'A');
-Axis axisB = Axis(&writer, 'B');
-ZAxis axisZ = ZAxis(&writer, 'Z', &axisX);
+Axis axisT = Axis(writer, 'T');
+VerticalAxis axisY = VerticalAxis(writer, 'Y');
+HorizontalAxis axisX = HorizontalAxis(writer, 'X');
+Axis axisA = Axis(writer, 'A');
+Axis axisB = Axis(writer, 'B');
+ZAxis axisZ = ZAxis(writer, 'Z', &axisX);
 
 Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
 
@@ -86,7 +87,7 @@ void loop() {
         }
       } else if (cmd == '?') {
         for (int i = 0; axes[i] != NULL; i++) {
-          printDebugAxis(axes[i], &writer);
+          //printDebugAxis(axes[i], &writer);
         }
       } else {
         Serial.print("Error received command while previous was not finished: ");

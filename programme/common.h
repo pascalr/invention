@@ -69,79 +69,6 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
   return i;
 }
 
-void printDebugAxis(Axis* axis, Writer* writer) {
-  // TODO: Turn the axis into a char[], then print the char[], so I can debug too.
-  writer->doPrint("-Pos ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->getPosition());
-  
-  writer->doPrint("-Dest ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->destination);
-  
-  writer->doPrint("-Speed ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->speed);
-
-  writer->doPrint("-CW ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->isForward);
-  
-  writer->doPrint("-Referenced ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->isReferenced);
-  
-  writer->doPrint("-Referencing ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->isReferencing);
-  
-  writer->doPrint("-Enabled ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->isMotorEnabled);
-  
-  writer->doPrint("-Step ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->isStepHigh);
-
-  writer->doPrint("-Force ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->forceRotation);
-
-  writer->doPrint("-PIN enabled ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(writer->doDigitalRead(axis->enabledPin));
-  
-  writer->doPrint("-PIN dir ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(writer->doDigitalRead(axis->dirPin));
-  
-  writer->doPrint("-PIN step ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(writer->doDigitalRead(axis->stepPin));
-  
-  writer->doPrint("-PIN limit switch ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(writer->doDigitalRead(axis->limitSwitchPin));
-
-  writer->doPrint("-stepsPerUnit ");
-  writer->doPrint(axis->name);
-  writer->doPrint(": ");
-  writer->doPrintLn(axis->stepsPerUnit);
-}
-
 int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
 
   // Should the cursor passed to the function be a pointer?
@@ -157,7 +84,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     }
     cursor = size; // Disregard everything else after the stop command.
   } else if (cmd == 'H' || cmd == 'h') { // home reference (eg. H, or HX, or HY, ...)
-    writer->doPrintLn("Referencing...");
+    writer->doPrint("Referencing...\n");
     if (size == 1) {
       for (int i = 0; axes[i] != NULL; i++) {
         axes[i]->startReferencing();
@@ -178,7 +105,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     #endif
   } else if (cmd == '?') {
     for (int i = 0; axes[i] != NULL; i++) {
-      printDebugAxis(axes[i], writer);
+      //printDebugAxis(axes[i], writer);
     }
   } else if (cmd == '+') {
     Axis* axis = axisByLetter(axes, input[cursor]);
@@ -197,7 +124,8 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
   }
 
   writer->doPrint("Cmd: ");
-  writer->doPrintLn(input+oldCursor);
+  writer->doPrint(input+oldCursor);
+  writer->doPrint("\n");
   /*if (cursor < size) {
     char tmp = input[cursor];
     input[cursor] = '\0';
