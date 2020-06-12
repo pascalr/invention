@@ -185,10 +185,10 @@ void testMoveZ(Writer* writer, Axis** axes) {
   assertNearby("Position Z", 380.0, axisZ->getPosition());
   assertNearby("Position steps Z", 380.0, axisZ->getPositionSteps());
 
-  assertNearby("Destination X", RAYON, axisX->getDestination());
-  assertTest("Destination steps X", 380.0, axisX->getDestinationSteps());
+  assertNearby("Destination X", 0.0, axisX->getDestination());
+  assertTest("Destination steps X", 0.0, axisX->getDestinationSteps());
 
-  assertNearby("Delta Destination X", 380.0, axisX->getDeltaDestination());
+  assertNearby("Delta Destination X", 0.0, axisX->getDeltaDestination());
   assertNearby("Position X is zero first", 0.0, axisX->getPosition());
   steps = axisX->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
@@ -208,7 +208,7 @@ void testMoveZ(Writer* writer, Axis** axes) {
     axisZ->turnOneStep();
   }
   assertNearby("Position Z", 0.0, axisZ->getPosition());
-  assertNearby("Destination X", 380.0, axisX->getDestination());
+  assertNearby("Destination X", RAYON, axisX->getDestination());
 
 }
 
@@ -222,13 +222,13 @@ int main (int argc, char *argv[]) {
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
   
-  testAxisByLetter(axes);
+  /*testAxisByLetter(axes);
   testParseMove(axes);
   testAtof();
   testStop(&axisX);
   testSpeed(&axisX);
   testParseInput(&writer, axes);
-  testHandleAxis(&writer, axes);
+  testHandleAxis(&writer, axes);*/
   testMoveZ(&writer, axes);
 
   axisX.serialize();

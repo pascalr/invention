@@ -248,14 +248,14 @@ class Axis {
 
     Axis* m_following_axis;
 
-    unsigned long m_position_steps;
+    long m_position_steps;
     double m_destination_steps;
 };
 
 class HorizontalAxis : public Axis {
   public:
     HorizontalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
-      m_delta_destination = 0;
+      m_delta_destination = RAYON;
     }
 
     bool shouldGoForward() {
@@ -279,9 +279,9 @@ class HorizontalAxis : public Axis {
       return m_delta_destination;
     }
 
-    virtual void prepare(unsigned long time) {
-      Axis::prepare(time);
-      m_delta_destination = 0;
+    virtual void referenceReached() {
+      Axis::referenceReached();
+      setPositionSteps(RAYON * stepsPerUnit);
     }
 
     virtual void serialize() {
@@ -290,6 +290,7 @@ class HorizontalAxis : public Axis {
     }
     
   private:
+    // The horizontal distance between the tip and the base.
     double m_delta_destination;
 };
 
@@ -302,9 +303,13 @@ class ZAxis : public Axis {
 
     virtual void turnOneStep() {
       Axis::turnOneStep();
-      double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
-      ////std::cout << "position " << getPosition() << std::endl;
+      double angle = m_position_steps / stepsPerUnit;
+      ////std::cout << "m_position_steps " << m_position_steps << std::endl;
+      double deltaX = RAYON * cos(angle / 180 * PI) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
       m_horizontal_axis->setDeltaDestination(deltaX);
+      //double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
+      ////std::cout << "position " << getPosition() << std::endl;
+      //m_horizontal_axis->setDeltaDestination(deltaX);
       ////std::cout << "2" << std::endl;
     }
 
