@@ -6,6 +6,8 @@
 #define FORWARD true
 #define REVERSE false
 
+#include "writer.h"
+
 #ifndef LOW
 #define LOW 0
 #define HIGH 1
@@ -16,36 +18,7 @@
 
 #define AXIS(t) (axisByLetter(axes, t))
 
-class Writer {
-  public:
-    virtual void doPinMode(int pin, bool type) = 0;
-    virtual void doDigitalWrite(int pin, bool value) = 0;
-    virtual double doDigitalRead(int pin) = 0;
-    virtual void doPrint(const char* val) = 0;
-    virtual void doPrint(char val) = 0;
-    virtual void doPrint(double val) = 0;
-    virtual void doPrint(long val) = 0;
-};
 
-Writer& operator<<(Writer& writer, const char* theString) {
-  writer.doPrint(theString);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, char val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, double val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, long val) {
-  writer.doPrint(val);
-  return writer;
-}
 
 class Axis {
   public:
@@ -80,76 +53,20 @@ class Axis {
     }
 
     virtual void serialize() {
-      // TODO: Turn the axis into a char[], then print the char[], so I can debug too.
-      
-      //Writer& writer = *writer;
-      //m_writer << "-Pos " << name << ": " << getPosition() << "\n";
-      m_writer << "-Pos " << name << ": " << 10.0 << "\n";
-      
-      /*m_writer.doPrint("-Dest ");
-      m_writer.doPrint(axis->name);
-      m_writer.doPrint(": ");
-      m_writer.doPrintLn(axis->destination);
-      
-      m_writer.doPrint("-Speed ");
-      m_writer.doPrint(axis->name);
-      m_writer.doPrint(": ");
-      m_writer.doPrintLn(axis->speed);
-    
-      m_writer.doPrint("-CW ");
-      m_writer.doPrint(axis->name);
-      m_writer.doPrint(": ");
-      m_writer.doPrintLn(axis->isForward);
-      
-      m_writer.doPrint("-Referenced ");
-      m_writer.doPrint(axis->name);
-      m_writer.doPrint(": ");
-      m_writer.doPrintLn(axis->isReferenced);
-      
-      m_writer.doPrint("-Referencing ");
-      m_writer.doPrint(axis->name);
-      m_writer.doPrint(": ");
-      m_writer.doPrintLn(axis->isReferencing);
-      
-      writer->doPrint("-Enabled ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(axis->isMotorEnabled);
-      
-      writer->doPrint("-Step ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(axis->isStepHigh);
-    
-      writer->doPrint("-Force ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(axis->forceRotation);
-    
-      writer->doPrint("-PIN enabled ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(writer->doDigitalRead(axis->enabledPin));
-      
-      writer->doPrint("-PIN dir ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(writer->doDigitalRead(axis->dirPin));
-      
-      writer->doPrint("-PIN step ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(writer->doDigitalRead(axis->stepPin));
-      
-      writer->doPrint("-PIN limit switch ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(writer->doDigitalRead(axis->limitSwitchPin));
-    
-      writer->doPrint("-stepsPerUnit ");
-      writer->doPrint(axis->name);
-      writer->doPrint(": ");
-      writer->doPrintLn(axis->stepsPerUnit);*/
+      m_writer << "-Pos " << name << ": " << getPosition() << "\n";
+      m_writer << "-Dest " << name << ": " << getDestination() << "\n";
+      m_writer << "-Speed " << name << ": " << speed << "\n";
+      m_writer << "-CW " << name << ": " << isForward << "\n";
+      m_writer << "-Referenced " << name << ": " << isReferenced << "\n";
+      m_writer << "-Referencing " << name << ": " << isReferencing << "\n";
+      m_writer << "-Enabled " << name << ": " << isMotorEnabled << "\n";
+      m_writer << "-Step " << name << ": " << isStepHigh << "\n";
+      m_writer << "-Force " << name << ": " << forceRotation << "\n";
+      m_writer << "-PIN enabled " << name << ": " << enabledPin << "\n";
+      m_writer << "-PIN dir " << name << ": " << dirPin << "\n";
+      m_writer << "-PIN step " << name << ": " << stepPin << "\n";
+      m_writer << "-PIN limit switch " << name << ": " << limitSwitchPin << "\n";
+      m_writer << "-stepsPerUnit " << name << ": " << stepsPerUnit << "\n";
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -373,6 +290,11 @@ class HorizontalAxis : public Axis {
       Axis::prepare(time);
       m_delta_destination = 0;
     }
+
+    virtual void serialize() {
+      Axis::serialize();
+      m_writer << "-DeltaDest " << name << ": " << m_delta_destination << "\n";
+    }
     
   private:
     double m_delta_destination;
@@ -424,6 +346,12 @@ class ZAxis : public Axis {
       Axis::setDestination(dest);
       //std::cout << "Is forward " << isForward << std::endl;
       
+    }
+
+    virtual void serialize() {
+      Axis::serialize();
+      m_writer << "-DestAngle " << name << ": " << m_destination_angle << "\n";
+      m_writer << "-OriginalPos " << name << ": " << m_original_position << "\n";
     }
   private:
     HorizontalAxis* m_horizontal_axis;

@@ -31,19 +31,16 @@ class ConsoleWriter : public Writer {
     void doPrint(long val) {
       cerr << val;
     }
+    void doPrint(unsigned long val) {
+      cerr << val;
+    }
+    void doPrint(bool val) {
+      cerr << val;
+    }
+    void doPrint(int val) {
+      cerr << val;
+    }
 };
-
-class SilentWriter : public Writer {
-  public:
-    void doPinMode(int pin, bool type) {
-    }
-    void doDigitalWrite(int pin, bool value) {
-    }
-    double doDigitalRead(int pin) {
-    }
-};
-
-
 
 template <class P>
 void assertNearby(const char* info, P t1, P t2) {
@@ -218,7 +215,6 @@ void testMoveZ(Writer* writer, Axis** axes) {
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
 
-  //SilentWriter writer = SilentWriter();
   ConsoleWriter writer = ConsoleWriter();
   HorizontalAxis axisX = HorizontalAxis(writer, 'X');
   VerticalAxis axisY = VerticalAxis(writer, 'Y');

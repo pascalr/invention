@@ -105,7 +105,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     #endif
   } else if (cmd == '?') {
     for (int i = 0; axes[i] != NULL; i++) {
-      //printDebugAxis(axes[i], writer);
+      axes[i]->serialize();
     }
   } else if (cmd == '+') {
     Axis* axis = axisByLetter(axes, input[cursor]);

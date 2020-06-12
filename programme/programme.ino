@@ -36,6 +36,18 @@ class ArduinoWriter : public Writer {
       Serial.print(val);
     }
 
+    void doPrint(unsigned long val) {
+      Serial.print(val);
+    }
+
+    void doPrint(bool val) {
+      Serial.print(val);
+    }
+
+    void doPrint(int val) {
+      Serial.print(val);
+    }
+
 };
 
 ArduinoWriter writer = ArduinoWriter();
@@ -87,10 +99,8 @@ void loop() {
         }
       } else if (cmd == '?') {
         for (int i = 0; axes[i] != NULL; i++) {
-          //printDebugAxis(axes[i], &writer);
+          axes[i]->serialize();
         }
-      } else if (cmd == '\n' || cmd == '\r') {
-        // Ignore
       } else {
         Serial.print("Error received command while previous was not finished: ");
         Serial.println(cmd);
