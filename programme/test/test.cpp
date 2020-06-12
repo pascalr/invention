@@ -240,7 +240,60 @@ void testMoveZ(Writer* writer, Axis** axes) {
 
 }*/
 
+void testMoveSquare(Writer* writer, Axis** axes) {
+  cout << "Test move square" << endl;
 
+  HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
+  Axis* axisZ = axisByLetter(axes, 'Z');
+
+  referenceAll(axes);
+
+  // (X,Z)
+  // (RAYON,0) ->
+  // (RAYON,RAYON) ->
+  // (0,RAYON) ->
+  // (0,0) ->
+  // (RAYON,0)
+
+  // BEGINNING
+  assertNearby("Beginning position X", RAYON, axisX->getPosition());
+  assertNearby("Beginning destination X", RAYON, axisX->getDestination());
+  assertNearby("Beginning delta X", RAYON, axisX->getDeltaPosition());
+  assertNearby("Beginning position Z", 0.0, axisZ->getPosition());
+  assertNearby("Beginning destination Z", 0.0, axisZ->getDestination());
+
+  move("MZ380", writer, axes);
+  
+  assertNearby("MZ380 position X", RAYON, axisX->getPosition());
+  assertNearby("MZ380 destination X", RAYON, axisX->getDestination());
+  assertNearby("MZ380 delta X", 0.0, axisX->getDeltaPosition());
+  assertNearby("MZ380 position Z", RAYON, axisZ->getPosition());
+  assertNearby("MZ380 destination Z", RAYON, axisZ->getDestination());
+  
+  move("MX0", writer, axes);
+  
+  assertNearby("MX0 position X", 0.0, axisX->getPosition());
+  assertNearby("MX0 destination X", 0.0, axisX->getDestination());
+  assertNearby("MX0 delta X", 0.0, axisX->getDeltaPosition());
+  assertNearby("MX0 position Z", RAYON, axisZ->getPosition());
+  assertNearby("MX0 destination Z", RAYON, axisZ->getDestination());
+
+  move("MZ0", writer, axes);
+  
+  assertNearby("MZ0 position X", 0.0, axisX->getPosition());
+  assertNearby("MZ0 destination X", 0.0, axisX->getDestination());
+  assertNearby("MZ0 delta X", -RAYON, axisX->getDeltaPosition());
+  assertNearby("MZ0 position Z", 0.0, axisZ->getPosition());
+  assertNearby("MZ0 destination Z", 0.0, axisZ->getDestination());
+
+  move("MX380", writer, axes);
+
+  assertNearby("MX380 position X", RAYON, axisX->getPosition());
+  assertNearby("MX380 destination X", RAYON, axisX->getDestination());
+  assertNearby("MX380 delta X", -RAYON, axisX->getDeltaPosition());
+  assertNearby("MX380 position Z", 0.0, axisZ->getPosition());
+  assertNearby("MX380 destination Z", 0.0, axisZ->getDestination());
+}
 
 void testMoveZMovesX(Writer* writer, Axis** axes) {
   cout << "Test move Z moves X" << endl;
@@ -325,4 +378,5 @@ int main (int argc, char *argv[]) {
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
+  testMoveSquare(&writer, axes);
 }

@@ -391,10 +391,15 @@ class ZAxis : public Axis {
     void setDestination(double dest) {
       //std::cout << "Set destination " << dest << std::endl;
       //std::cout << "Is forward " << isForward << std::endl;
+
+      m_destination_angle = (asin(dest / RAYON) * 180.0 / PI);
+
+      if(m_horizontal_axis->getPosition() < RAYON) {
+        m_destination_angle = 180 - m_destination_angle;
+      }
       
-      m_original_position = getPosition();
-      m_destination_angle = asin(dest / RAYON) * 180.0 / PI;
       Axis::setDestination(dest);
+      //std::cout << "destination angle : " << m_destination_angle << std::endl;
       //std::cout << "Is forward " << isForward << std::endl;
       
     }
@@ -402,12 +407,10 @@ class ZAxis : public Axis {
     virtual void serialize() {
       Axis::serialize();
       m_writer << "-DestAngle " << name << ": " << m_destination_angle << "\n";
-      m_writer << "-OriginalPos " << name << ": " << m_original_position << "\n";
     }
   private:
     HorizontalAxis* m_horizontal_axis;
     double m_destination_angle;
-    double m_original_position;
 };
 
 class VerticalAxis: public Axis {
