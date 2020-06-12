@@ -180,17 +180,21 @@ void testMoveZ(Writer* writer, Axis** axes) {
 
   parseInput("MZ380", writer, axes, 0);
   assertNearby("Destination Z", 380.0, axisZ->getDestination());
-  //assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
+  assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
 
   cout << "---------------------------------------------------------------" << endl;  
+  assertNearby("Position steps Z is zero first", 0.0, axisZ->getPositionSteps());
+  assertNearby("Position Z is zero first", 0.0, axisZ->getPosition());
+  assertNearby("Axis Z should be forward", true, axisZ->isForward);
   int steps = axisZ->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
     axisZ->turnOneStep();
   }
   assertNearby("Position Z", 380.0, axisZ->getPosition());
+  assertNearby("Position steps Z", 380.0, axisZ->getPositionSteps());
 
   assertNearby("Destination X", RAYON, axisX->getDestination());
-  //assertTest("Destination steps X", 380.0, axisX->getDestinationSteps());
+  assertTest("Destination steps X", 380.0, axisX->getDestinationSteps());
 
   assertNearby("Delta Destination X", 380.0, axisX->getDeltaDestination());
   assertNearby("Position X is zero first", 0.0, axisX->getPosition());

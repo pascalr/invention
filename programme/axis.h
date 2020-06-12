@@ -37,7 +37,7 @@ class Axis {
       previousStepTime = 0;
       isStepHigh = false;
       isMotorEnabled = false;
-      isForward = true;
+      isForward = false;
       isReferenced = false;
       isReferencing = false;
       speed = 500;
@@ -122,6 +122,8 @@ class Axis {
     }
 
     void updateDirection() {
+      //std::cout << "Destination steps " << getDestinationSteps() << std::endl;
+      //std::cout << "Position steps " << getPositionSteps() << std::endl;
       setMotorDirection(getDestinationSteps() > getPositionSteps());
     }
 
@@ -140,9 +142,10 @@ class Axis {
       isMotorEnabled = value;
     }
 
-    virtual void setMotorDirection(bool clockwise) {
-      m_writer->doDigitalWrite(dirPin, clockwise ? LOW : HIGH);
-      isForward = clockwise;
+    virtual void setMotorDirection(bool forward) {
+      // Maybe add a variable to the axis: isClockwiseForward?
+      m_writer->doDigitalWrite(dirPin, forward ? LOW : HIGH);
+      isForward = forward;
     }
 
     virtual void startReferencing() {
@@ -268,6 +271,12 @@ class HorizontalAxis : public Axis {
     double getDeltaDestination() {
       return m_delta_destination;
     }
+
+    virtual void prepare(unsigned long time) {
+      Axis::prepare(time);
+      m_delta_destination = 0;
+    }
+    
   private:
     double m_delta_destination;
 };
@@ -281,8 +290,10 @@ class ZAxis : public Axis {
 
     virtual void turnOneStep() {
       Axis::turnOneStep();
-      double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? -1 : 1);
+      double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
+      ////std::cout << "position " << getPosition() << std::endl;
       m_horizontal_axis->setDeltaDestination(deltaX);
+      ////std::cout << "2" << std::endl;
     }
 
 /*void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
@@ -299,6 +310,7 @@ class ZAxis : public Axis {
 
     virtual double getPosition() {
       double angle = m_position_steps / stepsPerUnit;
+      ////std::cout << "m_position_steps " << m_position_steps << std::endl;
       return RAYON * sin(angle / 180 * PI);
     }
 
@@ -307,9 +319,14 @@ class ZAxis : public Axis {
     }
 
     void setDestination(double dest) {
+      //std::cout << "Set destination " << dest << std::endl;
+      //std::cout << "Is forward " << isForward << std::endl;
+      
       m_original_position = getPosition();
-      Axis::setDestination(dest);
       m_destination_angle = asin(dest / RAYON) * 180.0 / PI;
+      Axis::setDestination(dest);
+      //std::cout << "Is forward " << isForward << std::endl;
+      
     }
   private:
     HorizontalAxis* m_horizontal_axis;
