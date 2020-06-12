@@ -37,19 +37,10 @@ class Axis {
       maxPosition = 999999;
       m_position_steps = 0;
       m_destination_steps = 0;
-      m_is_working = false;
     }
 
     virtual void setMaxPosition(double maxP) {
       maxPosition = maxP;
-    }
-
-    virtual bool isWorking() {
-      return m_is_working;
-    }
-
-    virtual void setIsWorking(bool val) {
-      m_is_working = val;
     }
 
     virtual void serialize() {
@@ -67,6 +58,10 @@ class Axis {
       m_writer << "-PIN step " << name << ": " << stepPin << "\n";
       m_writer << "-PIN limit switch " << name << ": " << limitSwitchPin << "\n";
       m_writer << "-stepsPerUnit " << name << ": " << stepsPerUnit << "\n";
+      m_writer << "-m_position_steps " << name << ": " << m_position_steps << "\n";
+      m_writer << "-m_destination_steps " << name << ": " << m_destination_steps << "\n";
+      m_writer << "-maxPosition " << name << ": " << maxPosition << "\n";
+      m_writer << "-previousStepTime " << name << ": " << previousStepTime << "\n";
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -255,8 +250,6 @@ class Axis {
 
     unsigned long m_position_steps;
     double m_destination_steps;
-
-    bool m_is_working; // FIXME: Probably useless
 };
 
 class HorizontalAxis : public Axis {
