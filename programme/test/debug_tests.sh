@@ -1,2 +1,2 @@
 #!/bin/bash
-g++ -g test.cpp -DDEBUG && clear && gdb a.out
+g++ -g test.cpp -DDEBUG -x gdb.txt && clear && gdb a.out
