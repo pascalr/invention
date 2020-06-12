@@ -309,6 +309,19 @@ class HorizontalAxis : public Axis {
       return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
     }
 
+    /*double getDestinationSteps() {
+      return Axis::getDestinationSteps() - m_delta_position * stepsPerUnit;
+    }
+
+    double getDestination() {
+      return Axis::getDestination() + m_delta_position;
+    }
+
+    void setDestination(double dest) {
+      Axis::setDestination(dest);
+      TODO
+    }*/
+
     virtual void referenceReached() {
       Axis::referenceReached();
       m_delta_position = RAYON;

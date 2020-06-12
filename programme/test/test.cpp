@@ -62,6 +62,31 @@ void assertTest(P t1, P t2) {
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
+void move(const char* dest, Writer* writer, Axis** axes) {
+  unsigned long currentTime = 0;
+
+  for (int i = 0; axes[i] != NULL; i++) {
+    axes[i]->prepare(currentTime);
+  }
+
+  parseInput(dest, writer, axes, 0);
+
+  bool stillWorking = true;
+  while (stillWorking) {
+    currentTime++;
+    stillWorking = false;
+    for (int i = 0; axes[i] != NULL; i++) {
+      stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
+    }
+  }
+}
+
+void referenceAll(Axis** axes) {
+  for (int i = 0; axes[i] != NULL; i++) {
+    axes[i]->referenceReached();
+  }
+}
+
 // Axis by name should be case insensitive
 void testAxisByLetter(Axis** axes) {
   cout << "Testing axisByName" << endl;
@@ -157,10 +182,28 @@ void testHandleAxis(Writer* writer, Axis** axes) {
 
 void debug() {}
 
+
 void testMoveZ(Writer* writer, Axis** axes) {
   cout << "Test move Z" << endl;
 
-  HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
+  Axis* axisZ = axisByLetter(axes, 'Z');
+
+  referenceAll(axes);
+  
+  assertNearby("Beginning position Z", 0.0, axisZ->getPosition());
+  assertNearby("Beginning destination Z", 0.0, axisZ->getDestination());
+
+  move("MZ380", writer, axes);
+  
+  assertNearby("MZ380 position Z", RAYON, axisZ->getPosition());
+  assertNearby("MZ380 destination Z", RAYON, axisZ->getDestination());
+  assertNearby("MZ380 destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
+}
+
+
+/*void testMoveZ(Writer* writer, Axis** axes) {
+  cout << "Test move Z" << endl;
+
   Axis* axisZ = axisByLetter(axes, 'Z');
   int steps;
   
@@ -170,25 +213,72 @@ void testMoveZ(Writer* writer, Axis** axes) {
   }
   cout << "Test move Z" << endl;
 
-  // axisX->getDestination() -> tip destination
-
-  // Tip starts at X380, and delta is 380
-  // Base position is dest - delta
-  // By moving Z380, the tip stays at 380
-  // But the delta becomes 0.
   parseInput("MZ380", writer, axes, 0);
   assertNearby("Destination Z", RAYON, axisZ->getDestination());
   assertTest("Destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
   assertNearby("Position steps Z is zero first", 0.0, axisZ->getPositionSteps());
   assertNearby("Position Z is zero first", 0.0, axisZ->getPosition());
   assertNearby("Axis Z should be forward", true, axisZ->isForward);
-  assertNearby("Position X is rayon first", RAYON, axisX->getPosition());
   steps = axisZ->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
     axisZ->turnOneStep();
   }
   assertNearby("Position Z", 380.0, axisZ->getPosition());
   assertNearby("Position steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getPositionSteps());
+
+  cout << "MZ0 should bring back the Z to zero." << endl;
+  parseInput("MZ0", writer, axes, 0);
+  assertNearby("Destination Z", 0.0, axisZ->getDestination());
+  assertNearby("Axis Z should be in reverse", false, axisZ->isForward);
+  assertTest("Destination steps Z", 0.0, axisZ->getDestinationSteps());
+  steps = axisZ->getDestinationSteps();
+  for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
+    debug();
+    axisZ->turnOneStep();
+  }
+  assertNearby("Position Z", 0.0, axisZ->getPosition());
+
+}*/
+
+
+
+void testMoveZMovesX(Writer* writer, Axis** axes) {
+  cout << "Test move Z moves X" << endl;
+
+  HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
+
+  referenceAll(axes);
+
+  // BEGINNING
+  assertNearby("Beginning position X", RAYON, axisX->getPosition());
+  assertNearby("Beginning destination X", RAYON, axisX->getDestination());
+  assertNearby("Beginning delta X", RAYON, axisX->getDeltaPosition());
+
+  move("MX100", writer, axes);
+  
+  assertNearby("MX100 position X", 100.0, axisX->getPosition());
+  assertNearby("MX100 destination X", 100.0, axisX->getDestination());
+  assertNearby("MX100 delta X", RAYON, axisX->getDeltaPosition());
+  
+  referenceAll(axes);
+  move("MZ380", writer, axes);
+  
+  assertNearby("MX100 position X", RAYON, axisX->getPosition());
+  assertNearby("MX100 destination X", RAYON, axisX->getDestination());
+  assertNearby("MX100 delta X", 0.0, axisX->getDeltaPosition());
+
+  // axisX->getDestination() -> tip destination
+
+  // Tip starts at X380, and delta is 380
+  // Base position is dest - delta
+  // By moving Z380, the tip stays at 380
+  // But the delta becomes 0.
+  /*parseInput("MZ380", writer, axes, 0);
+  assertNearby("Position X is rayon first", RAYON, axisX->getPosition());
+  steps = axisZ->getDestinationSteps();
+  for (int i = 0; i < steps; i++) {
+    axisZ->turnOneStep();
+  }
 
   assertNearby("Destination X", RAYON, axisX->getDestination());
   assertTest("Destination steps X", RAYON * axisX->getStepsPerUnit(), axisX->getDestinationSteps());
@@ -200,19 +290,13 @@ void testMoveZ(Writer* writer, Axis** axes) {
   }
   assertNearby("Position X", 380.0, axisX->getPosition());
 
-  cout << "MZ0 should bring back the Z to zero." << endl;
   parseInput("MZ0", writer, axes, 0);
-  assertNearby("Destination Z", 0.0, axisZ->getDestination());
-  assertNearby("Axis Z should be in reverse", false, axisZ->isForward);
-  assertTest("Destination steps Z", 0.0, axisZ->getDestinationSteps());
-  steps = axisZ->getDestinationSteps();
   assertNearby("Destination X", RAYON, axisX->getDestination());
   for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
     debug();
     axisZ->turnOneStep();
   }
-  assertNearby("Position Z", 0.0, axisZ->getPosition());
-  assertNearby("Destination X", RAYON, axisX->getDestination());
+  assertNearby("Destination X", RAYON, axisX->getDestination());*/
 
 }
 
@@ -226,14 +310,13 @@ int main (int argc, char *argv[]) {
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
   
-  /*testAxisByLetter(axes);
+  testAxisByLetter(axes);
   testParseMove(axes);
   testAtof();
-  testStop(&axisX);
-  testSpeed(&axisX);
+  testStop(&axisY);
+  testSpeed(&axisY);
   testParseInput(&writer, axes);
-  testHandleAxis(&writer, axes);*/
+  testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
-
-  axisX.serialize();
+  testMoveZMovesX(&writer, axes);
 }
