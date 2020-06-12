@@ -170,26 +170,30 @@ void testMoveZ(Writer* writer, Axis** axes) {
   }
   cout << "Test move Z" << endl;
 
-  parseInput("MZ380", writer, axes, 0);
-  assertNearby("Destination Z", 380.0, axisZ->getDestination());
-  assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
+  // axisX->getDestination() -> tip destination
 
-  cout << "---------------------------------------------------------------" << endl;  
+  // Tip starts at X380, and delta is 380
+  // Base position is dest - delta
+  // By moving Z380, the tip stays at 380
+  // But the delta becomes 0.
+  parseInput("MZ380", writer, axes, 0);
+  assertNearby("Destination Z", RAYON, axisZ->getDestination());
+  assertTest("Destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
   assertNearby("Position steps Z is zero first", 0.0, axisZ->getPositionSteps());
   assertNearby("Position Z is zero first", 0.0, axisZ->getPosition());
   assertNearby("Axis Z should be forward", true, axisZ->isForward);
+  assertNearby("Position X is rayon first", RAYON, axisX->getPosition());
   steps = axisZ->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
     axisZ->turnOneStep();
   }
   assertNearby("Position Z", 380.0, axisZ->getPosition());
-  assertNearby("Position steps Z", 380.0, axisZ->getPositionSteps());
+  assertNearby("Position steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getPositionSteps());
 
-  assertNearby("Destination X", 0.0, axisX->getDestination());
-  assertTest("Destination steps X", 0.0, axisX->getDestinationSteps());
+  assertNearby("Destination X", RAYON, axisX->getDestination());
+  assertTest("Destination steps X", RAYON * axisX->getStepsPerUnit(), axisX->getDestinationSteps());
 
-  assertNearby("Delta Destination X", 0.0, axisX->getDeltaDestination());
-  assertNearby("Position X is zero first", 0.0, axisX->getPosition());
+  assertNearby("Delta position X", 0.0, axisX->getDeltaPosition());
   steps = axisX->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
     axisX->turnOneStep();
@@ -200,9 +204,9 @@ void testMoveZ(Writer* writer, Axis** axes) {
   parseInput("MZ0", writer, axes, 0);
   assertNearby("Destination Z", 0.0, axisZ->getDestination());
   assertNearby("Axis Z should be in reverse", false, axisZ->isForward);
-  assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
+  assertTest("Destination steps Z", 0.0, axisZ->getDestinationSteps());
   steps = axisZ->getDestinationSteps();
-  assertNearby("Destination X", 0.0, axisX->getDestination());
+  assertNearby("Destination X", RAYON, axisX->getDestination());
   for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
     debug();
     axisZ->turnOneStep();

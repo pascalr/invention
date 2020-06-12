@@ -162,8 +162,9 @@ class Axis {
 
     virtual bool isDestinationReached() {
       double destSteps = getDestinationSteps();
-      return (isForward && m_position_steps >= destSteps) ||
-             (!isForward && m_position_steps <= destSteps);
+      double posSteps = getPositionSteps();
+      return (isForward && posSteps >= destSteps) ||
+             (!isForward && posSteps <= destSteps);
     }
 
     virtual void referenceReached() {
@@ -252,22 +253,34 @@ class Axis {
     double m_destination_steps;
 };
 
+// Destination refers to the tip
+// Position refers to the tip
+// Delta is the difference between the tip and the base
+// Tip = Base + Delta
+// Base = Tip - Delta
+// The positionSteps refers to the base, these must start at zero
+
+// I think it must always either refer to the base or the tip.
+// The tip would be nice because set destination you want the tip.
+// It would be nice if it hides the base.
+
+// OK I GOT IT
+// turn one step moves the position, not the destination!!!
+
+// positionStep is the base position
 class HorizontalAxis : public Axis {
   public:
     HorizontalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
-      m_delta_destination = RAYON;
     }
 
-    bool shouldGoForward() {
-      return getPosition() < maxPosition / 2;
-    }
+    /*
 
     double getDestinationSteps() {
-      return Axis::getDestinationSteps() + m_delta_destination * stepsPerUnit;
+      return Axis::getDestinationSteps() - m_delta_destination * stepsPerUnit;
     }
 
     double getDestination() {
-      return Axis::getDestination() + m_delta_destination;
+      return Axis::getDestination() - m_delta_destination;
     }
     
     void setDeltaDestination(double dest) {
@@ -277,21 +290,40 @@ class HorizontalAxis : public Axis {
 
     double getDeltaDestination() {
       return m_delta_destination;
+    }*/
+
+    void setDeltaPosition(double pos) {
+      m_delta_position = pos;
+      updateDirection();
+    }
+
+    double getDeltaPosition() {
+      return m_delta_position;
+    }
+
+    double getPosition() {
+      return Axis::getPosition() + m_delta_position;
+    }
+
+    double getPositionSteps() {
+      return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
     }
 
     virtual void referenceReached() {
       Axis::referenceReached();
-      setPositionSteps(RAYON * stepsPerUnit);
+      m_delta_position = RAYON;
+      setDestination(RAYON);
+      //setPositionSteps(RAYON * stepsPerUnit);
     }
 
     virtual void serialize() {
       Axis::serialize();
-      m_writer << "-DeltaDest " << name << ": " << m_delta_destination << "\n";
+      m_writer << "-DeltaPos " << name << ": " << m_delta_position << "\n";
     }
     
   private:
     // The horizontal distance between the tip and the base.
-    double m_delta_destination;
+    double m_delta_position;
 };
 
 // The ZAxis is the TAxis.
@@ -301,12 +333,20 @@ class ZAxis : public Axis {
       m_horizontal_axis = hAxis;
     }
 
+    // It is not about if the horizontal axis should go forward or not,
+    // it is about whether the T axis should turn clockwise or counter clockwise to get to the z position.
+    // The x axis just follows.
+
+    //bool shouldGoForward() {
+    //  return getPosition() < maxPosition / 2;
+    //}
+
     virtual void turnOneStep() {
       Axis::turnOneStep();
       double angle = m_position_steps / stepsPerUnit;
       ////std::cout << "m_position_steps " << m_position_steps << std::endl;
-      double deltaX = RAYON * cos(angle / 180 * PI) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
-      m_horizontal_axis->setDeltaDestination(deltaX);
+      double deltaX = RAYON * cos(angle / 180 * PI);
+      m_horizontal_axis->setDeltaPosition(deltaX);
       //double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
       ////std::cout << "position " << getPosition() << std::endl;
       //m_horizontal_axis->setDeltaDestination(deltaX);
