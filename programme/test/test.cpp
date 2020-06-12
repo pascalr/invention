@@ -166,11 +166,14 @@ void testHandleAxis(Writer* writer, Axis** axes) {
   assertTest("After a move it should work", true, axis->handleAxis(time_us));
 }
 
+void debug() {}
+
 void testMoveZ(Writer* writer, Axis** axes) {
   cout << "Test move Z" << endl;
 
   HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
   Axis* axisZ = axisByLetter(axes, 'Z');
+  int steps;
   
   for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->prepare(0);
@@ -186,7 +189,7 @@ void testMoveZ(Writer* writer, Axis** axes) {
   assertNearby("Position steps Z is zero first", 0.0, axisZ->getPositionSteps());
   assertNearby("Position Z is zero first", 0.0, axisZ->getPosition());
   assertNearby("Axis Z should be forward", true, axisZ->isForward);
-  int steps = axisZ->getDestinationSteps();
+  steps = axisZ->getDestinationSteps();
   for (int i = 0; i < steps; i++) {
     axisZ->turnOneStep();
   }
@@ -203,6 +206,18 @@ void testMoveZ(Writer* writer, Axis** axes) {
     axisX->turnOneStep();
   }
   assertNearby("Position X", 380.0, axisX->getPosition());
+
+  // MZ0 should bring back the Z to zero.
+  parseInput("MZ0", writer, axes, 0);
+  assertNearby("Destination Z", 0.0, axisZ->getDestination());
+  assertNearby("Axis Z should be in reverse", false, axisZ->isForward);
+  assertTest("Destination steps Z", 380.0, axisZ->getDestinationSteps());
+  steps = axisZ->getDestinationSteps();
+  for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
+    debug();
+    axisZ->turnOneStep();
+  }
+  assertNearby("Position Z", 0.0, axisZ->getPosition());
 
 }
 

@@ -156,6 +156,12 @@ class Axis {
       setMotorEnabled(true);*/
     }
 
+    virtual bool isDestinationReached() {
+      double destSteps = getDestinationSteps();
+      return (isForward && m_position_steps >= destSteps) ||
+             (!isForward && m_position_steps <= destSteps);
+    }
+
     virtual void referenceReached() {
       m_writer->doPrint("Done referencing axis ");
       char theName[] = {name, '\0'};
@@ -175,12 +181,10 @@ class Axis {
     // Returns true if the axis is still working.
     virtual bool handleAxis(unsigned long currentTime) {
       unsigned int delay = getDelay();
-      double destSteps = getDestinationSteps();
+      
       if (isReferencing) {
         return moveToReference();
-      } else if (isReferenced && isMotorEnabled && (forceRotation ||
-                ((isForward && m_position_steps < destSteps) ||
-                (!isForward && m_position_steps > destSteps)))) {
+      } else if (isReferenced && isMotorEnabled && (forceRotation || !isDestinationReached())) {
         unsigned long deltaTime = currentTime - previousStepTime;
         if (deltaTime > delay) {
           turnOneStep();
