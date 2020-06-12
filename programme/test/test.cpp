@@ -263,9 +263,15 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
   referenceAll(axes);
   move("MZ380", writer, axes);
   
-  assertNearby("MX100 position X", RAYON, axisX->getPosition());
-  assertNearby("MX100 destination X", RAYON, axisX->getDestination());
-  assertNearby("MX100 delta X", 0.0, axisX->getDeltaPosition());
+  assertNearby("MZ380 position X", RAYON, axisX->getPosition());
+  assertNearby("MZ380 destination X", RAYON, axisX->getDestination());
+  assertNearby("MZ380 delta X", 0.0, axisX->getDeltaPosition());
+
+  move("MX0", writer, axes);
+  
+  assertNearby("MX0 position X", 0.0, axisX->getPosition());
+  assertNearby("MX0 destination X", 0.0, axisX->getDestination());
+  assertNearby("MX0 delta X", 0.0, axisX->getDeltaPosition());
 
   // axisX->getDestination() -> tip destination
 
