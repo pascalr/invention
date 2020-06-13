@@ -6,7 +6,10 @@
 #include "../setup.h"
 #include "../common.h"
 
+#include "matplotlibcpp.h"
+
 using namespace std;
+namespace plt = matplotlibcpp;
 
 class ConsoleWriter : public Writer {
   public:
@@ -62,7 +65,7 @@ void assertTest(P t1, P t2) {
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
-void move(const char* dest, Writer* writer, Axis** axes) {
+void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
   unsigned long currentTime = 0;
 
   for (int i = 0; axes[i] != NULL; i++) {
@@ -75,13 +78,29 @@ void move(const char* dest, Writer* writer, Axis** axes) {
     axes[i]->afterInput();
   }
 
+  std::vector<double> t;
+  std::vector<double> y[20];
+
   bool stillWorking = true;
   while (stillWorking) {
-    currentTime++;
     stillWorking = false;
     for (int i = 0; axes[i] != NULL; i++) {
       stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
     }
+    if (plot && currentTime % 50 == 0) {
+      t.push_back(currentTime);
+      for (int i = 0; axes[i] != NULL; i++) {
+        y[i].push_back(axes[i]->getPosition());
+      }
+    }
+    currentTime++;
+  }
+
+  if (plot) {
+    for (int i = 0; axes[i] != NULL; i++) {
+      plt::plot(t,y[i]);
+    }
+    plt::show();
   }
 }
 
@@ -314,7 +333,7 @@ void testMoveXFlipsZ(Writer* writer, Axis** axes) {
   assertNearby("Beginning destination Z", 0.0, axisZ->getDestination());
   assertNearby("Beginning angle Z", 0.0, axisZ->getDestinationAngle());
 
-  move("MX0", writer, axes);
+  move("MX0", writer, axes, true);
   
   assertNearby("MX0 position X", 0.0, axisX->getPosition());
   assertNearby("MX0 destination X", 0.0, axisX->getDestination());
@@ -408,4 +427,5 @@ int main (int argc, char *argv[]) {
   testMoveZMovesX(&writer, axes);
   testMoveSquare(&writer, axes);
   testMoveXFlipsZ(&writer, axes);
+
 }
