@@ -184,6 +184,9 @@ class Axis {
       referenceReached();
     }
 
+    virtual void afterInput() {
+    }
+
     // Returns true if the axis is still working.
     virtual bool handleAxis(unsigned long currentTime) {
       unsigned int delay = getDelay();
@@ -394,14 +397,21 @@ class ZAxis : public Axis {
 
       m_destination_angle = (asin(dest / RAYON) * 180.0 / PI);
 
-      if(m_horizontal_axis->getPosition() < RAYON) {
-        m_destination_angle = 180 - m_destination_angle;
-      }
-      
       Axis::setDestination(dest);
       //std::cout << "destination angle : " << m_destination_angle << std::endl;
       //std::cout << "Is forward " << isForward << std::endl;
       
+    }
+
+    virtual void afterInput() {
+      if(m_horizontal_axis->getDestination() < RAYON) {
+        m_destination_angle = 180 - m_destination_angle;
+        updateDirection();
+      }
+    }
+
+    double getDestinationAngle() {
+      return m_destination_angle;
     }
 
     virtual void serialize() {

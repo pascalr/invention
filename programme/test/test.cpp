@@ -71,6 +71,10 @@ void move(const char* dest, Writer* writer, Axis** axes) {
 
   parseInput(dest, writer, axes, 0);
 
+  for (int i = 0; axes[i] != NULL; i++) {
+    axes[i]->afterInput();
+  }
+
   bool stillWorking = true;
   while (stillWorking) {
     currentTime++;
@@ -295,6 +299,30 @@ void testMoveSquare(Writer* writer, Axis** axes) {
   assertNearby("MX380 destination Z", 0.0, axisZ->getDestination());
 }
 
+void testMoveXFlipsZ(Writer* writer, Axis** axes) {
+  cout << "Test move X flips Z" << endl;
+
+  HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
+  ZAxis* axisZ = (ZAxis*)axisByLetter(axes, 'Z');
+
+  referenceAll(axes);
+
+  assertNearby("Beginning position X", RAYON, axisX->getPosition());
+  assertNearby("Beginning destination X", RAYON, axisX->getDestination());
+  assertNearby("Beginning delta X", RAYON, axisX->getDeltaPosition());
+  assertNearby("Beginning position Z", 0.0, axisZ->getPosition());
+  assertNearby("Beginning destination Z", 0.0, axisZ->getDestination());
+  assertNearby("Beginning angle Z", 0.0, axisZ->getDestinationAngle());
+
+  move("MX0", writer, axes);
+  
+  assertNearby("MX0 position X", 0.0, axisX->getPosition());
+  assertNearby("MX0 destination X", 0.0, axisX->getDestination());
+  assertNearby("MX0 delta X", -RAYON, axisX->getDeltaPosition());
+  assertNearby("MX0 position Z", 0.0, axisZ->getPosition());
+  assertNearby("MX0 angle Z", 180.0, axisZ->getDestinationAngle());
+}
+
 void testMoveZMovesX(Writer* writer, Axis** axes) {
   cout << "Test move Z moves X" << endl;
 
@@ -311,7 +339,7 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
   
   assertNearby("MX100 position X", 100.0, axisX->getPosition());
   assertNearby("MX100 destination X", 100.0, axisX->getDestination());
-  assertNearby("MX100 delta X", RAYON, axisX->getDeltaPosition());
+  assertNearby("MX100 delta X", -RAYON, axisX->getDeltaPosition());
   
   referenceAll(axes);
   move("MZ380", writer, axes);
@@ -379,4 +407,5 @@ int main (int argc, char *argv[]) {
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
   testMoveSquare(&writer, axes);
+  testMoveXFlipsZ(&writer, axes);
 }

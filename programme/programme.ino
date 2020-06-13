@@ -120,6 +120,9 @@ void loop() {
      axes[i]->prepare(currentTime);
     }
     inputCursor = parseInput(input, &writer, axes, inputCursor);
+    for (int i = 0; axes[i] != NULL; i++) {
+     axes[i]->afterInput();
+    }
   }
 }
 
