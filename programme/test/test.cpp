@@ -416,7 +416,7 @@ int main (int argc, char *argv[]) {
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
   
-  testAxisByLetter(axes);
+  /*testAxisByLetter(axes);
   testParseMove(axes);
   testAtof();
   testStop(&axisY);
@@ -425,7 +425,7 @@ int main (int argc, char *argv[]) {
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
-  testMoveSquare(&writer, axes);
+  testMoveSquare(&writer, axes);*/
   testMoveXFlipsZ(&writer, axes);
 
 }

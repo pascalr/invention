@@ -404,7 +404,9 @@ class ZAxis : public Axis {
     }
 
     virtual void afterInput() {
-      if(m_horizontal_axis->getDestination() < RAYON) {
+      std::cout << "getDestination" << std::endl;
+      std::cout << m_horizontal_axis->getDestination() << std::endl;
+      if(m_horizontal_axis->getDestination() < RAYON && m_destination_angle < 90) {
         m_destination_angle = 180 - m_destination_angle;
         updateDirection();
       }
