@@ -4,3 +4,6 @@ find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 add_executable( DetectChessboard detect_chessboard.cpp )
 target_link_libraries( DetectChessboard ${OpenCV_LIBS} )
+add_executable( ScanQRCode scan_qr_code.cpp )
+target_link_libraries( ScanQRCode ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
+
