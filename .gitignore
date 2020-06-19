@@ -6,3 +6,4 @@ vision/CMakeCache.txt
 vision/Makefile
 vision/cmake_install.cmake
 vision/DetectChessboard
+*.FCStd1
