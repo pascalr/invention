@@ -16,11 +16,11 @@ using namespace zbar;
 typedef struct {
   string type;
   string data;
-  vector <point> location;
+  vector <Point> location;
 } decodedObject;
 
 // Find and decode barcodes and QR codes
-void decode(Mat &im, vector<decodedobject>&decodedObjects)
+void decode(Mat &im, vector<decodedObject>&decodedObjects)
 {
   
   // Create zbar scanner
@@ -34,7 +34,7 @@ void decode(Mat &im, vector<decodedobject>&decodedObjects)
   
   // Convert image to grayscale
   Mat imGray;
-  cvtColor(im, imGray,CV_BGR2GRAY);
+  cvtColor(im, imGray,COLOR_BGR2GRAY);
 
   // Wrap image data in a zbar image
   Image image(im.cols, im.rows, "Y800", (uchar *)imGray.data, im.cols * im.rows);
