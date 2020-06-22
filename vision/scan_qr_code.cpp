@@ -43,6 +43,8 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
 
   // Scan the image for barcodes and QRCodes
   int n = scanner.scan(image);
+
+  cout << "About to print results" << endl;
   
   // Print results
   for(Image::SymbolIterator symbol = image.symbol_begin(); symbol != image.symbol_end(); ++symbol)
@@ -69,17 +71,15 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
 int main(int argc, char *argv[])
 {
   Mat im;
-  // The first argument is an image path, otherwise try to capture a video image.
+  // The first argument is an image path
   if ( argc == 2 ) {
     string imagepath = argv[1];
     im = imread(imagepath);
     printf("usage: DisplayImage.out <Image_Path>\n");
     return -1;
-  } else {
+  } else { // Try to capture a video image
     captureVideoImage(im);
   }
-
-  // Read image
 
    // Variable for decoded objects
    vector<decodedObject> decodedObjects;

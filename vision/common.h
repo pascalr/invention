@@ -28,6 +28,8 @@ int captureVideoImage(Mat& frame) {
     cerr << "ERROR! blank frame grabbed\n";
     return -1;
   }
+
+  return 0;
 }
 
 #endif // COMMON_H
