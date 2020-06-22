@@ -6,4 +6,6 @@ add_executable( DetectChessboard detect_chessboard.cpp )
 target_link_libraries( DetectChessboard ${OpenCV_LIBS} )
 add_executable( ScanQRCode scan_qr_code.cpp )
 target_link_libraries( ScanQRCode ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
+add_executable( bin/capture capture.cpp )
+target_link_libraries( bin/capture ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
 
