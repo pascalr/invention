@@ -6,4 +6,5 @@ vision/CMakeCache.txt
 vision/Makefile
 vision/cmake_install.cmake
 vision/DetectChessboard
+vision/ScanQRCode
 *.FCStd1
