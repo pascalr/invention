@@ -13,3 +13,14 @@ sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libp
 # cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
 # make -j7
 # sudo make install
+
+# libqrencode
+sudo apt install autoconf automake autotools-dev libtool pkg-config libpng12-dev
+# https://fukuchi.org/works/qrencode/qrencode-4.0.2.tar.gz
+./configure
+make
+sudo make install
+sudo ldconfig
+
+# barcode
+sudo apt install barcode

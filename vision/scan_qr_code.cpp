@@ -28,11 +28,12 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
   // Create zbar scanner
   ImageScanner scanner;
 
+  scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
   // disable all
-  scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 0);
+  //scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 0);
 
   // enable qr
-  scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
+  //scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
   
   // Convert image to grayscale
   Mat imGray;
