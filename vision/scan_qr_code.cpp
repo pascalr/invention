@@ -75,8 +75,6 @@ int main(int argc, char *argv[])
   if ( argc == 2 ) {
     string imagepath = argv[1];
     im = imread(imagepath);
-    printf("usage: DisplayImage.out <Image_Path>\n");
-    return -1;
   } else { // Try to capture a video image
     captureVideoImage(im);
   }
