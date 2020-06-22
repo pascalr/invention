@@ -9,6 +9,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "common.h"
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
@@ -66,10 +68,18 @@ void decode(Mat &im, vector<decodedObject>&decodedObjects)
 
 int main(int argc, char *argv[])
 {
+  Mat im;
+  // The first argument is an image path, otherwise try to capture a video image.
+  if ( argc == 2 ) {
+    string imagepath = argv[1];
+    im = imread(imagepath);
+    printf("usage: DisplayImage.out <Image_Path>\n");
+    return -1;
+  } else {
+    captureVideoImage(im);
+  }
 
   // Read image
-  string imagepath = argv[1];
-  Mat im = imread(imagepath);
 
    // Variable for decoded objects
    vector<decodedObject> decodedObjects;
