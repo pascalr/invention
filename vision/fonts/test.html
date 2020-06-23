@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<style>
+@font-face {
+  font-family: 'Inconsolata';
+  src: URL('static/Inconsolata-SemiBold.ttf') format('truetype');
+}
+
+html body {
+  font-size:100%;
+  font:inherit;
+  font-family: 'Inconsolata';
+  vertical-align:baseline;
+}
+.label {
+  /*box-sizing: border-box; Does not work in firefox print*/
+  width: 30mm;
+  height: 30mm;
+  text-align: center;
+  border: 2mm black solid;
+  border-radius: 50%;
+  display: inline-block;
+  padding: 5px;
+  margin: 5mm;
+  font-size: 25px;
+}
+.jarId::before, .jarId::after {
+  content: ' ';
+  width: 3.5mm;
+  height: 3.5mm;
+  background-color: black;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0.5mm;
+}
+</style>
+
+<div class="label">
+  <span class="jarId">001</span><br/>
+  0.660kg<br/>
+  Farine<br/>
+  254<br/>
+</div>
+<div class="label">
+  <span class="jarId">002</span><br/>
+  0.660kg<br/>
+  Sucre<br/>
+  305<br/>
+</div>
+<div class="label">
+  <span class="jarId">003</span><br/>
+  0.100kg<br/>
+  GrMout<br/>
+  881<br/>
+</div>
+<br/>
+<div class="label">
+  <span class="jarId">004</span><br/>
+  0.330kg<br/>
+  BiSoude<br/>
+  259<br/>
+</div>
+<div class="label">
+  <span class="jarId">005</span><br/>
+  0.095kg<br/>
+  Moutarde<br/>
+  880<br/>
+</div>
+<div class="label">
+  <span class="jarId">006</span><br/>
+  0.330kg<br/>
+  Amarante<br/>
+  2554<br/>
+</div>
+<br/>
+<div class="label">
+  <span class="jarId">007</span><br/>
+  0.330kg<br/>
+  HuilCoco<br/>
+  2317<br/>
+</div>
+
+</body>
+</html>
+
+
+

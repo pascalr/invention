@@ -32,4 +32,12 @@ int captureVideoImage(Mat& frame) {
   return 0;
 }
 
+void showImgAndWaitForKey(Mat& mat) {
+  for (;;) {
+    imshow("Live", mat);
+    if (waitKey(40) >= 0)
+    break;
+  }
+}
+
 #endif // COMMON_H

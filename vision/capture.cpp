@@ -15,11 +15,7 @@ int main(int, char**)
   Mat frame;
   captureVideoImage(frame);
   imwrite("output/capture.jpg", frame);
-  for (;;) {
-    imshow("Live", frame);
-    if (waitKey(40) >= 0)
-    break;
-  }
+  showImgAndWaitForKey(frame);
   return 0;
 }
 

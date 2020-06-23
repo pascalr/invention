@@ -24,3 +24,7 @@ sudo ldconfig
 
 # barcode
 sudo apt install barcode
+
+# opencv OCR tesseract
+sudo apt install tesseract-ocr
+sudo apt install libtesseract-dev
