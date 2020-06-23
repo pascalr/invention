@@ -1,4 +1,4 @@
-#include <opencv2/opencv.hpp>
+/*#include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
@@ -49,7 +49,7 @@ int main(int, char**)
   ft2->putText(img, text, textOrg, fontHeight,
                Scalar::all(255), thickness, linestyle, true );
 
-  /*int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
+  int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
   double fontScale = 2;
   int thickness = 3;
   
@@ -75,12 +75,12 @@ int main(int, char**)
   
   // then put the text itself
   putText(img, text, textOrg, fontFace, fontScale,
-        Scalar::all(255), thickness, 8);*/
+        Scalar::all(255), thickness, 8);
   
   showImgAndWaitForKey(img);
 
   return 0;
-}
+}*/
 
 /*
 int main(int argc, char** argv )

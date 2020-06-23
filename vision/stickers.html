@@ -5,10 +5,10 @@
 </head>
 <body>
 
-<style>
+<style media="all">
 @font-face {
   font-family: 'Inconsolata';
-  src: URL('static/Inconsolata-SemiBold.ttf') format('truetype');
+  src: URL('fonts/static/Inconsolata-SemiBold.ttf') format('truetype');
 }
 
 html body {
@@ -30,13 +30,10 @@ html body {
   font-size: 25px;
 }
 .jarId::before, .jarId::after {
-  content: ' ';
-  width: 3.5mm;
-  height: 3.5mm;
-  background-color: black;
-  border-radius: 50%;
+  font-size: 18px;
+  content: '⬤';
   display: inline-block;
-  margin: 0.5mm;
+  padding: 0.5mm;
 }
 </style>
 
