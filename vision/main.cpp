@@ -120,20 +120,20 @@ namespace HoughCircleDetector {
 }
 
 bool isCircle(vector<Point> contours, Point2f center, float radius, float epsilon) {
-  // epsilon varies based on the radius
-  // The larger the circle is, the more delta it can have
-  // epsilon = epsilon / radius;
+  // epsilon is a percentage of the radius
+  // no more than 10% variation
+  float maxVariation = radius * epsilon;
   bool isACircle = true;
   for( size_t i = 0; i < contours.size(); i++ ) {
     double norm = sqrt(pow(contours[i].x - center.x, 2)+pow(contours[i].y - center.y, 2));
-    isACircle = isACircle && abs(norm-radius) < epsilon;
+    isACircle = isACircle && abs(norm-radius) < maxVariation;
     //cout << "Norm is: " + norm;
-    //cout << "Radius is: " << radius << endl;
   }
   return isACircle;
 }
 
 bool isBigCircle(vector<Point> contours, Point2f center, float radius, float epsilon, float minRadius) {
+    cout << "Radius is: " << radius << endl;
   return radius > minRadius && isCircle(contours, center, radius, epsilon);
 }
 
@@ -169,7 +169,7 @@ namespace ContourDetector {
         //drawContours( drawing, contours, (int)i, color );
         //rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2 );
         //if (isCircle(contours[i], centers[i], radius[i], 2)) {
-        if (isBigCircle(contours[i], centers[i], radius[i], 2, 20)) {
+        if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
           circle( drawing, centers[i], (int)radius[i], color, 2 );
         }
     }
@@ -194,6 +194,7 @@ int main(int argc, char** argv ) {
   Mat mat;
   if (argc == 2) {
     mat = imread( argv[1] );
+    cout << "Input image is " << mat.size() << endl;
   } else {
     mat = Mat(200, 200, CV_8UC3, Scalar(255,255,255));
     circle(mat, Point(100,100), 40, Scalar(0,0,0), 2, LINE_8);
