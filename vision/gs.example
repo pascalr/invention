@@ -1,2 +1,3 @@
 gs -sDEVICE=jpeg -sOutputFile=test2.jpg -r144 ../../mozilla.pdf
 gs -sDEVICE=pnggray -sOutputFile=test2.png -r300 ../../mozilla.pdf
+gs -sDEVICE=pnggray -sOutputFile=test2.png ../../mozilla.pdf

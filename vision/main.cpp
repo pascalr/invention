@@ -93,14 +93,7 @@ namespace HoughCircleDetector {
         circle( frame, center, radius, Scalar(0,0,255), 10, LINE_8);
     }
  
-    /* 
-    // Calculate angle
-    double rise = circles[1][1] - circles[0][1];
-    double run = circles[1][0] - circles[0][0];
-    double slope = rise / run;
-    double angle_radians = atan(slope);
-    double angle_degrees = angle_radians*180.0 / CV_PI;*/
-  
+ 
     resize(frame, frame, Size(640,480), 0, 0, INTER_CUBIC);
     imshow(window_name, frame);
   }
@@ -127,13 +120,11 @@ bool isCircle(vector<Point> contours, Point2f center, float radius, float epsilo
   for( size_t i = 0; i < contours.size(); i++ ) {
     double norm = sqrt(pow(contours[i].x - center.x, 2)+pow(contours[i].y - center.y, 2));
     isACircle = isACircle && abs(norm-radius) < maxVariation;
-    //cout << "Norm is: " + norm;
   }
   return isACircle;
 }
 
 bool isBigCircle(vector<Point> contours, Point2f center, float radius, float epsilon, float minRadius) {
-    cout << "Radius is: " << radius << endl;
   return radius > minRadius && isCircle(contours, center, radius, epsilon);
 }
 
@@ -144,15 +135,37 @@ namespace ContourDetector {
   const char* source_window = "Source";
   const int max_thresh = 255;
 
+  int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
+    if (i < 0) return -1;
+    if (contourIsCircle[i]) {
+      return i;
+    } else {
+      return findNextCircle(hierarchy[i][0], hierarchy, contourIsCircle);
+    }
+  }
+
   void refresh(int, void* ) {
     Mat canny_output;
     Canny( src_gray, canny_output, thresh, thresh*2 );
-    vector<vector<Point> > contours;
-    findContours( canny_output, contours, RETR_TREE, CHAIN_APPROX_SIMPLE );
+
+    // https://stackoverflow.com/questions/43852023/detecting-small-circles-using-houghcircles-opencv
+    // Use erosion and dilation combination to eliminate false positives.
+    // In this case the text Q0X could be identified as circles but it is not.
+    // mask = cv2.erode(mask, kernel, iterations=6)
+    // mask = cv2.dilate(mask, kernel, iterations=3)
+    // closing = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+
+    vector<vector<Point>> contours;
+    vector<cv::Vec4i> hierarchy;
+    findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
     //vector<vector<Point> > contours_poly( contours.size() );
     //vector<Rect> boundRect( contours.size() );
-    vector<Point2f>centers( contours.size() );
-    vector<float>radius( contours.size() );
+    vector<Point2f> centers( contours.size() );
+    vector<float> radius( contours.size() );
+    vector<bool> contourIsCircle( contours.size() );
+
+    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+
     for( size_t i = 0; i < contours.size(); i++ )
     {
         //approxPolyDP( contours[i], contours_poly[i], 3, true );
@@ -160,9 +173,85 @@ namespace ContourDetector {
         //boundRect[i] = boundingRect( contours[i] );
         //minEnclosingCircle( contours_poly[i], centers[i], radius[i] );
         minEnclosingCircle( contours[i], centers[i], radius[i] );
+        Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
+        if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
+          contourIsCircle[i] = true;
+          circle( drawing, centers[i], (int)radius[i], color, 2 );
+        } else {
+          contourIsCircle[i] = false; // OPTIMIZE: Default vector to false to avoid doing that
+        }
     }
-    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-    for( size_t i = 0; i< contours.size(); i++ )
+
+    for( size_t i = 0; i < hierarchy.size(); i++ ) {
+
+      // FIXME only check circles not all contours
+
+      int child = hierarchy[i][2];
+      if (child < 0) continue;
+
+      //int firstInnerCircle = hierarchy[child][2];
+      int firstInnerCircle = findNextCircle(hierarchy[child][2], hierarchy, contourIsCircle);
+      if (firstInnerCircle < 0 || !contourIsCircle[child]) continue;
+
+      //int secondInnerCircle = hierarchy[firstInnerCircle][0];
+      int secondInnerCircle = findNextCircle(hierarchy[firstInnerCircle][0], hierarchy, contourIsCircle);
+      if (secondInnerCircle < 0) continue;
+
+      //int thirdInnerCircle = hierarchy[secondInnerCircle][0];
+      int thirdInnerCircle = findNextCircle(hierarchy[secondInnerCircle][0], hierarchy, contourIsCircle);
+      if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
+        
+      cout << "Possible candidate!!!" << endl;
+
+      // All relatives because actual size vary based on distance of camera to sticker.
+      float borderThickness = 2; // mm
+      float insideDiameter = 30; // mm
+      float smallDotDiameter = 4.86; // mm
+      float outsideDiameter = insideDiameter + 2*borderThickness; // mm
+
+      float expectedRatio = outsideDiameter / insideDiameter;
+      float actualRatio = radius[i] / radius[child];
+      bool perimeterDetected = abs(actualRatio - expectedRatio)/expectedRatio < 0.2;
+
+      float dotExpectedRatio = outsideDiameter / smallDotDiameter;
+      float dotActualRatio = radius[i] / radius[firstInnerCircle];
+      bool dotDetected = abs(dotActualRatio - dotExpectedRatio)/dotExpectedRatio < 0.2;
+
+      float dotActualRatio2 = radius[i] / radius[secondInnerCircle];
+      bool dotDetected2 = abs(dotActualRatio2 - dotExpectedRatio)/dotExpectedRatio < 0.2;
+
+      cout << "perimeterDetected: " << perimeterDetected << endl;
+      cout << "firstDotDetected: " << dotDetected << endl;
+      cout << "secondDotDetected: " << dotDetected2 << endl;
+      cout << "dotExpectedRatio: " << dotExpectedRatio << endl;
+      cout << "dotActualRatio: " << dotActualRatio << endl;
+
+      if (perimeterDetected && dotDetected && dotDetected2) {
+        cout << "Detected HRCode!!!" << endl;
+        // Calculate angle
+        double rise = centers[secondInnerCircle].y - centers[firstInnerCircle].y;
+        double run = centers[secondInnerCircle].x - centers[firstInnerCircle].x;
+        double slope = rise / run;
+        double angle_radians = atan(slope);
+        double angle_degrees = angle_radians*180.0 / CV_PI;
+        cout << "angle_degrees: "  << angle_degrees << endl;
+ 
+        circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
+
+        //Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], centers[i].x+radius[i], centers[i].y+radius[i]));
+        Mat rotatedHRCode;
+        Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
+        Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
+        warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
+
+        //cv::normalize(leftROI, leftROI, 0, 1, cv::NORM_MINMAX);  //to view
+        std::string title = "detectedHRCode";
+        title += std::to_string(i);
+        imshow("detectedHRCode",rotatedHRCode);
+      }
+    }
+    
+    /*for( size_t i = 0; i< contours.size(); i++ )
     {
         Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
         //drawContours( drawing, contours_poly, (int)i, color );
@@ -172,7 +261,7 @@ namespace ContourDetector {
         if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
           circle( drawing, centers[i], (int)radius[i], color, 2 );
         }
-    }
+    }*/
     imshow( "Contours", drawing );
   }
 
@@ -190,7 +279,6 @@ namespace ContourDetector {
 }
 
 int main(int argc, char** argv ) {
-  cout << "0";
   Mat mat;
   if (argc == 2) {
     mat = imread( argv[1] );
