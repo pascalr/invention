@@ -272,11 +272,18 @@ namespace ContourDetector {
         // Calculate angle
         double rise = centers[secondInnerCircle].y - centers[firstInnerCircle].y;
         double run = centers[secondInnerCircle].x - centers[firstInnerCircle].x;
-        double slope = rise / run;
-        double angle_degrees = atan(slope)*180.0 / CV_PI;
-        if (centers[secondInnerCircle].x < centers[i].x) {
-          angle_degrees += 180.0;
+        double angle_degrees;
+        if (run == 0) { // edge case both circles are vertically aligned
+          angle_degrees = centers[secondInnerCircle].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+        } else {
+          angle_degrees = atan2(rise, run)*180.0 / CV_PI;
+
+          double avg_x = (centers[secondInnerCircle].x + centers[firstInnerCircle].x)/2;
+          if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
+            angle_degrees += 180.0;
+          }
         }
+
         cout << "angle_degrees: "  << angle_degrees << endl;
  
         circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
