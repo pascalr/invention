@@ -196,112 +196,122 @@ namespace ErosionDilatation {
   }
 }
 
+int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
+  if (i < 0) return -1;
+  if (contourIsCircle[i]) {
+    return i;
+  } else {
+    return findNextCircle(hierarchy[i][0], hierarchy, contourIsCircle);
+  }
+}
+
+// An HRCode consists of a perimeter circle, two markers and text at known position.
+// The inner and outer contours are both detected.
+void findHRCode(Mat src_gray, vector<Mat> detectedCodes, int thresh) {
+  Mat canny_output;
+  Canny( src_gray, canny_output, thresh, thresh*2 );
+
+
+
+  RNG rng(12345);
+  vector<vector<Point>> contours;
+  vector<cv::Vec4i> hierarchy;
+  findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+  vector<Point2f> centers( contours.size() );
+  vector<float> radius( contours.size() );
+  vector<bool> contourIsCircle( contours.size(), false );
+
+  Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+
+  for( size_t i = 0; i < contours.size(); i++ )
+  {
+      minEnclosingCircle( contours[i], centers[i], radius[i] );
+      Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
+      if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
+        contourIsCircle[i] = true;
+        circle( drawing, centers[i], (int)radius[i], color, 2 );
+      }
+  }
+
+  for( size_t i = 0; i < hierarchy.size(); i++ ) {
+
+    if (!contourIsCircle[i]) continue;
+    
+    cout << "Checking circle " << i << endl;
+
+    int child = hierarchy[i][2];
+    if (child < 0) continue;
+    
+    cout << "Child found." << endl;
+
+    int firstInnerCircle = findNextCircle(hierarchy[child][2], hierarchy, contourIsCircle);
+    if (firstInnerCircle < 0) continue;
+    
+    cout << "First inner circle found." << endl;
+
+    int secondInnerCircle = findNextCircle(hierarchy[firstInnerCircle][0], hierarchy, contourIsCircle);
+    if (secondInnerCircle < 0) continue;
+    
+    cout << "Second inner circle found." << endl;
+
+    int thirdInnerCircle = findNextCircle(hierarchy[secondInnerCircle][0], hierarchy, contourIsCircle);
+    if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
+    
+    cout << "No third inner circle found." << endl;
+      
+    cout << "Possible candidate!!!" << endl;
+
+    if (isValidHRCode(i, child, firstInnerCircle, secondInnerCircle, centers, radius)) {
+      cout << "Detected HRCode!!!" << endl;
+      // Calculate angle
+      double rise = centers[secondInnerCircle].y - centers[firstInnerCircle].y;
+      double run = centers[secondInnerCircle].x - centers[firstInnerCircle].x;
+      double angle_degrees;
+      if (run == 0) { // edge case both circles are vertically aligned
+        angle_degrees = centers[secondInnerCircle].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+      } else {
+        angle_degrees = atan2(rise, run)*180.0 / CV_PI;
+
+        double avg_x = (centers[secondInnerCircle].x + centers[firstInnerCircle].x)/2;
+        if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
+          angle_degrees += 180.0;
+        }
+      }
+
+      cout << "angle_degrees: "  << angle_degrees << endl;
+ 
+      circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
+
+      Mat rotatedHRCode;
+      Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
+      Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
+      warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
+
+      std::string title = "detectedHRCode";
+      title += std::to_string(i);
+      title += ".png";
+      imshow(title,rotatedHRCode);
+      imwrite(title,rotatedHRCode);
+    }
+  }
+  imshow( "Contours", drawing );
+}
+
 namespace ContourDetector {
   Mat src_gray;
   int thresh = 100;
-  RNG rng(12345);
   const char* source_window = "Source";
   const int max_thresh = 255;
 
-  int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
-    if (i < 0) return -1;
-    if (contourIsCircle[i]) {
-      return i;
-    } else {
-      return findNextCircle(hierarchy[i][0], hierarchy, contourIsCircle);
-    }
-  }
+  
 
   void refresh(int, void* ) {
     /*Mat dilate_output;
     Mat element = getStructuringElement( MORPH_RECT, Size(3,3), Point(1, 1) );
     dilate( src_gray, dilate_output, element );*/
 
-    Mat canny_output;
-    Canny( src_gray, canny_output, thresh, thresh*2 );
-
-    vector<vector<Point>> contours;
-    vector<cv::Vec4i> hierarchy;
-    findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
-    vector<Point2f> centers( contours.size() );
-    vector<float> radius( contours.size() );
-    vector<bool> contourIsCircle( contours.size(), false );
-
-    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-
-    for( size_t i = 0; i < contours.size(); i++ )
-    {
-        minEnclosingCircle( contours[i], centers[i], radius[i] );
-        Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
-        if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
-          contourIsCircle[i] = true;
-          circle( drawing, centers[i], (int)radius[i], color, 2 );
-        }
-    }
-
-    for( size_t i = 0; i < hierarchy.size(); i++ ) {
-
-      if (!contourIsCircle[i]) continue;
-      
-      cout << "Checking circle " << i << endl;
-
-      int child = hierarchy[i][2];
-      if (child < 0) continue;
-      
-      cout << "Child found." << endl;
-
-      int firstInnerCircle = findNextCircle(hierarchy[child][2], hierarchy, contourIsCircle);
-      if (firstInnerCircle < 0) continue;
-      
-      cout << "First inner circle found." << endl;
-
-      int secondInnerCircle = findNextCircle(hierarchy[firstInnerCircle][0], hierarchy, contourIsCircle);
-      if (secondInnerCircle < 0) continue;
-      
-      cout << "Second inner circle found." << endl;
-
-      int thirdInnerCircle = findNextCircle(hierarchy[secondInnerCircle][0], hierarchy, contourIsCircle);
-      if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
-      
-      cout << "No third inner circle found." << endl;
-        
-      cout << "Possible candidate!!!" << endl;
-
-      if (isValidHRCode(i, child, firstInnerCircle, secondInnerCircle, centers, radius)) {
-        cout << "Detected HRCode!!!" << endl;
-        // Calculate angle
-        double rise = centers[secondInnerCircle].y - centers[firstInnerCircle].y;
-        double run = centers[secondInnerCircle].x - centers[firstInnerCircle].x;
-        double angle_degrees;
-        if (run == 0) { // edge case both circles are vertically aligned
-          angle_degrees = centers[secondInnerCircle].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
-        } else {
-          angle_degrees = atan2(rise, run)*180.0 / CV_PI;
-
-          double avg_x = (centers[secondInnerCircle].x + centers[firstInnerCircle].x)/2;
-          if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
-            angle_degrees += 180.0;
-          }
-        }
-
-        cout << "angle_degrees: "  << angle_degrees << endl;
- 
-        circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
-
-        Mat rotatedHRCode;
-        Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
-        Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
-        warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
-
-        std::string title = "detectedHRCode";
-        title += std::to_string(i);
-        title += ".png";
-        imshow(title,rotatedHRCode);
-        imwrite(title,rotatedHRCode);
-      }
-    }
-    
-    imshow( "Contours", drawing );
+    vector<Mat> hr_codes;
+    findHRCode(src_gray, hr_codes, thresh);
   }
 
   int run(Mat& src) {
