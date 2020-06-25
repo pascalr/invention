@@ -3,15 +3,13 @@
 #include "opencv2/highgui.hpp"
 #include <iostream>
 #include <cmath>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "common.h"
 
 using namespace cv;
 using namespace std;
-
-// TODO: Faire des calculs
-// 640X480
-// 60deg, 8po de profond => Donc on voit une largeur de 8po
-// Mon sticker va mesure 32mm, donc un peut plus de 1 po.
-// 640 / 8 = 80 pixels pour le gros cercle
 
 // Using a namespace before of createTrackbar, I don't want to put generic variable too much.
 namespace CannyDetector {
@@ -112,20 +110,90 @@ namespace HoughCircleDetector {
   }
 }
 
-bool isCircle(vector<Point> contours, Point2f center, float radius, float epsilon) {
-  // epsilon is a percentage of the radius
-  // no more than 10% variation
-  float maxVariation = radius * epsilon;
-  bool isACircle = true;
-  for( size_t i = 0; i < contours.size(); i++ ) {
-    double norm = sqrt(pow(contours[i].x - center.x, 2)+pow(contours[i].y - center.y, 2));
-    isACircle = isACircle && abs(norm-radius) < maxVariation;
-  }
-  return isACircle;
-}
 
-bool isBigCircle(vector<Point> contours, Point2f center, float radius, float epsilon, float minRadius) {
-  return radius > minRadius && isCircle(contours, center, radius, epsilon);
+
+namespace ErosionDilatation {
+  /// Global variables
+  Mat src, erosion_dst, dilation_dst;
+  
+  int erosion_elem = 0;
+  int erosion_size = 0;
+  int dilation_elem = 0;
+  int dilation_size = 0;
+  int const max_elem = 2;
+  int const max_kernel_size = 21;
+  
+  /** Function Headers */
+  void Erosion( int, void* );
+  void Dilation( int, void* );
+  
+  /** @function main */
+  int run(Mat& image)
+  {
+    src = image;
+    /// Create windows
+    namedWindow( "Erosion Demo", WINDOW_AUTOSIZE );
+    namedWindow( "Dilation Demo", WINDOW_AUTOSIZE );
+    moveWindow( "Dilation Demo", src.cols, 0 );
+  
+    /// Create Erosion Trackbar
+    createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Erosion Demo",
+                    &erosion_elem, max_elem,
+                    Erosion );
+  
+    createTrackbar( "Kernel size:\n 2n +1", "Erosion Demo",
+                    &erosion_size, max_kernel_size,
+                    Erosion );
+  
+    /// Create Dilation Trackbar
+    createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Dilation Demo",
+                    &dilation_elem, max_elem,
+                    Dilation );
+  
+    createTrackbar( "Kernel size:\n 2n +1", "Dilation Demo",
+                    &dilation_size, max_kernel_size,
+                    Dilation );
+  
+    /// Default start
+    Erosion( 0, 0 );
+    Dilation( 0, 0 );
+  
+    waitKey(0);
+    return 0;
+  }
+  
+  /**  @function Erosion  */
+  void Erosion( int, void* )
+  {
+    int erosion_type;
+    if( erosion_elem == 0 ){ erosion_type = MORPH_RECT; }
+    else if( erosion_elem == 1 ){ erosion_type = MORPH_CROSS; }
+    else if( erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
+  
+    Mat element = getStructuringElement( erosion_type,
+                                         Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                                         Point( erosion_size, erosion_size ) );
+  
+    /// Apply the erosion operation
+    erode( src, erosion_dst, element );
+    imshow( "Erosion Demo", erosion_dst );
+  }
+  
+  /** @function Dilation */
+  void Dilation( int, void* )
+  {
+    int dilation_type;
+    if( dilation_elem == 0 ){ dilation_type = MORPH_RECT; }
+    else if( dilation_elem == 1 ){ dilation_type = MORPH_CROSS; }
+    else if( dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
+  
+    Mat element = getStructuringElement( dilation_type,
+                                         Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                                         Point( dilation_size, dilation_size ) );
+    /// Apply the dilation operation
+    dilate( src, dilation_dst, element );
+    imshow( "Dilation Demo", dilation_dst );
+  }
 }
 
 namespace ContourDetector {
@@ -145,123 +213,87 @@ namespace ContourDetector {
   }
 
   void refresh(int, void* ) {
+    /*Mat dilate_output;
+    Mat element = getStructuringElement( MORPH_RECT, Size(3,3), Point(1, 1) );
+    dilate( src_gray, dilate_output, element );*/
+
     Mat canny_output;
     Canny( src_gray, canny_output, thresh, thresh*2 );
-
-    // https://stackoverflow.com/questions/43852023/detecting-small-circles-using-houghcircles-opencv
-    // Use erosion and dilation combination to eliminate false positives.
-    // In this case the text Q0X could be identified as circles but it is not.
-    // mask = cv2.erode(mask, kernel, iterations=6)
-    // mask = cv2.dilate(mask, kernel, iterations=3)
-    // closing = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
     vector<vector<Point>> contours;
     vector<cv::Vec4i> hierarchy;
     findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
-    //vector<vector<Point> > contours_poly( contours.size() );
-    //vector<Rect> boundRect( contours.size() );
     vector<Point2f> centers( contours.size() );
     vector<float> radius( contours.size() );
-    vector<bool> contourIsCircle( contours.size() );
+    vector<bool> contourIsCircle( contours.size(), false );
 
     Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
 
     for( size_t i = 0; i < contours.size(); i++ )
     {
-        //approxPolyDP( contours[i], contours_poly[i], 3, true );
-        //boundRect[i] = boundingRect( contours_poly[i] );
-        //boundRect[i] = boundingRect( contours[i] );
-        //minEnclosingCircle( contours_poly[i], centers[i], radius[i] );
         minEnclosingCircle( contours[i], centers[i], radius[i] );
         Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
         if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
           contourIsCircle[i] = true;
           circle( drawing, centers[i], (int)radius[i], color, 2 );
-        } else {
-          contourIsCircle[i] = false; // OPTIMIZE: Default vector to false to avoid doing that
         }
     }
 
     for( size_t i = 0; i < hierarchy.size(); i++ ) {
 
-      // FIXME only check circles not all contours
+      if (!contourIsCircle[i]) continue;
+      
+      cout << "Checking circle " << i << endl;
 
       int child = hierarchy[i][2];
       if (child < 0) continue;
+      
+      cout << "Child found." << endl;
 
-      //int firstInnerCircle = hierarchy[child][2];
       int firstInnerCircle = findNextCircle(hierarchy[child][2], hierarchy, contourIsCircle);
-      if (firstInnerCircle < 0 || !contourIsCircle[child]) continue;
+      if (firstInnerCircle < 0) continue;
+      
+      cout << "First inner circle found." << endl;
 
-      //int secondInnerCircle = hierarchy[firstInnerCircle][0];
       int secondInnerCircle = findNextCircle(hierarchy[firstInnerCircle][0], hierarchy, contourIsCircle);
       if (secondInnerCircle < 0) continue;
+      
+      cout << "Second inner circle found." << endl;
 
-      //int thirdInnerCircle = hierarchy[secondInnerCircle][0];
       int thirdInnerCircle = findNextCircle(hierarchy[secondInnerCircle][0], hierarchy, contourIsCircle);
       if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
+      
+      cout << "No third inner circle found." << endl;
         
       cout << "Possible candidate!!!" << endl;
 
-      // All relatives because actual size vary based on distance of camera to sticker.
-      float borderThickness = 2; // mm
-      float insideDiameter = 30; // mm
-      float smallDotDiameter = 4.86; // mm
-      float outsideDiameter = insideDiameter + 2*borderThickness; // mm
-
-      float expectedRatio = outsideDiameter / insideDiameter;
-      float actualRatio = radius[i] / radius[child];
-      bool perimeterDetected = abs(actualRatio - expectedRatio)/expectedRatio < 0.2;
-
-      float dotExpectedRatio = outsideDiameter / smallDotDiameter;
-      float dotActualRatio = radius[i] / radius[firstInnerCircle];
-      bool dotDetected = abs(dotActualRatio - dotExpectedRatio)/dotExpectedRatio < 0.2;
-
-      float dotActualRatio2 = radius[i] / radius[secondInnerCircle];
-      bool dotDetected2 = abs(dotActualRatio2 - dotExpectedRatio)/dotExpectedRatio < 0.2;
-
-      cout << "perimeterDetected: " << perimeterDetected << endl;
-      cout << "firstDotDetected: " << dotDetected << endl;
-      cout << "secondDotDetected: " << dotDetected2 << endl;
-      cout << "dotExpectedRatio: " << dotExpectedRatio << endl;
-      cout << "dotActualRatio: " << dotActualRatio << endl;
-
-      if (perimeterDetected && dotDetected && dotDetected2) {
+      if (isValidHRCode(i, child, firstInnerCircle, secondInnerCircle, centers, radius)) {
         cout << "Detected HRCode!!!" << endl;
         // Calculate angle
         double rise = centers[secondInnerCircle].y - centers[firstInnerCircle].y;
         double run = centers[secondInnerCircle].x - centers[firstInnerCircle].x;
         double slope = rise / run;
-        double angle_radians = atan(slope);
-        double angle_degrees = angle_radians*180.0 / CV_PI;
+        double angle_degrees = atan(slope)*180.0 / CV_PI;
+        if (centers[secondInnerCircle].x < centers[i].x) {
+          angle_degrees += 180.0;
+        }
         cout << "angle_degrees: "  << angle_degrees << endl;
  
         circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
 
-        //Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], centers[i].x+radius[i], centers[i].y+radius[i]));
         Mat rotatedHRCode;
         Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
         Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
         warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
-        //cv::normalize(leftROI, leftROI, 0, 1, cv::NORM_MINMAX);  //to view
         std::string title = "detectedHRCode";
         title += std::to_string(i);
-        imshow("detectedHRCode",rotatedHRCode);
+        title += ".png";
+        imshow(title,rotatedHRCode);
+        imwrite(title,rotatedHRCode);
       }
     }
     
-    /*for( size_t i = 0; i< contours.size(); i++ )
-    {
-        Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
-        //drawContours( drawing, contours_poly, (int)i, color );
-        //drawContours( drawing, contours, (int)i, color );
-        //rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2 );
-        //if (isCircle(contours[i], centers[i], radius[i], 2)) {
-        if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
-          circle( drawing, centers[i], (int)radius[i], color, 2 );
-        }
-    }*/
     imshow( "Contours", drawing );
   }
 
@@ -293,4 +325,5 @@ int main(int argc, char** argv ) {
   //HoughCircleDetector::run(mat);
   //CannyDetector::run(mat);
   ContourDetector::run(mat);
+  //ErosionDilatation::run(mat);
 }

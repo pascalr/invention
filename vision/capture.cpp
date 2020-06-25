@@ -10,12 +10,21 @@
 using namespace cv;
 using namespace std;
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
+  if ( argc != 2 )
+  {
+      printf("usage: capture <Output_Path>\n");
+      return -1;
+  }
+  string outfile_name = "output/";
+  outfile_name += argv[1];
+
   Mat frame;
   captureVideoImage(frame);
-  imwrite("output/capture.jpg", frame);
-  showImgAndWaitForKey(frame);
+  imwrite(outfile_name, frame);
+  imshow("Live", frame);
+  waitKey();
   return 0;
 }
 
