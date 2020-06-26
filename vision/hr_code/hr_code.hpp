@@ -197,7 +197,11 @@ ostream &operator<<(std::ostream &os, const HRCode &m) {
 
 string parseLineTesseract(Mat& im) {
 	tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
-	ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY);
+  char config_name[] = "chars";
+  char* config_ptr = config_name;
+  //char config[][10] = {"chars"};
+	//ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
+	ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
 	ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
   // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
@@ -216,9 +220,9 @@ HRCode parseHRCode(Mat& mat) {
   BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << mat.cols;
   double scale = mat.cols/110.0;
   BOOST_LOG_TRIVIAL(debug) << "scale: " << scale;
-  double topOffset = 8.0 * scale;
-  double charWidth = 11 * scale;
-  double charHeight = 24 * scale;
+  double topOffset = 10.0 * scale;
+  double charWidth = 12 * scale;
+  double charHeight = 26 * scale;
   double lineInterspace = 24 * scale;
 
   int nbLines = 4;
@@ -238,6 +242,7 @@ HRCode parseHRCode(Mat& mat) {
     Rect lineRect = Rect(nbChar/-2.0*charWidth + mat.cols/2, y, nbChar*charWidth, charHeight);
     //rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
     Mat lineMat(mat, lineRect);
+    imshow(string("line")+to_string(i),lineMat);
     rawHRCode[i] = parseLineTesseract(lineMat);
   }
 

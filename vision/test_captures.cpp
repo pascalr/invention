@@ -26,6 +26,13 @@ using namespace std;
 
 namespace logging = boost::log;
 
+template <class P>
+void assertTest(const char* info, P t1, P t2) {
+  cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
+  cout << " (" << info << ")";
+  cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
+}
+
 int main(int argc, char** argv)
 {
   logging::core::get()->set_filter(
@@ -41,6 +48,11 @@ int main(int argc, char** argv)
         string filename = "output/"; filename += ent->d_name;
         Mat mat = imread( filename );
         vector<HRCode> codes = detectHRCodes(mat);
+        if (!codes.empty()) {
+          assertTest(filename.c_str(), codes[0].isValid(), true);
+        } else {
+          assertTest((filename + ": No codes detected").c_str(), true, false);
+        }
       }
     }
     closedir (dir);
