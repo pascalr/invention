@@ -1,6 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 project( DisplayImage )
 find_package( OpenCV REQUIRED )
+
+
+find_package( PkgConfig REQUIRED )
+pkg_search_module( TESSERACT REQUIRED tesseract )
+pkg_search_module( LEPTONICA REQUIRED lept )
+include_directories( ${TESSERACT_INCLUDE_DIRS} )
+include_directories( ${LEPTONICA_INCLUDE_DIRS} )
+link_directories( ${TESSERACT_LIBRARY_DIRS} )
+link_directories( ${LEPTONICA_LIBRARY_DIRS} )
+
+
+
+#find_package( Tesseract REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -14,4 +27,5 @@ target_link_libraries( capture ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
 #add_executable( write_font_sticker write_font_sticker.cpp )
 #target_link_libraries( write_font_sticker ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
 add_executable( main main.cpp )
-target_link_libraries( main ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
+#target_link_libraries( main ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${} )
+target_link_libraries( main ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES})

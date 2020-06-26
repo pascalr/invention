@@ -14,13 +14,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../common.h"
+#include <tesseract/baseapi.h>
+#include <leptonica/allheaders.h>
+//#include <opencv2/text/ocr.hpp>
 
-typedef struct {
-  int perimeter_i;
-  int marker1_i;
-  int marker2_i;
-} HRCode;
+#include "../common.h"
 
 int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
   if (i < 0) return -1;
@@ -115,28 +113,122 @@ void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, int thresh) {
   imshow( "Contours", drawing );
 }
 
+class HRCode {
+  public:
+    HRCode() {}
+
+    bool setJarId(string s) {
+      trim(s);
+      if (s.length() != 3) {
+        cout << "Error jar id length was " << s.length() << " expected 3." << endl;
+        return false;
+      }
+      char* p;
+      m_jar_id = strtol(s.c_str(), &p, 10);
+      return *p == 0 || logError("Error jar id bad conversion to number.");
+    }
+
+    bool setWeight(string s) {
+      trim(s);
+      if (s.length() != 7) {
+        cout << "Error weight length was " << s.length() << " expected 7." << endl;
+        return false;
+      }
+      char* p;
+      m_weight = strtof(s.substr(0,5).c_str(), &p);
+      return *p == 0 || logError("Error weight bad conversion to number.");
+    }
+
+    // Maybe latter make sure that the content id matches the name
+    // but for now it doesn't.
+    bool setName(string s) {
+      trim(s);
+      m_name = s;
+      return true;
+    }
+
+    bool setContentId(string s) {
+      trim(s);
+      if (s.length() != 4 && s.length() != 3) {
+        cout << "Error content id length was " << s.length() << " expected 3 or 4." << endl;
+        return false;
+      }
+      char* p;
+      m_content_id = strtol(s.c_str(), &p, 10);
+      return *p == 0 || logError("Error content id bad conversion to number.");
+    }
+
+    friend ostream &operator<<(std::ostream &os, const HRCode &m);
+    
+
+  private:
+
+    bool logError(const char* msg) {
+      cout << msg;
+      return false;
+    }
+
+    int m_jar_id = -1;
+    float m_weight = 0;
+    string m_name;
+    int m_content_id;
+};
+
+ostream &operator<<(std::ostream &os, const HRCode &m) {
+  os << "#" << m.m_jar_id << "[" << m.m_weight << " kg]: ";
+  return os << m.m_name << " (" << m.m_content_id << ")";
+}
+
+string parseLineTesseract(Mat& im) {
+	tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
+	ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY);
+	ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
+  // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
+
+	ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
+	string outText = string(ocr->GetUTF8Text());
+
+	cout << outText << endl;
+  ocr->End();
+
+  return outText;
+}
+
 void parseHRCode(Mat& mat) {
   cout << "Mat cols: " << mat.cols << endl;
   double scale = mat.cols/110.0;
   cout << "scale: " << scale << endl;
   double topOffset = 8.0 * scale;
   double charWidth = 11 * scale;
-  double charHeight = 18 * scale;
+  double charHeight = 24 * scale;
   double lineInterspace = 24 * scale;
 
   int nbLines = 4;
   int pattern[nbLines] = {3,7,8,4}; // number of char per line
+  string rawHRCode[nbLines];
 
   // Get the sub-matrices (minors) for every character.
   for (int i = 0; i < nbLines; i++) {
     int nbChar = pattern[i];
+    double y = i*lineInterspace + topOffset;
     for (int j = 0; j < nbChar; j++) {
-      double x = (0.0+j-1.0*nbChar/2)*charWidth + mat.cols/2;
-      double y = i*lineInterspace + topOffset;
+      double x = (0.0+j-1.0*nbChar/2.0)*charWidth + mat.cols/2;
       Rect r = Rect(x, y, charWidth, charHeight);
-      rectangle(mat, r, Scalar(0,0,255), 1, LINE_8);
+      //rectangle(mat, r, Scalar(0,0,255), 1, LINE_8);
       //Mat charMat(mat, Rect(x, y, charWidth, charHeight));
     }
+    Rect lineRect = Rect(nbChar/-2.0*charWidth + mat.cols/2, y, nbChar*charWidth, charHeight);
+    //rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
+    string title = string("line_") + to_string(i) + ".png";
+    Mat lineMat(mat, lineRect);
+    imwrite(title,lineMat);
+    rawHRCode[i] = parseLineTesseract(lineMat);
+  }
+
+  HRCode code;
+  if (code.setJarId(rawHRCode[0]) && code.setWeight(rawHRCode[1])
+      && code.setName(rawHRCode[2]) && code.setContentId(rawHRCode[3])) {
+    cout << "Detected code: " << code << endl;
   }
 }
 

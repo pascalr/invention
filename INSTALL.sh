@@ -26,5 +26,7 @@ sudo ldconfig
 sudo apt install barcode
 
 # opencv OCR tesseract
-sudo apt install tesseract-ocr
-sudo apt install libtesseract-dev
+# DOESNT WORK FOR c++ for me sudo apt install tesseract-ocr
+# DOESNT WORK FOR c++ for me sudo apt install libtesseract-dev
+# from source:
+git clone https://github.com/tesseract-ocr/tesseract.git # follow INSTALL

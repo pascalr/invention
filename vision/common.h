@@ -6,8 +6,32 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 
+#include <algorithm>
+#include <cctype>
+#include <locale>
+
 using namespace cv;
 using namespace std;
+
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
 
 int captureVideoImage(Mat& frame) {
   VideoCapture cap;

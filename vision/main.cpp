@@ -13,6 +13,9 @@
 using namespace cv;
 using namespace std;
 
+// TODO: Imprimer des sticker avec openCV, comme ca je peux controller les dimensions exactement et facilement.
+// Aussi, je vais pouvoir faire plein de test et de training ainsi.
+
 // Using a namespace before of createTrackbar, I don't want to put generic variable too much.
 namespace CannyDetector {
   
