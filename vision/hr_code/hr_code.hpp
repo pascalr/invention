@@ -202,6 +202,7 @@ string parseLineTesseract(Mat& im) {
   //char config[][10] = {"chars"};
 	//ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
 	ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
+  ocr->SetVariable("user_defined_dpi", "300"); // FIXME: Is it
 	ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
   // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
