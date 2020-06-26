@@ -10,8 +10,16 @@
 #include <cctype>
 #include <locale>
 
+#include <fstream>
+
 using namespace cv;
 using namespace std;
+
+bool file_exists(const char *fileName)
+{
+  std::ifstream infile(fileName);
+  return infile.good();
+}
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {

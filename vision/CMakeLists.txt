@@ -22,8 +22,12 @@ add_executable( detect_chessboard detect_chessboard.cpp )
 target_link_libraries( detect_chessboard ${OpenCV_LIBS} )
 add_executable( scan_qr_code scan_qr_code.cpp )
 target_link_libraries( scan_qr_code ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
+
 add_executable( capture capture.cpp )
+#target_compile_features( capture PRIVATE cxx_std_17)
+#target_link_libraries( capture ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar stdc++fs std=c++17 )
 target_link_libraries( capture ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
+
 #add_executable( write_font_sticker write_font_sticker.cpp )
 #target_link_libraries( write_font_sticker ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
 add_executable( main main.cpp )
