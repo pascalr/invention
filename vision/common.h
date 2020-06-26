@@ -106,11 +106,11 @@ bool isValidHRCode(int i, int child, int firstInnerCircle, int secondInnerCircle
   float dotActualRatio2 = radius[i] / radius[secondInnerCircle];
   bool dotDetected2 = abs(dotActualRatio2 - dotExpectedRatio)/dotExpectedRatio < 0.2;
 
-  BOOST_LOG_TRIVIAL(trace) << "perimeterDetected: " << perimeterDetected << endl;
-  BOOST_LOG_TRIVIAL(trace) << "firstDotDetected: " << dotDetected << endl;
-  BOOST_LOG_TRIVIAL(trace) << "secondDotDetected: " << dotDetected2 << endl;
-  BOOST_LOG_TRIVIAL(trace) << "dotExpectedRatio: " << dotExpectedRatio << endl;
-  BOOST_LOG_TRIVIAL(trace) << "dotActualRatio: " << dotActualRatio << endl;
+  BOOST_LOG_TRIVIAL(trace) << "perimeterDetected: " << perimeterDetected;
+  BOOST_LOG_TRIVIAL(trace) << "firstDotDetected: " << dotDetected;
+  BOOST_LOG_TRIVIAL(trace) << "secondDotDetected: " << dotDetected2;
+  BOOST_LOG_TRIVIAL(trace) << "dotExpectedRatio: " << dotExpectedRatio;
+  BOOST_LOG_TRIVIAL(trace) << "dotActualRatio: " << dotActualRatio;
 
 
   return perimeterDetected && dotDetected && dotDetected2;

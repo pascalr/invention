@@ -237,9 +237,7 @@ HRCode parseHRCode(Mat& mat) {
     }
     Rect lineRect = Rect(nbChar/-2.0*charWidth + mat.cols/2, y, nbChar*charWidth, charHeight);
     //rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
-    string title = string("line_") + to_string(i) + ".png";
     Mat lineMat(mat, lineRect);
-    imwrite(title,lineMat);
     rawHRCode[i] = parseLineTesseract(lineMat);
   }
 
