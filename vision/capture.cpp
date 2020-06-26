@@ -13,22 +13,28 @@
 //namespace fs = std::filesystem;
 //fs::exists("capture.cpp");
 
+#include <boost/filesystem.hpp>
+
 using namespace std::chrono;
 using namespace cv;
 using namespace std;
 
 int main(int argc, char** argv)
 {
-  string outfile_name = "output/";
+  string outfile_name;
   if ( argc == 2 ) {
+    outfile_name = "output/";
     outfile_name += argv[1];
   } else {
-    std::stringstream ss;
     for (int i = 1; i < 1000; i++) {
-      ss << "capture_" << std::setw(3) << std::setfill('0') << i << ".jpg";
-      if (!file_exists(ss.str().c_str())) break;
+      std::stringstream ss;
+      ss << "output/capture_" << std::setw(3) << std::setfill('0') << i << ".jpg";
+
+      if ( !boost::filesystem::exists(ss.str()) ){
+        outfile_name = ss.str();
+	break;
+      }
     }
-    outfile_name += ss.str();
   }/* else {
     system_clock::time_point now = std::chrono::system_clock::now();
     time_t t_c = std::chrono::system_clock::to_time_t(now);
