@@ -12,8 +12,15 @@
 
 #include <fstream>
 
+#include <boost/log/trivial.hpp>
+
 using namespace cv;
 using namespace std;
+
+bool startsWith(const char *pre, const char *str)
+{
+  return strncmp(pre, str, strlen(pre)) == 0;
+}
 
 bool file_exists(const char *fileName)
 {
@@ -99,11 +106,12 @@ bool isValidHRCode(int i, int child, int firstInnerCircle, int secondInnerCircle
   float dotActualRatio2 = radius[i] / radius[secondInnerCircle];
   bool dotDetected2 = abs(dotActualRatio2 - dotExpectedRatio)/dotExpectedRatio < 0.2;
 
-  cout << "perimeterDetected: " << perimeterDetected << endl;
-  cout << "firstDotDetected: " << dotDetected << endl;
-  cout << "secondDotDetected: " << dotDetected2 << endl;
-  cout << "dotExpectedRatio: " << dotExpectedRatio << endl;
-  cout << "dotActualRatio: " << dotActualRatio << endl;
+  BOOST_LOG_TRIVIAL(trace) << "perimeterDetected: " << perimeterDetected << endl;
+  BOOST_LOG_TRIVIAL(trace) << "firstDotDetected: " << dotDetected << endl;
+  BOOST_LOG_TRIVIAL(trace) << "secondDotDetected: " << dotDetected2 << endl;
+  BOOST_LOG_TRIVIAL(trace) << "dotExpectedRatio: " << dotExpectedRatio << endl;
+  BOOST_LOG_TRIVIAL(trace) << "dotActualRatio: " << dotActualRatio << endl;
+
 
   return perimeterDetected && dotDetected && dotDetected2;
 }

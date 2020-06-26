@@ -30,3 +30,6 @@ sudo apt install barcode
 # DOESNT WORK FOR c++ for me sudo apt install libtesseract-dev
 # from source:
 git clone https://github.com/tesseract-ocr/tesseract.git # follow INSTALL
+
+# boost
+sudo apt-get install libboost-all-dev
