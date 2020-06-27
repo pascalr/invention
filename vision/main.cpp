@@ -210,8 +210,9 @@ namespace ContourDetector {
     Mat element = getStructuringElement( MORPH_RECT, Size(3,3), Point(1, 1) );
     dilate( src_gray, dilate_output, element );*/
 
+    HRCodeParser parser(0.2, 0.2);
     vector<Mat> hr_codes;
-    findHRCode(src_gray, hr_codes, thresh);
+    parser.findHRCode(src_gray, hr_codes, thresh);
 
     for( size_t i = 0; i < hr_codes.size(); i++ ) {
       Mat m = hr_codes[i];

@@ -24,153 +24,136 @@
 
 #include "common.h"
 
-// TODO: Test distances too, not just size.
-bool isValidHRCode(int i, int child, int firstMarker, int secondMarker, vector<Point2f> centers, vector<float> radius) {
-  // All relatives because actual size vary based on distance of camera to sticker.
-  float borderThickness = 2; // mm
-  float insideDiameter = 30; // mm
-  float outsideDiameter = insideDiameter + 2*borderThickness; // mm
-
-  float expectedRatio = outsideDiameter / insideDiameter;
-  float actualRatio = radius[i] / radius[child];
-  bool perimeterDetected = abs(actualRatio - expectedRatio)/expectedRatio < 0.2;
-
-  BOOST_LOG_TRIVIAL(trace) << "perimeterDetected: " << perimeterDetected;
-
-
-  /*float actualMarkerDistFromCent = sqrt(pow(centers[firstMarker].y - centers[i].y, 2)+pow(centers[firstMarker].x - centers[i].x, 2));
-  bool firstMarkerDistOk =  abs(actualMarkerDistFromCent - expectedMarkerDistFromCenter)/actualMarkerDistFromCent < 0.2; // FIXME: Is it ok?
-
-  float actualMarkerDistFromCent2 = sqrt(pow(centers[secondMarker].y - centers[i].y, 2)+pow(centers[secondMarker].x - centers[i].x, 2));
-  bool firstMarkerDistOk =  abs(actualMarkerDistFromCent - expectedMarkerDistFromCenter)/actualMarkerDistFromCent < 0.2; // FIXME: Is it ok?*/
-
-  return perimeterDetected;
-}
-
-int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
-  if (i < 0) return -1;
-  if (contourIsCircle[i]) {
-    return i;
-  } else {
-    return findNextCircle(hierarchy[i][0], hierarchy, contourIsCircle);
-  }
-}
-
-bool contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
-
-  float expected = 26.8 * scale; // mm
-  float markerDia = 4.86 * scale; // mm
-
-  //float dotExpectedRatio = outsideDiameter / smallDotDiameter;
-  //float dotActualRatio = radius[i] / radius[firstMarker];
-  //bool dotDetected = abs(dotActualRatio - dotExpectedRatio)/dotExpectedRatio < 0.2;
-
-  bool correctSize = abs(radius[i] - markerDia)/markerDia < 0.2;
-  if (!correctSize) return false;
-
-  float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2));
-  BOOST_LOG_TRIVIAL(error) << "expectedMarkerDistance: " << expected;
-  BOOST_LOG_TRIVIAL(error) << "actualMarkerDistance: " << distFromCenter;
-  return abs(distFromCenter - expected)/expected < 0.2;
-}
-
-// TODO: Put all these function is a class: HRCodeParser, so they all have access to the variables instead
-// of passing a super long quatity of variables;
-
-int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale) {
-  if (i < 0) return -1;
-  if (contourIsCircle[i] && contourIsMarker(i,center, centers, radius, scale)) {
-    return i;
-  } else {
-    return findNextMarker(hierarchy[i][0], hierarchy, contourIsCircle, centers, radius, center, scale);
-  }
-}
-
-void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, int thresh) {
-  Mat canny_output;
-  Canny( src_gray, canny_output, thresh, thresh*2 );
-
-  RNG rng(12345);
-  vector<vector<Point>> contours;
-  vector<cv::Vec4i> hierarchy;
-  findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
-  vector<Point2f> centers( contours.size() );
-  vector<float> radius( contours.size() );
-  vector<bool> contourIsCircle( contours.size(), false );
-
-  Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-
-  for( size_t i = 0; i < contours.size(); i++ )
-  {
-      minEnclosingCircle( contours[i], centers[i], radius[i] );
-      Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
-      if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
-        contourIsCircle[i] = true;
-        circle( drawing, centers[i], (int)radius[i], color, 2 );
-      }
-  }
-
-  for( size_t i = 0; i < hierarchy.size(); i++ ) {
-
-    if (!contourIsCircle[i]) continue;
-    
-    BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
-
-    int child = hierarchy[i][2];
-    if (child < 0) continue;
-    
-    BOOST_LOG_TRIVIAL(debug) << "Child found.";
-
-    float scale = radius[i] / 36.0; // mm
-
-    int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (firstMarker < 0) continue;
-    
-    BOOST_LOG_TRIVIAL(debug) << "First inner circle found.";
-
-    int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (secondMarker < 0) continue;
-    
-    BOOST_LOG_TRIVIAL(debug) << "Second inner circle found.";
-
-    int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
-    
-    BOOST_LOG_TRIVIAL(debug) << "No third inner circle found.";
-      
-    BOOST_LOG_TRIVIAL(debug) << "Possible candidate!!!";
-
-    if (isValidHRCode(i, child, firstMarker, secondMarker, centers, radius)) {
-      BOOST_LOG_TRIVIAL(debug) << "Detected HRCode!!!";
-      // Calculate angle
-      double rise = centers[secondMarker].y - centers[firstMarker].y;
-      double run = centers[secondMarker].x - centers[firstMarker].x;
-      double angle_degrees;
-      if (run == 0) { // edge case both circles are vertically aligned
-        angle_degrees = centers[secondMarker].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
-      } else {
-        angle_degrees = atan2(rise, run)*180.0 / CV_PI;
-
-        double avg_x = (centers[secondMarker].x + centers[firstMarker].x)/2;
-        if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
-          angle_degrees += 180.0;
-        }
-      }
-
-      BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
- 
-      circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
-
-      Mat rotatedHRCode;
-      Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
-      Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
-      warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
-
-      detectedCodes.push_back(rotatedHRCode);
+class HRCodeParser {
+  public:
+    HRCodeParser(int epsilonDia, int epsilonDist) {
     }
-  }
-  imshow( "Contours", drawing );
-}
+
+    int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
+      if (i < 0) return -1;
+      if (contourIsCircle[i]) {
+        return i;
+      } else {
+        return findNextCircle(hierarchy[i][0], hierarchy, contourIsCircle);
+      }
+    }
+    
+    bool contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
+    
+      float expected = 26.8 * scale; // mm
+      float markerDia = 4.86 * scale; // mm
+    
+      bool correctSize = abs(radius[i] - markerDia)/markerDia < 0.2;
+      if (!correctSize) return false;
+    
+      float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2));
+      BOOST_LOG_TRIVIAL(error) << "expectedMarkerDistance: " << expected;
+      BOOST_LOG_TRIVIAL(error) << "actualMarkerDistance: " << distFromCenter;
+      return abs(distFromCenter - expected)/expected < 0.2;
+    }
+    
+    // TODO: Put all these function is a class: HRCodeParser, so they all have access to the variables instead
+    // of passing a super long quatity of variables;
+    
+    int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale) {
+      if (i < 0) return -1;
+      if (contourIsCircle[i] && contourIsMarker(i,center, centers, radius, scale)) {
+        return i;
+      } else {
+        return findNextMarker(hierarchy[i][0], hierarchy, contourIsCircle, centers, radius, center, scale);
+      }
+    }
+    
+    void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, int thresh) {
+      Mat canny_output;
+      Canny( src_gray, canny_output, thresh, thresh*2 );
+    
+      RNG rng(12345);
+      vector<vector<Point>> contours;
+      vector<cv::Vec4i> hierarchy;
+      findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+      vector<Point2f> centers( contours.size() );
+      vector<float> radius( contours.size() );
+      vector<bool> contourIsCircle( contours.size(), false );
+    
+      Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+    
+      for( size_t i = 0; i < contours.size(); i++ )
+      {
+          minEnclosingCircle( contours[i], centers[i], radius[i] );
+          Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
+          if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
+            contourIsCircle[i] = true;
+            circle( drawing, centers[i], (int)radius[i], color, 2 );
+          }
+      }
+    
+      for( size_t i = 0; i < hierarchy.size(); i++ ) {
+    
+        if (!contourIsCircle[i]) continue;
+        
+        BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
+    
+        int child = hierarchy[i][2];
+        if (child < 0) continue;
+        
+        BOOST_LOG_TRIVIAL(debug) << "Child found.";
+        
+        float scale = radius[i] / 36.0; // mm
+        float insideDiameter = 30 * scale; // mm
+
+        bool correctSize = abs(radius[child] - insideDiameter)/insideDiameter < 0.2;
+        if (!correctSize) continue;
+        
+        BOOST_LOG_TRIVIAL(debug) << "Child correct size.";
+    
+        int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
+        if (firstMarker < 0) continue;
+        
+        BOOST_LOG_TRIVIAL(debug) << "First inner circle found.";
+    
+        int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
+        if (secondMarker < 0) continue;
+        
+        BOOST_LOG_TRIVIAL(debug) << "Second inner circle found.";
+    
+        int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
+        if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
+        
+        BOOST_LOG_TRIVIAL(debug) << "Detected HRCode!!!";
+        // Calculate angle
+        double rise = centers[secondMarker].y - centers[firstMarker].y;
+        double run = centers[secondMarker].x - centers[firstMarker].x;
+        double angle_degrees;
+        if (run == 0) { // edge case both circles are vertically aligned
+          angle_degrees = centers[secondMarker].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+        } else {
+          angle_degrees = atan2(rise, run)*180.0 / CV_PI;
+    
+          double avg_x = (centers[secondMarker].x + centers[firstMarker].x)/2;
+          if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
+            angle_degrees += 180.0;
+          }
+        }
+    
+        BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
+     
+        circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
+    
+        Mat rotatedHRCode;
+        Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
+        Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
+        warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
+    
+        detectedCodes.push_back(rotatedHRCode);
+      }
+      imshow( "Contours", drawing );
+    }
+
+  protected:
+};
+
+
 
 class HRCode {
   public:
@@ -330,8 +313,9 @@ vector<HRCode> detectHRCodes(Mat& src) {
   Mat element = getStructuringElement( MORPH_RECT, Size(3,3), Point(1, 1) );
   dilate( src_gray, dilate_output, element );*/
 
+  HRCodeParser parser(0.2, 0.2);
   vector<Mat> hr_codes;
-  findHRCode(src_gray, hr_codes, thresh);
+  parser.findHRCode(src_gray, hr_codes, thresh);
 
   vector<HRCode> codes(hr_codes.size());
 
