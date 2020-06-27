@@ -8,7 +8,7 @@
 
 #include "common.h"
 
-#include "hr_code/hr_code.hpp"
+#include "hr_code.hpp"
 
 using namespace cv;
 using namespace std;

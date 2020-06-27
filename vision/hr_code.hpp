@@ -22,7 +22,7 @@
 // trace debug info warning error fatal
 
 
-#include "../common.h"
+#include "common.h"
 
 // TODO: Test distances too, not just size.
 bool isValidHRCode(int i, int child, int firstMarker, int secondMarker, vector<Point2f> centers, vector<float> radius) {
