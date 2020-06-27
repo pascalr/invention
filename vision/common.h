@@ -87,33 +87,4 @@ bool isBigCircle(vector<Point> contours, Point2f center, float radius, float eps
   return radius > minRadius && isCircle(contours, center, radius, epsilon);
 }
 
-// TODO: Test distances too, not just size.
-bool isValidHRCode(int i, int child, int firstInnerCircle, int secondInnerCircle, vector<Point2f> centers, vector<float> radius) {
-  // All relatives because actual size vary based on distance of camera to sticker.
-  float borderThickness = 2; // mm
-  float insideDiameter = 30; // mm
-  float smallDotDiameter = 4.86; // mm
-  float outsideDiameter = insideDiameter + 2*borderThickness; // mm
-
-  float expectedRatio = outsideDiameter / insideDiameter;
-  float actualRatio = radius[i] / radius[child];
-  bool perimeterDetected = abs(actualRatio - expectedRatio)/expectedRatio < 0.2;
-
-  float dotExpectedRatio = outsideDiameter / smallDotDiameter;
-  float dotActualRatio = radius[i] / radius[firstInnerCircle];
-  bool dotDetected = abs(dotActualRatio - dotExpectedRatio)/dotExpectedRatio < 0.2;
-
-  float dotActualRatio2 = radius[i] / radius[secondInnerCircle];
-  bool dotDetected2 = abs(dotActualRatio2 - dotExpectedRatio)/dotExpectedRatio < 0.2;
-
-  BOOST_LOG_TRIVIAL(trace) << "perimeterDetected: " << perimeterDetected;
-  BOOST_LOG_TRIVIAL(trace) << "firstDotDetected: " << dotDetected;
-  BOOST_LOG_TRIVIAL(trace) << "secondDotDetected: " << dotDetected2;
-  BOOST_LOG_TRIVIAL(trace) << "dotExpectedRatio: " << dotExpectedRatio;
-  BOOST_LOG_TRIVIAL(trace) << "dotActualRatio: " << dotActualRatio;
-
-
-  return perimeterDetected && dotDetected && dotDetected2;
-}
-
 #endif // COMMON_H

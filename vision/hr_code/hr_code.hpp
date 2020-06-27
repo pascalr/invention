@@ -24,12 +24,65 @@
 
 #include "../common.h"
 
+// TODO: Test distances too, not just size.
+bool isValidHRCode(int i, int child, int firstMarker, int secondMarker, vector<Point2f> centers, vector<float> radius) {
+  // All relatives because actual size vary based on distance of camera to sticker.
+  float borderThickness = 2; // mm
+  float insideDiameter = 30; // mm
+  float outsideDiameter = insideDiameter + 2*borderThickness; // mm
+
+  float expectedRatio = outsideDiameter / insideDiameter;
+  float actualRatio = radius[i] / radius[child];
+  bool perimeterDetected = abs(actualRatio - expectedRatio)/expectedRatio < 0.2;
+
+  BOOST_LOG_TRIVIAL(trace) << "perimeterDetected: " << perimeterDetected;
+
+
+  /*float actualMarkerDistFromCent = sqrt(pow(centers[firstMarker].y - centers[i].y, 2)+pow(centers[firstMarker].x - centers[i].x, 2));
+  bool firstMarkerDistOk =  abs(actualMarkerDistFromCent - expectedMarkerDistFromCenter)/actualMarkerDistFromCent < 0.2; // FIXME: Is it ok?
+
+  float actualMarkerDistFromCent2 = sqrt(pow(centers[secondMarker].y - centers[i].y, 2)+pow(centers[secondMarker].x - centers[i].x, 2));
+  bool firstMarkerDistOk =  abs(actualMarkerDistFromCent - expectedMarkerDistFromCenter)/actualMarkerDistFromCent < 0.2; // FIXME: Is it ok?*/
+
+  return perimeterDetected;
+}
+
 int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
   if (i < 0) return -1;
   if (contourIsCircle[i]) {
     return i;
   } else {
     return findNextCircle(hierarchy[i][0], hierarchy, contourIsCircle);
+  }
+}
+
+bool contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
+
+  float expected = 26.8 * scale; // mm
+  float markerDia = 4.86 * scale; // mm
+
+  //float dotExpectedRatio = outsideDiameter / smallDotDiameter;
+  //float dotActualRatio = radius[i] / radius[firstMarker];
+  //bool dotDetected = abs(dotActualRatio - dotExpectedRatio)/dotExpectedRatio < 0.2;
+
+  bool correctSize = abs(radius[i] - markerDia)/markerDia < 0.2;
+  if (!correctSize) return false;
+
+  float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2));
+  BOOST_LOG_TRIVIAL(error) << "expectedMarkerDistance: " << expected;
+  BOOST_LOG_TRIVIAL(error) << "actualMarkerDistance: " << distFromCenter;
+  return abs(distFromCenter - expected)/expected < 0.2;
+}
+
+// TODO: Put all these function is a class: HRCodeParser, so they all have access to the variables instead
+// of passing a super long quatity of variables;
+
+int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale) {
+  if (i < 0) return -1;
+  if (contourIsCircle[i] && contourIsMarker(i,center, centers, radius, scale)) {
+    return i;
+  } else {
+    return findNextMarker(hierarchy[i][0], hierarchy, contourIsCircle, centers, radius, center, scale);
   }
 }
 
@@ -68,35 +121,37 @@ void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, int thresh) {
     
     BOOST_LOG_TRIVIAL(debug) << "Child found.";
 
-    int firstInnerCircle = findNextCircle(hierarchy[child][2], hierarchy, contourIsCircle);
-    if (firstInnerCircle < 0) continue;
+    float scale = radius[i] / 36.0; // mm
+
+    int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
+    if (firstMarker < 0) continue;
     
     BOOST_LOG_TRIVIAL(debug) << "First inner circle found.";
 
-    int secondInnerCircle = findNextCircle(hierarchy[firstInnerCircle][0], hierarchy, contourIsCircle);
-    if (secondInnerCircle < 0) continue;
+    int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
+    if (secondMarker < 0) continue;
     
     BOOST_LOG_TRIVIAL(debug) << "Second inner circle found.";
 
-    int thirdInnerCircle = findNextCircle(hierarchy[secondInnerCircle][0], hierarchy, contourIsCircle);
+    int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
     
     BOOST_LOG_TRIVIAL(debug) << "No third inner circle found.";
       
     BOOST_LOG_TRIVIAL(debug) << "Possible candidate!!!";
 
-    if (isValidHRCode(i, child, firstInnerCircle, secondInnerCircle, centers, radius)) {
+    if (isValidHRCode(i, child, firstMarker, secondMarker, centers, radius)) {
       BOOST_LOG_TRIVIAL(debug) << "Detected HRCode!!!";
       // Calculate angle
-      double rise = centers[secondInnerCircle].y - centers[firstInnerCircle].y;
-      double run = centers[secondInnerCircle].x - centers[firstInnerCircle].x;
+      double rise = centers[secondMarker].y - centers[firstMarker].y;
+      double run = centers[secondMarker].x - centers[firstMarker].x;
       double angle_degrees;
       if (run == 0) { // edge case both circles are vertically aligned
-        angle_degrees = centers[secondInnerCircle].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+        angle_degrees = centers[secondMarker].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
       } else {
         angle_degrees = atan2(rise, run)*180.0 / CV_PI;
 
-        double avg_x = (centers[secondInnerCircle].x + centers[firstInnerCircle].x)/2;
+        double avg_x = (centers[secondMarker].x + centers[firstMarker].x)/2;
         if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
           angle_degrees += 180.0;
         }
@@ -203,11 +258,14 @@ string parseLineTesseract(Mat& im) {
 	//ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
 	ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
   ocr->SetVariable("user_defined_dpi", "300"); // FIXME: Is it
+  //ocr->SetVariable("user_words_suffix", "eng.user-words"); Does this work? Rebuild and retrain my own dictionnary I think with only words that can be content.
+  // But that means everytime a user adds a new product, it must retrain et rebuild everything??? Maybe, if it's fast to do...
 	ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
   // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
 	ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
 	string outText = string(ocr->GetUTF8Text());
+  trim(outText);
 
 	BOOST_LOG_TRIVIAL(debug) << outText;
   ocr->End();
