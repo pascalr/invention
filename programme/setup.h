@@ -42,7 +42,7 @@ void setupAxes(Writer* writer, Axis** axes) {
   }
 
   if (axisX) {
-    axisX->setStepsPerUnit(200 * 2 * 8 / (1.25*25.4*3.1416));
+    axisX->setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
     axisX->enabledPin = 8;
     axisX->dirPin = 2;
     axisX->stepPin = 3;
