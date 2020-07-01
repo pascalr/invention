@@ -75,6 +75,7 @@ class Axis {
       //m_writer << "-m_destination_steps " << name << ": " << m_destination_steps << "\n";
       m_writer << "-maxPosition " << name << ": " << maxPosition << "\n";
       m_writer << "-previousStepTime " << name << ": " << previousStepTime << "\n";
+      m_writer << "-reverseMotorDirection " << name << ": " << m_reverse_motor_direction << "\n";
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -164,14 +165,15 @@ class Axis {
     }
     
     virtual void setMotorEnabled(bool value) {
-      m_writer.doDigitalWrite(m_reverse_motor_direction ? !enabledPin : enabledPin, LOW); // FIXME: ALWAYS ENABLED
+      m_writer.doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(enabledPin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
 
     virtual void setMotorDirection(bool forward) {
-      // Maybe add a variable to the axis: isClockwiseForward?
-      m_writer.doDigitalWrite(dirPin, forward ? LOW : HIGH);
+      bool val = forward ? LOW : HIGH;
+      val = m_reverse_motor_direction ? !val : val;
+      m_writer.doDigitalWrite(dirPin, val);
       isForward = forward;
     }
 
