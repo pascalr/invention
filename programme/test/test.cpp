@@ -11,44 +11,12 @@
 #include <chrono> // for sleep
 #include <thread> // for sleep
 
+#include "console_writer.h"
+
 // FIXME: MX10.0
 
 using namespace std;
 namespace plt = matplotlibcpp;
-
-class ConsoleWriter : public Writer {
-  public:
-    void doPinMode(int pin, bool type) {
-      cerr << "pinMode(" << pin << ", " << type << ")" << endl;
-    }
-    void doDigitalWrite(int pin, bool value) {
-      cerr << "digitalWrite(" << pin << ", " << value << ")" << endl;
-    }
-    double doDigitalRead(int pin) {
-      cerr << "digitalRead(" << pin << ")" << endl;
-    }
-    void doPrint(const char* theString) {
-      cerr << theString;
-    }
-    void doPrint(char val) {
-      cerr << val;
-    }
-    void doPrint(double val) {
-      cerr << val;
-    }
-    void doPrint(long val) {
-      cerr << val;
-    }
-    void doPrint(unsigned long val) {
-      cerr << val;
-    }
-    void doPrint(bool val) {
-      cerr << val;
-    }
-    void doPrint(int val) {
-      cerr << val;
-    }
-};
 
 /*class PlotWriter : public ConsoleWriter {
   public:
@@ -412,7 +380,6 @@ void signalHandler( int signum ) {
 }
 
 int main (int argc, char *argv[]) {
-  cout << "Debugging..." << endl;
 
   signal(SIGINT, signalHandler);
 
