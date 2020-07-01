@@ -21,6 +21,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisT->stepPin = 11;
     axisT->limitSwitchPin = 12;
     axisT->setupPins();
+    axisT->setReverseMotorDirection(true);
   }
 
   if (axisA) {
@@ -69,6 +70,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisZ->limitSwitchPin = 12;
     axisZ->setupPins();
     axisZ->setMaxPosition(RAYON);
+    axisZ->setReverseMotorDirection(true);
   }
 }
 
