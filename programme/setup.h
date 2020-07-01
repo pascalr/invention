@@ -48,6 +48,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisX->stepPin = 3;
     axisX->limitSwitchPin = 12;
     axisX->setupPins();
+    axisX->setMaxPosition(685);
   }
 
   if (axisY) {

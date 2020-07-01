@@ -1,7 +1,7 @@
 #ifndef AXIS_H
 #define AXIS_H
 
-#define RAYON 380.0
+#define RAYON 340.0
 
 #define FORWARD true
 #define REVERSE false

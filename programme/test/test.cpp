@@ -8,8 +8,10 @@
 
 #include "matplotlibcpp.h"
       
-#include <chrono>
-#include <thread>
+#include <chrono> // for sleep
+#include <thread> // for sleep
+
+// FIXME: MX10.0
 
 using namespace std;
 namespace plt = matplotlibcpp;
@@ -84,6 +86,8 @@ void assertTest(P t1, P t2) {
 void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
   unsigned long currentTime = 0;
 
+  cout << "Move: " << dest << endl;
+
   for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->prepare(currentTime);
   }
@@ -94,36 +98,54 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
     axes[i]->afterInput();
   }
 
-  vector<double> x(1);
-  vector<double> z(1);
-
   bool stillWorking = true;
   while (stillWorking) {
     stillWorking = false;
     for (int i = 0; axes[i] != NULL; i++) {
       stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
     }
-    if (plot && currentTime % 200000 == 0) {
+    if (plot && currentTime % 200000 == 0 || !stillWorking) {
 
-      Axis* axisX = axisByLetter(axes, 'X');
+      HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
       Axis* axisZ = axisByLetter(axes, 'Z');
-
+      
+      plt::clf();
+  
+      vector<double> x(1);
+      vector<double> z(1);
+      
       x[0] = axisX->getPosition();
       z[0] = axisZ->getPosition();
-
-      cout << "2";
       plt::plot(x,z,"ro");
-      cout << "3";
-      //plt::show();
-      cout << "4";
-      
-      this_thread::sleep_for(chrono::milliseconds(200));
-      cout << "5";
+
+      x.push_back(axisX->getPosition() - axisX->getDeltaPosition());
+      z.push_back(0.0);
+      plt::plot(x,z,"b-");
+
+      plt::xlim(0.0, axisX->getMaxPosition());
+      plt::ylim(0.0, axisZ->getMaxPosition());
+
+			// Add graph title
+			plt::title("Position de du bras");
+      // TODO: Afficher une ligne bleu pour montrer où est le bras. Un point rouge pour l'outil.
+      cout << "1";
+			plt::pause(0.01);
+      cout << "2";
     }
     currentTime++;
   }
 
+  if (plot) {
+    this_thread::sleep_for(chrono::milliseconds(500));
+  }
   
+}
+
+void move(char axis, double destination, Writer* writer, Axis** axes, bool plot=false) {
+  string str0 = "M";
+  str0 += axis;
+  str0 += to_string((int)destination); // FIXME
+  move(str0.c_str(), writer, axes, plot);
 }
 
 void referenceAll(Axis** axes) {
@@ -238,52 +260,12 @@ void testMoveZ(Writer* writer, Axis** axes) {
   assertNearby("Beginning position Z", 0.0, axisZ->getPosition());
   assertNearby("Beginning destination Z", 0.0, axisZ->getDestination());
 
-  move("MZ380", writer, axes);
+  move('Z', RAYON, writer, axes);
   
-  assertNearby("MZ380 position Z", RAYON, axisZ->getPosition());
-  assertNearby("MZ380 destination Z", RAYON, axisZ->getDestination());
-  assertNearby("MZ380 destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
+  assertNearby("MZ(RAYON) position Z", RAYON, axisZ->getPosition());
+  assertNearby("MZ(RAYON) destination Z", RAYON, axisZ->getDestination());
+  assertNearby("MZ(RAYON) destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
 }
-
-
-/*void testMoveZ(Writer* writer, Axis** axes) {
-  cout << "Test move Z" << endl;
-
-  Axis* axisZ = axisByLetter(axes, 'Z');
-  int steps;
-  
-  for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->prepare(0);
-    axes[i]->referenceReached();
-  }
-  cout << "Test move Z" << endl;
-
-  parseInput("MZ380", writer, axes, 0);
-  assertNearby("Destination Z", RAYON, axisZ->getDestination());
-  assertTest("Destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
-  assertNearby("Position steps Z is zero first", 0.0, axisZ->getPositionSteps());
-  assertNearby("Position Z is zero first", 0.0, axisZ->getPosition());
-  assertNearby("Axis Z should be forward", true, axisZ->isForward);
-  steps = axisZ->getDestinationSteps();
-  for (int i = 0; i < steps; i++) {
-    axisZ->turnOneStep();
-  }
-  assertNearby("Position Z", 380.0, axisZ->getPosition());
-  assertNearby("Position steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getPositionSteps());
-
-  cout << "MZ0 should bring back the Z to zero." << endl;
-  parseInput("MZ0", writer, axes, 0);
-  assertNearby("Destination Z", 0.0, axisZ->getDestination());
-  assertNearby("Axis Z should be in reverse", false, axisZ->isForward);
-  assertTest("Destination steps Z", 0.0, axisZ->getDestinationSteps());
-  steps = axisZ->getDestinationSteps();
-  for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
-    debug();
-    axisZ->turnOneStep();
-  }
-  assertNearby("Position Z", 0.0, axisZ->getPosition());
-
-}*/
 
 void testMoveSquare(Writer* writer, Axis** axes) {
   cout << "Test move square" << endl;
@@ -307,7 +289,7 @@ void testMoveSquare(Writer* writer, Axis** axes) {
   assertNearby("Beginning position Z", 0.0, axisZ->getPosition());
   assertNearby("Beginning destination Z", 0.0, axisZ->getDestination());
 
-  move("MZ380", writer, axes);
+  move('Z', RAYON, writer, axes, true);
   
   assertNearby("MZ380 position X", RAYON, axisX->getPosition());
   assertNearby("MZ380 destination X", RAYON, axisX->getDestination());
@@ -315,7 +297,7 @@ void testMoveSquare(Writer* writer, Axis** axes) {
   assertNearby("MZ380 position Z", RAYON, axisZ->getPosition());
   assertNearby("MZ380 destination Z", RAYON, axisZ->getDestination());
   
-  move("MX0", writer, axes);
+  move("MX0", writer, axes, true);
   
   assertNearby("MX0 position X", 0.0, axisX->getPosition());
   assertNearby("MX0 destination X", 0.0, axisX->getDestination());
@@ -323,7 +305,7 @@ void testMoveSquare(Writer* writer, Axis** axes) {
   assertNearby("MX0 position Z", RAYON, axisZ->getPosition());
   assertNearby("MX0 destination Z", RAYON, axisZ->getDestination());
 
-  move("MZ0", writer, axes);
+  move("MZ0", writer, axes, true);
   
   assertNearby("MZ0 position X", 0.0, axisX->getPosition());
   assertNearby("MZ0 destination X", 0.0, axisX->getDestination());
@@ -331,7 +313,7 @@ void testMoveSquare(Writer* writer, Axis** axes) {
   assertNearby("MZ0 position Z", 0.0, axisZ->getPosition());
   assertNearby("MZ0 destination Z", 0.0, axisZ->getDestination());
 
-  move("MX380", writer, axes);
+  move('X', RAYON, writer, axes, true);
 
   assertNearby("MX380 position X", RAYON, axisX->getPosition());
   assertNearby("MX380 destination X", RAYON, axisX->getDestination());
@@ -383,7 +365,7 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
   assertNearby("MX100 delta X", -RAYON, axisX->getDeltaPosition());
   
   referenceAll(axes);
-  move("MZ380", writer, axes);
+  move('Z',RAYON, writer, axes);
   
   assertNearby("MZ380 position X", RAYON, axisX->getPosition());
   assertNearby("MZ380 destination X", RAYON, axisX->getDestination());
@@ -445,15 +427,10 @@ int main (int argc, char *argv[]) {
   ZAxis axisZ = ZAxis(writer, 'Z', &axisX);
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
-  
+
   //plt::figure_size(axisX.getMaxPosition(), axisZ.getMaxPosition());
   
-  cout << "Here" << endl;
-
-  plt::xlim(0.0, axisX.getMaxPosition());
-  plt::ylim(0.0, axisZ.getMaxPosition());
-
-  cout << "There" << endl;
+  //plt::ion();
 
   /*testAxisByLetter(axes);
   testParseMove(axes);
@@ -464,7 +441,7 @@ int main (int argc, char *argv[]) {
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
-  testMoveSquare(&writer, axes);*/
-  testMoveXFlipsZ(&writer, axes);
+  testMoveXFlipsZ(&writer, axes);*/
+  testMoveSquare(&writer, axes);
 
 }
