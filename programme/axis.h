@@ -263,7 +263,6 @@ class Axis {
 // Destination refers to the tip
 // Position refers to the tip
 // Delta is the difference between the tip and the base
-// Tip = Base + Delta
 // Base = Tip - Delta
 // The positionSteps refers to the base, these must start at zero
 
@@ -279,25 +278,6 @@ class HorizontalAxis : public Axis {
   public:
     HorizontalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
     }
-
-    /*
-
-    double getDestinationSteps() {
-      return Axis::getDestinationSteps() - m_delta_destination * stepsPerUnit;
-    }
-
-    double getDestination() {
-      return Axis::getDestination() - m_delta_destination;
-    }
-    
-    void setDeltaDestination(double dest) {
-      m_delta_destination = dest;
-      updateDirection();
-    }
-
-    double getDeltaDestination() {
-      return m_delta_destination;
-    }*/
 
     void setDeltaPosition(double pos) {
       m_delta_position = pos;
@@ -316,15 +296,11 @@ class HorizontalAxis : public Axis {
       return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
     }
 
-    /*double getDestinationSteps() {
-      return Axis::getDestinationSteps() - m_delta_position * stepsPerUnit;
-    }
+    //double getDestinationSteps() {
+    //  return Axis::getDestinationSteps() + m_delta_position * stepsPerUnit;
+    //}
 
-    double getDestination() {
-      return Axis::getDestination() + m_delta_position;
-    }
-
-    void setDestination(double dest) {
+    /*void setDestination(double dest) {
       Axis::setDestination(dest);
       TODO
     }*/
@@ -357,37 +333,15 @@ class ZAxis : public Axis {
     // it is about whether the T axis should turn clockwise or counter clockwise to get to the z position.
     // The x axis just follows.
 
-    //bool shouldGoForward() {
-    //  return getPosition() < maxPosition / 2;
-    //}
-
     virtual void turnOneStep() {
       Axis::turnOneStep();
       double angle = m_position_steps / stepsPerUnit;
-      ////std::cout << "m_position_steps " << m_position_steps << std::endl;
       double deltaX = RAYON * cos(angle / 180 * PI);
       m_horizontal_axis->setDeltaPosition(deltaX);
-      //double deltaX = (getPosition() - m_original_position) * (m_horizontal_axis->shouldGoForward() ? 1 : -1);
-      ////std::cout << "position " << getPosition() << std::endl;
-      //m_horizontal_axis->setDeltaDestination(deltaX);
-      ////std::cout << "2" << std::endl;
     }
-
-/*void followedAxisMoved(double oldPosition, double position, double followedStepsPerUnit) {
--
--      //setDestination(getDestination() + position - oldPosition);
--
--      //double deltaAngle = (position - oldPosition);// * stepsPerUnit / followedStepsPerUnit;
--
--      // OPTIMIZE: This can probably be done with only one cos.
--      double deltaX = (RAYON * cos(m_rotation_axis_beginning_position * PI / 180)) - (RAYON * cos(position * PI / 180));
--      m_rotation_position = deltaX * ((int)m_should_go_forward);
--      //setDestination(getDestination() + (deltaX * (int)m_should_go_forward));
--    }*/
 
     virtual double getPosition() {
       double angle = m_position_steps / stepsPerUnit;
-      ////std::cout << "m_position_steps " << m_position_steps << std::endl;
       return RAYON * sin(angle / 180 * PI);
     }
 

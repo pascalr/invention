@@ -125,12 +125,8 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
       plt::xlim(0.0, axisX->getMaxPosition());
       plt::ylim(0.0, axisZ->getMaxPosition());
 
-			// Add graph title
-			plt::title("Position de du bras");
-      // TODO: Afficher une ligne bleu pour montrer où est le bras. Un point rouge pour l'outil.
-      cout << "1";
+			plt::title("Position du bras");
 			plt::pause(0.01);
-      cout << "2";
     }
     currentTime++;
   }
@@ -441,7 +437,7 @@ int main (int argc, char *argv[]) {
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
-  testMoveXFlipsZ(&writer, axes);*/
-  testMoveSquare(&writer, axes);
+  testMoveSquare(&writer, axes);*/
+  testMoveXFlipsZ(&writer, axes);
 
 }
