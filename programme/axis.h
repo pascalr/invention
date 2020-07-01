@@ -37,6 +37,11 @@ class Axis {
       maxPosition = 999999;
       m_position_steps = 0;
       m_destination_steps = 0;
+      m_reverse_motor_direction = false;
+    }
+
+    void setReverseMotorDirection(bool val) {
+      m_reverse_motor_direction = val;
     }
 
     virtual void setMaxPosition(double maxP) {
@@ -141,7 +146,7 @@ class Axis {
     }
     
     virtual void setMotorEnabled(bool value) {
-      m_writer.doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
+      m_writer.doDigitalWrite(m_reverse_motor_direction ? !enabledPin : enabledPin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(enabledPin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
@@ -254,6 +259,8 @@ class Axis {
 
     long m_position_steps;
     double m_destination_steps;
+
+    bool m_reverse_motor_direction;
 };
 
 // Destination refers to the tip
