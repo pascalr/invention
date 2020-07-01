@@ -39,6 +39,7 @@ class Axis {
       forceRotation = false;
       maxPosition = 999999;
       m_position_steps = 0;
+      m_min_position = 0;
       //m_destination_steps = 0;
     }
 
@@ -98,6 +99,15 @@ class Axis {
       setMotorDirection(direction);
       forceRotation = true;
       setMotorEnabled(true);
+    }
+
+    virtual bool notGoingOutOfBounds() {
+      double p = getPosition();
+      return isForward ? p <= getMaxPosition() : p >= m_min_position;
+    }
+
+    virtual bool canMove() {
+      return isReferenced && isMotorEnabled && notGoingOutOfBounds();
     }
 
     virtual double getPosition() {
@@ -203,7 +213,7 @@ class Axis {
       
       if (isReferencing) {
         return moveToReference();
-      } else if (isReferenced && isMotorEnabled && (forceRotation || !isDestinationReached())) {
+      } else if (canMove() && (forceRotation || !isDestinationReached())) {
         unsigned long deltaTime = currentTime - previousStepTime;
         if (deltaTime > delay) {
           turnOneStep();
@@ -263,6 +273,7 @@ class Axis {
     Axis* m_following_axis;
 
     long m_position_steps;
+    double m_min_position;
     //double m_destination_steps;
 };
 
@@ -300,6 +311,14 @@ class HorizontalAxis : public Axis {
       return Axis::getPosition() + m_delta_position;
     }
 
+    bool baseNotGoingOutOfBounds() {
+      double p = Axis::getPosition();
+      return isForward ? p <= getMaxPosition() : p >= m_min_position;
+    }
+
+    virtual bool canMove() {
+      return Axis::canMove() && baseNotGoingOutOfBounds();
+    }
     //double getPositionSteps() {
     //  return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
     //}

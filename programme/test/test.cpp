@@ -427,7 +427,7 @@ int main (int argc, char *argv[]) {
   
   //plt::ion();
 
-  /*testAxisByLetter(axes);
+  testAxisByLetter(axes);
   testParseMove(axes);
   testAtof();
   testStop(&axisY);
@@ -436,8 +436,7 @@ int main (int argc, char *argv[]) {
   testHandleAxis(&writer, axes);
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
-  testMoveSquare(&writer, axes);*/
-  //testMoveSquare(&writer, axes);
+  testMoveSquare(&writer, axes);
   testMoveXFlipsZ(&writer, axes);
 
 }
