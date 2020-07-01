@@ -260,7 +260,6 @@ void testMoveZ(Writer* writer, Axis** axes) {
   
   assertNearby("MZ(RAYON) position Z", RAYON, axisZ->getPosition());
   assertNearby("MZ(RAYON) destination Z", RAYON, axisZ->getDestination());
-  assertNearby("MZ(RAYON) destination steps Z", 90.0 * axisZ->getStepsPerUnit(), axisZ->getDestinationSteps());
 }
 
 void testMoveSquare(Writer* writer, Axis** axes) {
@@ -438,6 +437,7 @@ int main (int argc, char *argv[]) {
   testMoveZ(&writer, axes);
   testMoveZMovesX(&writer, axes);
   testMoveSquare(&writer, axes);*/
+  //testMoveSquare(&writer, axes);
   testMoveXFlipsZ(&writer, axes);
 
 }

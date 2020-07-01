@@ -18,7 +18,10 @@
 
 #define AXIS(t) (axisByLetter(axes, t))
 
-
+// Y0 is on the floor
+// X0 is on the left
+// Z0 is aligned with the wheels that go up and down
+// The arm starts at theta 0 degree. Counterclockwise is forward.
 
 class Axis {
   public:
@@ -36,7 +39,7 @@ class Axis {
       forceRotation = false;
       maxPosition = 999999;
       m_position_steps = 0;
-      m_destination_steps = 0;
+      //m_destination_steps = 0;
     }
 
     virtual double getMaxPosition() {
@@ -63,7 +66,7 @@ class Axis {
       m_writer << "-PIN limit switch " << name << ": " << limitSwitchPin << "\n";
       m_writer << "-stepsPerUnit " << name << ": " << stepsPerUnit << "\n";
       m_writer << "-m_position_steps " << name << ": " << m_position_steps << "\n";
-      m_writer << "-m_destination_steps " << name << ": " << m_destination_steps << "\n";
+      //m_writer << "-m_destination_steps " << name << ": " << m_destination_steps << "\n";
       m_writer << "-maxPosition " << name << ": " << maxPosition << "\n";
       m_writer << "-previousStepTime " << name << ": " << previousStepTime << "\n";
     }
@@ -105,9 +108,9 @@ class Axis {
       return destination;
     }
 
-    virtual double getDestinationSteps() {
-      return m_destination_steps;
-    }
+    //virtual double getDestinationSteps() {
+    //  return m_destination_steps;
+    //}
 
     virtual void stop() {
       //setMotorsEnabled(false);
@@ -129,10 +132,11 @@ class Axis {
       return m_position_steps;
     }
 
-    void updateDirection() {
+    virtual void updateDirection() {
       //std::cout << "Destination steps " << getDestinationSteps() << std::endl;
       //std::cout << "Position steps " << getPositionSteps() << std::endl;
-      setMotorDirection(getDestinationSteps() > getPositionSteps());
+      //setMotorDirection(getDestinationSteps() > getPositionSteps());
+      setMotorDirection(getDestination() > getPosition());
     }
 
     virtual void setDestination(double dest) {
@@ -140,7 +144,7 @@ class Axis {
       destination = dest;
       if (destination > maxPosition) {destination = maxPosition;}
       if (destination < 0) {destination = 0;}
-      m_destination_steps = dest * stepsPerUnit;
+      //m_destination_steps = dest * stepsPerUnit;
       updateDirection();
     }
     
@@ -165,10 +169,12 @@ class Axis {
     }
 
     virtual bool isDestinationReached() {
-      double destSteps = getDestinationSteps();
-      double posSteps = getPositionSteps();
-      return (isForward && posSteps >= destSteps) ||
-             (!isForward && posSteps <= destSteps);
+      //double destSteps = getDestinationSteps();
+      //double posSteps = getPositionSteps();
+      //return (isForward && posSteps >= destSteps) ||
+      //       (!isForward && posSteps <= destSteps);
+      return (isForward && getPosition() >= getDestination()) ||
+             (!isForward && getPosition() <= getDestination());
     }
 
     virtual void referenceReached() {
@@ -257,23 +263,25 @@ class Axis {
     Axis* m_following_axis;
 
     long m_position_steps;
-    double m_destination_steps;
+    //double m_destination_steps;
 };
+
+// I DO MX0 at reference: I WANT:
+// The x axis to do nothing at first because it is already at 0.
+// The z axis to flip because it knows it has to.
+// The z axis moves the delta x.
+// The x axis compensates.
+// axisX.setDestination(0); Does nothing, already at 0.
+// axisZ.afterInput();
+// axisZ.setDestinationAngle(180);
+// moves Z
+// x follows
 
 // Destination refers to the tip
 // Position refers to the tip
 // Delta is the difference between the tip and the base
 // Base = Tip - Delta
 // The positionSteps refers to the base, these must start at zero
-
-// I think it must always either refer to the base or the tip.
-// The tip would be nice because set destination you want the tip.
-// It would be nice if it hides the base.
-
-// OK I GOT IT
-// turn one step moves the position, not the destination!!!
-
-// positionStep is the base position
 class HorizontalAxis : public Axis {
   public:
     HorizontalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
@@ -292,17 +300,17 @@ class HorizontalAxis : public Axis {
       return Axis::getPosition() + m_delta_position;
     }
 
-    double getPositionSteps() {
-      return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
-    }
+    //double getPositionSteps() {
+    //  return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
+    //}
 
-    //double getDestinationSteps() {
+    //double getDestinationSteps() { TODO: Remove this function everywhere
     //  return Axis::getDestinationSteps() + m_delta_position * stepsPerUnit;
     //}
 
     /*void setDestination(double dest) {
       Axis::setDestination(dest);
-      TODO
+      te
     }*/
 
     virtual void referenceReached() {
@@ -340,14 +348,26 @@ class ZAxis : public Axis {
       m_horizontal_axis->setDeltaPosition(deltaX);
     }
 
-    virtual double getPosition() {
-      double angle = m_position_steps / stepsPerUnit;
-      return RAYON * sin(angle / 180 * PI);
+    virtual double getPositionAngle() {
+      return m_position_steps / stepsPerUnit;
     }
 
-    double getDestinationSteps() {
-      return m_destination_angle * stepsPerUnit;
+    virtual double getPosition() {
+      return RAYON * sin(getPositionAngle() / 180 * PI);
     }
+
+    virtual bool isDestinationReached() {
+      //double destSteps = getDestinationSteps();
+      //double posSteps = getPositionSteps();
+      //return (isForward && posSteps >= destSteps) ||
+      //       (!isForward && posSteps <= destSteps);
+      return (isForward && getPositionAngle() >= getDestinationAngle()) ||
+             (!isForward && getPositionAngle() <= getDestinationAngle());
+    }
+
+    //double getDestinationSteps() {
+    //  return m_destination_angle * stepsPerUnit;
+    //}
 
     void setDestination(double dest) {
       //std::cout << "Set destination " << dest << std::endl;
@@ -361,9 +381,14 @@ class ZAxis : public Axis {
       
     }
 
+    virtual void updateDirection() {
+      setMotorDirection(getDestinationAngle() > getPositionAngle());
+    }
+
     virtual void afterInput() {
       std::cout << "getDestination" << std::endl;
       std::cout << m_horizontal_axis->getDestination() << std::endl;
+      // If a flip is required, do one
       if(m_horizontal_axis->getDestination() < RAYON && m_destination_angle < 90) {
         m_destination_angle = 180 - m_destination_angle;
         updateDirection();
@@ -381,6 +406,7 @@ class ZAxis : public Axis {
   private:
     HorizontalAxis* m_horizontal_axis;
     double m_destination_angle;
+    bool m_is_clockwise;
 };
 
 class VerticalAxis: public Axis {
