@@ -7,6 +7,9 @@
 #include "../common.h"
 
 #include "matplotlibcpp.h"
+      
+#include <chrono>
+#include <thread>
 
 using namespace std;
 namespace plt = matplotlibcpp;
@@ -45,6 +48,19 @@ class ConsoleWriter : public Writer {
     }
 };
 
+/*class PlotWriter : public ConsoleWriter {
+  public:
+    PlotWriter(Axis** axes) : m_axes(axes) {
+    }
+
+    void doDigitalWrite(int pin, bool value) {
+      ConsoleWriter::doDigitalWrite(pin,value);
+    }
+  protected:
+    Axis** m_axes;
+    vector<int> positions;
+};*/
+
 template <class P>
 void assertNearby(const char* info, P t1, P t2) {
   cout << ((t1 - t2) < 0.5 && (t2 - t1) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
@@ -78,8 +94,8 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
     axes[i]->afterInput();
   }
 
-  std::vector<double> t;
-  std::vector<double> y[20];
+  vector<double> x(1);
+  vector<double> z(1);
 
   bool stillWorking = true;
   while (stillWorking) {
@@ -87,21 +103,27 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
     for (int i = 0; axes[i] != NULL; i++) {
       stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
     }
-    if (plot && currentTime % 50 == 0) {
-      t.push_back(currentTime);
-      for (int i = 0; axes[i] != NULL; i++) {
-        y[i].push_back(axes[i]->getPosition());
-      }
+    if (plot && currentTime % 200000 == 0) {
+
+      Axis* axisX = axisByLetter(axes, 'X');
+      Axis* axisZ = axisByLetter(axes, 'Z');
+
+      x[0] = axisX->getPosition();
+      z[0] = axisZ->getPosition();
+
+      cout << "2";
+      plt::plot(x,z,"ro");
+      cout << "3";
+      //plt::show();
+      cout << "4";
+      
+      this_thread::sleep_for(chrono::milliseconds(200));
+      cout << "5";
     }
     currentTime++;
   }
 
-  if (plot) {
-    for (int i = 0; axes[i] != NULL; i++) {
-      plt::plot(t,y[i]);
-    }
-    plt::show();
-  }
+  
 }
 
 void referenceAll(Axis** axes) {
@@ -406,8 +428,16 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
 
 }
 
+void signalHandler( int signum ) {
+   cout << "Interrupt signal (" << signum << ") received.\n";
+
+   exit(signum);
+}
+
 int main (int argc, char *argv[]) {
   cout << "Debugging..." << endl;
+
+  signal(SIGINT, signalHandler);
 
   ConsoleWriter writer = ConsoleWriter();
   HorizontalAxis axisX = HorizontalAxis(writer, 'X');
@@ -416,6 +446,15 @@ int main (int argc, char *argv[]) {
   Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
   setupAxes(&writer, axes);
   
+  //plt::figure_size(axisX.getMaxPosition(), axisZ.getMaxPosition());
+  
+  cout << "Here" << endl;
+
+  plt::xlim(0.0, axisX.getMaxPosition());
+  plt::ylim(0.0, axisZ.getMaxPosition());
+
+  cout << "There" << endl;
+
   /*testAxisByLetter(axes);
   testParseMove(axes);
   testAtof();

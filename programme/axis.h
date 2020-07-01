@@ -39,6 +39,10 @@ class Axis {
       m_destination_steps = 0;
     }
 
+    virtual double getMaxPosition() {
+      return maxPosition;
+    }
+
     virtual void setMaxPosition(double maxP) {
       maxPosition = maxP;
     }
