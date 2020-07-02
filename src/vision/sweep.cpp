@@ -7,6 +7,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "../programme/setup.h"
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
