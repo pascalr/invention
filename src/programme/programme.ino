@@ -101,6 +101,7 @@ void loop() {
         for (int i = 0; axes[i] != NULL; i++) {
           axes[i]->serialize();
         }
+      } else if (cmd == '@') { // asking for position
       } else {
         Serial.print("Error received command while previous was not finished: ");
         Serial.println(cmd);

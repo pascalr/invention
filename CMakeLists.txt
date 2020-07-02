@@ -56,7 +56,7 @@ target_link_libraries( main ${MyLibs} )
 add_executable( test_captures src/vision/test_captures.cpp )
 target_link_libraries( test_captures ${MyLibs} )
 
-add_executable( sweep src/vision/sweep.cpp )
+add_executable( sweep src/sweep.cpp )
 target_link_libraries( sweep ${MyLibs} )
 
 add_executable( communicate src/programme/test/communicate.cpp )

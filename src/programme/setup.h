@@ -4,6 +4,9 @@
 #include "axis.h"
 #include "common.h"
 
+#define AXIS_X_MAX_POS 685
+#define AXIS_Z_MAX_POS RAYON
+
 // TODO: Pass only Axis** axes, then here compare with to name to setup.
 void setupAxes(Writer* writer, Axis** axes) {
 
@@ -49,7 +52,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisX->stepPin = 3;
     axisX->limitSwitchPin = 12;
     axisX->setupPins();
-    axisX->setMaxPosition(685);
+    axisX->setMaxPosition(AXIS_X_MAX_POS);
   }
 
   if (axisY) {

@@ -7,4 +7,5 @@ Makefile
 cmake_install.cmake
 bin
 output
+node_modules
 *.FCStd1

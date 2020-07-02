@@ -1,0 +1,449 @@
+<!-- SECTION *Untitled -->
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../common/style.css">
+  <link rel="shortcut icon" href="../common/favicon.ico" />
+  <meta charset="utf-8"/>
+  <script src="../common/jquery.min.js"></script>
+  <base href="/">
+</head>
+
+<body style="background: white;">
+<!-- SECTION *Style -->
+<style>
+html *
+{
+   font-size: 0.99em;
+   font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+}
+#manuel {
+  position: relative;
+}
+.icon {
+  border: solid black 2.5px;
+  position: absolute;
+  cursor: pointer;
+  z-index: 3;
+}
+.icon:active {
+  background-color: red;
+}
+.background_image {
+  z-index: 2;
+  position: absolute;
+  user-drag: none; 
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+input[type='number'] {
+  width: 80px;
+}
+input[type=checkbox] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid gray;
+  outline: none;
+  vertical-align: middle;
+  background-color: white;
+}
+
+input[type=checkbox]:checked {
+  background-color: yellow;
+}
+
+button {
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>
+<!-- SECTION Menu -->
+<style>
+#menu {
+  background-color: black;
+  color: white;
+}
+.item:hover {
+  background-color: orange;
+}
+.item {
+  padding-left: 6px;
+  padding-right: 10px;
+  border-right: solid 1px white;
+  cursor: pointer;
+}
+</style>
+
+<div id="menu">
+<span class="item" onclick="menuItemClicked(this)">Inventaire</span>
+<span class="item" onclick="menuItemClicked(this)">Recette</span>
+<span class="item" onclick="menuItemClicked(this)">Manuel</span>
+<span class="item" onclick="menuItemClicked(this)">TODO</span>
+<span class="item" onclick="menuItemClicked(this)">Notes</span>
+<span class="item" onclick="menuItemClicked(this)">design</span>
+<span class="item" onclick="menuItemClicked(this)">pesée</span>
+<span class="item" onclick="menuItemClicked(this)">cable</span>
+<span class="item" onclick="menuItemClicked(this)">Camera</span>
+<span class="item" onclick="menuItemClicked(this)">RPI Camera</span>
+</div>
+
+<script>
+function menuItemClicked(item) {
+  let siblings = item.parentElement.children;
+  for (let i = 0; i < siblings.length; i++) {
+    let elem = document.getElementById(siblings[i].innerText)
+    if (elem) {elem.style.display = "none";}
+  }
+  let elem = document.getElementById(item.innerText)
+  if (elem) {elem.style.display = "block";}
+}
+</script>
+<!-- SECTION *Polling -->
+<script>
+(function poll() {
+  setInterval(function() {
+    $.get( "/poll/arduino", function( data ) {
+      let log = document.getElementById("log")
+      log.value += data.log;
+      log.scrollTop = log.scrollHeight;
+
+      const info = data.info
+      if (info) {
+        window.info = info
+        Object.keys(info).forEach((key) => {
+          const input = document.getElementById(key)
+          if (input) {
+            if (input.type == "checkbox") {
+              input.checked = info[key] === "1"
+            } else {
+              input.value = info[key]
+            }
+          }
+        })
+      }
+    });
+  }, 1000);
+})();
+</script>
+<!-- SECTION *Manuel -->
+<div id="Manuel">
+<h1>Commandes</h1>
+
+<div>
+<button onclick="document.getElementById('log').value='';$.get('/reloadArduino');">Connect</button>
+<button onclick="$.get('/closeArduino')">Close</button>
+<button onclick="$.get('/run/arduino?cmd=\?')">Info</button>
+<button onclick="$.get('/run/arduino?cmd=\s')" style="color: red;">Stop</button>
+<button onclick="$.get('/takePicture')">Picture</button>
+</div>
+
+<div  style="position: absolute; top: 120px; left: 0px;">
+<button style="font-size: 28px; margin-bottom: 10px;" onclick="$.get('/run/arduino?cmd=H')">🏠</button><br/>
+<button onclick="$.get('/run/arduino?cmd=HX')">🏠 X</button><br/>
+<button onclick="$.get('/run/arduino?cmd=HY')">🏠 Y</button><br/>
+<button onclick="$.get('/run/arduino?cmd=HZ')">🏠 Z</button><br/>
+<button onclick="$.get('/run/arduino?cmd=HW')">🏠 W</button><br/>
+</div>
+
+<div  style="position: absolute; top: 100px; left: 100px;">
+<h2>Position</h2>
+Position X: <input id="Pos X" type="number" readonly>
+<button onclick="$.get('/run/arduino?cmd=%2DX')">-</button>
+<button onclick="$.get('/run/arduino?cmd=%2BX')">+</button>
+<br/>
+Position Y: <input id="Pos Y" type="number" readonly>
+<button onmousedown="$.get('/run/arduino?cmd=%2DY')"
+onclick="$.get('/run/arduino?cmd=s')">-</button>
+<button onmousedown="$.get('/run/arduino?cmd=%2BY')"
+onclick="$.get('/run/arduino?cmd=s')">+</button>
+<br/>
+Position Z: <input id="Pos Z" type="number" readonly>
+<button onclick="$.get('/run/arduino?cmd=%2DZ')">-</button>
+<button onclick="$.get('/run/arduino?cmd=%2BZ')">+</button>
+<br/>
+Position W: <input id="Pos W" type="number" readonly>
+<button onclick="$.get('/run/arduino?cmd=%2DW')">-</button>
+<button onclick="$.get('/run/arduino?cmd=%2BW')">+</button>
+<br/>
+</div>
+<div  style="position: absolute; top: 100px; left: 400px;">
+<h2>Destination</h2>
+<form action="#" onsubmit="$.get(`/run/arduino?cmd=MX${this[0].value}Y${this[1].value}Z${this[2].value}W${this[3].value}`);return false">
+Position X: <input id="Dest X" type="number" readonly><br/>
+Position Y: <input id="Dest Y" type="number" readonly><br/>
+Position Z: <input id="Dest Z" type="number" readonly><br/>
+Position W: <input id="Dest W" type="number" readonly><br/>
+</form>
+</div>
+
+<div  style="position: absolute; top: 100px; left: 620px;">
+<h2>Outputs</h2> Axis
+<select id="axis" name="axis">
+  <option value="X">X</option>
+  <option value="Y">Y</option>
+  <option value="Z">Z</option>
+  <option value="W">W</option>
+</select>
+<br/>
+<input id="PIN enabled Y" type="checkbox">Enabled
+<br/>
+<input id="PIN dir Y" type="checkbox" readonly>Direction<br/>
+<input id="PIN step Y" type="checkbox" readonly>Step<br/>
+<input id="PIN limit switch Y" type="checkbox" readonly>Limit switch<br/>
+<input id="Force Y" type="checkbox" readonly>Force rotation<br/>
+</div>
+
+<div  style="position: absolute; top: 100px; left: 800px;">
+<h2>Inputs</h2> Axis
+<select id="axis" name="axis">
+  <option value="X">X</option>
+  <option value="Y">Y</option>
+  <option value="Z">Z</option>
+  <option value="W">W</option>
+</select>
+<br/>
+Speed: <input type="range" min="500" max="3000" value="500" style ="direction: rtl;" onchange="$.get('/run/arduino?cmd=v' + this.value)">
+<br/>
+</div>
+
+<script>
+function sendMessage() {
+  let v = document.getElementById('message');
+  $.get('/run/arduino?cmd=' + encodeURI(v.value));
+  v.value = "";
+}
+</script>
+
+<div  style="position: absolute; top: 300px; left: 0px;">
+<form action="#" onsubmit="sendMessage(); return false;" autocomplete="off">
+  Message: <input id="message" type="text">
+  <input type="submit" value="Send"/>
+</form>
+</div>
+
+<div  style="position: absolute; top: 350px; left: 0px;">
+
+ <textarea id="log" cols=100 rows=14 readonly>
+Log...
+</textarea> 
+</div>
+
+<div style="padding-top: 512px;"></div>
+
+<div>
+<img src="capture.jpg" id="captureImg" />
+</div>
+</div>
+<!-- SECTION *Inventaire -->
+<div id="Inventaire">
+<h1>Inventaire</h1>
+
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<br/>
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+
+</div>
+<!-- SECTION *Recette -->
+<div id="Recette">
+<h1>Recettes</h1>
+
+<h2>Entrées</h2>
+Soupe aux pois
+<h2>Brevages</h2>
+Chocolat chaud
+Capuccino vanille française
+Fraise kiwi
+<h2>Repas</h2>
+Riz
+Pâtes
+
+<h2>Desserts</h2>
+Gateau aux carottes
+<h2>Accompagnements</h2>
+<div><a href="/show/hummus">Hummus</a></div>
+<div><a href="/show/tahini">Tahini</a></div>
+
+50g riz
+
+<img src="/images/1582349055246_image.png" width=128 onclick="$.get('/run/arduino?cmd=riz')">
+
+<h2>Codes</h2>
+Riz au jasmin: 1610
+
+</div>
+<!-- SECTION *Notes -->
+<div id="Notes">
+
+<h1>Notes</h1>
+
+NOTE de design:
+
+Mettre mon site de machine beau.
+
+Oui ça serait cool un bras robotique, mais je mets de côté pour l'instant. Tellement de monde ont essayer d'en faire, je n'arriverai jamais à faire mieux pour moins cher. C'est plus cool, mais aussi c'est moins efficace. Parce qu'il n'y a pas de support, c'est beaucoup plus difficile pour les moteurs. Des mouvements linéaires sont beaucoup plus efficaces parce que le déplacement se fait sur des roues.
+
+Toutefois, ce n'est pas en vaint, j'ai une bonne idée je crois. Le potentiel est dans des trucs imbriqués (comme des poupées russes!) C'est beaucoup plus éléguant qu'une structure pleine avec un petit déplacement.
+</div>
+<!-- SECTION *TODO -->
+<div id="TODO">
+<h1>TODO</h1>
+<pre>
+Renforcir les rails qui montent en rajoutant des coches dedans, de la même manière que les brackets de menuiseries sont fait.
+</pre>
+</div>
+<!-- SECTION *Design -->
+<div id="design">
+<pre>
+Section transversale debout ou couchée:
+
+Je dois avec de l'espace derrière pour que ça monte et descende, donc debout c'est mieux pour ça?
+
+Aussi je dois avoir de l'espace pour le moteur et tout.
+
+La hauteur du meuble est de 79" pour pouvoir se déménager facilement (une porte standard mesure 80"). Une section du haut pour la machine est vissée par dessus, et toute la machine s'enlève simplement en la soulevant en haut (Ça pourrait être par en bas aussi).
+
+Pour l'instant, je fais une seule rotation parce que j'ai aussi mon déplacement gauche droite. Peut-être par contre que je vais aussi rajouter une 2e rotation (comme pour un robot SCARA). Pour avoir plus de mobilité. Aussi, ce qui pourrait être cool, c'est d'avoir un 2e bras. Donc 2 bras avec 2 rotations chacune comme ça ils peuvent se déplacer chacun indépendemment l'un de l'autre. C'est donc le torse qui se déplacerait gauche droite pour des armoire larges. Ce déplacement ne serait donc peut-être pas nécessaire pour une petite armoire (le torse toujours au milieu)
+
+Je ne suis pas sûr de faire ça parce que là ça devient vraiment compliqué. Il faut que je rajoute tous les moments doublés. Par exemple, je ne peux plus utiliser un seul monter descendre. Il en faut un pour chaque bras. Pas sûr finalment...
+
+C'est mieux si c'est le bras qui monte et descends et non seulement la tablette mobile pour plusieurs raisons. Premièrement, le bras doit pouvoir monter et descendre pour prendre des pots. Aussi, ça voudrait dire qu'il pourrait utiliser la tablette mobile comme surface de travail.
+
+Il va y avoir une camera sur le robot pour determiner la position des pots. Il va pouvoir trouver la position en x et z. Aussi, il va pouvoir determiner la hauteur des pots. Ainsi, le bras va se positionner au dessus en x et z. Ensuite il va descendre dessus.
+
+Il va y avoir un gros ressort au bout pour donner une marche de manoeuvre sur la hauteur.
+
+Avec la camera sur mon robot, peut-etre que le raspeberry pi devrait etre sur l'ordinateur.
+
+Il n'y a pas le choix, il y a de l'impreicision dans mon systeme. Il y a plusieurs solutions possibles. Des encodeurs pour s'assurer que je ne manque pas de step. Des capteur de force pour arreter a temps, mais je crois que le plus simple et le moins dispendieux serait de simplement donner du lousse a tous les axes avec des ressorts. Je crois que je n'ai pas besoin de haute precision et c'est plus safe ainsi au lieu d'un bras rigide. Ca me prendrait une genre de clutch a ressort sur les gears. Ou peut-etre bien avec une bille et un ressort, ca serait un limiteur de couple. Ca serait rigide sauf si c'est un trop gros contant, et idealement je detecte si le contact n'est plus la donc je sais qu'il a assez force.
+</pre>
+</div>
+<!-- SECTION *Pesée -->
+<div id="pesée">
+<h1>Pesée</h1>
+<pre>
+Pour me donner une référence, le plus pesant est mes 2 tubes carés. Ils mesurent 40" X (0.75"^2-0.5"^2) C'est 12.5 po^3. C'est 3.6 lbs. Donc des plates de 1" X 4" serait bon en masse.
+
+Acheter des plates de 1/2" X 1" X 10' serait le best, les plates pèserait à peu près une demi-livre chacune, ça ferait une livre par plate, non c'est trop, j'aime mieux 1/4" d'épais.
+
+Un mix des deux.
+
+Une plate 1/2" X 1" X 10' pèse 20 lbs.
+Une plate 1/4" X 1" X 10' pèse 10 lbs.
+
+Une plate 1/4" X 4" X 1" moins (0.375"^2/4*3.1416)
+= (1 - 0.110446875)*0.2908247 = 0.25870402071218745 lbs
+
+Dans 10", il y aurait 40 plaques. Donc 80 plaques, c'est beaucoup...!
+
+Des plates 1/2" serait mieux...
+
+J'ai décider que ce serait des poids de 1.25" X 4" X 0.25"
+
+Je vais acheter:
+Une barre de 1.25" X 0.25" X 10' et une barre 1.25" X 0.375" X 10'
+</pre>
+</div>
+<!-- SECTION *Cable -->
+<div id="cable">
+Longeur du cable: 50" + 2" + 13" + 2" + 4 tour
+
+4 tour 3.5*3.1416 donne 44".
+44 / 3.1416 / 2.625 donne 5.33
+
+6 tours 3.5" équivaut à 8 tours 2.625"
+
+Il y a un demi pouce entre les deux.
+500/72 donne 7 tours.
+
+Donc je vais me couper un cable de: 67" + 66" = 133"
+
+Regarder comment fonctionne le frein d'un cable de pont roulant.
+</div>
+
+</body>
+</html>
+<!-- SECTION *Camera -->
+<div id="Camera">
+<h1>Camera</h1>
+
+<div>
+<video autoplay></video>
+</div>
+
+<div>
+<button onclick="showVideo()">Show</button>
+</div>
+
+</div>
+
+<script>
+function showVideo() {
+  console.log('here')
+  const constraints = {
+    video: true
+  };
+ 
+  const video = document.querySelector('video');
+
+  navigator.mediaDevices.getUserMedia(constraints).
+    then((stream) => {video.srcObject = stream});
+}
+</script>
+<!-- SECTION *RPI Camera -->
+<div id="RPI Camera">
+<h1>Camera</h1>
+
+<div>
+<img src="capture.jpg" id="captureImg" />
+</div>
+
+</div>
+
+<script>
+
+setInterval(function() {
+    var myImageElement = document.getElementById('captureImg');
+    myImageElement.src = 'capture.jpg?rand=' + Math.random();
+}, 995)
+
+</script>
