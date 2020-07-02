@@ -76,6 +76,9 @@ void setup() {
   Serial.println("Done");
 }
 
+#define MESSAGE_RECEIVED "ok"
+#define MESSAGE_DONE "done"
+
 void loop() {
   
   if (Serial.available() > 0) {
@@ -84,6 +87,7 @@ void loop() {
     if (inputCursor >= inputSize) { 
       inputCursor = 0;
       inputSize = Serial.readBytes(input, 254);
+      Serial.println(MESSAGE_RECEIVED);
       
       if (input[inputSize-1] == '\n') {inputSize--;}
       if (input[inputSize-1] == '\r') {inputSize--;}
@@ -93,15 +97,19 @@ void loop() {
     } else {
       // Should not received another command exept stop.
       int cmd = Serial.read();
+      Serial.println(MESSAGE_RECEIVED);
       if (cmd == 's' || cmd == 'S') {
         for (int i = 0; axes[i] != NULL; i++) {
           axes[i]->stop();
         }
+        Serial.println(MESSAGE_DONE);
       } else if (cmd == '?') {
         for (int i = 0; axes[i] != NULL; i++) {
           axes[i]->serialize();
         }
+        Serial.println(MESSAGE_DONE);
       } else if (cmd == '@') { // asking for position
+        Serial.println(MESSAGE_DONE);
       } else {
         Serial.print("Error received command while previous was not finished: ");
         Serial.println(cmd);
