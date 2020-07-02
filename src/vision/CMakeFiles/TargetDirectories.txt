@@ -1,0 +1,8 @@
+/home/pascalr/invention/vision/CMakeFiles/rebuild_cache.dir
+/home/pascalr/invention/vision/CMakeFiles/edit_cache.dir
+/home/pascalr/invention/vision/CMakeFiles/capture.dir
+/home/pascalr/invention/vision/CMakeFiles/detect_chessboard.dir
+/home/pascalr/invention/vision/CMakeFiles/main.dir
+/home/pascalr/invention/vision/CMakeFiles/scan_qr_code.dir
+/home/pascalr/invention/vision/CMakeFiles/test_captures.dir
+/home/pascalr/invention/vision/CMakeFiles/sweep.dir
