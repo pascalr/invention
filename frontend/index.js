@@ -10,6 +10,9 @@ const { exec, spawn } = require('child_process');
 
 const SerialPort = require('serialport');
 
+var nodeCleanup = require('node-cleanup')
+var sweep
+
 var isPortOpen = false
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -83,22 +86,14 @@ function retract() {
 }
 
 app.get('/run/arduino',function (req, res) {
-  // TODO: write to serial directly
-  let fn = (query) => (`echo ${query.cmd} > /dev/ttyACM0`)
   console.log('Running command arduino: ' + req.query.cmd)
-  const toExe = fn(req.query)
-  exec(toExe, function(err, stdout, stderr) {
-    console.log(err)
-    console.log(stderr)
-    console.log(stdout);
-    res.set({ 'content-type': 'text/plain; charset=utf-8' });
-    res.send(stdout)
-  });
+  arduino_or_fake.write(req.query.cmd+"\n")
+  res.end()
 })
 
 app.get('/sweep',function (req, res) {
 
-  const sweep = spawn('../bin/sweep', {
+  sweep = spawn('../bin/sweep', {
     stdio: [
       'pipe', // stdin
       'pipe', // stdout
@@ -107,9 +102,19 @@ app.get('/sweep',function (req, res) {
   })
 
   arduino_or_fake.on('data', function (data) {
-    sweep.stdin.write(data)
-    console.log("Port out " + data);
+    if (sweep.exitCode) {
+      console.log("Unable to send data to sweep, already closed..")
+    } else {
+      sweep.stdin.write(data)
+      console.log("Port out " + data);
+    }
   })
+
+  sweep.stdin.on('error', function( err ) {
+    if (err.code == "EPIPE") {
+      console.log("Unable to send data to sweep, already closed..")
+    }
+  });
 
   sweep.stdout.on('data', (data) => {
     arduino_or_fake.write(data)
@@ -119,6 +124,7 @@ app.get('/sweep',function (req, res) {
   sweep.on('close', (code) => {
     arduino_or_fake.on('data', function (data) {}) // FIXME: Put back what it used to be
     console.log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
+    res.end()
   });
 
   sweep.on('error', (err) => {
@@ -237,7 +243,6 @@ app.get('/reloadArduino', function(req, res) {
 })
 
 app.get('/poll/arduino', nocache, function(req, res) {
-  console.log('poll/arduino')
   //res.set('Content-Type', 'application/json');
   //res.writeHead(200, { 'Content-Type': 'application/json' });
   const keys = Object.keys(arduinoLog).slice()
@@ -279,12 +284,22 @@ if (server_address === 'local' || server_address === 'lan') {
   server_address = ip_address
 }
 
+//const fake = spawn('../bin/fake')
+const fake = spawn('../bin/fake', {
+    stdio: [
+      'pipe', // stdin
+      'pipe', // stdout
+      0 // stderr
+    ]
+  })
+
 const arduino_or_fake = {
   write: (data) => {
     if (isPortOpen) {
       port.write(data);
     } else {
-      console.log("Error arduino port not opened. Using fake arduino instead.");
+      console.log("Arduino port not opened. Using fake arduino instead.");
+      fake.stdin.write(data)
     }
   },
 
@@ -292,10 +307,18 @@ const arduino_or_fake = {
     if (isPortOpen) {
       port.on(str,func);
     } else {
-      console.log("Error arduino port not opened. Using fake arduino instead.");
+      console.log("Arduino port not opened. Using fake arduino instead.");
+      fake.stdout.on(str,func);
     }
   }
 }
+
+nodeCleanup(function (exitCode, signal) {
+  if (sweep) {
+    sweep.kill('SIGINT');
+  }
+  fake.kill('SIGINT');
+})
 
 app.listen(portnb, server_address);
 

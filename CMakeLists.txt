@@ -59,14 +59,10 @@ target_link_libraries( test_captures ${MyLibs} )
 add_executable( sweep src/sweep.cpp )
 target_link_libraries( sweep ${MyLibs} )
 
-add_executable( communicate src/programme/test/communicate.cpp )
-target_include_directories(communicate PRIVATE ${MyDirs})
-target_link_libraries( communicate ${MyLibs} )
-
 add_executable( run_tests src/programme/test/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs} )
 
-add_executable( comm src/comm.cpp )
-target_link_libraries( comm ${MyLibs} )
-
+add_executable( fake src/fake.cpp )
+target_include_directories(fake PRIVATE ${MyDirs})
+target_link_libraries( fake ${MyLibs} )
