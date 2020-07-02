@@ -154,7 +154,7 @@ function menuItemClicked(item) {
 <button onclick="$.get('/closeArduino')">Close</button>
 <button onclick="$.get('/run/arduino?cmd=\?')">Info</button>
 <button onclick="$.get('/run/arduino?cmd=\s')" style="color: red;">Stop</button>
-<button onclick="$.get('/takePicture')">Picture</button>
+<button onclick="$.get('/takePicture'); refreshPicture()">Picture</button>
 </div>
 
 <div  style="position: absolute; top: 120px; left: 0px;">
@@ -397,9 +397,13 @@ function showVideo() {
 
 <script>
 
-setInterval(function() {
+  function refreshPicture() {
     var myImageElement = document.getElementById('captureImg');
     myImageElement.src = 'capture.jpg?rand=' + Math.random();
-}, 995)
+  }
+
+/*setInterval(function() {
+  refreshPicture();
+}, 995)*/
 
 </script>
