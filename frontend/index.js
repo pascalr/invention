@@ -148,7 +148,7 @@ var arduinoInfo = {}
 var arduinoInfoChanged = false
 
 const Readline = require('@serialport/parser-readline');
-const port = new SerialPort('/dev/ttyACM0', { baudRate: 9600, autoOpen: false });
+const port = new SerialPort('/dev/ttyACM0', { baudRate: 115200, autoOpen: false });
 const parser = port.pipe(new Readline({ delimiter: '\n' }));
 port.on("open", () => {
   arduinoLog = {}
