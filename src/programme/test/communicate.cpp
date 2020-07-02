@@ -13,6 +13,8 @@
 
 #include "console_writer.h"
 
+#include <signal.h>
+
 using namespace std;
 namespace plt = matplotlibcpp;
 

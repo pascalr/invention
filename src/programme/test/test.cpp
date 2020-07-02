@@ -13,6 +13,8 @@
 
 #include "console_writer.h"
 
+#include <signal.h>
+
 // FIXME: MX10.0
 
 using namespace std;

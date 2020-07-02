@@ -33,3 +33,6 @@ git clone https://github.com/tesseract-ocr/tesseract.git # follow INSTALL
 
 # boost
 sudo apt-get install libboost-all-dev
+
+# matplotlib
+sudo apt-get install python-matplotlib python-numpy python2.7-dev
