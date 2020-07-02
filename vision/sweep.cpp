@@ -1,5 +1,3 @@
-//Reference:https://www.learnopencv.com/opencv-qr-code-scanner-c-and-python/
-
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -64,48 +62,45 @@ void decode(Mat &im, vector<DecodedObject>&decodedObjects)
   }
 }
 
+#define MAX_X 700.0
+#define MAX_Z 380.0
+
+void move(const char* txt, double pos) {
+  cout << txt << pos << endl;
+}
+
+// x and z position is the position of the camera.
 int main(int argc, char *argv[])
 {
+  double heights[] = {0.0};
+  //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
+  double zStep = MAX_Z / 2;
+  double xStep = MAX_X / 4;
 
-  if ( argc != 2 )
-  {
-      printf("usage: ScanQRCode <Image_Path>\n");
-      return -1;
-  }
+  bool xUp = true; // Wheter the x axis goes from 0 to MAX or from MAX to 0
 
-  // Read image
-  string imagepath = argv[1];
-  Mat im = imread(imagepath);
+  double x = 0;
+  double z = 0;
 
-  // Variable for decoded objects
-  vector<DecodedObject> decodedObjects;
+  for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
+    move("MZ",0);
+    bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
 
-  // Find and decode barcodes and QR codes
-  decode(im, decodedObjects);
-
-  for(vector<DecodedObject>::iterator it = decodedObjects.begin(); it != decodedObjects.end(); ++it) {
-    if (it->location.size() >= 4) {
-      Point center = Point(0,0);
-      center.x += it->location.at(0).x;
-      center.x += it->location.at(1).x;
-      center.x += it->location.at(2).x;
-      center.x += it->location.at(3).x;
-      center.y += it->location.at(0).y;
-      center.y += it->location.at(1).y;
-      center.y += it->location.at(2).y;
-      center.y += it->location.at(3).y;
-      // is there a function sum?
-      center.x = center.x / 4;
-      center.y = center.y / 4;
-      circle(im, center, 5, Scalar(0, 0, 255), FILLED);
+    move("MY",heights[i]);
+    for (x = xUp ? 0 : MAX_X; xUp ? x <= MAX_X : x >= 0; x += xStep * (xUp ? 1 : -1)) {
+      move("MX",x);
+      for (z = zUp ? 0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0; z += zStep * (zUp ? 1 : -1)) {
+        move("MZ",z);
+        // Detect new ones and move to them to get exact position.
+        // findBarCodes();
+        
+      }
+      zUp = !zUp;
     }
-    //for(vector<Point>::iterator it2 = it->location.begin(); it2 != it->location.end(); ++it2) {
-    //  Point p = *it2;
-    //  circle(im, p, 5, Scalar(0, 0, 255), FILLED);
-    //}
+    xUp = !xUp;
   }
-  //imshow("Live", im);
-  imwrite("output.png", im);
 
   return 0;
 }
+
+
