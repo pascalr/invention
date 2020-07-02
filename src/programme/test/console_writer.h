@@ -8,13 +8,13 @@ using namespace std;
 class ConsoleWriter : public Writer {
   public:
     void doPinMode(int pin, bool type) {
-      cerr << "pinMode(" << pin << ", " << type << ")" << endl;
+      //cerr << "pinMode(" << pin << ", " << type << ")" << endl;
     }
     void doDigitalWrite(int pin, bool value) {
-      cerr << "digitalWrite(" << pin << ", " << value << ")" << endl;
+      //cerr << "digitalWrite(" << pin << ", " << value << ")" << endl;
     }
     double doDigitalRead(int pin) {
-      cerr << "digitalRead(" << pin << ")" << endl;
+      //cerr << "digitalRead(" << pin << ")" << endl;
     }
     void doPrint(const char* val) {
       cerr << val;
