@@ -34,11 +34,7 @@ app.get('/capture.jpg',function (req, res) {
   res.sendFile(path.join(__dirname, req.path));
 })
 
-app.get('/common/*',function (req, res) {
-  res.sendFile(path.join(__dirname, req.path));
-})
-
-app.get('/icon/*',function (req, res) {
+app.get('/public/*',function (req, res) {
   res.sendFile(path.join(__dirname, req.path));
 })
 
