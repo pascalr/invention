@@ -67,3 +67,6 @@ add_executable( run_tests src/programme/test/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs} )
 
+add_executable( comm src/comm.cpp )
+target_link_libraries( comm ${MyLibs} )
+
