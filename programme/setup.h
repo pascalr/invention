@@ -21,6 +21,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisT->stepPin = 11;
     axisT->limitSwitchPin = 12;
     axisT->setupPins();
+    axisT->setReverseMotorDirection(true);
   }
 
   if (axisA) {
@@ -42,12 +43,13 @@ void setupAxes(Writer* writer, Axis** axes) {
   }
 
   if (axisX) {
-    axisX->setStepsPerUnit(200 * 2 * 8 / (1.25*25.4*3.1416));
+    axisX->setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
     axisX->enabledPin = 8;
     axisX->dirPin = 2;
     axisX->stepPin = 3;
     axisX->limitSwitchPin = 12;
     axisX->setupPins();
+    axisX->setMaxPosition(685);
   }
 
   if (axisY) {
@@ -67,6 +69,7 @@ void setupAxes(Writer* writer, Axis** axes) {
     axisZ->limitSwitchPin = 12;
     axisZ->setupPins();
     axisZ->setMaxPosition(RAYON);
+    axisZ->setReverseMotorDirection(true);
   }
 }
 

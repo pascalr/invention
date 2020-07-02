@@ -9,6 +9,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "common.h"
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
@@ -26,11 +28,12 @@ void decode(Mat &im, vector<DecodedObject>&decodedObjects)
   // Create zbar scanner
   ImageScanner scanner;
 
+  scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
   // disable all
-  scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 0);
+  //scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 0);
 
   // enable qr
-  scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
+  //scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
   
   // Convert image to grayscale
   Mat imGray;
@@ -41,6 +44,8 @@ void decode(Mat &im, vector<DecodedObject>&decodedObjects)
 
   // Scan the image for barcodes and QRCodes
   int n = scanner.scan(image);
+
+  cout << "About to print results" << endl;
   
   // Print results
   for(Image::SymbolIterator symbol = image.symbol_begin(); symbol != image.symbol_end(); ++symbol)
@@ -66,16 +71,14 @@ void decode(Mat &im, vector<DecodedObject>&decodedObjects)
 
 int main(int argc, char *argv[])
 {
-
-  if ( argc != 2 )
-  {
-      printf("usage: ScanQRCode <Image_Path>\n");
-      return -1;
+  Mat im;
+  // The first argument is an image path
+  if ( argc == 2 ) {
+    string imagepath = argv[1];
+    im = imread(imagepath);
+  } else { // Try to capture a video image
+    captureVideoImage(im);
   }
-
-  // Read image
-  string imagepath = argv[1];
-  Mat im = imread(imagepath);
 
   // Variable for decoded objects
   vector<DecodedObject> decodedObjects;
