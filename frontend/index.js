@@ -1,3 +1,4 @@
+var Stream = require('stream');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser')
@@ -5,17 +6,12 @@ const fs = require('fs');
 const path = require('path');
 
 var sys = require('util')
-var exec = require('child_process').exec;
+const { exec, spawn } = require('child_process');
 
 const SerialPort = require('serialport');
 
-// CONSTANTS
+var isPortOpen = false
 
-const DATA_PATH = path.join(__dirname, 'data');
-
-// FUNCTIONS
-
-//app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(function(req, res, next) {
@@ -25,8 +21,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-//app.use(express.static("private"));
-
 // TODO: read this
 // https://blog.soshace.com/en/programming-en/node-lessons-safe-way-to-file/
 
@@ -34,13 +28,10 @@ app.get('/capture.jpg',function (req, res) {
   res.sendFile(path.join(__dirname, req.path));
 })
 
+//app.use(express.static("public"));
 app.get('/public/*',function (req, res) {
   res.sendFile(path.join(__dirname, req.path));
 })
-
-//app.get('/private/*',function (req, res) {
-//  res.sendFile(path.join(__dirname, req.path));
-//})
 
 app.get('/images/*',function (req, res) {
   res.sendFile(path.join(__dirname, req.path));
@@ -105,6 +96,37 @@ app.get('/run/arduino',function (req, res) {
   });
 })
 
+app.get('/sweep',function (req, res) {
+
+  const sweep = spawn('../bin/sweep', {
+    stdio: [
+      'pipe', // stdin
+      'pipe', // stdout
+      0 // stderr
+    ]
+  })
+
+  arduino_or_fake.on('data', function (data) {
+    sweep.stdin.write(data)
+    console.log("Port out " + data);
+  })
+
+  sweep.stdout.on('data', (data) => {
+    arduino_or_fake.write(data)
+    console.log("Sweep out " + data);
+  });
+  
+  sweep.on('close', (code) => {
+    arduino_or_fake.on('data', function (data) {}) // FIXME: Put back what it used to be
+    console.log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
+  });
+
+  sweep.on('error', (err) => {
+    console.error('Failed to start subprocess.');
+  });
+
+})
+
 app.post('/run/recette',function (req, res) {
   console.log('HERE! About to run command: ' + req.params.command)
   var gcode = ""
@@ -147,8 +169,14 @@ const Readline = require('@serialport/parser-readline');
 const port = new SerialPort('/dev/ttyACM0', { baudRate: 115200, autoOpen: false });
 const parser = port.pipe(new Readline({ delimiter: '\n' }));
 port.on("open", () => {
+  isPortOpen = true
   arduinoLog = {}
-  console.log('serial port open');
+  console.log('serial port opened');
+});
+port.on("close", () => {
+  isPortOpen = false
+  arduinoLog = {}
+  console.log('serial port closed');
 });
 parser.on('data', data =>{
   const timestamp = Date.now()
@@ -249,6 +277,24 @@ if (server_address === 'local' || server_address === 'lan') {
     }
   })
   server_address = ip_address
+}
+
+const arduino_or_fake = {
+  write: (data) => {
+    if (isPortOpen) {
+      port.write(data);
+    } else {
+      console.log("Error arduino port not opened. Using fake arduino instead.");
+    }
+  },
+
+  on: (str, func) => {
+    if (isPortOpen) {
+      port.on(str,func);
+    } else {
+      console.log("Error arduino port not opened. Using fake arduino instead.");
+    }
+  }
 }
 
 app.listen(portnb, server_address);
