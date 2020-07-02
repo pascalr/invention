@@ -6,7 +6,7 @@
   <link rel="shortcut icon" href="../common/favicon.ico" />
   <meta charset="utf-8"/>
   <script src="../common/jquery.min.js"></script>
-  <base href="/">
+  <!--<base href="/">-->
 </head>
 
 <body style="background: white;">
@@ -103,8 +103,6 @@ input[type=number] {
 <span class="item" onclick="menuItemClicked(this)">TODO</span>
 <span class="item" onclick="menuItemClicked(this)">Notes</span>
 <span class="item" onclick="menuItemClicked(this)">design</span>
-<span class="item" onclick="menuItemClicked(this)">pesée</span>
-<span class="item" onclick="menuItemClicked(this)">cable</span>
 <span class="item" onclick="menuItemClicked(this)">Camera</span>
 <span class="item" onclick="menuItemClicked(this)">RPI Camera</span>
 </div>
@@ -260,27 +258,27 @@ Log...
 <div id="Inventaire">
 <h1>Inventaire</h1>
 
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
 <br/>
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
-<img src="/images/invention/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
+<img src="/images/pot.svg" onclick="$.get('/run/arduino?cmd=?')">
 
 </div>
 <!-- SECTION *Recette -->
@@ -356,48 +354,6 @@ Avec la camera sur mon robot, peut-etre que le raspeberry pi devrait etre sur l'
 
 Il n'y a pas le choix, il y a de l'impreicision dans mon systeme. Il y a plusieurs solutions possibles. Des encodeurs pour s'assurer que je ne manque pas de step. Des capteur de force pour arreter a temps, mais je crois que le plus simple et le moins dispendieux serait de simplement donner du lousse a tous les axes avec des ressorts. Je crois que je n'ai pas besoin de haute precision et c'est plus safe ainsi au lieu d'un bras rigide. Ca me prendrait une genre de clutch a ressort sur les gears. Ou peut-etre bien avec une bille et un ressort, ca serait un limiteur de couple. Ca serait rigide sauf si c'est un trop gros contant, et idealement je detecte si le contact n'est plus la donc je sais qu'il a assez force.
 </pre>
-</div>
-<!-- SECTION *Pesée -->
-<div id="pesée">
-<h1>Pesée</h1>
-<pre>
-Pour me donner une référence, le plus pesant est mes 2 tubes carés. Ils mesurent 40" X (0.75"^2-0.5"^2) C'est 12.5 po^3. C'est 3.6 lbs. Donc des plates de 1" X 4" serait bon en masse.
-
-Acheter des plates de 1/2" X 1" X 10' serait le best, les plates pèserait à peu près une demi-livre chacune, ça ferait une livre par plate, non c'est trop, j'aime mieux 1/4" d'épais.
-
-Un mix des deux.
-
-Une plate 1/2" X 1" X 10' pèse 20 lbs.
-Une plate 1/4" X 1" X 10' pèse 10 lbs.
-
-Une plate 1/4" X 4" X 1" moins (0.375"^2/4*3.1416)
-= (1 - 0.110446875)*0.2908247 = 0.25870402071218745 lbs
-
-Dans 10", il y aurait 40 plaques. Donc 80 plaques, c'est beaucoup...!
-
-Des plates 1/2" serait mieux...
-
-J'ai décider que ce serait des poids de 1.25" X 4" X 0.25"
-
-Je vais acheter:
-Une barre de 1.25" X 0.25" X 10' et une barre 1.25" X 0.375" X 10'
-</pre>
-</div>
-<!-- SECTION *Cable -->
-<div id="cable">
-Longeur du cable: 50" + 2" + 13" + 2" + 4 tour
-
-4 tour 3.5*3.1416 donne 44".
-44 / 3.1416 / 2.625 donne 5.33
-
-6 tours 3.5" équivaut à 8 tours 2.625"
-
-Il y a un demi pouce entre les deux.
-500/72 donne 7 tours.
-
-Donc je vais me couper un cable de: 67" + 66" = 133"
-
-Regarder comment fonctionne le frein d'un cable de pont roulant.
 </div>
 
 </body>

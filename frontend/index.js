@@ -3,11 +3,6 @@ var app = express();
 var bodyParser = require('body-parser')
 const fs = require('fs');
 const path = require('path');
-const multer = require('multer')
-var _ = require('./common/lodash.min.js')
-var he = require('he') // unused I think
-var elasticlunr = require('./common/elasticlunr.js')
-const { Transform } = require('stream');
 
 var sys = require('util')
 var exec = require('child_process').exec;
@@ -236,7 +231,7 @@ app.get('/poll/arduino', nocache, function(req, res) {
 // *****************************************
 
 app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname, 'data/Ma machine.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 })
 
 app.get('*',function (req, res) {
@@ -246,7 +241,7 @@ app.get('*',function (req, res) {
 });
 
 var server_address = process.argv[2] || 'localhost'
-var portnb = process.argv[3] || '3000'
+var portnb = process.argv[3] || '3001'
 
 if (server_address === 'local' || server_address === 'lan') {
   var ip_address = null

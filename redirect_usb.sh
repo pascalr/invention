@@ -14,8 +14,6 @@ socat /dev/ttyUSB0,raw,echo=0 tcp-listen:8888,reuseaddr
 #socat PTY,raw,echo=0,link=/dev/ttyVUSB0 tcp:192.168.0.18:8888
 socat PTY,raw,echo=0,link=/dev/ttyUSB0,b115200 tcp:192.168.0.18:8888
 
-
-
 #/dev/ttyS0 and /dev/ttyAMA0 are inbuilt UARTS /dev/ttyprintk MAY be yours.
 #NOT all USB devices/drivers are "tty".
 #Unplug the device, list /dev then plug in and see what has changed.

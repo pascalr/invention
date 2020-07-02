@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   viewBox="0 0 16.933333 16.933333"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="ref.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="50.605162"
+     inkscape:cy="33.981208"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1853"
+     inkscape:window-height="1025"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-280.06667)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.28933847;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 11.251933,282.49191 c 5.574624,3.17419 4.776434,9.99397 -0.258451,11.84565"
+       id="path4734"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.28933847;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 6.0398438,294.55295 c -5.44934221,-2.61758 -6.29316201,-9.64546 0.1723003,-12.14719"
+       id="path4736"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.28933847;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 6.2121438,282.40576 -2.3691305,0.21538 1.0338027,1.67991 z"
+       id="path4738"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.28933847;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 10.993482,294.33756 1.378404,-1.76607 0.861501,1.29225 z"
+       id="path4740"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+    <ellipse
+       style="fill:none;fill-opacity:1;stroke-width:1.28933847;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path4742"
+       cx="8.5381994"
+       cy="288.41473"
+       rx="1.8091544"
+       ry="2.0891426" />
+    <ellipse
+       style="fill:none;fill-opacity:1;stroke-width:1.28933847;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path4744"
+       cx="7.7843857"
+       cy="287.89783"
+       rx="1.012265"
+       ry="1.7445419" />
+    <ellipse
+       style="fill:#000000;fill-opacity:1;stroke-width:1.62831569;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path4746"
+       cx="8.6028118"
+       cy="288.22095"
+       rx="2.2183681"
+       ry="2.7137318" />
+    <ellipse
+       style="fill:#ffffff;fill-opacity:1;stroke-width:1.4511025;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path4750"
+       cx="8.6243496"
+       cy="288.24243"
+       rx="1.6368539"
+       ry="2.0891426" />
+  </g>
+</svg>
