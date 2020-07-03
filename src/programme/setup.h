@@ -4,7 +4,7 @@
 #include "axis.h"
 #include "common.h"
 
-#define AXIS_X_MAX_POS 685.0 // mm
+#define AXIS_X_MAX_POS 670.0 // mm
 #define AXIS_Z_MAX_POS RAYON
 
 #define ARM_WIDTH 111.0 // mm

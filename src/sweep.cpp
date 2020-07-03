@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
   double heights[] = {0.0};
   //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
-  double zStep = MAX_Z / 2;
+  double zStep = MAX_Z / 1;
   double xStep = MAX_X / 4;
 
   bool xUp = false; // Wheter the x axis goes from 0 to MAX or from MAX to 0
