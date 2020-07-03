@@ -195,10 +195,7 @@ class Axis {
     }
 
     virtual void referenceReached() {
-      m_writer.doPrint("Done referencing axis ");
-      char theName[] = {name, '\0'};
-      m_writer.doPrint(theName);
-      m_writer.doPrint("\n");
+      m_writer << "Done referencing axis " << name << '\n';
       setPositionSteps(0);
       setDestination(0);
       setMotorEnabled(true);

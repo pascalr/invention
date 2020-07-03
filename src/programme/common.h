@@ -88,7 +88,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     }
     cursor = size; // Disregard everything else after the stop command.
   } else if (cmd == 'H' || cmd == 'h') { // home reference (eg. H, or HX, or HY, ...)
-    writer->doPrint("Referencing...\n");
+    *writer << "Referencing...\n";
     if (size == 1) {
       for (int i = 0; axes[i] != NULL; i++) {
         axes[i]->startReferencing();

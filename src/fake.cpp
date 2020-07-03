@@ -33,8 +33,12 @@ bool inputAvailable() {
   FD_ZERO(&read_fds);
   FD_SET(STDIN_FILENO, &read_fds);
   int sfd = 1; // I think, because only 1 file descriptor
+
+  struct timeval tv;
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
  
-  int result = select(sfd + 1, &read_fds, NULL, NULL, NULL);
+  int result = select(sfd + 1, &read_fds, NULL, NULL, &tv);
   if (result == -1 && errno != EINTR) {
     cerr << "Error in select: " << strerror(errno) << "\n";
   } else if (result == -1 && errno == EINTR) {
@@ -131,47 +135,55 @@ Axis axisT = Axis(writer, 'T');
   
 Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
 
+unsigned long currentTime = 0;
+bool isWorking = false;
+
 void setup() {
   setupAxes(&writer, axes);
 }
 
 void loop() {
-  if (!inputAvailable()) {
-    this_thread::sleep_for(chrono::milliseconds(10));
-    return;
-  }
-  cerr << "inputAvailabe!";
-  string cmd;
-  cin >> cmd;
-  cout << MESSAGE_RECEIVED << endl;
+  if (isWorking) {
 
-  unsigned long currentTime = 0;
+    if (inputAvailable()) {
+      // TODO: Check for stop, or position queries
+      // cout << MESSAGE_RECEIVED << endl;
+      // cout << MESSAGE_DONE << endl;
+      // cout << MESSAGE_INVALID << endl;
+    }
 
-  for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->prepare(currentTime);
-  }
-
-  parseInput(cmd.c_str(), &writer, axes, 0);
-
-  for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->afterInput();
-  }
-
-  bool stillWorking = true;
-  while (stillWorking) {
-    stillWorking = false;
+    bool stillWorking = false;
     for (int i = 0; axes[i] != NULL; i++) {
       stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
     }
-    if (currentTime % 200000 == 0 || !stillWorking) {
-      draw(axes);
-    }
-    currentTime++;
-  }
-  cout << MESSAGE_DONE << endl;
 
-  cerr << ">> ";
-  draw(axes);
+    if (!stillWorking) {
+      isWorking = false;
+      writer << MESSAGE_DONE << '\n';
+    }
+    
+  } else if (!inputAvailable()) {
+    this_thread::sleep_for(chrono::milliseconds(10));
+    return;
+  } else {
+    string cmd;
+    cin >> cmd;
+    cout << MESSAGE_RECEIVED << '\n';
+
+    isWorking = true;
+    
+    for (int i = 0; axes[i] != NULL; i++) {
+      axes[i]->prepare(currentTime);
+    }
+    
+    const char* input = cmd.c_str();
+    int cursorPos = parseInput(input, &writer, axes, 0);
+
+    for (int i = 0; axes[i] != NULL; i++) {
+      axes[i]->afterInput();
+    }
+
+  }
 }
 
 int main (int argc, char *argv[]) {
@@ -183,7 +195,19 @@ int main (int argc, char *argv[]) {
   draw(axes);
 
   while (true) {
+    bool wasWorking = isWorking;
+
+    currentTime = (isWorking) ? currentTime + 5 : 0;
+
     loop();
+    
+    if (isWorking && currentTime % 200000 == 0) {
+      draw(axes);
+    }
+    if (wasWorking && !isWorking) {
+      cerr << ">> ";
+      draw(axes);
+    }
   }
 
   return 0;

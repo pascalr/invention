@@ -17,31 +17,31 @@ class ConsoleWriter : public Writer {
       //cerr << "digitalRead(" << pin << ")" << endl;
     }
     void doPrint(const char* val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
     void doPrint(char val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
     void doPrint(double val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
     void doPrint(long val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
     void doPrint(unsigned long val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
     void doPrint(bool val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
     void doPrint(int val) {
-      cerr << val;
+      //cerr << val;
       cout << val;
     }
 };
