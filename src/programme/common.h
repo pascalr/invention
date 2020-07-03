@@ -9,6 +9,7 @@
 
 #define MESSAGE_RECEIVED "ok"
 #define MESSAGE_DONE "done"
+#define MESSAGE_INVALID "invalid"
 
 Axis* axisByLetter(Axis** axes, char letter) {
   for (int i = 0; axes[i] != NULL; i++) {
