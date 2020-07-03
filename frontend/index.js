@@ -314,13 +314,14 @@ const arduino_or_fake = {
   },
 
   open: (callback) => {
-    if (isPortOpen) {
-      port.open(callback);
-    } else {
-      log("Arduino port not opened. Using fake arduino instead.");
-      fake = spawn('../bin/fake')
-      callback()
-    }
+    port.open(function(err) {
+      if (err) {
+        log("Error opening arduino port. Using fake arduino instead.");
+        fake = spawn('../bin/fake')
+        callback(err)
+      }
+      callback(err)
+    })
   },
 
   close: (callback) => {
