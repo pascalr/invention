@@ -41,13 +41,14 @@ void drawArmCenterAxis(HorizontalAxis* axisX, Axis* axisZ) {
   vector<double> x(2);
   vector<double> z(2);
 
-  x.push_back(axisX->getPosition());
-  x.push_back(axisX->getPosition() - axisX->getDeltaPosition());
-  z.push_back(axisZ->getPosition());
-  z.push_back(0.0);
+  x[0] = axisX->getPosition();
+  x[1] = axisX->getPosition() - axisX->getDeltaPosition();
+  z[0] = axisZ->getPosition();
+  z[1] = 0.0;
   plt::plot(x,z,"b-");
 }
 
+// TODO: Do my own thing I think, because yeah not sure what lib to use anyways...
 class Point {
   public:
     Point(double valX, double valY) : x(valX), y(valY) {}
@@ -67,8 +68,17 @@ void drawArmBoundingBox(HorizontalAxis* axisX, ZAxis* axisZ) {
                    {ARM_WIDTH, ARM_LENGTH},
                    {0, ARM_LENGTH}};
 
-  // TODO: Do my own thing I think, because yeah not sure what lib to use anyways...
 
+}
+
+void drawPossibleXPosition(double maxX) {
+  vector<double> x(2);
+  vector<double> z(2);
+  x[0] = 0.0;
+  x[1] = maxX;
+  z[0] = 0.0;
+  z[1] = 0.0;
+  plt::plot(x,z,"k-");
 }
 
 void draw(Axis** axes) {
@@ -77,11 +87,12 @@ void draw(Axis** axes) {
   
   plt::clf();
   
-  drawToolPosition(axisX->getPosition(),axisZ->getPosition());
+  drawPossibleXPosition(axisX->getMaxPosition());
   drawArmCenterAxis(axisX, axisZ);
+  drawToolPosition(axisX->getPosition(),axisZ->getPosition());
 
-  plt::xlim(0.0, axisX->getMaxPosition());
-  plt::ylim(0.0, axisZ->getMaxPosition());
+  plt::xlim(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X);
+  plt::ylim(-OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z);
 
   plt::title("Position du bras");
   plt::pause(0.01);
