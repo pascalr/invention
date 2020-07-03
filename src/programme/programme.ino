@@ -68,19 +68,17 @@ class ArduinoProgram : public Program {
       return Serial.available() > 0;
     }
     bool getInput(char* buf, int size) {
-      Serial.readBytes(buf, size);
-      return true; // FIXME: Is it always true?
+      size_t inputSize = Serial.readBytes(buf, size);
+      if (inputSize == 0) return false;
+      
+      buf[inputSize] = 0;
+      return true;
     }
 
     ArduinoWriter m_writer;
 };
 
 ArduinoProgram p;
-
-char input[256];
-
-int inputCursor = 0;
-byte inputSize = 0;
 
 void setup() {
 
