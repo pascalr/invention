@@ -1,6 +1,6 @@
 #include "axis.h"
 #include "setup.h"
-#include "common.h" 
+#include "common.h"
 
 // CONSTANTS
 #define SLOW_SPEED_DELAY 2000
@@ -50,15 +50,32 @@ class ArduinoWriter : public Writer {
 
 };
 
-ArduinoWriter writer = ArduinoWriter();
-Axis axisT = Axis(writer, 'T');
-VerticalAxis axisY = VerticalAxis(writer, 'Y');
-HorizontalAxis axisX = HorizontalAxis(writer, 'X');
-Axis axisA = Axis(writer, 'A');
-Axis axisB = Axis(writer, 'B');
-ZAxis axisZ = ZAxis(writer, 'Z', &axisX);
+class ArduinoProgram : public Program {
+  public:
+    ArduinoProgram() : Program(m_writer) {
+    }
 
-Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
+    Writer& getWriter() {
+      return m_writer;
+    }
+    unsigned long getCurrentTime() {
+      return micros();
+    }
+    void sleepMs(int time) {
+      delay(time); // FIXME: Should be sleep, not busy wait..
+    }
+    bool inputAvailable() {
+      return Serial.available() > 0;
+    }
+    bool getInput(char* buf, int size) {
+      Serial.readBytes(buf, size);
+      return true; // FIXME: Is it always true?
+    }
+
+    ArduinoWriter m_writer;
+};
+
+ArduinoProgram p;
 
 char input[256];
 
@@ -71,7 +88,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Setup...");
 
-  setupAxes(&writer, axes);
+  setupAxes(&p.getWriter(), p.axes);
   
   Serial.println("Done");
 }
@@ -81,87 +98,5 @@ void setup() {
 
 void loop() {
   
-  if (Serial.available() > 0) {
-
-    // If we are done doing the commands, get another one.
-    if (inputCursor >= inputSize) { 
-      inputCursor = 0;
-      inputSize = Serial.readBytes(input, 254);
-      Serial.println(MESSAGE_RECEIVED);
-      
-      if (input[inputSize-1] == '\n') {inputSize--;}
-      if (input[inputSize-1] == '\r') {inputSize--;}
-      
-      input[inputSize] = 0; // Add the final 0 to end the C string
-      
-    } else {
-      // Should not received another command exept stop.
-      int cmd = Serial.read();
-      Serial.println(MESSAGE_RECEIVED);
-      if (cmd == 's' || cmd == 'S') {
-        for (int i = 0; axes[i] != NULL; i++) {
-          axes[i]->stop();
-        }
-        Serial.println(MESSAGE_DONE);
-      } else if (cmd == '?') {
-        for (int i = 0; axes[i] != NULL; i++) {
-          axes[i]->serialize();
-        }
-        Serial.println(MESSAGE_DONE);
-      } else if (cmd == '@') { // asking for position
-        Serial.println(MESSAGE_DONE);
-      } else {
-        Serial.print("Error received command while previous was not finished: ");
-        Serial.println(cmd);
-      }
-    }
-    
-  }
-
-  unsigned long currentTime = micros();
-  bool stillWorking = false;
-  for (int i = 0; axes[i] != NULL; i++) {
-    stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
-  }
-
-  if (!stillWorking && inputCursor < inputSize) {
-    for (int i = 0; axes[i] != NULL; i++) {
-     axes[i]->prepare(currentTime);
-    }
-    inputCursor = parseInput(input, &writer, axes, inputCursor);
-    for (int i = 0; axes[i] != NULL; i++) {
-     axes[i]->afterInput();
-    }
-  }
+  myLoop(p);
 }
-
-/* https://arduino.stackexchange.com/questions/1013/how-do-i-split-an-incoming-string
- // Calculate based on max input size expected for one command
-#define INPUT_SIZE 30
-...
-
-// Get next command from Serial (add 1 for final 0)
-char input[INPUT_SIZE + 1];
-byte size = Serial.readBytes(input, INPUT_SIZE);
-// Add the final 0 to end the C string
-input[size] = 0;
-
-// Read each command pair 
-char* command = strtok(input, "&");
-while (command != 0)
-{
-    // Split the command in two values
-    char* separator = strchr(command, ':');
-    if (separator != 0)
-    {
-        // Actually split the string in 2: replace ':' with 0
-        *separator = 0;
-        int servoId = atoi(command);
-        ++separator;
-        int position = atoi(separator);
-
-        // Do something with servoId and position
-    }
-    // Find the next command in input string
-    command = strtok(0, "&");
-}*/
