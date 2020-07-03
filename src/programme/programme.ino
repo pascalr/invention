@@ -1,6 +1,7 @@
 #include "axis.h"
 #include "setup.h"
 #include "common.h"
+#include "utils.h"
 
 // CONSTANTS
 #define SLOW_SPEED_DELAY 2000
@@ -72,6 +73,7 @@ class ArduinoProgram : public Program {
       if (inputSize == 0) return false;
       
       buf[inputSize] = 0;
+      rtrim(buf);
       return true;
     }
 
