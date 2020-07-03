@@ -150,8 +150,8 @@ function menuItemClicked(item) {
 <h1>Commandes</h1>
 
 <div>
-<button onclick="document.getElementById('log').value='';$.get('/reloadArduino');">Connect</button>
-<button onclick="$.get('/closeArduino')">Close</button>
+<button onclick="document.getElementById('log').value='';$.get('/connect');">Connect</button>
+<button onclick="$.get('/close')">Close</button>
 <button onclick="$.get('/run/arduino?cmd=\?')">Info</button>
 <button onclick="$.get('/run/arduino?cmd=\s')" style="color: red;">Stop</button>
 <button onclick="$.get('/takePicture'); refreshPicture()">Picture</button>

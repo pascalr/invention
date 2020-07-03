@@ -12,8 +12,17 @@ const SerialPort = require('serialport');
 
 var nodeCleanup = require('node-cleanup')
 var sweep
+var fake
 
 var isPortOpen = false
+
+function log(msg, err) {
+  if (err) {
+    console.log(`${new Date().toUTCString()} - ${err}`);
+  } else {
+    console.log(`${new Date().toUTCString()} - ${msg}`);
+  }
+}
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -86,44 +95,38 @@ function retract() {
 }
 
 app.get('/run/arduino',function (req, res) {
-  console.log('Running command arduino: ' + req.query.cmd)
+  log('Running command arduino: ' + req.query.cmd)
   arduino_or_fake.write(req.query.cmd+"\n")
   res.end()
 })
 
 app.get('/sweep',function (req, res) {
 
-  sweep = spawn('../bin/sweep', {
-    stdio: [
-      'pipe', // stdin
-      'pipe', // stdout
-      0 // stderr
-    ]
-  })
+  sweep = spawn('../bin/sweep')
 
   arduino_or_fake.on('data', function (data) {
     if (sweep.exitCode) {
-      console.log("Unable to send data to sweep, already closed..")
+      log("Unable to send data to sweep, already closed..")
     } else {
       sweep.stdin.write(data)
-      console.log("Port out " + data);
+      log("Port out " + data);
     }
   })
 
   sweep.stdin.on('error', function( err ) {
     if (err.code == "EPIPE") {
-      console.log("Unable to send data to sweep, already closed..")
+      log("Unable to send data to sweep, already closed..")
     }
   });
 
   sweep.stdout.on('data', (data) => {
     arduino_or_fake.write(data)
-    console.log("Sweep out " + data);
+    log("Sweep out " + data);
   });
   
   sweep.on('close', (code) => {
     arduino_or_fake.on('data', function (data) {}) // FIXME: Put back what it used to be
-    console.log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
+    log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
     res.end()
   });
 
@@ -134,7 +137,7 @@ app.get('/sweep',function (req, res) {
 })
 
 app.post('/run/recette',function (req, res) {
-  console.log('HERE! About to run command: ' + req.params.command)
+  log('HERE! About to run command: ' + req.params.command)
   var gcode = ""
   var selectedContainerType = 0;
   var selectedContainer = 0;
@@ -157,13 +160,13 @@ app.post('/run/recette',function (req, res) {
     } else if (cmd === "Melanger") {
     } else if (cmd === "Cuire") {
     } else {
-      console.log('Unkown command: ' + cmd)
+      log('Unkown command: ' + cmd)
       res.end('Unkown command: ' + cmd)
       return false;
     }
   }
   gcode += CODE_TERMINATE
-  console.log(req)
+  log(req)
 })
 
 // ************ ARDUINO ********************
@@ -177,12 +180,12 @@ const parser = port.pipe(new Readline({ delimiter: '\n' }));
 port.on("open", () => {
   isPortOpen = true
   arduinoLog = {}
-  console.log('serial port opened');
+  log('serial port opened');
 });
 port.on("close", () => {
   isPortOpen = false
   arduinoLog = {}
-  console.log('serial port closed');
+  log('serial port closed');
 });
 parser.on('data', data =>{
   const timestamp = Date.now()
@@ -196,7 +199,7 @@ parser.on('data', data =>{
   } else {
     arduinoLog[timestamp.toString()] = str
   }
-  console.log('got word from arduino:', str);
+  log('got word from arduino:', str);
 });
 
 function nocache(req, res, next) {
@@ -206,9 +209,9 @@ function nocache(req, res, next) {
   next();
 }
 
-app.get('/closeArduino', function(req, res) {
-  port.close(function (err) {
-    console.log(`${new Date().toUTCString()} - Port closed.`, err);
+app.get('/close', function(req, res) {
+  arduino_or_fake.close(function (err) {
+    log("Port closed", err);
   })
   res.end()
 })
@@ -216,29 +219,30 @@ app.get('/closeArduino', function(req, res) {
 app.get('/takePicture', function(req, res) {
 	
   exec('fswebcam --no-banner -r 640x480 -i 0 -F 2 --flip v capture.jpg', function(err, stdout, stderr) {
-    console.log(err)
-    console.log(stderr)
-    console.log(stdout);
+    log(err)
+    log(stderr)
+    log(stdout);
     res.set({ 'content-type': 'text/plain; charset=utf-8' });
     res.send(stdout)
   });
 })
 
-app.get('/reloadArduino', function(req, res) {
-  console.log('GET path=' + req.path);
-  console.log('*** reloadingArduino ***')
-  port.close(function (err) {
-    console.log(`${new Date().toUTCString()} - Port closed.`, err);
-    port.open(function (err) {
-      console.log(`${new Date().toUTCString()} - Port opened.`, err);
-      if (err) {
-        return console.log('Error opening port: ', err.message)
-      }
-  
-      // Because there's no callback to write, write errors will be emitted on the port:
-      //port.write('main screen turn on')
+function openCallback(err) {
+  log('Port opened', err)
+}
+
+app.get('/connect', function(req, res) {
+  log('GET path=' + req.path);
+  if (arduino_or_fake.isOpen()) {
+    log('Reloading connection')
+    arduino_or_fake.close(function (err) {
+      log('Port closed')
+      arduino_or_fake.open(openCallback)
     })
-  })
+  } else {
+    arduino_or_fake.open(openCallback)
+  }
+  
   res.end()
 })
 
@@ -264,7 +268,7 @@ app.get('/', function(req, res) {
 })
 
 app.get('*',function (req, res) {
-  console.log('GET * path=' + req.path);
+  log('GET * path=' + req.path);
   res.writeHead(404, 'Not Found');
   res.end();
 });
@@ -284,21 +288,14 @@ if (server_address === 'local' || server_address === 'lan') {
   server_address = ip_address
 }
 
-//const fake = spawn('../bin/fake')
-const fake = spawn('../bin/fake', {
-    stdio: [
-      'pipe', // stdin
-      'pipe', // stdout
-      0 // stderr
-    ]
-  })
 
+// Could simply return directly the port when isPortOpen, but this way I have more control
 const arduino_or_fake = {
   write: (data) => {
     if (isPortOpen) {
       port.write(data);
     } else {
-      console.log("Arduino port not opened. Using fake arduino instead.");
+      log("Arduino port not opened. Using fake arduino instead.");
       fake.stdin.write(data)
     }
   },
@@ -307,19 +304,49 @@ const arduino_or_fake = {
     if (isPortOpen) {
       port.on(str,func);
     } else {
-      console.log("Arduino port not opened. Using fake arduino instead.");
+      log("Arduino port not opened. Using fake arduino instead.");
       fake.stdout.on(str,func);
     }
+  },
+
+  isOpen: () => {
+    return isPortOpen || (fake && !fake.exitCode)
+  },
+
+  open: (callback) => {
+    if (isPortOpen) {
+      port.open(callback);
+    } else {
+      log("Arduino port not opened. Using fake arduino instead.");
+      fake = spawn('../bin/fake')
+      callback()
+    }
+  },
+
+  close: (callback) => {
+    if (isPortOpen) {
+      port.close(callback)
+    } else {
+      log("Arduino port not opened. Using fake arduino instead.");
+      if (fake && !fake.exitCode) {
+        fake.kill('SIGINT');
+        callback()
+      }
+    }
   }
+
+
 }
 
 nodeCleanup(function (exitCode, signal) {
   if (sweep) {
     sweep.kill('SIGINT');
   }
-  fake.kill('SIGINT');
+  if (fake) {
+    fake.kill('SIGINT');
+  }
 })
 
 app.listen(portnb, server_address);
 
-console.log('Listening on ' + server_address + ' port ' + portnb)
+log('Listening on ' + server_address + ' port ' + portnb)

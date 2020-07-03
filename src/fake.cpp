@@ -27,22 +27,58 @@ void signalHandler( int signum ) {
    exit(signum);
 }
 
-void show(Axis** axes) {
+vector<double> toVect(double x) {
+  vector<double> xs(1);
+  xs[0] = x;
+  return xs;
+}
+
+void drawToolPosition(double x, double z) {
+  plt::plot(toVect(x),toVect(z),"ro");
+}
+
+void drawArmCenterAxis(HorizontalAxis* axisX, Axis* axisZ) {
+  vector<double> x(2);
+  vector<double> z(2);
+
+  x.push_back(axisX->getPosition());
+  x.push_back(axisX->getPosition() - axisX->getDeltaPosition());
+  z.push_back(axisZ->getPosition());
+  z.push_back(0.0);
+  plt::plot(x,z,"b-");
+}
+
+class Point {
+  public:
+    Point(double valX, double valY) : x(valX), y(valY) {}
+    Point operator+(Point& v) {
+      return Point(x + v.x, y+v.y);
+    }
+
+    double x;
+    double y;
+};
+
+void drawArmBoundingBox(HorizontalAxis* axisX, ZAxis* axisZ) {
+  double angle = axisZ->getPositionAngle();
+
+  double a[4][2] = {{0,0},
+                   {ARM_WIDTH, 0},
+                   {ARM_WIDTH, ARM_LENGTH},
+                   {0, ARM_LENGTH}};
+
+  // TODO: Do my own thing I think, because yeah not sure what lib to use anyways...
+
+}
+
+void draw(Axis** axes) {
   HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
-  Axis* axisZ = axisByLetter(axes, 'Z');
+  ZAxis* axisZ = (ZAxis*)axisByLetter(axes, 'Z');
   
   plt::clf();
   
-  vector<double> x(1);
-  vector<double> z(1);
-  
-  x[0] = axisX->getPosition();
-  z[0] = axisZ->getPosition();
-  plt::plot(x,z,"ro");
-
-  x.push_back(axisX->getPosition() - axisX->getDeltaPosition());
-  z.push_back(0.0);
-  plt::plot(x,z,"b-");
+  drawToolPosition(axisX->getPosition(),axisZ->getPosition());
+  drawArmCenterAxis(axisX, axisZ);
 
   plt::xlim(0.0, axisX->getMaxPosition());
   plt::ylim(0.0, axisZ->getMaxPosition());
@@ -68,7 +104,7 @@ int main (int argc, char *argv[]) {
 
   while (true) {
 
-    show(axes);
+    draw(axes);
 
     cerr << ">> ";
     string cmd;
@@ -94,7 +130,7 @@ int main (int argc, char *argv[]) {
         stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
       }
       if (currentTime % 200000 == 0 || !stillWorking) {
-        show(axes);
+        draw(axes);
       }
       currentTime++;
     }

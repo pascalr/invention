@@ -4,8 +4,11 @@
 #include "axis.h"
 #include "common.h"
 
-#define AXIS_X_MAX_POS 685
+#define AXIS_X_MAX_POS 685 // mm
 #define AXIS_Z_MAX_POS RAYON
+
+#define ARM_WIDTH 111 // mm
+#define ARM_LENGTH 370 // mm
 
 // TODO: Pass only Axis** axes, then here compare with to name to setup.
 void setupAxes(Writer* writer, Axis** axes) {
