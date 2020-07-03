@@ -5,27 +5,17 @@
 #include "programme/axis.h"
 #include "programme/setup.h"
 #include "programme/common.h"
+#include "io_common.h"
 
 #include "programme/test/matplotlibcpp.h" // FIXME
       
 #include <chrono> // for sleep
 #include <thread> // for sleep
 
-#include <signal.h>
-
 #include "programme/test/console_writer.h"
 
 using namespace std;
 namespace plt = matplotlibcpp;
-
-#define MESSAGE_RECEIVED "ok"
-#define MESSAGE_DONE "done"
-
-void signalHandler( int signum ) {
-   cout << "Interrupt signal (" << signum << ") received.\n";
-
-   exit(signum);
-}
 
 vector<double> toVect(double x) {
   vector<double> xs(1);
@@ -120,7 +110,7 @@ int main (int argc, char *argv[]) {
     cerr << ">> ";
     string cmd;
     cin >> cmd;
-    cerr << "RECEIVED SOMETHING!" << endl;
+    cout << MESSAGE_RECEIVED << endl;
 
     unsigned long currentTime = 0;
 
@@ -145,6 +135,7 @@ int main (int argc, char *argv[]) {
       }
       currentTime++;
     }
+    cout << MESSAGE_DONE << endl;
   }
 
   return 0;

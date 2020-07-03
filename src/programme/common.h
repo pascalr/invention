@@ -7,6 +7,9 @@
 #define PI 3.1415926535897932384626433832795
 #endif
 
+#define MESSAGE_RECEIVED "ok"
+#define MESSAGE_DONE "done"
+
 Axis* axisByLetter(Axis** axes, char letter) {
   for (int i = 0; axes[i] != NULL; i++) {
     if (toupper(letter) == axes[i]->name) {

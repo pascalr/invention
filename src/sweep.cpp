@@ -9,6 +9,8 @@
 
 #include "programme/setup.h"
 
+#include "io_common.h"
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
@@ -33,21 +35,31 @@ class MovingDetectedCodes {
     double lastKnownPosition;
 };
 
+void waitForMessageDone() {
+  string str;
+  cin >> str;
+  if (str != MESSAGE_DONE)
+    waitForMessageDone();
+}
+
 void move(const char* txt, double pos) {
   cout << txt << pos << endl;
+  waitForMessageDone();
 }
 
 // x and z position is the position of the camera.
 int main(int argc, char *argv[])
 {
+  signal(SIGINT, signalHandler);
+
   double heights[] = {0.0};
   //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
   double zStep = MAX_Z / 2;
   double xStep = MAX_X / 4;
 
-  bool xUp = true; // Wheter the x axis goes from 0 to MAX or from MAX to 0
+  bool xUp = false; // Wheter the x axis goes from 0 to MAX or from MAX to 0
 
-  double x = 0;
+  double x = MAX_X;
   double z = 0;
 
   for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
