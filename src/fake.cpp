@@ -18,6 +18,8 @@
 
 #include <sys/select.h>
 
+#include "utils.h"
+
 std::string GetLineFromCin() {
     std::string line;
     std::getline(std::cin, line);
@@ -147,9 +149,39 @@ void loop() {
 
     if (inputAvailable()) {
       // TODO: Check for stop, or position queries
-      // cout << MESSAGE_RECEIVED << endl;
-      // cout << MESSAGE_DONE << endl;
       // cout << MESSAGE_INVALID << endl;
+      string str;
+      cin >> str;
+      if (str.length() >= 10) {
+        writer << MESSAGE_INVALID << '\n';
+        return;
+      }
+      char c_str[12];
+      strcpy(c_str, str.c_str());
+      rtrim(c_str);
+      writer << MESSAGE_RECEIVED << '\n';
+      if (strlen(c_str) != 1) {
+        writer << MESSAGE_INVALID << '\n';
+        return;
+      }
+      char cmd = c_str[0];
+      if (cmd == 's' || cmd == 'S') {
+        for (int i = 0; axes[i] != NULL; i++) {
+          axes[i]->stop();
+        }
+        writer << MESSAGE_DONE << '\n';
+        isWorking = false;
+      } else if (cmd == '?') {
+        for (int i = 0; axes[i] != NULL; i++) {
+          axes[i]->serialize();
+        }
+        writer << MESSAGE_DONE << '\n';
+      } else if (cmd == '@') { // asking for position
+        writer << MESSAGE_INVALID << '\n';
+      } else {
+        writer << MESSAGE_INVALID << '\n';
+      }
+      return;
     }
 
     bool stillWorking = false;
