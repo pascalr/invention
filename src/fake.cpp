@@ -20,41 +20,72 @@
 
 #include "utils.h"
 
-std::string GetLineFromCin() {
-    std::string line;
-    std::getline(std::cin, line);
-    return line;
-}
-
-bool inputAvailable() {
-  // https://stackoverflow.com/questions/6171132/non-blocking-console-input-c
-  // we want to receive data from stdin so add these file
-  // descriptors to the file descriptor set. These also have to be reset
-  // within the loop since select modifies the sets.
-  fd_set read_fds;
-  FD_ZERO(&read_fds);
-  FD_SET(STDIN_FILENO, &read_fds);
-  int sfd = 1; // I think, because only 1 file descriptor
-
-  struct timeval tv;
-  tv.tv_sec = 0;
-  tv.tv_usec = 0;
- 
-  int result = select(sfd + 1, &read_fds, NULL, NULL, &tv);
-  if (result == -1 && errno != EINTR) {
-    cerr << "Error in select: " << strerror(errno) << "\n";
-  } else if (result == -1 && errno == EINTR) {
-    exit(0); // we've received an interrupt - handle this
-  } else {
-    if (FD_ISSET(STDIN_FILENO, &read_fds)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 using namespace std;
 namespace plt = matplotlibcpp;
+
+class FakeProgram : public Program {
+  public:
+    FakeProgram() : Program(m_writer) {
+    }
+
+    Writer& getWriter() {
+      return m_writer;
+    }
+    unsigned long getCurrentTime() {
+      return currentTime;
+    }
+    void setCurrentTime(unsigned long time) {
+      currentTime = time;
+    }
+
+    void sleepMs(int time) {
+      this_thread::sleep_for(chrono::milliseconds(time));
+    }
+
+    bool getInput(char* buf, int size) {
+      string str;
+      cin >> str;
+
+      if (str.length() >= size-1) {
+        return false;
+      }
+
+      strcpy(buf, str.c_str());
+      rtrim(buf);
+      return true;
+    }
+
+    bool inputAvailable() {
+      // https://stackoverflow.com/questions/6171132/non-blocking-console-input-c
+      // we want to receive data from stdin so add these file
+      // descriptors to the file descriptor set. These also have to be reset
+      // within the loop since select modifies the sets.
+      fd_set read_fds;
+      FD_ZERO(&read_fds);
+      FD_SET(STDIN_FILENO, &read_fds);
+      int sfd = 1; // I think, because only 1 file descriptor
+    
+      struct timeval tv;
+      tv.tv_sec = 0;
+      tv.tv_usec = 0;
+     
+      int result = select(sfd + 1, &read_fds, NULL, NULL, &tv);
+      if (result == -1 && errno != EINTR) {
+        cerr << "Error in select: " << strerror(errno) << "\n";
+      } else if (result == -1 && errno == EINTR) {
+        exit(0); // we've received an interrupt - handle this
+      } else {
+        if (FD_ISSET(STDIN_FILENO, &read_fds)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+  protected:
+    ConsoleWriter m_writer;
+    unsigned long currentTime = 0;
+};
 
 vector<double> toVect(double x) {
   vector<double> xs(1);
@@ -127,118 +158,29 @@ void draw(Axis** axes) {
   plt::pause(0.01);
 }
 
-ConsoleWriter writer = ConsoleWriter();
-VerticalAxis axisY = VerticalAxis(writer, 'Y');
-HorizontalAxis axisX = HorizontalAxis(writer, 'X');
-Axis axisA = Axis(writer, 'A');
-Axis axisB = Axis(writer, 'B');
-ZAxis axisZ = ZAxis(writer, 'Z', &axisX);
-Axis axisT = Axis(writer, 'T');
-  
-Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
-
-unsigned long currentTime = 0;
-bool isWorking = false;
-
-void setup() {
-  setupAxes(&writer, axes);
-}
-
-void loop() {
-  if (isWorking) {
-
-    if (inputAvailable()) {
-      // TODO: Check for stop, or position queries
-      // cout << MESSAGE_INVALID << endl;
-      string str;
-      cin >> str;
-      if (str.length() >= 10) {
-        writer << MESSAGE_INVALID << '\n';
-        return;
-      }
-      char c_str[12];
-      strcpy(c_str, str.c_str());
-      rtrim(c_str);
-      writer << MESSAGE_RECEIVED << '\n';
-      if (strlen(c_str) != 1) {
-        writer << MESSAGE_INVALID << '\n';
-        return;
-      }
-      char cmd = c_str[0];
-      if (cmd == 's' || cmd == 'S') {
-        for (int i = 0; axes[i] != NULL; i++) {
-          axes[i]->stop();
-        }
-        writer << MESSAGE_DONE << '\n';
-        isWorking = false;
-      } else if (cmd == '?') {
-        for (int i = 0; axes[i] != NULL; i++) {
-          axes[i]->serialize();
-        }
-        writer << MESSAGE_DONE << '\n';
-      } else if (cmd == '@') { // asking for position
-        writer << MESSAGE_INVALID << '\n';
-      } else {
-        writer << MESSAGE_INVALID << '\n';
-      }
-      return;
-    }
-
-    bool stillWorking = false;
-    for (int i = 0; axes[i] != NULL; i++) {
-      stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
-    }
-
-    if (!stillWorking) {
-      isWorking = false;
-      writer << MESSAGE_DONE << '\n';
-    }
-    
-  } else if (!inputAvailable()) {
-    this_thread::sleep_for(chrono::milliseconds(10));
-    return;
-  } else {
-    string cmd;
-    cin >> cmd;
-    cout << MESSAGE_RECEIVED << '\n';
-
-    isWorking = true;
-    
-    for (int i = 0; axes[i] != NULL; i++) {
-      axes[i]->prepare(currentTime);
-    }
-    
-    const char* input = cmd.c_str();
-    int cursorPos = parseInput(input, &writer, axes, 0);
-
-    for (int i = 0; axes[i] != NULL; i++) {
-      axes[i]->afterInput();
-    }
-
-  }
-}
-
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
-  setup();
+
+  FakeProgram p;
+  setupAxes(&p.getWriter(), p.axes);
 
   cerr << ">> ";
-  draw(axes);
+  draw(p.axes);
 
   while (true) {
-    bool wasWorking = isWorking;
+    bool wasWorking = p.isWorking;
 
-    currentTime = (isWorking) ? currentTime + 5 : 0;
+    p.setCurrentTime((p.isWorking) ? p.getCurrentTime() + 5 : 0);
 
-    loop();
+    myLoop(p);
     
-    if (isWorking && currentTime % 200000 == 0) {
-      draw(axes);
+    if (p.isWorking && p.getCurrentTime() % 200000 == 0) {
+      draw(p.axes);
     }
-    if (wasWorking && !isWorking) {
+    if (wasWorking && !p.isWorking) {
       cerr << ">> ";
-      draw(axes);
+      draw(p.axes);
     }
   }
 

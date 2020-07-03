@@ -21,6 +21,32 @@ Axis* axisByLetter(Axis** axes, char letter) {
   return NULL;
 }
 
+class Program {
+  public:
+    Program(Writer& writer) : axisY(writer, 'Y'), axisX(writer, 'X'), axisA(writer, 'A'),
+        axisB(writer, 'B'), axisZ(writer, 'Z', &axisX), axisT(writer, 'T') {
+    }
+
+    virtual Writer& getWriter() = 0;
+    virtual unsigned long getCurrentTime() = 0;
+    virtual void sleepMs(int time) = 0;
+    virtual bool inputAvailable() = 0;
+    virtual bool getInput(char* buf, int size) = 0;
+
+    VerticalAxis axisY;
+    HorizontalAxis axisX;
+    Axis axisA;
+    Axis axisB;
+    ZAxis axisZ;
+    Axis axisT;
+      
+    Axis* axes[10] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL}; // FIXME: CAREFULL WITH SIZE!!!
+    //Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
+    
+    bool isWorking = false;
+};
+
+
 bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.' || c == '-';
 }
@@ -144,6 +170,81 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
   writer->doPrintLn(sint);*/
 
   return cursor;
+}
+
+void myLoop(Program& p) {
+  if (p.isWorking) {
+
+    if (p.inputAvailable()) {
+
+      char c_str[12];
+      if (p.getInput(c_str, 10)) {
+        p.getWriter() << MESSAGE_RECEIVED << '\n';
+      } else {
+        p.getWriter() << MESSAGE_INVALID << '\n';
+        return;
+      }
+
+      if (strlen(c_str) != 1) {
+        p.getWriter() << MESSAGE_INVALID << '\n';
+        return;
+      }
+      char cmd = c_str[0];
+      if (cmd == 's' || cmd == 'S') {
+        for (int i = 0; p.axes[i] != NULL; i++) {
+          p.axes[i]->stop();
+        }
+        p.getWriter() << MESSAGE_DONE << '\n';
+        p.isWorking = false;
+      } else if (cmd == '?') {
+        for (int i = 0; p.axes[i] != NULL; i++) {
+          p.axes[i]->serialize();
+        }
+        p.getWriter() << MESSAGE_DONE << '\n';
+      } else if (cmd == '@') { // asking for position
+        p.getWriter() << MESSAGE_INVALID << '\n';
+      } else {
+        p.getWriter() << MESSAGE_INVALID << '\n';
+      }
+      return;
+    }
+
+    bool stillWorking = false;
+    for (int i = 0; p.axes[i] != NULL; i++) {
+      stillWorking = stillWorking || p.axes[i]->handleAxis(p.getCurrentTime());
+    }
+
+    if (!stillWorking) {
+      p.isWorking = false;
+      p.getWriter() << MESSAGE_DONE << '\n';
+    }
+    
+  } else if (!p.inputAvailable()) {
+    p.sleepMs(10);
+    return;
+  } else {
+
+    p.isWorking = true;
+    
+    for (int i = 0; p.axes[i] != NULL; i++) {
+      p.axes[i]->prepare(p.getCurrentTime());
+    }
+
+    char input[256];
+    if (p.getInput(input, 250)) {
+      p.getWriter() << MESSAGE_RECEIVED << '\n';
+    } else {
+      p.getWriter() << MESSAGE_INVALID << '\n';
+      return;
+    }
+    
+    int cursorPos = parseInput(input, &p.getWriter(), p.axes, 0);
+
+    for (int i = 0; p.axes[i] != NULL; i++) {
+      p.axes[i]->afterInput();
+    }
+
+  }
 }
 
 #endif
