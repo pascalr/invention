@@ -100,38 +100,38 @@ app.get('/run/arduino',function (req, res) {
   res.end()
 })
 
+function pipe(source, dest) {
+  source.on('data', function(data) {
+    dest.write(data)
+  })
+}
+
 app.get('/sweep',function (req, res) {
 
+  log('Spawning sweep')
   sweep = spawn('../bin/sweep')
 
-  arduino_or_fake.on('data', function (data) {
-    if (sweep.exitCode) {
-      log("Unable to send data to sweep, already closed..")
-    } else {
-      sweep.stdin.write(data)
-      log("Port out " + data);
-    }
-  })
+  pipe(arduino_or_fake, sweep.stdin)
+  pipe(sweep.stdout, arduino_or_fake)
 
-  sweep.stdin.on('error', function( err ) {
-    if (err.code == "EPIPE") {
-      log("Unable to send data to sweep, already closed..")
-    }
-  });
+  //sweep.stdin.on('error', function( err ) {
+  //  if (err.code == "EPIPE") {
+  //    log("Unable to send data to sweep, already closed..")
+  //  }
+  //});
 
-  sweep.stdout.on('data', (data) => {
-    arduino_or_fake.write(data)
-    log("Sweep out " + data);
-  });
+  //sweep.stderr.on('data', (data) => {
+  //  log("Sweep err " + data);
+  //});
   
   sweep.on('close', (code) => {
-    arduino_or_fake.on('data', function (data) {}) // FIXME: Put back what it used to be
     log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
+    arduino_or_fake.on('data', defaultParserDataVal)
     res.end()
   });
 
   sweep.on('error', (err) => {
-    console.error('Failed to start subprocess.');
+    console.error('Failed to start sweep.');
   });
 
 })
@@ -187,7 +187,7 @@ port.on("close", () => {
   arduinoLog = {}
   log('serial port closed');
 });
-parser.on('data', data =>{
+var defaultParserDataVal = (data) => {
   const timestamp = Date.now()
   const str = data.toString()
   if (str[0] === '-') {
@@ -200,7 +200,8 @@ parser.on('data', data =>{
     arduinoLog[timestamp.toString()] = str
   }
   log('got word from arduino:', str);
-});
+}
+parser.on('data', defaultParserDataVal);
 
 function nocache(req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
@@ -295,16 +296,15 @@ const arduino_or_fake = {
     if (isPortOpen) {
       port.write(data);
     } else {
-      log("Arduino port not opened. Using fake arduino instead.");
       fake.stdin.write(data)
     }
   },
 
   on: (str, func) => {
     if (isPortOpen) {
-      port.on(str,func);
+      //port.on(str,func);
+      parser.on(str,func);
     } else {
-      log("Arduino port not opened. Using fake arduino instead.");
       fake.stdout.on(str,func);
     }
   },
@@ -328,7 +328,6 @@ const arduino_or_fake = {
     if (isPortOpen) {
       port.close(callback)
     } else {
-      log("Arduino port not opened. Using fake arduino instead.");
       if (fake && !fake.exitCode) {
         fake.kill('SIGINT');
         callback()

@@ -10,6 +10,8 @@
 #include "programme/setup.h"
 
 #include "io_common.h"
+#include <chrono>
+#include <thread>
 
 using namespace std;
 using namespace cv;
@@ -38,13 +40,19 @@ class MovingDetectedCodes {
 void waitForMessageDone() {
   string str;
   cin >> str;
-  if (str != MESSAGE_DONE)
+  if (str != MESSAGE_DONE) {
+    cerr << "not done yet, waiting for message done" << endl;
     waitForMessageDone();
+  } else {
+    cerr << "str: " << str << ". DONE: " << MESSAGE_DONE << endl;
+    cerr << "OK received message done\n";
+  }
 }
 
 void move(const char* txt, double pos) {
   cout << txt << pos << endl;
   waitForMessageDone();
+  this_thread::sleep_for(chrono::milliseconds(1000));
 }
 
 // x and z position is the position of the camera.

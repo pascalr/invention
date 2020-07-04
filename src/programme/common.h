@@ -9,7 +9,11 @@
 
 #define MESSAGE_RECEIVED "ok"
 #define MESSAGE_DONE "done"
-#define MESSAGE_INVALID "invalid"
+#define MESSAGE_INVALID_INPUT "invalid_input"
+// invalid_pending means that it should only process one command at once
+// it is still listening if told to stop or query position
+// anything else is an invalid_pending.
+#define MESSAGE_INVALID_PENDING "invalid_pending"
 
 Axis* axisByLetter(Axis** axes, char letter) {
   for (int i = 0; axes[i] != NULL; i++) {
@@ -181,12 +185,12 @@ void myLoop(Program& p) {
       if (p.getInput(c_str, 10)) {
         p.getWriter() << MESSAGE_RECEIVED << '\n';
       } else {
-        p.getWriter() << MESSAGE_INVALID << '\n';
+        p.getWriter() << MESSAGE_INVALID_INPUT << c_str << '\n';
         return;
       }
 
       if (strlen(c_str) != 1) {
-        p.getWriter() << MESSAGE_INVALID << '\n';
+        p.getWriter() << MESSAGE_INVALID_PENDING << c_str << '\n';
         return;
       }
       char cmd = c_str[0];
@@ -194,17 +198,15 @@ void myLoop(Program& p) {
         for (int i = 0; p.axes[i] != NULL; i++) {
           p.axes[i]->stop();
         }
-        p.getWriter() << MESSAGE_DONE << '\n';
         p.isWorking = false;
       } else if (cmd == '?') {
         for (int i = 0; p.axes[i] != NULL; i++) {
           p.axes[i]->serialize();
         }
-        p.getWriter() << MESSAGE_DONE << '\n';
       } else if (cmd == '@') { // asking for position
-        p.getWriter() << MESSAGE_INVALID << '\n';
+        p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
       } else {
-        p.getWriter() << MESSAGE_INVALID << '\n';
+        p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
       }
       return;
     }
@@ -234,7 +236,7 @@ void myLoop(Program& p) {
     if (p.getInput(input, 250)) {
       p.getWriter() << MESSAGE_RECEIVED << '\n';
     } else {
-      p.getWriter() << MESSAGE_INVALID << '\n';
+      p.getWriter() << MESSAGE_INVALID_INPUT << '\n';
       return;
     }
     

@@ -15,6 +15,8 @@
 
 #include <signal.h>
 
+#include "../../fake_program.h"
+
 // FIXME: MX10.0
 
 using namespace std;
@@ -309,6 +311,14 @@ void testMoveXFlipsZ(Writer* writer, Axis** axes) {
   assertNearby("MX0 delta X", -RAYON, axisX->getDeltaPosition());
   assertNearby("MX0 position Z", 0.0, axisZ->getPosition());
   assertNearby("MX0 angle Z", 180.0, axisZ->getDestinationAngle());
+
+  move('X', AXIS_X_MAX_POS, writer, axes, true);
+  
+  assertNearby("MX_max position X", AXIS_X_MAX_POS, axisX->getPosition());
+  assertNearby("MX_max destination X", AXIS_X_MAX_POS, axisX->getDestination());
+  assertNearby("MX_max delta X", RAYON, axisX->getDeltaPosition());
+  assertNearby("MX_max position Z", 0.0, axisZ->getPosition());
+  assertNearby("MX_max angle Z", 0.0, axisZ->getDestinationAngle());
 }
 
 void testMoveZMovesX(Writer* writer, Axis** axes) {
@@ -385,27 +395,23 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  ConsoleWriter writer = ConsoleWriter();
-  HorizontalAxis axisX = HorizontalAxis(writer, 'X');
-  VerticalAxis axisY = VerticalAxis(writer, 'Y');
-  ZAxis axisZ = ZAxis(writer, 'Z', &axisX);
-  Axis* axes[] = {&axisX, &axisY, &axisZ, NULL};
-  setupAxes(&writer, axes);
+  FakeProgram p;
+  setupAxes(&p.getWriter(), p.axes);
 
   //plt::figure_size(axisX.getMaxPosition(), axisZ.getMaxPosition());
   
   //plt::ion();
 
-  testAxisByLetter(axes);
-  testParseMove(axes);
+  testAxisByLetter(p.axes);
+  testParseMove(p.axes);
   testAtof();
-  testStop(&axisY);
-  testSpeed(&axisY);
-  testParseInput(&writer, axes);
-  testHandleAxis(&writer, axes);
-  testMoveZ(&writer, axes);
-  testMoveZMovesX(&writer, axes);
-  testMoveSquare(&writer, axes);
-  testMoveXFlipsZ(&writer, axes);
+  testStop(axisByLetter(p.axes,'Y'));
+  testSpeed(axisByLetter(p.axes,'Y'));
+  testParseInput(&p.getWriter(), p.axes);
+  testHandleAxis(&p.getWriter(), p.axes);
+  testMoveZ(&p.getWriter(), p.axes);
+  testMoveZMovesX(&p.getWriter(), p.axes);
+  testMoveSquare(&p.getWriter(), p.axes);
+  testMoveXFlipsZ(&p.getWriter(), p.axes);
 
 }
