@@ -120,9 +120,9 @@ app.get('/sweep',function (req, res) {
   //  }
   //});
 
-  //sweep.stderr.on('data', (data) => {
-  //  log("Sweep err " + data);
-  //});
+  sweep.stderr.on('data', (data) => {
+    log("Sweep err " + data);
+  });
   
   sweep.on('close', (code) => {
     log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
@@ -295,6 +295,8 @@ const arduino_or_fake = {
   write: (data) => {
     if (isPortOpen) {
       port.write(data);
+    } else if (!fake) {
+      log("Error: fake is not created yet...")
     } else {
       fake.stdin.write(data)
     }
@@ -304,6 +306,8 @@ const arduino_or_fake = {
     if (isPortOpen) {
       //port.on(str,func);
       parser.on(str,func);
+    } else if (!fake) {
+      log("Error: fake is not created yet...")
     } else {
       fake.stdout.on(str,func);
     }

@@ -45,14 +45,20 @@ class MovingDetectedCodes {
 
 void waitForMessageDone() {
   while (!linuxInputAvailable()) {
-    Mat frame;
-    captureVideoImage(frame);
-    this_thread::sleep_for(chrono::milliseconds(200));
-    vector<HRCode> codes = detectHRCodes(frame);
-    for (auto it = codes.begin(); it != codes.end(); it++) {
-      HRCode code = *it;
-      cerr << "FOUND: " << code << endl;
+    try {
+      Mat frame;
+      captureVideoImage(frame);
+      vector<HRCode> codes = detectHRCodes(frame);
+      for (auto it = codes.begin(); it != codes.end(); it++) {
+        HRCode code = *it;
+        cerr << "FOUND: " << code << endl;
+      }
+    } catch (cv::Exception & e) {
+      cerr << "An exception occurred trying to detect HR code. Exception " << e.what() << '\n';
+    } catch (int e) {
+      cerr << "An exception occurred trying to detect HR code. Exception Nr. " << e << '\n';
     }
+    this_thread::sleep_for(chrono::milliseconds(200));
   }
 
   string str;
