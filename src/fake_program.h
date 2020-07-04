@@ -26,7 +26,13 @@ class FakeProgram : public Program {
 
     bool getInput(char* buf, int size) {
       string str;
-      cin >> str;
+      if (fake_input.empty()) {
+        cin >> str;
+      } else {
+        str.assign(fake_input);
+        fake_input.clear();
+        cout << "Does it work? str=" << str << endl;
+      }
 
       if (str.length() >= size-1) {
         cerr << "Message is too long. Maximum: " << size << ". Was: " << str.length() << ".\n";
@@ -38,7 +44,14 @@ class FakeProgram : public Program {
       return true;
     }
 
+    void setFakeInput(string& str) {
+      fake_input.assign(str);
+    }
+
     bool inputAvailable() {
+      if (!fake_input.empty()) {
+        return true;
+      }
       // https://stackoverflow.com/questions/6171132/non-blocking-console-input-c
       // we want to receive data from stdin so add these file
       // descriptors to the file descriptor set. These also have to be reset
@@ -68,6 +81,7 @@ class FakeProgram : public Program {
   protected:
     ConsoleWriter m_writer;
     unsigned long currentTime = 0;
+    string fake_input;
 };
 
 
