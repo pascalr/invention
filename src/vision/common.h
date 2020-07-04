@@ -1,5 +1,5 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef COMMON_2_H
+#define COMMON_2_H
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>

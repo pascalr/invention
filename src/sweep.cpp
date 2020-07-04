@@ -4,14 +4,20 @@
 #include <zbar.h>
 
 #include <opencv2/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+#include <string>
+
+#include "programme/common.h"
 
 #include "programme/setup.h"
 
 #include "io_common.h"
 #include <chrono>
 #include <thread>
+
+#include "vision/hr_code.hpp"
 
 using namespace std;
 using namespace cv;
@@ -38,13 +44,23 @@ class MovingDetectedCodes {
 };
 
 void waitForMessageDone() {
+  while (!linuxInputAvailable()) {
+    Mat frame;
+    captureVideoImage(frame);
+    this_thread::sleep_for(chrono::milliseconds(200));
+    vector<HRCode> codes = detectHRCodes(frame);
+    for (auto it = codes.begin(); it != codes.end(); it++) {
+      HRCode code = *it;
+      cerr << "FOUND: " << code << endl;
+    }
+  }
+
   string str;
   cin >> str;
   if (str != MESSAGE_DONE) {
     cerr << "not done yet, waiting for message done" << endl;
     waitForMessageDone();
   } else {
-    cerr << "str: " << str << ". DONE: " << MESSAGE_DONE << endl;
     cerr << "OK received message done\n";
   }
 }

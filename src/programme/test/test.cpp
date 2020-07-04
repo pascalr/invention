@@ -393,12 +393,6 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
 
 }
 
-void signalHandler( int signum ) {
-   cout << "Interrupt signal (" << signum << ") received.\n";
-
-   exit(signum);
-}
-
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);

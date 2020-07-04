@@ -9,6 +9,9 @@
 #include <opencv2/opencv.hpp>
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
+#include <opencv2/core.hpp>
+#include <string>
+
 #include <iostream>
 #include <cmath>
 #include <stdlib.h>
@@ -21,8 +24,12 @@
 #include <boost/log/trivial.hpp>
 // trace debug info warning error fatal
 
-
 #include "common.h"
+
+#include <vector>
+
+using namespace std;
+using namespace cv;
 
 class HRCodeParser {
   public:
@@ -145,7 +152,7 @@ class HRCodeParser {
     
         detectedCodes.push_back(rotatedHRCode);
       }
-      imshow( "Contours", drawing );
+      //imshow( "Contours", drawing );
     }
 
   protected:
@@ -289,7 +296,7 @@ HRCode parseHRCode(Mat& mat) {
     Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
     //rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
     Mat lineMat(mat, lineRect);
-    imshow(string("line")+to_string(i),lineMat);
+    //imshow(string("line")+to_string(i),lineMat);
     rawHRCode[i] = parseLineTesseract(lineMat);
   }
 
@@ -330,9 +337,9 @@ vector<HRCode> detectHRCodes(Mat& src) {
     cvtColor( m, m, COLOR_GRAY2BGR );
     codes[i] = parseHRCode(m);
 
-    string title = string("detectedHRCode") + to_string(i) + ".png";
-    imshow(title,m);
-    imwrite(title,m);
+    //string title = string("detectedHRCode") + to_string(i) + ".png";
+    //imshow(title,m);
+    //imwrite(title,m);
   }
 
   return codes;

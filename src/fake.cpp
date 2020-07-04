@@ -15,8 +15,6 @@
 
 #include "programme/test/console_writer.h"
 
-#include <sys/select.h>
-
 #include "programme/utils.h"
 
 #include "fake_program.h"

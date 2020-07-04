@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <ctype.h>
+#include "axis.h"
 
 #ifndef PI
 #define PI 3.1415926535897932384626433832795
