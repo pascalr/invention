@@ -31,7 +31,6 @@ class FakeProgram : public Program {
       } else {
         str.assign(fake_input);
         fake_input.clear();
-        cout << "Does it work? str=" << str << endl;
       }
 
       if (str.length() >= size-1) {

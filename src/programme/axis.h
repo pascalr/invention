@@ -7,6 +7,7 @@
 #define REVERSE false
 
 #include "writer.h"
+#include "../constants.h"
 
 #ifndef LOW
 #define LOW 0
@@ -410,13 +411,30 @@ class ZAxis : public Axis {
       setMotorDirection(getDestinationAngle() > getPositionAngle());
     }
 
+    bool baseDestinationOutOfBounds() {
+      double tipPositionX = m_horizontal_axis->getDestination();
+      double tipPositionZ = getDestination();
+      
+      double basePositionX = tipPositionX - (RAYON * cos(getDestinationAngle() / 180 * PI));
+
+      return (basePositionX < 0 || basePositionX > AXIS_X_MAX_POS);
+    }
+
+    void flip() {
+      if(m_destination_angle < 90) {
+        m_destination_angle = 180 - m_destination_angle;
+      } else {
+        m_destination_angle = 90 - (m_destination_angle - 90);
+      }
+      updateDirection();
+    }
+
     virtual void afterInput() {
       //std::cout << "getDestination" << std::endl;
       //std::cout << m_horizontal_axis->getDestination() << std::endl;
       // If a flip is required, do one
-      if(m_horizontal_axis->getDestination() < RAYON && m_destination_angle < 90) {
-        m_destination_angle = 180 - m_destination_angle;
-        updateDirection();
+      if (baseDestinationOutOfBounds()) {
+        flip();
       }
     }
 

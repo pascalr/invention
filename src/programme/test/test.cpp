@@ -22,6 +22,8 @@
 using namespace std;
 namespace plt = matplotlibcpp;
 
+FakeProgram p;
+
 /*class PlotWriter : public ConsoleWriter {
   public:
     PlotWriter(Axis** axes) : m_axes(axes) {
@@ -55,12 +57,26 @@ void assertTest(P t1, P t2) {
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
+void title(const char* str) {
+  cout << "\033[36;1m" << str << "\033[0m" << endl;
+}
+
 void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
   unsigned long currentTime = 0;
 
   cout << "Move: " << dest << endl;
 
-  for (int i = 0; axes[i] != NULL; i++) {
+  string str = dest;
+  p.setFakeInput(str);
+
+  p.setCurrentTime(0);
+  myLoop(p);
+  while (p.isWorking) {
+    p.setCurrentTime(p.getCurrentTime() + 5);
+    myLoop(p);
+  }
+
+  /*for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->prepare(currentTime);
   }
 
@@ -105,7 +121,7 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
 
   if (plot) {
     this_thread::sleep_for(chrono::milliseconds(500));
-  }
+  }*/
   
 }
 
@@ -124,7 +140,8 @@ void referenceAll(Axis** axes) {
 
 // Axis by name should be case insensitive
 void testAxisByLetter(Axis** axes) {
-  cout << "Testing axisByName" << endl;
+  title("Testing axisByName");
+
   assertTest("Should be case insensitive", 'X', axisByLetter(axes, 'x')->name);
 
   cout << "Testing axisByName" << endl;
@@ -134,7 +151,7 @@ void testAxisByLetter(Axis** axes) {
 // MX10 should move axis X 10mm
 // MZ269 should move the axis T and the axis X
 void testParseMove(Axis** axes) {
-  cout << "Testing parseMove" << endl;
+  title("Testing parseMove");
 
   int cursor;
 
@@ -156,13 +173,9 @@ void testParseMove(Axis** axes) {
   //assertTest("Z100,X", 20.0, AXIS('X')->getDestination());
 }
 
-void testAtof() {
-  cout << "Testing atof" << endl;
-  assertTest("Should stop parsing at first non number symbol", 20.0, atof("20.0Y10.0"));
-}
-
 void testStop(Axis* axis) {
-  cout << "Testing stop" << endl;
+  title("Testing stop");
+
   axis->referenceReached();
   axis->setPositionSteps(10.0*axis->stepsPerUnit);
   axis->setDestination(20.0);
@@ -174,13 +187,8 @@ void testStop(Axis* axis) {
   assertTest(false, axis->forceRotation);
 }
 
-void testSpeed(Axis* axis) {
-  cout << "Testing speed" << endl;
-  assertNearby("speed", 10.0, axis->getSpeed());
-}
-
 void testParseInput(Writer* writer, Axis** axes) {
-  cout << "Testing parseInput" << endl;
+  title("Testing parseInput");
 
   Axis* axisX = axisByLetter(axes, 'X');
   Axis* axisY = axisByLetter(axes, 'Y');
@@ -203,7 +211,7 @@ void testParseInput(Writer* writer, Axis** axes) {
 }
 
 void testHandleAxis(Writer* writer, Axis** axes) {
-  cout << "Testing handleAxis" << endl;
+  title("Testing handleAxis");
 
   Axis* axis = axisByLetter(axes, 'X');
   axis->referenceReached();
@@ -219,7 +227,7 @@ void debug() {}
 
 
 void testMoveZ(Writer* writer, Axis** axes) {
-  cout << "Test move Z" << endl;
+  title("Testing move Z");
 
   Axis* axisZ = axisByLetter(axes, 'Z');
 
@@ -235,7 +243,7 @@ void testMoveZ(Writer* writer, Axis** axes) {
 }
 
 void testMoveSquare(Writer* writer, Axis** axes) {
-  cout << "Test move square" << endl;
+  title("Testing move square");
 
   HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
   Axis* axisZ = axisByLetter(axes, 'Z');
@@ -284,13 +292,13 @@ void testMoveSquare(Writer* writer, Axis** axes) {
 
   assertNearby("MX380 position X", RAYON, axisX->getPosition());
   assertNearby("MX380 destination X", RAYON, axisX->getDestination());
-  assertNearby("MX380 delta X", -RAYON, axisX->getDeltaPosition());
+  assertNearby("MX380 delta X", RAYON, axisX->getDeltaPosition());
   assertNearby("MX380 position Z", 0.0, axisZ->getPosition());
   assertNearby("MX380 destination Z", 0.0, axisZ->getDestination());
 }
 
 void testMoveXFlipsZ(Writer* writer, Axis** axes) {
-  cout << "Test move X flips Z" << endl;
+  title("Testing move x flips z");
 
   HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
   ZAxis* axisZ = (ZAxis*)axisByLetter(axes, 'Z');
@@ -322,7 +330,7 @@ void testMoveXFlipsZ(Writer* writer, Axis** axes) {
 }
 
 void testMoveZMovesX(Writer* writer, Axis** axes) {
-  cout << "Test move Z moves X" << endl;
+  title("Testing move z moves x");
 
   HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
 
@@ -395,7 +403,6 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  FakeProgram p;
   setupAxes(&p.getWriter(), p.axes);
 
   //plt::figure_size(axisX.getMaxPosition(), axisZ.getMaxPosition());
@@ -404,9 +411,7 @@ int main (int argc, char *argv[]) {
 
   testAxisByLetter(p.axes);
   testParseMove(p.axes);
-  testAtof();
   testStop(axisByLetter(p.axes,'Y'));
-  testSpeed(axisByLetter(p.axes,'Y'));
   testParseInput(&p.getWriter(), p.axes);
   testHandleAxis(&p.getWriter(), p.axes);
   testMoveZ(&p.getWriter(), p.axes);
