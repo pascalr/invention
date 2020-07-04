@@ -2,6 +2,7 @@
 #define CONSOLE_WRITER
 
 #include <iostream>
+#include "../core/writer.h"
 
 using namespace std;
 

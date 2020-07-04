@@ -2,22 +2,19 @@
 #include <cstring>
 #include <math.h>
 
-#include "../axis.h"
-#include "../setup.h"
-#include "../common.h"
-
-#include "matplotlibcpp.h"
+#include "lib/lib.h"
+#include "lib/matplotlibcpp.h"
+#include "core/console_writer.h"
+#include "core/axis.h"
+#include "config/setup.h"
       
 #include <chrono> // for sleep
 #include <thread> // for sleep
 
-#include "console_writer.h"
 
 #include <signal.h>
 
-#include "../../fake_program.h"
-
-// FIXME: MX10.0
+#include "core/fake_program.h"
 
 using namespace std;
 namespace plt = matplotlibcpp;
@@ -403,6 +400,7 @@ int main (int argc, char *argv[]) {
   
   //plt::ion();
 
+  // FIXME: MX10.0
   testAxisByLetter(p.axes);
   testParseMove(p.axes);
   testStop(axisByLetter(p.axes,'Y'));

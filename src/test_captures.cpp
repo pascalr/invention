@@ -7,11 +7,10 @@
 #include <string>
 #include <chrono>
 
-#include "common.h"
+#include "lib/lib.h"
+#include "lib/hr_code.hpp"
 
 #include "dirent.h"
-
-#include "hr_code.hpp"
 
 //#include <filesystem>
 //namespace fs = std::filesystem;

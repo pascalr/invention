@@ -6,8 +6,8 @@
 #define FORWARD true
 #define REVERSE false
 
-#include "writer.h"
-#include "../constants.h"
+#include "../core/writer.h"
+#include "../config/constants.h"
 
 #ifndef LOW
 #define LOW 0
@@ -458,5 +458,15 @@ class VerticalAxis: public Axis {
       
     }
 };
+
+Axis* axisByLetter(Axis** axes, char letter) {
+  for (int i = 0; axes[i] != NULL; i++) {
+    if (toupper(letter) == axes[i]->name) {
+      return axes[i];
+    }
+  }
+
+  return NULL;
+}
 
 #endif

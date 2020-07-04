@@ -9,15 +9,13 @@
 #include <opencv2/highgui.hpp>
 #include <string>
 
-#include "programme/common.h"
+#include "utils/io_common.h"
+#include "lib/lib.h"
+#include "lib/hr_code.hpp"
+#include "config/setup.h"
 
-#include "programme/setup.h"
-
-#include "io_common.h"
 #include <chrono>
 #include <thread>
-
-#include "vision/hr_code.hpp"
 
 using namespace std;
 using namespace cv;

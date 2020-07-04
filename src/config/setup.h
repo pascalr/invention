@@ -1,10 +1,8 @@
 #ifndef SETUP_H
 #define SETUP_H
 
-#include "axis.h"
-#include "common.h"
-
-#include "../constants.h"
+#include "../core/axis.h"
+#include "constants.h"
 
 // TODO: Pass only Axis** axes, then here compare with to name to setup.
 void setupAxes(Writer* writer, Axis** axes) {

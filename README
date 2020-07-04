@@ -1,3 +1,14 @@
+DIRECTORIES:
+
+src/: Directly in src are executable source files
+src/utils: Code with no dependencies
+src/lib:   Code with dependencies (e.g. Dependency on std so arduino cannot use it)
+src/core:  Code and models that are specific to my application
+src/arduino: Arduino files
+src/fake/:   Fake arduino files
+src/test/:   Test files
+src/config/: Config files
+
 ----
 
 Charge maximale: 2 kg (un grand pot rempli d'eau)

@@ -24,7 +24,7 @@
 #include <boost/log/trivial.hpp>
 // trace debug info warning error fatal
 
-#include "common.h"
+#include "../lib/lib.h"
 
 #include <vector>
 

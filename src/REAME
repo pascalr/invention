@@ -1,5 +1,0 @@
-utils: No dependant on anything
-lib: Dependant on c++ and std (so arduino cannot use it)
-arduino: Arduino files
-fake: Fake arduino files
-test: test files

@@ -1,8 +1,11 @@
 #ifndef FAKE_PROGRAM_H
 #define FAKE_PROGRAM_H
 
-#include "programme/utils.h"
-#include "io_common.h"
+#include "../utils/utils.h"
+#include "../utils/io_common.h"
+#include "../core/program.h"
+#include <thread>
+#include <chrono>
 
 using namespace std;
 

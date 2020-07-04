@@ -1,30 +1,8 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef PROGRAM_H
+#define PROGRAM_H
 
 #include <ctype.h>
 #include "axis.h"
-
-#ifndef PI
-#define PI 3.1415926535897932384626433832795
-#endif
-
-#define MESSAGE_RECEIVED "ok"
-#define MESSAGE_DONE "done"
-#define MESSAGE_INVALID_INPUT "invalid_input"
-// invalid_pending means that it should only process one command at once
-// it is still listening if told to stop or query position
-// anything else is an invalid_pending.
-#define MESSAGE_INVALID_PENDING "invalid_pending"
-
-Axis* axisByLetter(Axis** axes, char letter) {
-  for (int i = 0; axes[i] != NULL; i++) {
-    if (toupper(letter) == axes[i]->name) {
-      return axes[i];
-    }
-  }
-
-  return NULL;
-}
 
 class Program {
   public:

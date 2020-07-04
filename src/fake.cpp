@@ -3,21 +3,17 @@
 #include <math.h>
 #include <string>
 
-#include "programme/axis.h"
-#include "programme/setup.h"
-#include "programme/common.h"
-#include "io_common.h"
-
-#include "programme/test/matplotlibcpp.h" // FIXME
+#include "utils/io_common.h"
+#include "utils/utils.h"
+#include "lib/matplotlibcpp.h"
+#include "lib/lib.h"
+#include "core/axis.h"
+#include "core/console_writer.h"
+#include "core/fake_program.h"
+#include "config/setup.h"
       
 #include <chrono>
 #include <thread>
-
-#include "programme/test/console_writer.h"
-
-#include "programme/utils.h"
-
-#include "fake_program.h"
 
 using namespace std;
 namespace plt = matplotlibcpp;

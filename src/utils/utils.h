@@ -1,6 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+bool startsWith(const char *pre, const char *str) {
+  return strncmp(pre, str, strlen(pre)) == 0;
+}
+
 static inline void rtrim(char* str) {
   int len = strlen(str);
 

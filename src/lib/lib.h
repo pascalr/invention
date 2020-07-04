@@ -1,5 +1,5 @@
-#ifndef COMMON_2_H
-#define COMMON_2_H
+#ifndef LIB_H 
+#define LIB_H
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
@@ -14,19 +14,10 @@
 
 #include <boost/log/trivial.hpp>
 
+#include "../utils/utils.h"
+
 using namespace cv;
 using namespace std;
-
-bool startsWith(const char *pre, const char *str)
-{
-  return strncmp(pre, str, strlen(pre)) == 0;
-}
-
-bool file_exists(const char *fileName)
-{
-  std::ifstream infile(fileName);
-  return infile.good();
-}
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {

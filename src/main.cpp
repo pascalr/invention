@@ -6,9 +6,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "common.h"
-
-#include "hr_code.hpp"
+#include "lib/lib.h"
+#include "lib/hr_code.hpp"
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
