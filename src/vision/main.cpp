@@ -10,6 +10,17 @@
 
 #include "hr_code.hpp"
 
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+
+namespace logging = boost::log;
+
 using namespace cv;
 using namespace std;
 
@@ -240,10 +251,18 @@ namespace ContourDetector {
 }
 
 int main(int argc, char** argv ) {
+
+  logging::add_file_log("log/main.log");
+
+  logging::core::get()->set_filter(
+    logging::trivial::severity >= logging::trivial::trace
+  );
+
+  logging::add_common_attributes();
+
   Mat mat;
   if (argc == 2) {
     mat = imread( argv[1] );
-    cout << "Input image is " << mat.size() << endl;
   } else {
     mat = Mat(200, 200, CV_8UC3, Scalar(255,255,255));
     circle(mat, Point(100,100), 40, Scalar(0,0,0), 2, LINE_8);

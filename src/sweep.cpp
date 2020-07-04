@@ -52,7 +52,7 @@ void waitForMessageDone() {
 void move(const char* txt, double pos) {
   cout << txt << pos << endl;
   waitForMessageDone();
-  this_thread::sleep_for(chrono::milliseconds(1000));
+  this_thread::sleep_for(chrono::milliseconds(50));
 }
 
 // x and z position is the position of the camera.
