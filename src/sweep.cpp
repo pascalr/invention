@@ -41,72 +41,96 @@ class MovingDetectedCodes {
     double lastKnownPosition;
 };
 
-void waitForMessageDone() {
-  while (!linuxInputAvailable()) {
-    try {
-      Mat frame;
-      captureVideoImage(frame);
-      vector<HRCode> codes = detectHRCodes(frame);
-      for (auto it = codes.begin(); it != codes.end(); it++) {
-        HRCode code = *it;
-        cerr << "FOUND: " << code << endl;
+class Sweep {
+  public:
+
+    bool init() {
+      if (!initVideo(cap)) {
+        cerr << "ERROR! Unable to open camera\n";
+        return false;
       }
-    } catch (cv::Exception & e) {
-      cerr << "An exception occurred trying to detect HR code. Exception " << e.what() << '\n';
-    } catch (int e) {
-      cerr << "An exception occurred trying to detect HR code. Exception Nr. " << e << '\n';
+      return true;
     }
-    this_thread::sleep_for(chrono::milliseconds(200));
-  }
 
-  string str;
-  cin >> str;
-  if (str != MESSAGE_DONE) {
-    cerr << "not done yet, waiting for message done" << endl;
-    waitForMessageDone();
-  } else {
-    cerr << "OK received message done\n";
-  }
-}
+    void waitForMessageDone() {
+      while (!linuxInputAvailable()) {
+        Mat frame;
+        cap.read(frame);
+        if (frame.empty()) {
+          cerr << "ERROR! blank frame grabbed\n";
+          this_thread::sleep_for(chrono::milliseconds(1));
+          continue;
+        }
 
-void move(const char* txt, double pos) {
-  cout << txt << pos << endl;
-  waitForMessageDone();
-  this_thread::sleep_for(chrono::milliseconds(50));
-}
+        vector<HRCode> codes = detectHRCodes(frame);
+        for (auto it = codes.begin(); it != codes.end(); it++) {
+          HRCode code = *it;
+          cerr << "FOUND: " << code << endl;
+        }
+        this_thread::sleep_for(chrono::milliseconds(50));
+      }
+    
+      string str;
+      cin >> str;
+      if (str != MESSAGE_DONE) {
+        cerr << "not done yet, waiting for message done" << endl;
+        waitForMessageDone();
+      } else {
+        cerr << "OK received message done\n";
+      }
+    }
+    
+    void move(const char* txt, double pos) {
+      cout << txt << pos << endl;
+      waitForMessageDone();
+      this_thread::sleep_for(chrono::milliseconds(50));
+    }
+
+    void run() {
+      double heights[] = {0.0};
+      //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
+      double zStep = MAX_Z / 1;
+      double xStep = MAX_X / 4;
+
+      bool xUp = false; // Wheter the x axis goes from 0 to MAX or from MAX to 0
+
+      double x = MAX_X;
+      double z = 0;
+
+      for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
+        move("MZ",0);
+        bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
+
+        move("MY",heights[i]);
+        for (x = xUp ? 0 : MAX_X; xUp ? x <= MAX_X : x >= 0; x += xStep * (xUp ? 1 : -1)) {
+          move("MX",x);
+          for (z = zUp ? 0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0; z += zStep * (zUp ? 1 : -1)) {
+            move("MZ",z);
+            // Detect new ones and move to them to get exact position.
+            // findBarCodes();
+            
+          }
+          zUp = !zUp;
+        }
+        xUp = !xUp;
+      }
+    }
+
+  private:
+    VideoCapture cap;
+};
 
 // x and z position is the position of the camera.
 int main(int argc, char *argv[])
 {
   signal(SIGINT, signalHandler);
 
-  double heights[] = {0.0};
-  //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
-  double zStep = MAX_Z / 1;
-  double xStep = MAX_X / 4;
-
-  bool xUp = false; // Wheter the x axis goes from 0 to MAX or from MAX to 0
-
-  double x = MAX_X;
-  double z = 0;
-
-  for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
-    move("MZ",0);
-    bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
-
-    move("MY",heights[i]);
-    for (x = xUp ? 0 : MAX_X; xUp ? x <= MAX_X : x >= 0; x += xStep * (xUp ? 1 : -1)) {
-      move("MX",x);
-      for (z = zUp ? 0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0; z += zStep * (zUp ? 1 : -1)) {
-        move("MZ",z);
-        // Detect new ones and move to them to get exact position.
-        // findBarCodes();
-        
-      }
-      zUp = !zUp;
-    }
-    xUp = !xUp;
+  Sweep sweep;
+  if(!sweep.init()) {
+    cerr << "Error initializing sweep.\n";
+    return -1;
   }
+  sweep.run();
 
   return 0;
 }

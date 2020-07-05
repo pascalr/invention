@@ -15,9 +15,21 @@
 #include <boost/log/trivial.hpp>
 
 #include "../utils/utils.h"
+#include "../utils/io_common.h"
 
 using namespace cv;
 using namespace std;
+
+bool initVideo(VideoCapture& cap) {
+  // cap.open(0) open the default camera using default API
+  int deviceID = 0;             // 0 = open default camera
+  int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+  cap.open(deviceID + apiID);
+  if (!cap.isOpened()) {
+    return false;
+  }
+  return true;
+}
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
