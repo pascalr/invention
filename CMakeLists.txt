@@ -62,6 +62,9 @@ target_link_libraries( sweep ${MyLibs} )
 add_executable( video_capture src/video_capture.cpp )
 target_link_libraries( video_capture ${MyLibs} )
 
+add_executable( usbreset src/usbreset.c )
+target_link_libraries( usbreset ${MyLibs} )
+
 add_executable( run_tests src/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs} )
