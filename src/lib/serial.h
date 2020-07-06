@@ -23,11 +23,27 @@ class SerialPort {
   public:
 
     ~SerialPort() {
-      close(m_serial_port);
+      closePort();
+    }
+
+    void closePort() {
+      if (m_is_opened) {
+        close(m_serial_port);
+        m_is_opened = false;
+      }
+    }
+
+    bool isOpen() {
+      return m_is_opened;
     }
 
     // Device: "/dev/ttyACM0"
+    // opens or repoens the given device
     int openPort(const char* device) {
+      // If already open, close first
+      if (m_is_opened) {
+        closePort();
+      }
       // Open the serial port. Change device path as needed (currently set to an standard FTDI USB-UART cable type device)
       m_serial_port = open(device, O_RDWR);
       
@@ -72,6 +88,9 @@ class SerialPort {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
         return -1;
       }
+
+      m_is_opened = true;
+
       return m_serial_port;
     }
 
@@ -131,5 +150,6 @@ class SerialPort {
     char m_separator = '\n';
     string input;
     bool separatorFound = false;
+    bool m_is_opened = false;
 };
 

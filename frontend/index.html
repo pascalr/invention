@@ -121,6 +121,30 @@ function menuItemClicked(item) {
 <!-- SECTION *Polling -->
 <script>
 (function poll() {
+  $.get( "/poll", function( data ) {
+    let log = document.getElementById("log")
+    log.value += data.log;
+    log.scrollTop = log.scrollHeight;
+
+    const info = data.info
+    if (info) {
+      window.info = info
+      Object.keys(info).forEach((key) => {
+        const input = document.getElementById(key)
+        if (input) {
+          if (input.type == "checkbox") {
+            input.checked = info[key] === "1"
+          } else {
+            input.value = info[key]
+          }
+        }
+      })
+    }
+
+    poll(); // FIXME: Possible deep stack error can I do a forever loop or it will jam? It's single threaded I think.
+  });
+})()
+/*(function poll() {
   setInterval(function() {
     $.get( "/poll/arduino", function( data ) {
       let log = document.getElementById("log")
@@ -143,7 +167,7 @@ function menuItemClicked(item) {
       }
     });
   }, 1000);
-})();
+})();*/
 </script>
 <!-- SECTION *Manuel -->
 <div id="Manuel">

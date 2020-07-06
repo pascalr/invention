@@ -36,3 +36,7 @@ sudo apt-get install libboost-all-dev
 
 # matplotlib
 sudo apt-get install python-matplotlib python-numpy python2.7-dev
+
+# Simple Web Server (c++)
+git clone https://gitlab.com/eidheim/Simple-Web-Server.git
+sudo apt-get install libssl-dev libboost-filesystem-dev libboost-thread-dev
