@@ -40,6 +40,18 @@ app.get('/run/arduino',function (req, res) {
   arduino_or_fake.write(req.query.cmd+"\n")
   res.end()
 })*/
+  server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    if (!p.isOpen()) {
+      return;
+    }
+    
+    auto query_fields = request->parse_query_string();
+    for(auto &field : query_fields) {
+      if (field.first == "cmd") {
+        p.writePort(field.second);
+      }
+    }
+  };
 
 
   server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
@@ -73,27 +85,8 @@ app.get('/run/arduino',function (req, res) {
     }
   };
 
-  // Add resources using path-regex and method-string, and an anonymous function
-  // POST-example for the path /string, responds the posted string
-  server.resource["^/string$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    // Retrieve string:
-    auto content = request->content.string();
-
-    *response << "HTTP/1.1 200 OK\r\nContent-Length: " << content.length() << "\r\n\r\n"
-              << content;
-
-    // Alternatively, use one of the convenience functions, for instance:
-    // response->write(content);
-  };
-
   // POST-example for the path /json, responds firstName+" "+lastName from the posted json
   // Responds with an appropriate error message if the posted json is not valid, or if firstName or lastName is missing
-  // Example posted json:
-  // {
-  //   "firstName": "John",
-  //   "lastName": "Smith",
-  //   "age": 25
-  // }
   server.resource["^/json$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     try {
       ptree pt;
@@ -109,19 +102,6 @@ app.get('/run/arduino',function (req, res) {
       *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << strlen(e.what()) << "\r\n\r\n"
                 << e.what();
     }
-
-
-    // Alternatively, using a convenience function:
-    // try {
-    //     ptree pt;
-    //     read_json(request->content, pt);
-
-    //     auto name=pt.get<string>("firstName")+" "+pt.get<string>("lastName");
-    //     response->write(name);
-    // }
-    // catch(const exception &e) {
-    //     response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
-    // }
   };
 
   // GET-example for the path /info
@@ -253,37 +233,6 @@ app.get('/run/arduino',function (req, res) {
     });
   });
   cout << "Server listening on port " << server_port.get_future().get() << endl << endl;
-
-  // Client examples
-  string json_string = "{\"firstName\": \"John\",\"lastName\": \"Smith\",\"age\": 25}";
-
-  // Synchronous request examples
-  {
-    HttpClient client("localhost:8080");
-    try {
-      cout << "Example GET request to http://localhost:8080/match/123" << endl;
-      auto r1 = client.request("GET", "/match/123");
-      cout << "Response content: " << r1->content.rdbuf() << endl << endl; // Alternatively, use the convenience function r1->content.string()
-
-      cout << "Example POST request to http://localhost:8080/string" << endl;
-      auto r2 = client.request("POST", "/string", json_string);
-      cout << "Response content: " << r2->content.rdbuf() << endl << endl;
-    }
-    catch(const SimpleWeb::system_error &e) {
-      cerr << "Client request error: " << e.what() << endl;
-    }
-  }
-
-  // Asynchronous request example
-  {
-    HttpClient client("localhost:8080");
-    cout << "Example POST request to http://localhost:8080/json" << endl;
-    client.request("POST", "/json", json_string, [](shared_ptr<HttpClient::Response> response, const SimpleWeb::error_code &ec) {
-      if(!ec)
-        cout << "Response content: " << response->content.rdbuf() << endl;
-    });
-    client.io_service->run();
-  }
 
   server_thread.join();
 }
