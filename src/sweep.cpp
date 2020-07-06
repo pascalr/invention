@@ -12,6 +12,7 @@
 #include "utils/io_common.h"
 #include "lib/lib.h"
 #include "lib/hr_code.hpp"
+#include "lib/serial.h"
 #include "config/setup.h"
 
 #include <chrono>
@@ -45,17 +46,22 @@ class Sweep {
   public:
 
     bool init() {
-      if (!initVideo(cap)) {
-        cerr << "ERROR! Unable to open camera\n";
+      if (!initVideo(m_cap)) {
+        cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
+      //m_serial_port = openSerialPort("/dev/ttyACM0");
+      //if (m_serial_port < 0) {
+      //  cerr << "Error opening arduino port. Aborting sweep.\n";
+      //  return false;
+      //}
       return true;
     }
 
     void waitForMessageDone() {
       while (!linuxInputAvailable()) {
         Mat frame;
-        cap.read(frame);
+        m_cap.read(frame);
         if (frame.empty()) {
           cerr << "ERROR! blank frame grabbed\n";
           this_thread::sleep_for(chrono::milliseconds(1));
@@ -69,7 +75,13 @@ class Sweep {
         }
         this_thread::sleep_for(chrono::milliseconds(50));
       }
-    
+   
+      //char msg[256]; 
+      //memset(&msg, '\0', sizeof(msg));
+      //int num_bytes = readSerialPort(m_serial_port, &msg, sizeof(msg));
+      //if (num_bytes < 0) {
+      //  cerr << "" << str << endl;
+      //}
       string str;
       cin >> str;
       trim(str);
@@ -82,7 +94,10 @@ class Sweep {
     }
     
     void move(const char* txt, double pos) {
-      cout << txt << pos << endl;
+      //stringstream sstr;
+      //sstr << txt << pos;
+      //string str = to_string(txt) + to_string(pos);
+      //writeSerialPort(m_serial_port, str.c_str());
       waitForMessageDone();
       this_thread::sleep_for(chrono::milliseconds(50));
     }
@@ -118,7 +133,8 @@ class Sweep {
     }
 
   private:
-    VideoCapture cap;
+    VideoCapture m_cap;
+    int m_serial_port;
 };
 
 // x and z position is the position of the camera.

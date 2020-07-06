@@ -11,6 +11,14 @@ src/config/: Config files
 
 ----
 
+DESIGN:
+
+Je veux pouvoir rajouter des extensions sur les côtés. Alors au lieu de faire des cables fixes sur des roulettes,
+faire un genre d'assenseur, et quand la machine est en haut ou en bas, la machine peut se déplacer gauche droite
+et sortir de son extension pour aller dans un autre.
+
+----
+
 Charge maximale: 2 kg (un grand pot rempli d'eau)
 
 Vitesse: 1 ft/sec == 30 cm/s

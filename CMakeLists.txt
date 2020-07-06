@@ -53,6 +53,9 @@ target_link_libraries( capture ${MyLibs} )
 add_executable( main src/main.cpp )
 target_link_libraries( main ${MyLibs} )
 
+add_executable( serial_communicate src/serial_communicate.cpp )
+target_link_libraries( serial_communicate ${MyLibs} )
+
 add_executable( test_captures src/test_captures.cpp )
 target_link_libraries( test_captures ${MyLibs} )
 
