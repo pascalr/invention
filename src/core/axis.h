@@ -207,6 +207,7 @@ class Axis {
     // Only the vertical axis moves in order to do a reference
     virtual bool moveToReference() {
       referenceReached();
+      return true;
     }
 
     virtual void afterInput() {

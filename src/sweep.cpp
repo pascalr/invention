@@ -54,6 +54,20 @@ class Sweep {
         cerr << "Error opening arduino port. Aborting sweep.\n";
         return false;
       }
+      cout << "Waiting for arduino ready message.." << endl;
+      while (true) {
+	if (m_port.inputAvailable()) {
+	  string str;
+	  m_port.getInput(str);
+	  trim(str);
+          cout << "Reading: " << str << endl;
+	  if (str == MESSAGE_READY) {
+  	    break;
+	  }
+	}
+        this_thread::sleep_for(chrono::milliseconds(50));
+      }
+      cout << "Ok arduino ready!" << endl;
       return true;
     }
 
@@ -78,6 +92,7 @@ class Sweep {
       string str;
       m_port.getInput(str);
       trim(str);
+      cout << "Reading: " << str << endl;
       if (str != MESSAGE_DONE) {
         cerr << "Not done yet. Received message " << str << endl;
         waitForMessageDone();
@@ -88,8 +103,9 @@ class Sweep {
     
     void move(const char* txt, double pos) {
       string str = txt;
-      str += to_string(pos);
+      str += to_string((int)pos);
       m_port.writePort(str);
+      cout << "Writing: " << str << endl;
       waitForMessageDone();
     }
 

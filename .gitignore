@@ -8,4 +8,7 @@ cmake_install.cmake
 bin
 output
 node_modules
+src/arduino/core
+src/arduino/config
+src/arduino/utils
 *.FCStd1

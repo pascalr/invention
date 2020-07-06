@@ -1,13 +1,7 @@
+#include "utils.h"
 #include "axis.h"
 #include "setup.h"
-#include "common.h"
-#include "utils.h"
-
-// CONSTANTS
-#define SLOW_SPEED_DELAY 2000
-#define FAST_SPEED_DELAY 100
-
-using namespace std;
+#include "program.h"
 
 class ArduinoWriter : public Writer {
   public:
@@ -90,11 +84,8 @@ void setup() {
 
   setupAxes(&p.getWriter(), p.axes);
   
-  Serial.println("Done");
+  Serial.println(MESSAGE_READY);
 }
-
-#define MESSAGE_RECEIVED "ok"
-#define MESSAGE_DONE "done"
 
 void loop() {
   
