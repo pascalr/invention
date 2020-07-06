@@ -109,7 +109,7 @@ function pipe(source, dest) {
 app.get('/sweep',function (req, res) {
 
   log('Spawning sweep')
-  sweep = spawn('../bin/sweep')
+  sweep = spawn('../bin/sweep', {stdio: 'inherit'})
 
   //pipe(arduino_or_fake, sweep.stdin)
   //pipe(sweep.stdout, arduino_or_fake)

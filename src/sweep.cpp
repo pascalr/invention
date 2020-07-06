@@ -18,6 +18,8 @@
 #include <chrono>
 #include <thread>
 
+#include "helper/helper.h"
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
@@ -54,7 +56,8 @@ class Sweep {
         cerr << "Error opening arduino port. Aborting sweep.\n";
         return false;
       }
-      cout << "Waiting for arduino ready message.." << endl;
+      cout << "Ok arduino connected!" << endl;
+      /*cout << "Waiting for arduino ready message.." << endl;
       while (true) {
 	if (m_port.inputAvailable()) {
 	  string str;
@@ -67,7 +70,13 @@ class Sweep {
 	}
         this_thread::sleep_for(chrono::milliseconds(50));
       }
-      cout << "Ok arduino ready!" << endl;
+      cout << "Ok arduino ready!" << endl;*/
+     
+      // TODO: Ask arduino to make sure that the required axis are referenced... 
+      //m_port.writePort("H");
+      //waitForMessageDone();
+      //cout << "Ok arduino ready and referenced!" << endl;
+      
       return true;
     }
 
@@ -94,11 +103,11 @@ class Sweep {
       trim(str);
       cout << "Reading: " << str << endl;
       if (str != MESSAGE_DONE) {
-        cerr << "Not done yet. Received message " << str << endl;
+        //cerr << "Not done yet. Received message " << str << endl;
         waitForMessageDone();
-      } else {
-        cerr << "OK received message done\n";
-      }
+      }// else {
+      //  cerr << "OK received message done\n";
+      //}
     }
     
     void move(const char* txt, double pos) {
@@ -147,7 +156,8 @@ class Sweep {
 // x and z position is the position of the camera.
 int main(int argc, char *argv[])
 {
-  signal(SIGINT, signalHandler);
+  setupInterrupt();
+  setupLogging();
 
   Sweep sweep;
   if(!sweep.init()) {

@@ -9,16 +9,7 @@
 #include "lib/lib.h"
 #include "lib/hr_code.hpp"
 
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/sinks/text_file_backend.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-
-namespace logging = boost::log;
+#include "helper/helper.h"
 
 using namespace cv;
 using namespace std;
@@ -251,13 +242,7 @@ namespace ContourDetector {
 
 int main(int argc, char** argv ) {
 
-  logging::add_file_log("log/main.log");
-
-  logging::core::get()->set_filter(
-    logging::trivial::severity >= logging::trivial::trace
-  );
-
-  logging::add_common_attributes();
+  setupLogging();
 
   Mat mat;
   if (argc == 2) {
