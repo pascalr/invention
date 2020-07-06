@@ -27,7 +27,7 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 int main() {
   HttpServer server;
-  server.config.port = 8080;
+  server.config.port = 8083;
   
   SerialPort p;
 
