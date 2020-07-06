@@ -111,8 +111,8 @@ app.get('/sweep',function (req, res) {
   log('Spawning sweep')
   sweep = spawn('../bin/sweep')
 
-  pipe(arduino_or_fake, sweep.stdin)
-  pipe(sweep.stdout, arduino_or_fake)
+  //pipe(arduino_or_fake, sweep.stdin)
+  //pipe(sweep.stdout, arduino_or_fake)
 
   //sweep.stdin.on('error', function( err ) {
   //  if (err.code == "EPIPE") {
@@ -120,19 +120,19 @@ app.get('/sweep',function (req, res) {
   //  }
   //});
 
-  sweep.stderr.on('data', (data) => {
-    log("Sweep err " + data);
-  });
+  //sweep.stderr.on('data', (data) => {
+  //  log("Sweep err " + data);
+  //});
   
-  sweep.on('close', (code) => {
-    log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
-    arduino_or_fake.on('data', defaultParserDataVal)
-    res.end()
-  });
+  //sweep.on('close', (code) => {
+  //  log("sweep closed. FIXME: PUT BACK WHAT IT USED TO BE IN ON CODE");
+  //  arduino_or_fake.on('data', defaultParserDataVal)
+  //  res.end()
+  //});
 
-  sweep.on('error', (err) => {
-    console.error('Failed to start sweep.');
-  });
+  //sweep.on('error', (err) => {
+  //  console.error('Failed to start sweep.');
+  //});
 
 })
 

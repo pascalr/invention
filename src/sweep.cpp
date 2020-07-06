@@ -50,16 +50,15 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
-      //m_serial_port = openSerialPort("/dev/ttyACM0");
-      //if (m_serial_port < 0) {
-      //  cerr << "Error opening arduino port. Aborting sweep.\n";
-      //  return false;
-      //}
+      if (m_port.openPort("/dev/ttyACM0") < 0) {
+        cerr << "Error opening arduino port. Aborting sweep.\n";
+        return false;
+      }
       return true;
     }
 
     void waitForMessageDone() {
-      while (!linuxInputAvailable()) {
+      while (!m_port.inputAvailable()) {
         Mat frame;
         m_cap.read(frame);
         if (frame.empty()) {
@@ -76,14 +75,8 @@ class Sweep {
         this_thread::sleep_for(chrono::milliseconds(50));
       }
    
-      //char msg[256]; 
-      //memset(&msg, '\0', sizeof(msg));
-      //int num_bytes = readSerialPort(m_serial_port, &msg, sizeof(msg));
-      //if (num_bytes < 0) {
-      //  cerr << "" << str << endl;
-      //}
       string str;
-      cin >> str;
+      m_port.getInput(str);
       trim(str);
       if (str != MESSAGE_DONE) {
         cerr << "Not done yet. Received message " << str << endl;
@@ -94,12 +87,10 @@ class Sweep {
     }
     
     void move(const char* txt, double pos) {
-      //stringstream sstr;
-      //sstr << txt << pos;
-      //string str = to_string(txt) + to_string(pos);
-      //writeSerialPort(m_serial_port, str.c_str());
+      string str = txt;
+      str += to_string(pos);
+      m_port.writePort(str);
       waitForMessageDone();
-      this_thread::sleep_for(chrono::milliseconds(50));
     }
 
     void run() {
@@ -134,7 +125,7 @@ class Sweep {
 
   private:
     VideoCapture m_cap;
-    int m_serial_port;
+    SerialPort m_port;
 };
 
 // x and z position is the position of the camera.
