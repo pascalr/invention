@@ -72,8 +72,9 @@ class Sweep {
     
       string str;
       cin >> str;
+      trim(str);
       if (str != MESSAGE_DONE) {
-        cerr << "not done yet, waiting for message done" << endl;
+        cerr << "Not done yet. Received message " << str << endl;
         waitForMessageDone();
       } else {
         cerr << "OK received message done\n";

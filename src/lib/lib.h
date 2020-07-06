@@ -23,7 +23,9 @@ using namespace std;
 bool initVideo(VideoCapture& cap) {
   // cap.open(0) open the default camera using default API
   int deviceID = 0;             // 0 = open default camera
-  int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+  //int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+  int apiID = cv::CAP_V4L2;      // 0 = autodetect default API
+  
   cap.open(deviceID + apiID);
   if (!cap.isOpened()) {
     return false;
@@ -55,7 +57,7 @@ int captureVideoImage(Mat& frame) {
   VideoCapture cap;
   
   int deviceID = 0;             // 0 = open default camera
-  int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+  int apiID = cv::CAP_V4L2;
   
   cap.open(deviceID + apiID);
 
