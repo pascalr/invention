@@ -78,8 +78,11 @@ class SerialPort {
     void getInput(string& str) {
       if (separatorFound) {
         size_t i = input.find(m_separator);
-        str.assign(input, i);
-        input.erase(0, i+1); // remove the separator
+        str.assign(input, 0, i+1);
+        input.erase(0, i+1);
+        if (input.find(m_separator) == string::npos) {
+          separatorFound = false;
+        }
       } else {
         cerr << "Error trying to getInput, but none was available." << endl;
       }
@@ -99,6 +102,7 @@ class SerialPort {
           }
         }
       }
+      return separatorFound;
     }
     
     void writePort(string str) {

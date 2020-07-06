@@ -3,6 +3,7 @@
 #include <string>
 
 #include "utils/io_common.h"
+#include "lib/lib.h"
 
 #include <chrono>
 #include <thread>
@@ -14,7 +15,7 @@ int main(int argc, char** argv) {
   signal(SIGINT, signalHandler);
 
   SerialPort p;
-  if (p.openPort("/dev/ACM0") < 0) {
+  if (p.openPort("/dev/ttyACM0") < 0) {
     cout << "Error opening arduino port. Aborting." << endl;
     return -1;
   }

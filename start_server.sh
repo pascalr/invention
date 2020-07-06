@@ -1,4 +1,5 @@
 #!/bin/bash
-#(cd frontend && node index.js "$@")
+cmake .
 make
 (cd frontend && node index.js lan)
+#(cd frontend && node index.js "$@")
