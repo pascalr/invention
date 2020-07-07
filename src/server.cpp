@@ -17,6 +17,10 @@
 #endif
 
 #include "lib/serial.h"
+#include "lib/linux.h"
+#include "core/fake_serial.h"
+
+#include <unistd.h> // To parse arguments
 
 using namespace std;
 // Added for the json-example:
@@ -25,11 +29,54 @@ using namespace boost::property_tree;
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
-int main() {
+//app.use(bodyParser.urlencoded({ extended: true }))
+  //res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  //res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+//function nocache(req, res, next) {
+//  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+//  res.header('Expires', '-1');
+//  res.header('Pragma', 'no-cache');
+//  next();
+//}
+
+int main(int argc, char** argv) {
+
+  string serverAddress;
+  int serverPort = 0;
+  int flags;
+  int nsecs, tfnd;
+
+  nsecs = 0;
+  tfnd = 0;
+  flags = 0;
+  while ((int opt = getopt(argc, argv, "p:a:")) != -1) {
+    switch (opt) {
+    case 'p':
+      serverPort = atoi(optarg);
+      break;
+    case 'a':
+      serverAddress = optarg;
+      break;
+    default: /* '?' */
+      fprintf(stderr, "Usage: %s [-p port] [-a address]\n", argv[0]);
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  // optind: The index that has been read up to there
+
+  if (serverAddress.empty()) {
+    serverAdress = "localhost";
+  } else if (serverAddress == "lan") {
+  }
+
   HttpServer server;
-  server.config.port = 8083;
+  server.config.address = serverAddress;
+  server.config.port = serverPort || 8083;
   
   SerialPort p;
+  FakeSerialPort fake;
 
 /*  server.resource["^/run/arduino([0-9]+)$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     response->write(request->path_match[1].str());
@@ -53,6 +100,12 @@ app.get('/run/arduino',function (req, res) {
     }
   };
 
+  server.resource["^/sweep$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    if (!p.isOpen()) {
+      return;
+    }
+    // TODO
+  };
 
   server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     // FIXME: Also handle fake arduino too
@@ -62,8 +115,12 @@ app.get('/run/arduino',function (req, res) {
       return;
     }
   };
+
+  server.resource["^/close$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    // FIXME: Also handle fake arduino too
+    p.closePort();
+  };
  
-  // poll is very bad, instead query once with huge timeout, and the server responds when it gets someting to respond.
   server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (p.isOpen()) {
       thread work_thread([&p,response] {
@@ -224,7 +281,7 @@ app.get('/run/arduino',function (req, res) {
     // Note that connection timeouts will also call this handle with ec set to SimpleWeb::errc::operation_canceled
   };
 
-  // Start server and receive assigned port when server is listening for requests
+    // Start server and receive assigned port when server is listening for requests
   promise<unsigned short> server_port;
   thread server_thread([&server, &server_port]() {
     // Start server
