@@ -100,7 +100,11 @@ app.get('/run/arduino',function (req, res) {
     auto query_fields = request->parse_query_string();
     for(auto &field : query_fields) {
       if (field.first == "cmd") {
-        p.writePort(field.second);
+        if (field.second == "info") { // FIXME: Temporary fix until ?cmd=? works
+          p.writePort("?");
+        } else {
+          p.writePort(field.second);
+        }
       }
     }
     response->write("Ok command given to arduino");
@@ -150,38 +154,47 @@ app.get('/run/arduino',function (req, res) {
         pt.put("log", s);
         json_parser::write_json(ss, pt);
 
-	string str = ss.str();
-	SimpleWeb::CaseInsensitiveMultimap header;
-	header.emplace("Content-Length", to_string(str.length()));
-	header.emplace("Content-Type", "application/json");
+	      string str = ss.str();
+	      SimpleWeb::CaseInsensitiveMultimap header;
+	      header.emplace("Content-Length", to_string(str.length()));
+	      header.emplace("Content-Type", "application/json");
         response->write(SimpleWeb::StatusCode::success_ok, str, header);
       });
       work_thread.detach();
     }
   };
 
-  // POST-example for the path /json, responds firstName+" "+lastName from the posted json
-  // Responds with an appropriate error message if the posted json is not valid, or if firstName or lastName is missing
-  server.resource["^/json$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    try {
-      ptree pt;
-      read_json(request->content, pt);
+  //server.resource["^/info$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-      auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");
+    //if (!p.isOpen()) {
+    //  response->write("Error arduino is not connected.");
+    //  return;
+    //}
+    //p.writePort(field.second);
 
-      *response << "HTTP/1.1 200 OK\r\n"
-                << "Content-Length: " << name.length() << "\r\n\r\n"
-                << name;
+    /*if (p.isOpen()) {
+      thread work_thread([&p,response] {
+        while (!p.inputAvailable()) {
+          this_thread::sleep_for(chrono::milliseconds(10));
+        }
+        string s;
+        p.getInput(s);
+        cout << "Arduino: " << s;
+
+        ptree pt;
+        stringstream ss;
+        pt.put("log", s);
+        json_parser::write_json(ss, pt);
+
+	      string str = ss.str();
+	      SimpleWeb::CaseInsensitiveMultimap header;
+	      header.emplace("Content-Length", to_string(str.length()));
+	      header.emplace("Content-Type", "application/json");
+        response->write(SimpleWeb::StatusCode::success_ok, str, header);
+      });
+      work_thread.detach();
     }
-    catch(const exception &e) {
-      *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << strlen(e.what()) << "\r\n\r\n"
-                << e.what();
-    }
-  };
 
-  // GET-example for the path /info
-  // Responds with request-information
-  server.resource["^/info$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     stringstream stream;
     stream << "<h1>Request from " << request->remote_endpoint().address().to_string() << ":" << request->remote_endpoint().port() << "</h1>";
 
@@ -196,8 +209,8 @@ app.get('/run/arduino',function (req, res) {
     for(auto &field : request->header)
       stream << field.first << ": " << field.second << "<br>";
 
-    response->write(stream);
-  };
+    response->write(stream);*/
+  //};
 
   // GET-example for the path /match/[number], responds with the matched string in path (number)
   // For instance a request GET /match/123 will receive: 123

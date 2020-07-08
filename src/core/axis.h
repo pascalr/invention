@@ -57,26 +57,58 @@ class Axis {
       maxPosition = maxP;
     }
 
+    void writeJson(const char* key, const char* val) {
+      m_writer << "\"" << key << "\": \"" << val << "\", ";
+    }
+    void writeJson(const char* key, bool val) {
+      m_writer << "\"" << key << "\": " << (val ? "true" : "false") << ", ";
+    }
+    void writeJson(const char* key, char val) {
+      m_writer << "\"" << key << "\": \"" << val << "\", ";
+    }
+    void writeJson(const char* key, double val) {
+      m_writer << "\"" << key << "\": " << val << ", ";
+    }
+    void writeJson(const char* key, int val) {
+      m_writer << "\"" << key << "\": " << val << ", ";
+    }
+    void writeJson(const char* key, long val) {
+      m_writer << "\"" << key << "\": " << val << ", ";
+    }
+    void writeJson(const char* key, unsigned long val) {
+      m_writer << "\"" << key << "\": " << val << ", ";
+    }
+
+    virtual void serializeAttrs() {
+      writeJson("name", name);
+      writeJson("pos", getPosition());
+      writeJson("dest", getDestination());
+      writeJson("speed", speed);
+      writeJson("forward", isForward);
+      writeJson("referenced", isReferenced);
+      //writeJson("", );
+      /*doc["pos"] = getPosition();
+      doc["dest"] = getDestination();
+      doc["speed"] = speed;
+      doc["forward"] = isForward;
+      doc["referenced"] = isReferenced;
+      doc["referencing"] = isReferencing;
+      doc["enabled"] = isMotorEnabled;
+      doc["step"] = isStepHigh;
+      doc["rotate"] = forceRotation;
+      doc["pinEnabled"] = enabledPin;
+      doc["pinDirection"] = dirPin;
+      doc["pinStep"] = stepPin;
+      doc["pinLimitSwitch"] = limitSwitchPin;
+      doc["stepsPerUnit"] = stepsPerUnit;
+      doc["positionSteps"] = ;*/
+    }
+
     virtual void serialize() {
-      m_writer << "-Pos " << name << ": " << getPosition() << "\n";
-      m_writer << "-Dest " << name << ": " << getDestination() << "\n";
-      m_writer << "-Speed " << name << ": " << speed << "\n";
-      m_writer << "-CW " << name << ": " << isForward << "\n";
-      m_writer << "-Referenced " << name << ": " << isReferenced << "\n";
-      m_writer << "-Referencing " << name << ": " << isReferencing << "\n";
-      m_writer << "-Enabled " << name << ": " << isMotorEnabled << "\n";
-      m_writer << "-Step " << name << ": " << isStepHigh << "\n";
-      m_writer << "-Force " << name << ": " << forceRotation << "\n";
-      m_writer << "-PIN enabled " << name << ": " << enabledPin << "\n";
-      m_writer << "-PIN dir " << name << ": " << dirPin << "\n";
-      m_writer << "-PIN step " << name << ": " << stepPin << "\n";
-      m_writer << "-PIN limit switch " << name << ": " << limitSwitchPin << "\n";
-      m_writer << "-stepsPerUnit " << name << ": " << stepsPerUnit << "\n";
-      m_writer << "-m_position_steps " << name << ": " << m_position_steps << "\n";
-      //m_writer << "-m_destination_steps " << name << ": " << m_destination_steps << "\n";
-      m_writer << "-maxPosition " << name << ": " << maxPosition << "\n";
-      m_writer << "-previousStepTime " << name << ": " << previousStepTime << "\n";
-      m_writer << "-reverseMotorDirection " << name << ": " << m_reverse_motor_direction << "\n";
+      m_writer << "{";
+      serializeAttrs();
+      m_writer << "\"0\": 0"; // To be sure that the last attribute does not end with a comma
+      m_writer << "}";
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -347,9 +379,9 @@ class HorizontalAxis : public Axis {
       //setPositionSteps(RAYON * stepsPerUnit);
     }
 
-    virtual void serialize() {
-      Axis::serialize();
-      m_writer << "-DeltaPos " << name << ": " << m_delta_position << "\n";
+    virtual void serializeAttrs() {
+      Axis::serializeAttrs();
+      writeJson("delta_pos", m_delta_position);
     }
     
   private:
@@ -443,9 +475,9 @@ class ZAxis : public Axis {
       return m_destination_angle;
     }
 
-    virtual void serialize() {
-      Axis::serialize();
-      m_writer << "-DestAngle " << name << ": " << m_destination_angle << "\n";
+    virtual void serializeAttrs() {
+      Axis::serializeAttrs();
+      writeJson("dest_angle", m_destination_angle);
     }
   private:
     HorizontalAxis* m_horizontal_axis;
