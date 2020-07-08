@@ -62,15 +62,18 @@ int main(int argc, char** argv) {
 
   // optind: The index that has been read up to there
 
-  if (serverAddress.empty()) {
-    serverAddress = "localhost";
+  if (serverAddress.empty() || serverAddress == "localhost") {
+    serverAddress = "127.0.0.1";
   } else if (serverAddress == "lan") {
-    getLanAddress();
+    getLanAddress(serverAddress);
   }
 
   HttpServer server;
   server.config.address = serverAddress;
-  server.config.port = serverPort || 8083;
+  server.config.port = serverPort ? serverPort : 8083;
+  
+  //cout << "Serveraddress: " << serverAddress << endl;
+  //cout << "Port: " << server.config.port << endl;
   
   SerialPort p;
   //FakeSerialPort fake;
@@ -286,7 +289,7 @@ app.get('/run/arduino',function (req, res) {
       server_port.set_value(port);
     });
   });
-  cout << "Server listening on port " << server_port.get_future().get() << endl << endl;
+  cout << "Server listening on " << serverAddress << " port " << server_port.get_future().get() << endl << endl;
 
   server_thread.join();
 }

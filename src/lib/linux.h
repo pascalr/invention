@@ -3,14 +3,18 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <regex>
+
 // https://stackoverflow.com/questions/4656824/get-lan-ip-and-print-it
-int getLanAddress() {
+int getLanAddress(std::string& retAddress) {
     struct ifaddrs *iflist, *iface;
 
     if (getifaddrs(&iflist) < 0) {
         perror("getifaddrs");
         return -1;
     }
+
+    std::regex e("^192\\.168\\.[0-9]{1,3}\\.[0-9]{1,3}$");
 
     for (iface = iflist; iface; iface = iface->ifa_next) {
         int af = iface->ifa_addr->sa_family;
@@ -34,7 +38,14 @@ int getLanAddress() {
                 continue;
             }
 
-            printf("Interface %s has address %s\n", iface->ifa_name, addrp);
+            std::string s = addrp;
+            if (std::regex_match(s,e)) {
+              retAddress.assign(s);
+              freeifaddrs(iflist);
+              return 1;
+            }
+
+            //printf("Interface %s has address %s\n", iface->ifa_name, addrp);
         }
     }
 
