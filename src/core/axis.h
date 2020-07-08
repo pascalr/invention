@@ -57,35 +57,13 @@ class Axis {
       maxPosition = maxP;
     }
 
-    void writeJson(const char* key, const char* val) {
-      m_writer << "\"" << key << "\": \"" << val << "\", ";
-    }
-    void writeJson(const char* key, bool val) {
-      m_writer << "\"" << key << "\": " << (val ? "true" : "false") << ", ";
-    }
-    void writeJson(const char* key, char val) {
-      m_writer << "\"" << key << "\": \"" << val << "\", ";
-    }
-    void writeJson(const char* key, double val) {
-      m_writer << "\"" << key << "\": " << val << ", ";
-    }
-    void writeJson(const char* key, int val) {
-      m_writer << "\"" << key << "\": " << val << ", ";
-    }
-    void writeJson(const char* key, long val) {
-      m_writer << "\"" << key << "\": " << val << ", ";
-    }
-    void writeJson(const char* key, unsigned long val) {
-      m_writer << "\"" << key << "\": " << val << ", ";
-    }
-
     virtual void serializeAttrs() {
-      writeJson("name", name);
-      writeJson("pos", getPosition());
-      writeJson("dest", getDestination());
-      writeJson("speed", speed);
-      writeJson("forward", isForward);
-      writeJson("referenced", isReferenced);
+      writeJson(m_writer, "name", name);
+      writeJson(m_writer, "pos", getPosition());
+      writeJson(m_writer, "dest", getDestination());
+      writeJson(m_writer, "speed", speed);
+      writeJson(m_writer, "forward", isForward);
+      writeJson(m_writer, "referenced", isReferenced);
       //writeJson("", );
       /*doc["pos"] = getPosition();
       doc["dest"] = getDestination();
@@ -105,6 +83,7 @@ class Axis {
     }
 
     virtual void serialize() {
+      m_writer << "\n" << MESSAGE_JSON << "\n";
       m_writer << "{";
       serializeAttrs();
       m_writer << "\"0\": 0"; // To be sure that the last attribute does not end with a comma
@@ -381,7 +360,7 @@ class HorizontalAxis : public Axis {
 
     virtual void serializeAttrs() {
       Axis::serializeAttrs();
-      writeJson("delta_pos", m_delta_position);
+      writeJson(m_writer, "delta_pos", m_delta_position);
     }
     
   private:
@@ -477,7 +456,7 @@ class ZAxis : public Axis {
 
     virtual void serializeAttrs() {
       Axis::serializeAttrs();
-      writeJson("dest_angle", m_destination_angle);
+      writeJson(m_writer, "dest_angle", m_destination_angle);
     }
   private:
     HorizontalAxis* m_horizontal_axis;

@@ -27,8 +27,19 @@ class Program {
     //Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
     
     bool isWorking = false;
-};
 
+    virtual void serialize() {
+      getWriter() << "{";
+      for (int i = 0; axes[i] != NULL; i++) {
+        getWriter() << "\"axis_" << axes[i]->name << "\": \"";
+        axes[i]->serialize();
+        if (axes[i+1] != NULL) {
+          getWriter() << "\", ";
+        }
+      }
+      getWriter() << "}";
+    }
+};
 
 bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.' || c == '-';
@@ -117,9 +128,11 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
       delay(waitTime);
     #endif
   } else if (cmd == '?') {
+    *writer << "\n" << MESSAGE_JSON << "\n";
     for (int i = 0; axes[i] != NULL; i++) {
       axes[i]->serialize();
     }
+    *writer << "\n";
   } else if (cmd == '+') {
     Axis* axis = axisByLetter(axes, input[cursor]);
     cursor++;
@@ -179,9 +192,11 @@ void myLoop(Program& p) {
         }
         p.isWorking = false;
       } else if (cmd == '?') {
+        p.getWriter() << "\n" << MESSAGE_JSON << "\n";
         for (int i = 0; p.axes[i] != NULL; i++) {
           p.axes[i]->serialize();
         }
+        p.getWriter() << "\n";
       } else if (cmd == '@') { // asking for position
         p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
       } else {

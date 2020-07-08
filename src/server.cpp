@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
 
   setupLogging();
 
+  // ************** PARSE ARGS *******************
   string serverAddress;
   int serverPort = 0;
   int opt;
@@ -64,33 +65,22 @@ int main(int argc, char** argv) {
     }
   }
 
-  // optind: The index that has been read up to there
-
   if (serverAddress.empty() || serverAddress == "localhost") {
     serverAddress = "127.0.0.1";
   } else if (serverAddress == "lan") {
     getLanAddress(serverAddress);
   }
+  
+  // ************** SERVER CONFIG *******************
 
   HttpServer server;
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
   
-  //cout << "Serveraddress: " << serverAddress << endl;
-  //cout << "Port: " << server.config.port << endl;
-  
   SerialPort p;
+  vector<Jar> jars;
   //FakeSerialPort fake;
 
-/*  server.resource["^/run/arduino([0-9]+)$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    response->write(request->path_match[1].str());
-  };
-  server.resource["^/run/arduino$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-app.get('/run/arduino',function (req, res) {
-  log('Running command arduino: ' + req.query.cmd)
-  arduino_or_fake.write(req.query.cmd+"\n")
-  res.end()
-})*/
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (!p.isOpen()) {
       response->write("Error arduino is not connected.");
@@ -110,7 +100,7 @@ app.get('/run/arduino',function (req, res) {
     response->write("Ok command given to arduino");
   };
 
-  server.resource["^/sweep$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (!p.isOpen()) {
       response->write("Error arduino is not connected.");
       return;
@@ -120,7 +110,7 @@ app.get('/run/arduino',function (req, res) {
       response->write("Error initializing sweep.");
       return;
     }
-    sweep.run();
+    sweep.run(jars);
     
     response->write("Ok executing command sweeep");
   };
@@ -162,69 +152,6 @@ app.get('/run/arduino',function (req, res) {
       });
       work_thread.detach();
     }
-  };
-
-  //server.resource["^/info$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-
-    //if (!p.isOpen()) {
-    //  response->write("Error arduino is not connected.");
-    //  return;
-    //}
-    //p.writePort(field.second);
-
-    /*if (p.isOpen()) {
-      thread work_thread([&p,response] {
-        while (!p.inputAvailable()) {
-          this_thread::sleep_for(chrono::milliseconds(10));
-        }
-        string s;
-        p.getInput(s);
-        cout << "Arduino: " << s;
-
-        ptree pt;
-        stringstream ss;
-        pt.put("log", s);
-        json_parser::write_json(ss, pt);
-
-	      string str = ss.str();
-	      SimpleWeb::CaseInsensitiveMultimap header;
-	      header.emplace("Content-Length", to_string(str.length()));
-	      header.emplace("Content-Type", "application/json");
-        response->write(SimpleWeb::StatusCode::success_ok, str, header);
-      });
-      work_thread.detach();
-    }
-
-    stringstream stream;
-    stream << "<h1>Request from " << request->remote_endpoint().address().to_string() << ":" << request->remote_endpoint().port() << "</h1>";
-
-    stream << request->method << " " << request->path << " HTTP/" << request->http_version;
-
-    stream << "<h2>Query Fields</h2>";
-    auto query_fields = request->parse_query_string();
-    for(auto &field : query_fields)
-      stream << field.first << ": " << field.second << "<br>";
-
-    stream << "<h2>Header Fields</h2>";
-    for(auto &field : request->header)
-      stream << field.first << ": " << field.second << "<br>";
-
-    response->write(stream);*/
-  //};
-
-  // GET-example for the path /match/[number], responds with the matched string in path (number)
-  // For instance a request GET /match/123 will receive: 123
-  server.resource["^/match/([0-9]+)$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    response->write(request->path_match[1].str());
-  };
-
-  // GET-example simulating heavy work in a separate thread
-  server.resource["^/work$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> /*request*/) {
-    thread work_thread([response] {
-      this_thread::sleep_for(chrono::seconds(5));
-      response->write("Work done");
-    });
-    work_thread.detach();
   };
 
   // Default GET-example. If no other matches, this anonymous function will be called.

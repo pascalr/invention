@@ -1,6 +1,7 @@
 #ifndef WRITER_H
 #define WRITER_H
 
+// FIXME: Make the writer class simply a child of ostream
 class Writer {
   public:
     virtual void doPinMode(int pin, bool type) = 0;
@@ -48,6 +49,28 @@ Writer& operator<<(Writer& writer, bool val) {
 Writer& operator<<(Writer& writer, int val) {
   writer.doPrint(val);
   return writer;
+}
+
+void writeJson(Writer& writer, const char* key, const char* val) {
+  writer << "\"" << key << "\": \"" << val << "\", ";
+}
+void writeJson(Writer& writer, const char* key, bool val) {
+  writer << "\"" << key << "\": " << (val ? "true" : "false") << ", ";
+}
+void writeJson(Writer& writer, const char* key, char val) {
+  writer << "\"" << key << "\": \"" << val << "\", ";
+}
+void writeJson(Writer& writer, const char* key, double val) {
+  writer << "\"" << key << "\": " << val << ", ";
+}
+void writeJson(Writer& writer, const char* key, int val) {
+  writer << "\"" << key << "\": " << val << ", ";
+}
+void writeJson(Writer& writer, const char* key, long val) {
+  writer << "\"" << key << "\": " << val << ", ";
+}
+void writeJson(Writer& writer, const char* key, unsigned long val) {
+  writer << "\"" << key << "\": " << val << ", ";
 }
 
 #endif

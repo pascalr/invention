@@ -22,6 +22,10 @@
 #include <chrono>
 #include <thread>
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+using namespace boost::property_tree;
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
@@ -31,6 +35,13 @@ typedef struct {
   string data;
   vector <Point> location;
 } DecodedObject;
+
+class Jar {
+  public:
+    double position_x; // mm
+    double position_y; // mm
+    double position_z; // mm
+};
 
 #define MAX_X AXIS_X_MAX_POS
 #define MAX_Z AXIS_Z_MAX_POS
@@ -46,6 +57,7 @@ class MovingDetectedCodes {
     double lastKnownPosition;
 };
 
+
 class Sweep {
   public:
     Sweep(SerialPort& p) : m_port(p) {
@@ -56,36 +68,33 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
-      /*if (m_port.openPort("/dev/ttyACM0") < 0) {
-        cerr << "Error opening arduino port. Aborting sweep.\n";
-        return false;
-      }
-      cout << "Ok arduino connected!" << endl;*/
-      /*cout << "Waiting for arduino ready message.." << endl;
-      while (true) {
-	if (m_port.inputAvailable()) {
-	  string str;
-	  m_port.getInput(str);
-	  trim(str);
-          cout << "Reading: " << str << endl;
-	  if (str == MESSAGE_READY) {
-  	    break;
-	  }
-	}
-        this_thread::sleep_for(chrono::milliseconds(50));
-      }
-      cout << "Ok arduino ready!" << endl;*/
-     
-      // TODO: Ask arduino to make sure that the required axis are referenced... 
-      //m_port.writePort("H");
-      //waitForMessageDone();
-      //cout << "Ok arduino ready and referenced!" << endl;
-      
       return true;
     }
 
-    void waitForMessageDone() {
-      while (!m_port.inputAvailable()) {
+    void askPosition(double &x, double &z) {
+      m_port.writePort("?");
+      m_port.waitUntilMessageReceived(MESSAGE_JSON);
+
+      /*vector<string> axesStr;
+      while (true) {
+        string str;
+        m_port.waitUntilMessageReceived(str);
+        if (str == MESSAGE_DONE) {break;}
+        axesStr.push_back(str);
+      }
+
+      ptree pt;
+      read_json(json_str, pt);
+      auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");*/
+    }
+
+    void move(const char* txt, double pos, vector<Jar>& jars) {
+      string str = txt;
+      str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
+      cout << "Writing: " << str << endl;
+      m_port.writePort(str);
+
+      while (!m_port.messageReceived(MESSAGE_DONE)) {
         Mat frame;
         m_cap.read(frame);
         if (frame.empty()) {
@@ -97,32 +106,15 @@ class Sweep {
         vector<HRCode> codes = detectHRCodes(frame);
         for (auto it = codes.begin(); it != codes.end(); it++) {
           HRCode code = *it;
+          //jars.push_back();
           cerr << "FOUND: " << code << endl;
         }
         this_thread::sleep_for(chrono::milliseconds(50));
       }
-   
-      string str;
-      m_port.getInput(str);
-      trim(str);
-      cout << "Reading: " << str << endl;
-      if (str != MESSAGE_DONE) {
-        //cerr << "Not done yet. Received message " << str << endl;
-        waitForMessageDone();
-      }// else {
-      //  cerr << "OK received message done\n";
-      //}
-    }
-    
-    void move(const char* txt, double pos) {
-      string str = txt;
-      str += to_string((int)pos);
-      m_port.writePort(str);
-      cout << "Writing: " << str << endl;
-      waitForMessageDone();
     }
 
-    void run() {
+    void run(vector<Jar>& jars) {
+      jars.clear();
       double heights[] = {0.0};
       //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
       double zStep = MAX_Z / 1;
@@ -134,14 +126,14 @@ class Sweep {
       double z = 0;
 
       for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
-        move("MZ",0);
+        move("MZ",0, jars);
         bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
 
-        move("MY",heights[i]);
+        move("MY",heights[i], jars);
         for (x = xUp ? 0 : MAX_X; xUp ? x <= MAX_X : x >= 0; x += xStep * (xUp ? 1 : -1)) {
-          move("MX",x);
+          move("MX",x, jars);
           for (z = zUp ? 0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0; z += zStep * (zUp ? 1 : -1)) {
-            move("MZ",z);
+            move("MZ",z, jars);
             // Detect new ones and move to them to get exact position.
             // findBarCodes();
             

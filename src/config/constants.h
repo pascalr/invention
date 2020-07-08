@@ -26,5 +26,6 @@
 #define MESSAGE_INVALID_INPUT "invalid_input"
 #define MESSAGE_INVALID_PENDING "invalid_pending"
 #define MESSAGE_READY "ready"
+#define MESSAGE_JSON "json"
 
 #endif

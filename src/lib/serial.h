@@ -17,6 +17,10 @@
 #include <string>
 #include <iostream>
 
+#include "../lib/lib.h"
+#include <thread>
+#include <chrono>
+
 // FIXME: Write error messages to a string instead of printf to stdout...
 
 using namespace std;
@@ -28,6 +32,7 @@ class SerialPort {
     ~SerialPort() {
       closePort();
     }
+
 
     void closePort() {
       if (m_is_opened) {
@@ -126,7 +131,33 @@ class SerialPort {
       }
       return separatorFound;
     }
-    
+
+    bool messageReceived(const char* msg) {
+      if (!inputAvailable()) {
+        return false;
+      }
+
+      string str;
+      getInput(str);
+      trim(str);
+      return str == msg;
+    }
+
+    void waitUntilMessageReceived(const char* msg) {
+      while (!messageReceived(msg)) {
+        this_thread::sleep_for(chrono::milliseconds(10));
+      }
+    }
+
+    void waitUntilMessageReceived(string& str) {
+      while (!inputAvailable()) {
+        this_thread::sleep_for(chrono::milliseconds(10));
+      }
+      
+      getInput(str);
+      trim(str);
+    }
+
     void writePort(string str) {
       writePort(str.c_str());
     }
