@@ -1,5 +1,6 @@
 #include "client_http.hpp"
 #include "server_http.hpp"
+#include "status_code.hpp"
 #include <future>
 
 // Added for the json-example
@@ -89,6 +90,7 @@ app.get('/run/arduino',function (req, res) {
 })*/
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (!p.isOpen()) {
+      response->write("Error arduino is not connected.");
       return;
     }
     
@@ -98,6 +100,7 @@ app.get('/run/arduino',function (req, res) {
         p.writePort(field.second);
       }
     }
+    response->write("Ok command given to arduino");
   };
 
   server.resource["^/sweep$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
@@ -136,7 +139,11 @@ app.get('/run/arduino',function (req, res) {
         pt.put("log", s);
         json_parser::write_json(ss, pt);
 
-        response->write(ss.str());
+	string str = ss.str();
+	SimpleWeb::CaseInsensitiveMultimap header;
+	header.emplace("Content-Length", to_string(str.length()));
+	header.emplace("Content-Type", "application/json");
+        response->write(SimpleWeb::StatusCode::success_ok, str, header);
       });
       work_thread.detach();
     }
