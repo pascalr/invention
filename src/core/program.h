@@ -28,37 +28,17 @@ class Program {
     
     bool isWorking = false;
 
-    /*virtual void serializeAttrs() {
-      writeJson(m_writer, "axisX", );
-      writeJson(m_writer, "axisY", getPosition());
-      writeJson(m_writer, "axisT", getDestination());
-      writeJson(m_writer, "axisA", speed);
-      writeJson(m_writer, "axisB", isForward);
-      writeJson(m_writer, "axisZ", isReferenced);
-      //writeJson("", );
-      doc["pos"] = getPosition();
-      doc["dest"] = getDestination();
-      doc["speed"] = speed;
-      doc["forward"] = isForward;
-      doc["referenced"] = isReferenced;
-      doc["referencing"] = isReferencing;
-      doc["enabled"] = isMotorEnabled;
-      doc["step"] = isStepHigh;
-      doc["rotate"] = forceRotation;
-      doc["pinEnabled"] = enabledPin;
-      doc["pinDirection"] = dirPin;
-      doc["pinStep"] = stepPin;
-      doc["pinLimitSwitch"] = limitSwitchPin;
-      doc["stepsPerUnit"] = stepsPerUnit;
-      doc["positionSteps"] = ;
+    virtual void serialize() {
+      getWriter() << "{";
+      for (int i = 0; axes[i] != NULL; i++) {
+        getWriter() << "\"axis_" << axes[i]->name << "\": \"";
+        axes[i]->serialize();
+        if (axes[i+1] != NULL) {
+          getWriter() << "\", ";
+        }
+      }
+      getWriter() << "}";
     }
-
-    vitural void serialize() {
-      m_writer << "{";
-      serializeAttrs();
-      m_writer << "\"0\": 0"; // To be sure that the last attribute does not end with a comma
-      m_writer << "}";
-    }*/
 };
 
 bool isNumberSymbol(char c) {
@@ -152,6 +132,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     for (int i = 0; axes[i] != NULL; i++) {
       axes[i]->serialize();
     }
+    *writer << "\n";
   } else if (cmd == '+') {
     Axis* axis = axisByLetter(axes, input[cursor]);
     cursor++;
@@ -215,6 +196,7 @@ void myLoop(Program& p) {
         for (int i = 0; p.axes[i] != NULL; i++) {
           p.axes[i]->serialize();
         }
+        p.getWriter() << "\n";
       } else if (cmd == '@') { // asking for position
         p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
       } else {
