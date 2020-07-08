@@ -27,8 +27,39 @@ class Program {
     //Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
     
     bool isWorking = false;
-};
 
+    /*virtual void serializeAttrs() {
+      writeJson(m_writer, "axisX", );
+      writeJson(m_writer, "axisY", getPosition());
+      writeJson(m_writer, "axisT", getDestination());
+      writeJson(m_writer, "axisA", speed);
+      writeJson(m_writer, "axisB", isForward);
+      writeJson(m_writer, "axisZ", isReferenced);
+      //writeJson("", );
+      doc["pos"] = getPosition();
+      doc["dest"] = getDestination();
+      doc["speed"] = speed;
+      doc["forward"] = isForward;
+      doc["referenced"] = isReferenced;
+      doc["referencing"] = isReferencing;
+      doc["enabled"] = isMotorEnabled;
+      doc["step"] = isStepHigh;
+      doc["rotate"] = forceRotation;
+      doc["pinEnabled"] = enabledPin;
+      doc["pinDirection"] = dirPin;
+      doc["pinStep"] = stepPin;
+      doc["pinLimitSwitch"] = limitSwitchPin;
+      doc["stepsPerUnit"] = stepsPerUnit;
+      doc["positionSteps"] = ;
+    }
+
+    vitural void serialize() {
+      m_writer << "{";
+      serializeAttrs();
+      m_writer << "\"0\": 0"; // To be sure that the last attribute does not end with a comma
+      m_writer << "}";
+    }*/
+};
 
 bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.' || c == '-';
@@ -117,6 +148,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
       delay(waitTime);
     #endif
   } else if (cmd == '?') {
+    *writer << "\n" << MESSAGE_JSON << "\n";
     for (int i = 0; axes[i] != NULL; i++) {
       axes[i]->serialize();
     }
@@ -179,6 +211,7 @@ void myLoop(Program& p) {
         }
         p.isWorking = false;
       } else if (cmd == '?') {
+        p.getWriter() << "\n" << MESSAGE_JSON << "\n";
         for (int i = 0; p.axes[i] != NULL; i++) {
           p.axes[i]->serialize();
         }

@@ -22,6 +22,10 @@
 #include <chrono>
 #include <thread>
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+using namespace boost::property_tree;
+
 using namespace std;
 using namespace cv;
 using namespace zbar;
@@ -53,6 +57,7 @@ class MovingDetectedCodes {
     double lastKnownPosition;
 };
 
+
 class Sweep {
   public:
     Sweep(SerialPort& p) : m_port(p) {
@@ -66,8 +71,30 @@ class Sweep {
       return true;
     }
 
-    void waitForMessageDone(vector<Jar>& jars) {
-      while (!m_port.inputAvailable()) {
+    void askPosition(double &x, double &z) {
+      m_port.writePort("?");
+      m_port.waitUntilMessageReceived(MESSAGE_JSON);
+
+      /*vector<string> axesStr;
+      while (true) {
+        string str;
+        m_port.waitUntilMessageReceived(str);
+        if (str == MESSAGE_DONE) {break;}
+        axesStr.push_back(str);
+      }
+
+      ptree pt;
+      read_json(json_str, pt);
+      auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");*/
+    }
+
+    void move(const char* txt, double pos, vector<Jar>& jars) {
+      string str = txt;
+      str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
+      cout << "Writing: " << str << endl;
+      m_port.writePort(str);
+
+      while (!m_port.messageReceived(MESSAGE_DONE)) {
         Mat frame;
         m_cap.read(frame);
         if (frame.empty()) {
@@ -79,29 +106,11 @@ class Sweep {
         vector<HRCode> codes = detectHRCodes(frame);
         for (auto it = codes.begin(); it != codes.end(); it++) {
           HRCode code = *it;
+          //jars.push_back();
           cerr << "FOUND: " << code << endl;
         }
         this_thread::sleep_for(chrono::milliseconds(50));
       }
-   
-      string str;
-      m_port.getInput(str);
-      trim(str);
-      cout << "Reading: " << str << endl;
-      if (str != MESSAGE_DONE) {
-        //cerr << "Not done yet. Received message " << str << endl;
-        waitForMessageDone(jars);
-      }// else {
-      //  cerr << "OK received message done\n";
-      //}
-    }
-    
-    void move(const char* txt, double pos, vector<Jar>& jars) {
-      string str = txt;
-      str += to_string((int)pos);
-      m_port.writePort(str);
-      cout << "Writing: " << str << endl;
-      waitForMessageDone(jars);
     }
 
     void run(vector<Jar>& jars) {

@@ -68,7 +68,7 @@ class HRCodeParser {
       }
     }
     
-    void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, int thresh) {
+    void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, vector<Point2f> &foundCenters, int thresh) {
       Mat canny_output;
       Canny( src_gray, canny_output, thresh, thresh*2 );
     
@@ -151,6 +151,7 @@ class HRCodeParser {
         warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
     
         detectedCodes.push_back(rotatedHRCode);
+        foundCenters.push_back(centers[i]);
       }
       //imshow( "Contours", drawing );
     }
@@ -221,6 +222,9 @@ class HRCode {
     bool isValid() {
       return m_jar_id_valid && m_weight_valid && m_name_valid && m_content_id_valid;
     }
+    
+    double centerX;
+    double centerY;
 
   private:
 
@@ -237,8 +241,6 @@ class HRCode {
     float m_weight = 0;
     string m_name;
     int m_content_id;
-    double centerX;
-    double centerY;
 };
 
 ostream &operator<<(std::ostream &os, const HRCode &m) {
@@ -329,7 +331,8 @@ vector<HRCode> detectHRCodes(Mat& src) {
 
   HRCodeParser parser(0.2, 0.2);
   vector<Mat> hr_codes;
-  parser.findHRCode(src_gray, hr_codes, thresh);
+  vector<Point2f> centers;
+  parser.findHRCode(src_gray, hr_codes, centers, thresh);
 
   vector<HRCode> codes(hr_codes.size());
 
@@ -338,7 +341,8 @@ vector<HRCode> detectHRCodes(Mat& src) {
 
     cvtColor( m, m, COLOR_GRAY2BGR );
     codes[i] = parseHRCode(m);
-    //codes[i].centerX = 
+    codes[i].centerX = centers[i].x;
+    codes[i].centerY = centers[i].y;
 
     //string title = string("detectedHRCode") + to_string(i) + ".png";
     //imshow(title,m);
