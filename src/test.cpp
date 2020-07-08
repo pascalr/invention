@@ -11,15 +11,16 @@
 #include <chrono> // for sleep
 #include <thread> // for sleep
 
-
 #include <signal.h>
 
 #include "core/fake_program.h"
+#include "core/string_writer.h"
 
 using namespace std;
 namespace plt = matplotlibcpp;
 
-FakeProgram p;
+ConsoleWriter w;
+FakeProgram p(w);
 
 /*class PlotWriter : public ConsoleWriter {
   public:
@@ -73,53 +74,6 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
     myLoop(p);
   }
 
-  /*for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->prepare(currentTime);
-  }
-
-  parseInput(dest, writer, axes, 0);
-
-  for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->afterInput();
-  }
-
-  bool stillWorking = true;
-  while (stillWorking) {
-    stillWorking = false;
-    for (int i = 0; axes[i] != NULL; i++) {
-      stillWorking = stillWorking || axes[i]->handleAxis(currentTime);
-    }
-    if (plot && currentTime % 200000 == 0 || !stillWorking) {
-
-      HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
-      Axis* axisZ = axisByLetter(axes, 'Z');
-      
-      plt::clf();
-  
-      vector<double> x(1);
-      vector<double> z(1);
-      
-      x[0] = axisX->getPosition();
-      z[0] = axisZ->getPosition();
-      plt::plot(x,z,"ro");
-
-      x.push_back(axisX->getPosition() - axisX->getDeltaPosition());
-      z.push_back(0.0);
-      plt::plot(x,z,"b-");
-
-      plt::xlim(0.0, axisX->getMaxPosition());
-      plt::ylim(0.0, axisZ->getMaxPosition());
-
-			plt::title("Position du bras");
-			plt::pause(0.01);
-    }
-    currentTime++;
-  }
-
-  if (plot) {
-    this_thread::sleep_for(chrono::milliseconds(500));
-  }*/
-  
 }
 
 void move(char axis, double destination, Writer* writer, Axis** axes, bool plot=false) {
@@ -184,24 +138,24 @@ void testStop(Axis* axis) {
   assertTest(false, axis->forceRotation);
 }
 
-void testParseInput(Writer* writer, Axis** axes) {
+void testParseInput(Program& p) {
   title("Testing parseInput");
 
-  Axis* axisX = axisByLetter(axes, 'X');
-  Axis* axisY = axisByLetter(axes, 'Y');
+  Axis* axisX = axisByLetter(p.axes, 'X');
+  Axis* axisY = axisByLetter(p.axes, 'Y');
   axisX->setPositionSteps(100.0);
   axisY->setPositionSteps(100.0);
   int cursor;
 
-  cursor = parseInput("HX", writer, axes, 0);
+  cursor = parseInput("HX", p, 0);
   assertTest("HX should reference X", 0.0, axisX->getPositionSteps());
   assertTest("HX should not refence Y", 100.0, axisY->getPositionSteps());
   assertTest("Should increase the cursor by 2", 2, cursor);
   
-  cursor = parseInput("HHX", writer, axes, 1);
+  cursor = parseInput("HHX", p, 1);
   assertTest("HHX index 1 should not refence Y", 100.0, axisY->getPositionSteps());
 
-  cursor = parseInput("H", writer, axes, 0);
+  cursor = parseInput("H", p, 0);
   assertTest("H should reference Y", 0.0, axisY->getPositionSteps());
   assertTest("Should increase the cursor by 1", 1, cursor);
 
@@ -357,37 +311,18 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
   assertNearby("MX0 destination X", 0.0, axisX->getDestination());
   assertNearby("MX0 delta X", 0.0, axisX->getDeltaPosition());
 
-  // axisX->getDestination() -> tip destination
+}
 
-  // Tip starts at X380, and delta is 380
-  // Base position is dest - delta
-  // By moving Z380, the tip stays at 380
-  // But the delta becomes 0.
-  /*parseInput("MZ380", writer, axes, 0);
-  assertNearby("Position X is rayon first", RAYON, axisX->getPosition());
-  steps = axisZ->getDestinationSteps();
-  for (int i = 0; i < steps; i++) {
-    axisZ->turnOneStep();
-  }
+void testSerialize() {
+  title("Testing serialize");
 
-  assertNearby("Destination X", RAYON, axisX->getDestination());
-  assertTest("Destination steps X", RAYON * axisX->getStepsPerUnit(), axisX->getDestinationSteps());
+  /*StringWriter writer;
+  FakeProgram prog(writer);
+  setupAxes(&prog.getWriter(), prog.axes);
 
-  assertNearby("Delta position X", 0.0, axisX->getDeltaPosition());
-  steps = axisX->getDestinationSteps();
-  for (int i = 0; i < steps; i++) {
-    axisX->turnOneStep();
-  }
-  assertNearby("Position X", 380.0, axisX->getPosition());
+  ss << prog;
 
-  parseInput("MZ0", writer, axes, 0);
-  assertNearby("Destination X", RAYON, axisX->getDestination());
-  for (int i = 0; i < 100000 && !axisZ->isDestinationReached(); i++) {
-    debug();
-    axisZ->turnOneStep();
-  }
-  assertNearby("Destination X", RAYON, axisX->getDestination());*/
-
+  cout << writer.getString();*/
 }
 
 int main (int argc, char *argv[]) {
@@ -401,10 +336,11 @@ int main (int argc, char *argv[]) {
   //plt::ion();
 
   // FIXME: MX10.0
+  testSerialize();
   testAxisByLetter(p.axes);
   testParseMove(p.axes);
   testStop(axisByLetter(p.axes,'Y'));
-  testParseInput(&p.getWriter(), p.axes);
+  testParseInput(p);
   testHandleAxis(&p.getWriter(), p.axes);
   testMoveZ(&p.getWriter(), p.axes);
   testMoveZMovesX(&p.getWriter(), p.axes);

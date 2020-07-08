@@ -20,6 +20,7 @@
 #include "../config/setup.h"
 #include "serialize.hpp"
 #include "fake_program.h"
+#include "string_writer.h"
 
 #include <chrono>
 #include <thread>
@@ -76,7 +77,8 @@ class Sweep {
       string programJson;
       m_port.waitUntilMessageReceived(programJson);
 
-      FakeProgram p;
+      StringWriter w;
+      FakeProgram p(w);
       deserialize(p, programJson);
     }
 

@@ -79,3 +79,10 @@ target_link_libraries( run_tests ${MyLibs} )
 add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )
 target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
+
+
+
+enable_testing()
+add_test( regularTests bin/run_tests )
+
+add_custom_target(check COMMAND make && ${CMAKE_CTEST_COMMAND} --verbose)

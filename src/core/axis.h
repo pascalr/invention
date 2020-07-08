@@ -57,13 +57,14 @@ class Axis {
       maxPosition = maxP;
     }
 
-    virtual void serializeAttrs() {
-      writeJson(m_writer, "name", name);
-      writeJson(m_writer, "pos", getPosition());
-      writeJson(m_writer, "dest", getDestination());
-      writeJson(m_writer, "speed", speed);
-      writeJson(m_writer, "forward", isForward);
-      writeJson(m_writer, "referenced", isReferenced);
+    virtual Writer& serialize(Writer& out) {
+      writeJson(out, "name", name);
+      writeJson(out, "pos", getPosition());
+      writeJson(out, "dest", getDestination());
+      writeJson(out, "forward", isForward);
+      writeJson(out, "referenced", isReferenced);
+      writeJson(out, "referenced", isReferenced);
+      out << "\"speed\": " << speed; // CAREFULL: MUST NOT END WITH COMMA
       //writeJson("", );
       /*doc["pos"] = getPosition();
       doc["dest"] = getDestination();
@@ -80,14 +81,6 @@ class Axis {
       doc["pinLimitSwitch"] = limitSwitchPin;
       doc["stepsPerUnit"] = stepsPerUnit;
       doc["positionSteps"] = ;*/
-    }
-
-    virtual void serialize() {
-      m_writer << "\n" << MESSAGE_JSON << "\n";
-      m_writer << "{";
-      serializeAttrs();
-      m_writer << "\"0\": 0"; // To be sure that the last attribute does not end with a comma
-      m_writer << "}\n";
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -358,11 +351,13 @@ class HorizontalAxis : public Axis {
       //setPositionSteps(RAYON * stepsPerUnit);
     }
 
-    virtual void serializeAttrs() {
-      Axis::serializeAttrs();
-      writeJson(m_writer, "delta_pos", m_delta_position);
+    Writer& serialize(Writer& out) {
+      out << "{";
+      writeJson(out, "delta_pos", m_delta_position);
+      Axis::serialize(out);
+      out << "}";
     }
-    
+
   private:
     // The horizontal distance between the tip and the base.
     double m_delta_position;
@@ -454,10 +449,6 @@ class ZAxis : public Axis {
       return m_destination_angle;
     }
 
-    virtual void serializeAttrs() {
-      Axis::serializeAttrs();
-      writeJson(m_writer, "dest_angle", m_destination_angle);
-    }
   private:
     HorizontalAxis* m_horizontal_axis;
     double m_destination_angle;
@@ -479,6 +470,12 @@ Axis* axisByLetter(Axis** axes, char letter) {
   }
 
   return NULL;
+}
+
+Writer& operator<<(Writer& out, Axis &axis) {
+  out << "{";
+  axis.serialize(out);
+  return out << "}";
 }
 
 #endif

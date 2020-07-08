@@ -6,12 +6,13 @@
 #include "../core/program.h"
 #include <thread>
 #include <chrono>
+#include "console_writer.h"
 
 using namespace std;
 
 class FakeProgram : public Program {
   public:
-    FakeProgram() : Program(m_writer) {
+    FakeProgram(Writer& writer) : m_writer(writer), Program(writer) {
     }
 
     Writer& getWriter() {
@@ -65,7 +66,7 @@ class FakeProgram : public Program {
     }
 
   protected:
-    ConsoleWriter m_writer;
+    Writer& m_writer;
     unsigned long currentTime = 0;
     string fake_input;
 };

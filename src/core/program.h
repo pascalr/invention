@@ -28,18 +28,32 @@ class Program {
     
     bool isWorking = false;
 
-    virtual void serialize() {
-      getWriter() << "{";
+    friend Writer& operator<<(Writer& writer, const char* theString);
+
+    void serialize(Writer& out) {
+      out << "{";
       for (int i = 0; axes[i] != NULL; i++) {
-        getWriter() << "\"axis_" << axes[i]->name << "\": \"";
-        axes[i]->serialize();
+        out << "\"axis_" << axes[i]->name << "\": ";
+        out << axes[i];
         if (axes[i+1] != NULL) {
-          getWriter() << "\", ";
+          out << ", ";
         }
       }
-      getWriter() << "}";
+      out << "}";
     }
 };
+
+Writer& operator<<(Writer& out, const Program &p) {
+  out << "{";
+  for (int i = 0; p.axes[i] != NULL; i++) {
+    out << "\"axis_" << p.axes[i]->name << "\": ";
+    p.axes[i]->serialize(out);
+    if (p.axes[i+1] != NULL) {
+      out << ", ";
+    }
+  }
+  return out << "}";
+}
 
 bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.' || c == '-';
@@ -93,7 +107,7 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
   return i;
 }
 
-int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
+int parseInput(const char* input, Program& p, int oldCursor) {
 
   // Should the cursor passed to the function be a pointer?
   int cursor = oldCursor + 1;
@@ -101,20 +115,20 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
   char cmd = input[oldCursor];
   
   if (cmd == 'M' || cmd == 'm') {
-    cursor = parseMove(axes, input, cursor);
+    cursor = parseMove(p.axes, input, cursor);
   } else if (cmd == 's' || cmd == 'S') { // stop
-    for (int i = 0; axes[i] != NULL; i++) {
-      axes[i]->stop();
+    for (int i = 0; p.axes[i] != NULL; i++) {
+      p.axes[i]->stop();
     }
     cursor = size; // Disregard everything else after the stop command.
   } else if (cmd == 'H' || cmd == 'h') { // home reference (eg. H, or HX, or HY, ...)
-    *writer << "Referencing...\n";
+    p.getWriter() << "Referencing...\n";
     if (size == 1) {
-      for (int i = 0; axes[i] != NULL; i++) {
-        axes[i]->startReferencing();
+      for (int i = 0; p.axes[i] != NULL; i++) {
+        p.axes[i]->startReferencing();
       }
     } else {
-      Axis* axis = axisByLetter(axes, input[cursor]);
+      Axis* axis = axisByLetter(p.axes, input[cursor]);
       cursor++;
       if (axis) {
         axis->startReferencing();
@@ -128,20 +142,18 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
       delay(waitTime);
     #endif
   } else if (cmd == '?') {
-    *writer << "\n" << MESSAGE_JSON << "\n";
-    for (int i = 0; axes[i] != NULL; i++) {
-      axes[i]->serialize();
-    }
-    *writer << "\n";
+    p.getWriter() << "\n" << MESSAGE_JSON << "\n";
+    p.getWriter() << p;
+    p.getWriter() << "\n";
   } else if (cmd == '+') {
-    Axis* axis = axisByLetter(axes, input[cursor]);
+    Axis* axis = axisByLetter(p.axes, input[cursor]);
     cursor++;
     if (axis) {
       axis->rotate(FORWARD);
     }
     // TODO: Handle error
   } else if (cmd == '-') {
-    Axis* axis = axisByLetter(axes, input[cursor]);
+    Axis* axis = axisByLetter(p.axes, input[cursor]);
     cursor++;
     if (axis) {
       axis->rotate(REVERSE);
@@ -149,9 +161,7 @@ int parseInput(const char* input, Writer* writer, Axis** axes, int oldCursor) {
     // TODO: Handle error
   }
 
-  writer->doPrint("Cmd: ");
-  writer->doPrint(input+oldCursor);
-  writer->doPrint("\n");
+  p.getWriter() << "Cmd: " << input+oldCursor << "\n";
   /*if (cursor < size) {
     char tmp = input[cursor];
     input[cursor] = '\0';
@@ -193,9 +203,7 @@ void myLoop(Program& p) {
         p.isWorking = false;
       } else if (cmd == '?') {
         p.getWriter() << "\n" << MESSAGE_JSON << "\n";
-        for (int i = 0; p.axes[i] != NULL; i++) {
-          p.axes[i]->serialize();
-        }
+        p.getWriter() << p;
         p.getWriter() << "\n";
       } else if (cmd == '@') { // asking for position
         p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
@@ -234,7 +242,7 @@ void myLoop(Program& p) {
       return;
     }
     
-    int cursorPos = parseInput(input, &p.getWriter(), p.axes, 0);
+    int cursorPos = parseInput(input, p, 0);
 
     for (int i = 0; p.axes[i] != NULL; i++) {
       p.axes[i]->afterInput();

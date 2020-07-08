@@ -127,6 +127,7 @@ int main(int argc, char** argv) {
   server.resource["^/close$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     // FIXME: Also handle fake arduino too
     p.closePort();
+    response->write("Port closed.");
   };
  
   server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
