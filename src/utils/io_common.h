@@ -6,6 +6,7 @@
 #include <sys/select.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 void signalHandler( int signum ) {
   std::cout << "Interrupt signal (" << signum << ") received.\n";

@@ -1,3 +1,6 @@
+#ifndef SERIAL_H
+#define SERIAL_H
+
 // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
 
 // C library headers
@@ -153,3 +156,4 @@ class SerialPort {
     bool m_is_opened = false;
 };
 
+#endif

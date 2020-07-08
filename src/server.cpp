@@ -19,6 +19,7 @@
 
 #include "lib/serial.h"
 #include "lib/linux.h"
+#include "core/sweep.h"
 //#include "core/fake_serial.h"
 
 #include <unistd.h> // To parse arguments
@@ -42,6 +43,8 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 //}
 
 int main(int argc, char** argv) {
+
+  setupLogging();
 
   string serverAddress;
   int serverPort = 0;
@@ -105,14 +108,22 @@ app.get('/run/arduino',function (req, res) {
 
   server.resource["^/sweep$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (!p.isOpen()) {
+      response->write("Error arduino is not connected.");
       return;
     }
-    // TODO
+    Sweep sweep(p);
+    if(!sweep.init()) {
+      response->write("Error initializing sweep.");
+      return;
+    }
+    sweep.run();
+    
+    response->write("Ok executing command sweeep");
   };
 
   server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     // FIXME: Also handle fake arduino too
-    if (p.openPort("/dev/ttyACM0") < 0) { // FIXME: Close port if already opened..
+    if (p.openPort("/dev/ttyACM0") < 0) {
       response->write("Error opening arduino port.");
       return;
     }
