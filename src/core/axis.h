@@ -108,7 +108,7 @@ class Axis {
       m_writer << "{";
       serializeAttrs();
       m_writer << "\"0\": 0"; // To be sure that the last attribute does not end with a comma
-      m_writer << "}";
+      m_writer << "}\n";
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
