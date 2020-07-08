@@ -237,6 +237,8 @@ class HRCode {
     float m_weight = 0;
     string m_name;
     int m_content_id;
+    double centerX;
+    double centerY;
 };
 
 ostream &operator<<(std::ostream &os, const HRCode &m) {
@@ -336,6 +338,7 @@ vector<HRCode> detectHRCodes(Mat& src) {
 
     cvtColor( m, m, COLOR_GRAY2BGR );
     codes[i] = parseHRCode(m);
+    //codes[i].centerX = 
 
     //string title = string("detectedHRCode") + to_string(i) + ".png";
     //imshow(title,m);

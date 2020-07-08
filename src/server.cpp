@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
   //cout << "Port: " << server.config.port << endl;
   
   SerialPort p;
+  vector<Jar> jars;
   //FakeSerialPort fake;
 
 /*  server.resource["^/run/arduino([0-9]+)$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
@@ -110,7 +111,7 @@ app.get('/run/arduino',function (req, res) {
     response->write("Ok command given to arduino");
   };
 
-  server.resource["^/sweep$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (!p.isOpen()) {
       response->write("Error arduino is not connected.");
       return;
@@ -120,7 +121,7 @@ app.get('/run/arduino',function (req, res) {
       response->write("Error initializing sweep.");
       return;
     }
-    sweep.run();
+    sweep.run(jars);
     
     response->write("Ok executing command sweeep");
   };
