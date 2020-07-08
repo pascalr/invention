@@ -20,6 +20,9 @@ html *
 #manuel {
   position: relative;
 }
+.manuel_columns {
+  padding-left: 25px;
+}
 .icon {
   border: solid black 2.5px;
   position: absolute;
@@ -100,7 +103,7 @@ input[type=number] {
 <span class="item" onclick="menuItemClicked(this)">Inventaire</span>
 <span class="item" onclick="menuItemClicked(this)">Recette</span>
 <span class="item" onclick="menuItemClicked(this)">Simulation</span>
-<span class="item" onclick="menuItemClicked(this)">Manuel</span>
+<span class="item" onclick="menuItemClicked(this)" id="defaultMenuItem">Manuel</span>
 <span class="item" onclick="menuItemClicked(this)">TODO</span>
 <span class="item" onclick="menuItemClicked(this)">Notes</span>
 <span class="item" onclick="menuItemClicked(this)">design</span>
@@ -108,7 +111,7 @@ input[type=number] {
 <span class="item" onclick="menuItemClicked(this)">RPI Camera</span>
 </div>
 
-<script>
+<script defer>
 function menuItemClicked(item) {
   let siblings = item.parentElement.children;
   for (let i = 0; i < siblings.length; i++) {
@@ -118,6 +121,7 @@ function menuItemClicked(item) {
   let elem = document.getElementById(item.innerText)
   if (elem) {elem.style.display = "block";}
 }
+window.onload = () => menuItemClicked(document.getElementById("defaultMenuItem"))
 </script>
 <!-- SECTION *Polling -->
 <script>
@@ -171,85 +175,103 @@ function menuItemClicked(item) {
 })();*/
 </script>
 <!-- SECTION *Manuel -->
-<div id="Manuel">
-<h1>Commandes</h1>
-
-<div>
-<button onclick="document.getElementById('log').value='';$.get('/connect');">Connect</button>
-<button onclick="$.get('/close')">Close</button>
-<button onclick="$.get('/run/arduino?cmd=\?')">Info</button>
-<button onclick="$.get('/run/arduino?cmd=\s')" style="color: red;">Stop</button>
-<button onclick="$.get('/takePicture'); refreshPicture()">Picture</button>
-<button onclick="$.get('/sweep')">Sweep</button>
+<div id="Manuel" style="display: flex;">
+<div style="display: flex;">
+  <div>
+    <div>
+      <img src="capture.jpg" id="captureImg" width="640" height="480">
+    </div>
+    <div>
+      <form action="#" onsubmit="sendMessage(); return false;" autocomplete="off">
+        Message: <input id="message" type="text" size="51">
+        <input type="submit" value="Send"/>
+      </form>
+    </div>
+    <div>
+      <textarea id="log" cols=68 rows=14 readonly>
+      Log...
+      </textarea> 
+    </div>
+  </div>
+  <div>
+    <button style="font-size: 28px; margin-bottom: 10px;" onclick="$.get('/run/arduino?cmd=H')">🏠</button><br/>
+    <button onclick="$.get('/run/arduino?cmd=HX')">🏠 X</button><br/>
+    <button onclick="$.get('/run/arduino?cmd=HY')">🏠 Y</button><br/>
+    <button onclick="$.get('/run/arduino?cmd=HZ')">🏠 Z</button><br/>
+    <button onclick="$.get('/run/arduino?cmd=HW')">🏠 W</button><br/>
+  </div>
+  <div>
+    <div>
+      <button onclick="document.getElementById('log').value='';$.get('/connect');">Connect</button>
+      <button onclick="$.get('/close')">Close</button>
+      <button onclick="$.get('/run/arduino?cmd=\?')">Info</button>
+      <button onclick="$.get('/run/arduino?cmd=\s')" style="color: red;">Stop</button>
+      <button onclick="$.get('/takePicture'); refreshPicture()">Picture</button>
+      <button onclick="$.get('/sweep')">Sweep</button>
+    </div>
+    <div style="display: flex;">
+      
+      <div class="manuel_columns">
+        <h2>Position</h2>
+        Position X: <input id="Pos X" type="number" readonly>
+        <button onclick="$.get('/run/arduino?cmd=%2DX')">-</button>
+        <button onclick="$.get('/run/arduino?cmd=%2BX')">+</button>
+        <br/>
+        Position Y: <input id="Pos Y" type="number" readonly>
+        <button onmousedown="$.get('/run/arduino?cmd=%2DY')"
+        onclick="$.get('/run/arduino?cmd=s')">-</button>
+        <button onmousedown="$.get('/run/arduino?cmd=%2BY')"
+        onclick="$.get('/run/arduino?cmd=s')">+</button>
+        <br/>
+        Position Z: <input id="Pos Z" type="number" readonly>
+        <button onclick="$.get('/run/arduino?cmd=%2DZ')">-</button>
+        <button onclick="$.get('/run/arduino?cmd=%2BZ')">+</button>
+        <br/>
+        Position W: <input id="Pos W" type="number" readonly>
+        <button onclick="$.get('/run/arduino?cmd=%2DW')">-</button>
+        <button onclick="$.get('/run/arduino?cmd=%2BW')">+</button>
+        <br/>
+      </div>
+      <div class="manuel_columns">
+        <h2>Destination</h2>
+        <form action="#" onsubmit="$.get(`/run/arduino?cmd=MX${this[0].value}Y${this[1].value}Z${this[2].value}W${this[3].value}`);return false">
+        Position X: <input id="Dest X" type="number" readonly><br/>
+        Position Y: <input id="Dest Y" type="number" readonly><br/>
+        Position Z: <input id="Dest Z" type="number" readonly><br/>
+        Position W: <input id="Dest W" type="number" readonly><br/>
+        </form>
+      </div>
+      <div class="manuel_columns">
+        <h2>Outputs</h2> Axis
+        <select id="axis" name="axis">
+          <option value="X">X</option>
+          <option value="Y">Y</option>
+          <option value="Z">Z</option>
+          <option value="W">W</option>
+        </select>
+        <br/>
+        <input id="PIN enabled Y" type="checkbox">Enabled
+        <br/>
+        <input id="PIN dir Y" type="checkbox" readonly>Direction<br/>
+        <input id="PIN step Y" type="checkbox" readonly>Step<br/>
+        <input id="PIN limit switch Y" type="checkbox" readonly>Limit switch<br/>
+        <input id="Force Y" type="checkbox" readonly>Force rotation<br/>
+      </div>
+      <div class="manuel_columns">
+        <h2>Inputs</h2> Axis
+        <select id="axis" name="axis">
+          <option value="X">X</option>
+          <option value="Y">Y</option>
+          <option value="Z">Z</option>
+          <option value="W">W</option>
+        </select>
+        <br/>
+        Speed: <input type="range" min="500" max="3000" value="500" style ="direction: rtl;" onchange="$.get('/run/arduino?cmd=v' + this.value)">
+        <br/>
+      </div>
+    </div>
+  </div>
 </div>
-
-<div  style="position: absolute; top: 120px; left: 0px;">
-<button style="font-size: 28px; margin-bottom: 10px;" onclick="$.get('/run/arduino?cmd=H')">🏠</button><br/>
-<button onclick="$.get('/run/arduino?cmd=HX')">🏠 X</button><br/>
-<button onclick="$.get('/run/arduino?cmd=HY')">🏠 Y</button><br/>
-<button onclick="$.get('/run/arduino?cmd=HZ')">🏠 Z</button><br/>
-<button onclick="$.get('/run/arduino?cmd=HW')">🏠 W</button><br/>
-</div>
-
-<div  style="position: absolute; top: 100px; left: 100px;">
-<h2>Position</h2>
-Position X: <input id="Pos X" type="number" readonly>
-<button onclick="$.get('/run/arduino?cmd=%2DX')">-</button>
-<button onclick="$.get('/run/arduino?cmd=%2BX')">+</button>
-<br/>
-Position Y: <input id="Pos Y" type="number" readonly>
-<button onmousedown="$.get('/run/arduino?cmd=%2DY')"
-onclick="$.get('/run/arduino?cmd=s')">-</button>
-<button onmousedown="$.get('/run/arduino?cmd=%2BY')"
-onclick="$.get('/run/arduino?cmd=s')">+</button>
-<br/>
-Position Z: <input id="Pos Z" type="number" readonly>
-<button onclick="$.get('/run/arduino?cmd=%2DZ')">-</button>
-<button onclick="$.get('/run/arduino?cmd=%2BZ')">+</button>
-<br/>
-Position W: <input id="Pos W" type="number" readonly>
-<button onclick="$.get('/run/arduino?cmd=%2DW')">-</button>
-<button onclick="$.get('/run/arduino?cmd=%2BW')">+</button>
-<br/>
-</div>
-<div  style="position: absolute; top: 100px; left: 400px;">
-<h2>Destination</h2>
-<form action="#" onsubmit="$.get(`/run/arduino?cmd=MX${this[0].value}Y${this[1].value}Z${this[2].value}W${this[3].value}`);return false">
-Position X: <input id="Dest X" type="number" readonly><br/>
-Position Y: <input id="Dest Y" type="number" readonly><br/>
-Position Z: <input id="Dest Z" type="number" readonly><br/>
-Position W: <input id="Dest W" type="number" readonly><br/>
-</form>
-</div>
-
-<div  style="position: absolute; top: 100px; left: 620px;">
-<h2>Outputs</h2> Axis
-<select id="axis" name="axis">
-  <option value="X">X</option>
-  <option value="Y">Y</option>
-  <option value="Z">Z</option>
-  <option value="W">W</option>
-</select>
-<br/>
-<input id="PIN enabled Y" type="checkbox">Enabled
-<br/>
-<input id="PIN dir Y" type="checkbox" readonly>Direction<br/>
-<input id="PIN step Y" type="checkbox" readonly>Step<br/>
-<input id="PIN limit switch Y" type="checkbox" readonly>Limit switch<br/>
-<input id="Force Y" type="checkbox" readonly>Force rotation<br/>
-</div>
-
-<div  style="position: absolute; top: 100px; left: 800px;">
-<h2>Inputs</h2> Axis
-<select id="axis" name="axis">
-  <option value="X">X</option>
-  <option value="Y">Y</option>
-  <option value="Z">Z</option>
-  <option value="W">W</option>
-</select>
-<br/>
-Speed: <input type="range" min="500" max="3000" value="500" style ="direction: rtl;" onchange="$.get('/run/arduino?cmd=v' + this.value)">
-<br/>
 </div>
 
 <script>
@@ -260,25 +282,8 @@ function sendMessage() {
 }
 </script>
 
-<div  style="position: absolute; top: 300px; left: 0px;">
-<form action="#" onsubmit="sendMessage(); return false;" autocomplete="off">
-  Message: <input id="message" type="text">
-  <input type="submit" value="Send"/>
-</form>
-</div>
 
-<div  style="position: absolute; top: 350px; left: 0px;">
 
- <textarea id="log" cols=100 rows=14 readonly>
-Log...
-</textarea> 
-</div>
-
-<div style="padding-top: 512px;"></div>
-
-<div>
-<img src="capture.jpg" id="captureImg" />
-</div>
 </div>
 <!-- SECTION *Inventaire -->
 <div id="Inventaire">
@@ -328,8 +333,6 @@ Gateau aux carottes
 <div><a href="/show/tahini">Tahini</a></div>
 
 50g riz
-
-<img src="/images/1582349055246_image.png" width=128 onclick="$.get('/run/arduino?cmd=riz')">
 
 <h2>Codes</h2>
 Riz au jasmin: 1610
@@ -414,10 +417,6 @@ function showVideo() {
 <!-- SECTION *RPI Camera -->
 <div id="RPI Camera">
 <h1>Camera</h1>
-
-<div>
-<img src="capture.jpg" id="captureImg" />
-</div>
 
 </div>
 
