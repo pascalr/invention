@@ -18,13 +18,11 @@
 #include "../lib/serial.h"
 #include "../helper/helper.h"
 #include "../config/setup.h"
+#include "serialize.hpp"
+#include "fake_program.h"
 
 #include <chrono>
 #include <thread>
-
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-using namespace boost::property_tree;
 
 using namespace std;
 using namespace cv;
@@ -75,17 +73,11 @@ class Sweep {
       m_port.writePort("?");
       m_port.waitUntilMessageReceived(MESSAGE_JSON);
 
-      /*vector<string> axesStr;
-      while (true) {
-        string str;
-        m_port.waitUntilMessageReceived(str);
-        if (str == MESSAGE_DONE) {break;}
-        axesStr.push_back(str);
-      }
+      string programJson;
+      m_port.waitUntilMessageReceived(programJson);
 
-      ptree pt;
-      read_json(json_str, pt);
-      auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");*/
+      FakeProgram p;
+      deserialize(p, programJson);
     }
 
     void move(const char* txt, double pos, vector<Jar>& jars) {
