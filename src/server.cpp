@@ -110,10 +110,10 @@ app.get('/run/arduino',function (req, res) {
   server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     // FIXME: Also handle fake arduino too
     if (p.openPort("/dev/ttyACM0") < 0) { // FIXME: Close port if already opened..
-      string content = "Error opening arduino port. Aborting.";
-      *response << "HTTP/1.1 200 OK\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;
+      response->write("Error opening arduino port.");
       return;
     }
+    response->write("Successfully connected to arduino.");
   };
 
   server.resource["^/close$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
