@@ -18,7 +18,7 @@
 
 #include "lib/serial.h"
 #include "lib/linux.h"
-#include "core/fake_serial.h"
+//#include "core/fake_serial.h"
 
 #include <unistd.h> // To parse arguments
 
@@ -44,13 +44,9 @@ int main(int argc, char** argv) {
 
   string serverAddress;
   int serverPort = 0;
-  int flags;
-  int nsecs, tfnd;
+  int opt;
 
-  nsecs = 0;
-  tfnd = 0;
-  flags = 0;
-  while ((int opt = getopt(argc, argv, "p:a:")) != -1) {
+  while ((opt = getopt(argc, argv, "p:a:")) != -1) {
     switch (opt) {
     case 'p':
       serverPort = atoi(optarg);
@@ -67,8 +63,9 @@ int main(int argc, char** argv) {
   // optind: The index that has been read up to there
 
   if (serverAddress.empty()) {
-    serverAdress = "localhost";
+    serverAddress = "localhost";
   } else if (serverAddress == "lan") {
+    getLanAddress();
   }
 
   HttpServer server;
@@ -76,7 +73,7 @@ int main(int argc, char** argv) {
   server.config.port = serverPort || 8083;
   
   SerialPort p;
-  FakeSerialPort fake;
+  //FakeSerialPort fake;
 
 /*  server.resource["^/run/arduino([0-9]+)$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     response->write(request->path_match[1].str());

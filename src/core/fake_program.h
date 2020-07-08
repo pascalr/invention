@@ -29,7 +29,13 @@ class FakeProgram : public Program {
     }
 
     bool getInput(char* buf, int size) {
-      string str;
+      if (fake_input.empty()) {
+        return false;
+      }
+      strcpy(buf, fake_input.c_str());
+      fake_input.clear();
+      return true;
+      /*string str;
       if (fake_input.empty()) {
         cin >> str;
       } else {
@@ -43,8 +49,7 @@ class FakeProgram : public Program {
       }
 
       strcpy(buf, str.c_str());
-      rtrim(buf);
-      return true;
+      rtrim(buf);*/
     }
 
     void setFakeInput(string& str) {
@@ -52,10 +57,11 @@ class FakeProgram : public Program {
     }
 
     bool inputAvailable() {
-      if (!fake_input.empty()) {
+      return !fake_input.empty();
+      /*if (!fake_input.empty()) {
         return true;
       }
-      return linuxInputAvailable();
+      return linuxInputAvailable();*/
     }
 
   protected:

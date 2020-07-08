@@ -6,13 +6,15 @@
 #include <string>
 #include <iostream>
 
+#include <thread>
+
 using namespace std;
 
 class FakeSerialPort {
 
   public:
 
-    ~SerialPort() {
+    ~FakeSerialPort() {
       closePort();
     }
 
@@ -34,8 +36,25 @@ class FakeSerialPort {
       if (m_is_opened) {
         closePort();
       }
+
+      thread m_work_thread([&p,response] {
+        while (!p.inputAvailable()) {
+          this_thread::sleep_for(chrono::milliseconds(10));
+        }
+        string s;
+        p.getInput(s);
+        cout << "Arduino: " << s;
+
+        ptree pt;
+        stringstream ss;
+        pt.put("log", s);
+        json_parser::write_json(ss, pt);
+
+        response->write(ss.str());
+      });
+      m_work_thread.detach();
       
-      // TODO
+      setupAxes(&p.getWriter(), p.axes);
 
       m_is_opened = true;
       
@@ -94,6 +113,8 @@ class FakeSerialPort {
       return num_bytes;
     }
 
+    thread m_work_thread;
+    FakeProgram m_program;
     char m_separator = '\n';
     string input;
     bool separatorFound = false;

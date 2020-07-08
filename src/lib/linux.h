@@ -4,12 +4,12 @@
 #include <arpa/inet.h>
 
 // https://stackoverflow.com/questions/4656824/get-lan-ip-and-print-it
-void getLanAddress() {
+int getLanAddress() {
     struct ifaddrs *iflist, *iface;
 
     if (getifaddrs(&iflist) < 0) {
         perror("getifaddrs");
-        return 1;
+        return -1;
     }
 
     for (iface = iflist; iface; iface = iface->ifa_next) {
