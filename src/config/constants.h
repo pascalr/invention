@@ -11,6 +11,9 @@
 #define ARMOIRE_DEPTH 609.6 // mm
 #define ARMOIRE_HEIGHT 1905.0 // mm
 
+#define CAMERA_OFFSET 263.0 // mm
+#define CAMERA_FIELD_OF_VIEW 75.0 // degrees
+
 #define OFFSET_X 164.0 // mm, the distance between the sidewall and x = 0
 #define OFFSET_Z 160.0 // mm, the distance between the back and z = 0
 

@@ -89,6 +89,5 @@ void setup() {
 }
 
 void loop() {
-  
   myLoop(p);
 }

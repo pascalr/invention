@@ -43,6 +43,34 @@ class Jar {
     double position_z; // mm
 };
 
+void addUniqueToJars(vector<Jar> jars, vector<HRCodePosition> positions, double toolX, double toolZ, double angle) {
+
+  double camDeltaX = (RAYON - CAMERA_OFFSET) * cos(angle / 180 * PI);
+  double camDeltaZ = (RAYON - CAMERA_OFFSET) * sin(angle / 180 * PI);
+  double camX = toolX - camDeltaX;
+  double camZ = toolZ - camDeltaZ;
+
+  // Field of view distance = 2 * distance * tan(FOV[angle] / 2)
+  // Selon la loi du rapport des côtés d'un triangle b1/h1 = b2/h2 (triangle semblables)
+  // (opposé sur adjacent egal opposé sur adjacent)
+  // À une hauteur de 205mm, le code mesure ... de diamètre en pixel.
+  // Si la hauteur double, le code mesure va diviser par 2.
+  //
+  // Le facteur de mouvement en x, y est proportionnel à la hauteur.
+  //
+  // ATTENTION: Je dois transférer les coordonées x,y et données x,z; Je dois tourner...
+
+  for (auto pos = positions.begin(); pos != positions.end(); ++pos) {
+    double scale = pos->scale;
+    double imgDeltaX = pos->x - pos->originalImageWidth / 2.0 * scale;
+    double imgDeltaY = pos->y - pos->originalImageHeight / 2.0 * scale;
+
+    // x is side by side error, y is forward and backward error.
+    //pos->y;
+  }
+
+}
+
 #define MAX_X AXIS_X_MAX_POS
 #define MAX_Z AXIS_Z_MAX_POS
 
@@ -50,13 +78,6 @@ class Jar {
 // When a new sticker appears, it asks the arduino what position it is.
 // When a sticker disappers, it asks the arduino what position it is.
 // It can then triangulate the real position of the 
-
-class MovingDetectedCodes {
-  public:
-    double firstKnownPosition;
-    double lastKnownPosition;
-};
-
 
 class Sweep {
   public:
@@ -68,6 +89,7 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
+      m_jars.clear();
       return true;
     }
 
@@ -117,21 +139,21 @@ class Sweep {
           continue;
         }
 
-        BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR codes.";
-        vector<HRCode> codes = detectHRCodes(frame);
-	if (!codes.empty()) {
-          BOOST_LOG_TRIVIAL(debug) << "Code detected.";
+        BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
+ 
+        HRCodeParser parser(0.2, 0.2);
+        vector<HRCodePosition> positions;
+        parser.findHRCodePositions(frame, positions, 100);
+
+	      if (!positions.empty()) {
+          BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
           double x, z;
           askPosition(x, z);
-          for (auto it = codes.begin(); it != codes.end(); it++) {
-            HRCode code = *it;
-            //jars.push_back();
-            cerr << "FOUND: " << code << " at (" << x << ", " << z << ")" << endl;
-            BOOST_LOG_TRIVIAL(debug) << "FOUND: " << code << " at (" << x << ", " << z << ")";
-          }
-	}
+          //addUniqueToJars(m_jars, positions, x, z);
+          this_thread::sleep_for(chrono::milliseconds(500)); // To make sure it goes forward before stopping arduino again... Maybe "?100" so arduino runs 100 ms before returning position.
+	      }
         
-        this_thread::sleep_for(chrono::milliseconds(50));
+        this_thread::sleep_for(chrono::milliseconds(10));
       }
       BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
       m_port.unlock();
@@ -171,6 +193,7 @@ class Sweep {
   private:
     VideoCapture m_cap;
     SerialPort& m_port;
+    vector<Jar> m_jars;
 };
 
 #endif

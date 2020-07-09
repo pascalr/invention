@@ -31,6 +31,18 @@
 using namespace std;
 using namespace cv;
 
+class HRCodePosition {
+  public:
+    HRCodePosition(Mat& mat, double x1, double y1, int o1, int o2, double s1) : img(mat), x(x1), y(y1), originalImageWidth(o1), originalImageHeight(o2), scale(s1) {
+    }
+    Mat img;
+    double x;
+    double y;
+    int originalImageWidth;
+    int originalImageHeight;
+    double scale;
+};
+
 class HRCodeParser {
   public:
     HRCodeParser(int epsilonDia, int epsilonDist) {
@@ -68,7 +80,11 @@ class HRCodeParser {
       }
     }
     
-    void findHRCode(Mat src_gray, vector<Mat> &detectedCodes, vector<Point2f> &foundCenters, int thresh) {
+    void findHRCodePositions(Mat& src, vector<HRCodePosition> &detectedCodes, int thresh) {
+      Mat src_gray;
+      cvtColor( src, src_gray, COLOR_BGR2GRAY );
+      blur( src_gray, src_gray, Size(3,3) ); // Remove noise
+
       Mat canny_output;
       Canny( src_gray, canny_output, thresh, thresh*2 );
     
@@ -149,17 +165,14 @@ class HRCodeParser {
         Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
         Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
         warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
-    
-        detectedCodes.push_back(rotatedHRCode);
-        foundCenters.push_back(centers[i]);
+   
+        HRCodePosition codePos(rotatedHRCode, centers[i].x, centers[i].y, src.cols, src.rows, scale); 
+        detectedCodes.push_back(codePos);
       }
       //imshow( "Contours", drawing );
     }
 
-  protected:
 };
-
-
 
 class HRCode {
   public:
@@ -271,11 +284,11 @@ string parseLineTesseract(Mat& im) {
   return outText;
 }
 
-
-
-HRCode parseHRCode(Mat& mat) {
-  BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << mat.cols;
-  double scale = mat.cols/110.0;
+HRCode parseHRCode(HRCodePosition& p) {
+  Mat gray;
+  cvtColor(p.img, gray, COLOR_GRAY2BGR );
+  BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
+  double scale = gray.cols/110.0;
   BOOST_LOG_TRIVIAL(debug) << "scale: " << scale;
   double topOffset = 10.0 * scale;
   double charWidth = 12 * scale;
@@ -296,10 +309,10 @@ HRCode parseHRCode(Mat& mat) {
       //rectangle(mat, r, Scalar(0,0,255), 1, LINE_8);
       //Mat charMat(mat, Rect(x, y, charWidth, charHeight));
     }*/
-    double x = nbChar/-2.0*charWidth + mat.cols/2;
+    double x = nbChar/-2.0*charWidth + gray.cols/2;
     Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
     //rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
-    Mat lineMat(mat, lineRect);
+    Mat lineMat(gray, lineRect);
     //imshow(string("line")+to_string(i),lineMat);
     rawHRCode[i] = parseLineTesseract(lineMat);
   }
@@ -309,6 +322,8 @@ HRCode parseHRCode(Mat& mat) {
   code.setWeight(rawHRCode[1]);
   code.setName(rawHRCode[2]);
   code.setContentId(rawHRCode[3]);
+  code.centerX = p.x;
+  code.centerY = p.y;
   if (code.isValid()) {
     BOOST_LOG_TRIVIAL(info) << "Detected code: " << code;
   }
@@ -317,36 +332,14 @@ HRCode parseHRCode(Mat& mat) {
 }
 
 vector<HRCode> detectHRCodes(Mat& src) {
-  Mat src_gray;
-  int thresh = 100;
-  const char* source_window = "Source";
-  const int max_thresh = 255;
-
-  cvtColor( src, src_gray, COLOR_BGR2GRAY );
-  blur( src_gray, src_gray, Size(3,3) ); // Remove noise
-
-  /*Mat dilate_output;
-  Mat element = getStructuringElement( MORPH_RECT, Size(3,3), Point(1, 1) );
-  dilate( src_gray, dilate_output, element );*/
 
   HRCodeParser parser(0.2, 0.2);
-  vector<Mat> hr_codes;
-  vector<Point2f> centers;
-  parser.findHRCode(src_gray, hr_codes, centers, thresh);
+  vector<HRCodePosition> positions;
+  parser.findHRCodePositions(src, positions, 100);
 
-  vector<HRCode> codes(hr_codes.size());
-
-  for( size_t i = 0; i < hr_codes.size(); i++ ) {
-    Mat m = hr_codes[i];
-
-    cvtColor( m, m, COLOR_GRAY2BGR );
-    codes[i] = parseHRCode(m);
-    codes[i].centerX = centers[i].x;
-    codes[i].centerY = centers[i].y;
-
-    //string title = string("detectedHRCode") + to_string(i) + ".png";
-    //imshow(title,m);
-    //imwrite(title,m);
+  vector<HRCode> codes(positions.size());
+  for(size_t i = 0; i < positions.size(); i++) {
+    codes[i] = parseHRCode(positions[i]);
   }
 
   return codes;
