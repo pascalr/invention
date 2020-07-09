@@ -7,6 +7,7 @@ Makefile
 cmake_install.cmake
 bin
 output
+Testing
 node_modules
 src/arduino/core
 src/arduino/config

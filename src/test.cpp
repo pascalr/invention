@@ -324,10 +324,10 @@ void testSerialize() {
   setupAxes(&prog.getWriter(), prog.axes);
   referenceAll(prog.axes);
   
-  Axis* beforeX = axisByLetter(prog.axes, 'x');
-  beforeX->setIsReferenced(true);
-  beforeX->setIsReferencing(true);
-  beforeX->isForward = true;
+  Axis* beforeZ = axisByLetter(prog.axes, 'z');
+  beforeZ->setIsReferenced(true);
+  beforeZ->setIsReferencing(true);
+  beforeZ->isForward = true;
 
   stringstream ss;
   serialize<ostream>(prog, ss);
@@ -340,13 +340,13 @@ void testSerialize() {
   FakeProgram result(resultWriter);
   
   deserialize(result, ss.str());
-  Axis* axisX = axisByLetter(result.axes, 'x');
+  Axis* axisZ = axisByLetter(result.axes, 'z');
 
-  assertTest("dest", 0.0, axisX->getDestination());
-  assertTest("pos", 0.0, axisX->getPosition());
-  assertTest("isReferenced", true, axisX->isReferenced);
-  assertTest("isReferencing", true, axisX->isReferencing);
-  assertTest("forward", true, axisX->isForward);
+  assertNearby("dest", 0.0, axisZ->getDestination());
+  assertNearby("pos", 0.0, axisZ->getPosition());
+  assertTest("isReferenced", true, axisZ->isReferenced);
+  assertTest("isReferencing", true, axisZ->isReferencing);
+  assertTest("forward", true, axisZ->isForward);
 }
 
 int main (int argc, char *argv[]) {
