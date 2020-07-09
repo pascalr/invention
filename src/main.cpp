@@ -9,7 +9,7 @@
 #include "lib/lib.h"
 #include "lib/hr_code.hpp"
 
-#include "helper/helper.h"
+#include "helper/logging.h"
 
 using namespace cv;
 using namespace std;

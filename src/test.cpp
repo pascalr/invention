@@ -361,7 +361,7 @@ int main (int argc, char *argv[]) {
 
   // FIXME: MX10.0
   testSerialize();
-  /*testAxisByLetter(p.axes);
+  testAxisByLetter(p.axes);
   testParseMove(p.axes);
   testStop(axisByLetter(p.axes,'Y'));
   testParseInput(p);
@@ -369,6 +369,6 @@ int main (int argc, char *argv[]) {
   testMoveZ(&p.getWriter(), p.axes);
   testMoveZMovesX(&p.getWriter(), p.axes);
   testMoveSquare(&p.getWriter(), p.axes);
-  testMoveXFlipsZ(&p.getWriter(), p.axes);*/
+  testMoveXFlipsZ(&p.getWriter(), p.axes);
 
 }
