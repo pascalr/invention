@@ -11,40 +11,6 @@ bool isNumberSymbol(char c) {
 int parseMove(Axis** axes, const char* cmd, int oldCursor) {
   int i;
   for (i = oldCursor; cmd[i] != '\0'; i++) {
-
-    /*if (cmd[i] == 'Z' || cmd[i] == 'z') {
-
-      Axis* axisT = axisByLetter(axes, 'T');
-      HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
-            
-      if (destination >= 0 && destination <= RAYON && axisT && axisX) {
-        double angle = asin(destination / RAYON) * 180.0 / PI;
-        axisT->setDestination(angle);
-        axisT->setMotorEnabled(true);
-
-        axisT->setFollowingAxis(axisX);
-        axisX->setMotorEnabled(true);
-        axisX->updateShouldGoForward();
-        
-        double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
-        axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
-        axisX->setMotorEnabled(true);
-      }
-
-      /*Axis* axisT = axisByLetter(axes, 'T');      
-      
-      if (destination > 0 && destination <= RAYON && axisT) {
-        double angle = asin(destination / RAYON) * 180.0 / PI;
-        axisT->setDestination(angle);
-        axisT->setMotorEnabled(true);
-
-        HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
-        int shouldGoForward = axisX->getPosition() < axisX->maxPosition / 2 ? -1 : 1;
-        double deltaX = (RAYON * cos(angle * PI / 180)) - (RAYON * cos(axisT->getPosition() * PI / 180));
-        axisX->setDestination(axisX->getPosition() + (deltaX * shouldGoForward));
-        axisX->setMotorEnabled(true);
-      }
-    } else {*/
     Axis* axis = axisByLetter(axes, cmd[i]);
     if (axis) {
       axis->setDestination(atof(cmd+i+1));
@@ -131,20 +97,13 @@ void myLoop(Program& p) {
   if (p.isWorking) {
 
     if (p.inputAvailable()) {
-
-      char c_str[12];
-      if (p.getInput(c_str, 10)) {
-        p.getWriter() << MESSAGE_RECEIVED << '\n';
-      } else {
-        p.getWriter() << MESSAGE_INVALID_INPUT << c_str << '\n';
+      int incomingByte = p.getByte();
+      if (incomingByte < 0) {
         return;
       }
+      char cmd = (char) incomingByte;
+      p.getWriter() << MESSAGE_RECEIVED << cmd << '\n';
 
-      if (strlen(c_str) != 1) {
-        p.getWriter() << MESSAGE_INVALID_PENDING << c_str << '\n';
-        return;
-      }
-      char cmd = c_str[0];
       if (cmd == 's' || cmd == 'S') {
         for (int i = 0; p.axes[i] != NULL; i++) {
           p.axes[i]->stop();
@@ -156,6 +115,7 @@ void myLoop(Program& p) {
         p.getWriter() << "\n";
       } else if (cmd == '@') { // asking for position
         p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
+      } else if (cmd == '\r' || cmd == '\n') { // ignore
       } else {
         p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
       }

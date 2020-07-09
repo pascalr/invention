@@ -63,6 +63,9 @@ class ArduinoProgram : public Program {
     bool inputAvailable() {
       return Serial.available() > 0;
     }
+    int getByte() {
+      return Serial.read();
+    }
     bool getInput(char* buf, int size) {
       size_t inputSize = Serial.readBytes(buf, size);
       if (inputSize == 0) return false;

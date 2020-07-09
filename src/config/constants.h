@@ -41,5 +41,7 @@
 
 #define SERIAL_KEY_POLL 1111
 #define SERIAL_KEY_SWEEP 1112
+#define SERIAL_DELIMITER '\n'
+
 
 #endif

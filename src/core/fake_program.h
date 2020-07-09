@@ -28,6 +28,15 @@ class FakeProgram : public Program {
     void sleepMs(int time) {
       this_thread::sleep_for(chrono::milliseconds(time));
     }
+    
+    int getByte() {
+      if (fake_input.empty()) {
+        return -1;
+      }
+      int val = fake_input[0];
+      fake_input.erase(fake_input.begin());
+      return val;
+    }
 
     bool getInput(char* buf, int size) {
       if (fake_input.empty()) {

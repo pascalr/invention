@@ -15,6 +15,7 @@ class Program {
     virtual void sleepMs(int time) = 0;
     virtual bool inputAvailable() = 0;
     virtual bool getInput(char* buf, int size) = 0;
+    virtual int getByte() = 0;
 
     VerticalAxis axisY;
     HorizontalAxis axisX;
