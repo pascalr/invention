@@ -36,4 +36,7 @@
 #define PROPERTY_REFERENCING "referencing"
 #define PROPERTY_SPEED "speed"
 
+#define SERIAL_KEY_POLL 1111
+#define SERIAL_KEY_SWEEP 1112
+
 #endif
