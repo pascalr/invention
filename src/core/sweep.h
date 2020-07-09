@@ -104,13 +104,16 @@ class Sweep {
         }
 
         vector<HRCode> codes = detectHRCodes(frame);
-        for (auto it = codes.begin(); it != codes.end(); it++) {
-          HRCode code = *it;
-          //jars.push_back();
+	if (!codes.empty()) {
           double x, z;
           askPosition(x, z);
-          cerr << "FOUND: " << code << " at (" << x << ", " << z << ")" << endl;
-        }
+          for (auto it = codes.begin(); it != codes.end(); it++) {
+            HRCode code = *it;
+            //jars.push_back();
+            cerr << "FOUND: " << code << " at (" << x << ", " << z << ")" << endl;
+          }
+	}
+        
         this_thread::sleep_for(chrono::milliseconds(50));
       }
     }
