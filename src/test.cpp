@@ -6,6 +6,7 @@
 #include "lib/matplotlibcpp.h"
 #include "core/console_writer.h"
 #include "core/axis.h"
+#include "core/input_parser.h"
 #include "config/setup.h"
       
 #include <chrono> // for sleep
@@ -14,6 +15,7 @@
 #include <signal.h>
 
 #include "core/serialize.h"
+#include "core/deserialize.h"
 #include "core/fake_program.h"
 #include "core/string_writer.h"
 

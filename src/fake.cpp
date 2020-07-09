@@ -10,6 +10,7 @@
 #include "core/axis.h"
 #include "core/console_writer.h"
 #include "core/fake_program.h"
+#include "core/input_parser.h"
 #include "config/setup.h"
       
 #include <chrono>

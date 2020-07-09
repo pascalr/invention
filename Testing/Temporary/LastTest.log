@@ -1,10 +1,10 @@
-Start testing: Jul 09 10:42 EDT
+Start testing: Jul 09 10:43 EDT
 ----------------------------------------------------------
 1/1 Testing: regularTests
 1/1 Test: regularTests
 Command: "/home/pascalr/invention/bin/run_tests"
 Directory: /home/pascalr/invention
-"regularTests" start time: Jul 09 10:42 EDT
+"regularTests" start time: Jul 09 10:43 EDT
 Output:
 ----------------------------------------------------------
 [36;1mTesting serialize[0m
@@ -14,17 +14,17 @@ Done referencing axis T
 Done referencing axis A
 Done referencing axis B
 Done referencing axis Z
-[31mFAILED[0m (dest) - Expected: 0, Got: 340
-[31mFAILED[0m (pos) - Expected: 0, Got: -nan
+"pos": 0, "pos": 0, "pos": 0, "pos": 0, "pos": 0, "pos": 0, [31mFAILED[0m (dest) - Expected: 0, Got: 340
+[31mFAILED[0m (pos) - Expected: 0, Got: 1.65781e-315
 [32mPASSED[0m (isReferenced) - Expected: 1, Got: 1
 [32mPASSED[0m (isReferencing) - Expected: 1, Got: 1
 [32mPASSED[0m (forward) - Expected: 1, Got: 1
 <end of output>
-Test time =   0.03 sec
+Test time =   0.04 sec
 ----------------------------------------------------------
 Test Passed.
-"regularTests" end time: Jul 09 10:42 EDT
+"regularTests" end time: Jul 09 10:43 EDT
 "regularTests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Jul 09 10:42 EDT
+End testing: Jul 09 10:43 EDT

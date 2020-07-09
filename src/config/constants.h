@@ -28,4 +28,12 @@
 #define MESSAGE_READY "ready"
 #define MESSAGE_JSON "json"
 
+#define PROPERTY_NAME "name"
+#define PROPERTY_POSITION "pos"
+#define PROPERTY_DESTINATION "dest"
+#define PROPERTY_FORWARD "forward"
+#define PROPERTY_REFERENCED "referenced"
+#define PROPERTY_REFERENCING "referencing"
+#define PROPERTY_SPEED "speed"
+
 #endif

@@ -1,2 +1,2 @@
-regularTests 5 0.00639081
+regularTests 6 0.00590233
 ---

@@ -19,6 +19,7 @@
 #include "../helper/helper.h"
 #include "../config/setup.h"
 #include "serialize.h"
+#include "deserialize.h"
 #include "fake_program.h"
 #include "string_writer.h"
 
