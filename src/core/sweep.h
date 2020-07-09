@@ -16,7 +16,7 @@
 #include "../lib/lib.h"
 #include "../lib/hr_code.hpp"
 #include "../lib/serial.h"
-#include "../helper/helper.h"
+#include "../helper/logging.h"
 #include "../config/setup.h"
 #include "../config/constants.h"
 #include "deserialize.h"
@@ -72,17 +72,25 @@ class Sweep {
     }
 
     void askPosition(double &x, double &z) {
-      // FIXME: Clear buffer maybe
+      BOOST_LOG_TRIVIAL(debug) << "Asking position.";
+
+      BOOST_LOG_TRIVIAL(debug) << "Locking serial port sweep.";
       m_port.lock(SERIAL_KEY_SWEEP);
-      m_port.writePort("?");
+
+      BOOST_LOG_TRIVIAL(debug) << "Writing ? to port.";
+      m_port.writePort("?"); // FIXME: Clear buffer maybe
+      BOOST_LOG_TRIVIAL(debug) << "Waiting untill JSON message is received.";
       m_port.waitUntilMessageReceived(MESSAGE_JSON);
 
+      BOOST_LOG_TRIVIAL(debug) << "Waiting untill actual message is received.";
       string programJson;
       m_port.waitUntilMessageReceived(programJson);
+      BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
       m_port.unlock();
 
       StringWriter w;
       FakeProgram p(w);
+      BOOST_LOG_TRIVIAL(debug) << "Deserializing.";
       deserialize(p, programJson);
 
       Axis* axisX = axisByLetter(p.axes, 'X');
@@ -90,15 +98,20 @@ class Sweep {
 
       x = axisX->getPosition();
       z = axisZ->getPosition();
+      
+      BOOST_LOG_TRIVIAL(debug) << "Ask position done. x = " << x << ", z = " << z << ".";
     }
 
     void move(const char* txt, double pos, vector<Jar>& jars) {
       string str = txt;
       str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
       cout << "Writing: " << str << endl;
+      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << str;
+      BOOST_LOG_TRIVIAL(debug) << "Locking serial port sweep.";
       m_port.lock(SERIAL_KEY_SWEEP);
       m_port.writePort(str);
       while (!m_port.messageReceived(MESSAGE_DONE)) {
+        BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
         Mat frame;
         m_cap.read(frame);
         if (frame.empty()) {
@@ -107,16 +120,20 @@ class Sweep {
           continue;
         }
 
+        BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR codes.";
         vector<HRCode> codes = detectHRCodes(frame);
         for (auto it = codes.begin(); it != codes.end(); it++) {
+          BOOST_LOG_TRIVIAL(debug) << "Code detected.";
           HRCode code = *it;
           //jars.push_back();
           double x, z;
           askPosition(x, z);
           cerr << "FOUND: " << code << " at (" << x << ", " << z << ")" << endl;
+          BOOST_LOG_TRIVIAL(debug) << "FOUND: " << code << " at (" << x << ", " << z << ")";
         }
         this_thread::sleep_for(chrono::milliseconds(50));
       }
+      BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
       m_port.unlock();
     }
 

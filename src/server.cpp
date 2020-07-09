@@ -24,6 +24,8 @@
 
 #include <unistd.h> // To parse arguments
 
+#include "helper/logging.h"
+
 using namespace std;
 // Added for the json-example:
 using namespace boost::property_tree;

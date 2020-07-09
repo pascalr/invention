@@ -3,7 +3,7 @@
 #include "lib/hr_code.hpp"
 #include "lib/serial.h"
 #include "config/setup.h"
-#include "helper/helper.h"
+#include "helper/logging.h"
 
 #include "core/sweep.h"
 
