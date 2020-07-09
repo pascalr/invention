@@ -18,7 +18,7 @@
 #include "../lib/serial.h"
 #include "../helper/helper.h"
 #include "../config/setup.h"
-#include "serialize.hpp"
+#include "serialize.h"
 #include "fake_program.h"
 #include "string_writer.h"
 

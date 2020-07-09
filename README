@@ -25,6 +25,10 @@ Avec la machine, idéalement plus besoin de frigo. La nourriture est fait pour l
 Le problème peut-être est que fais tu des restants de nourriture qui ne se conserve pas? Il ne devrait pas y en avoir. Et pour combler la faim, tu
 manges du dessert. Le dessert peut rester à température pièce sans problème.
 
+----
+
+Ca serait pas pire je crois si les templates en c++ tu remplacerait le type de base. Ca veut dire que tu peux implementer un type qui conviendrait pour la fonction.
+Et tu overwrite le type qui existe deja. Tu pourrais ainsi patcher pas mal les fonctions. Idée farfelu de même.
 
 ----
 

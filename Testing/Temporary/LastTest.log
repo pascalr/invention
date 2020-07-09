@@ -1,202 +1,30 @@
-Start testing: Jul 08 15:48 EDT
+Start testing: Jul 09 10:42 EDT
 ----------------------------------------------------------
 1/1 Testing: regularTests
 1/1 Test: regularTests
 Command: "/home/pascalr/invention/bin/run_tests"
 Directory: /home/pascalr/invention
-"regularTests" start time: Jul 08 15:48 EDT
+"regularTests" start time: Jul 09 10:42 EDT
 Output:
 ----------------------------------------------------------
 [36;1mTesting serialize[0m
-{"name": "X", "pos": 0, "dest": -1, "speed": 500, "forward": false, "referenced": false, "delta_pos": 0, "0": 0}
-{"name": "Y", "pos": 0, "dest": -1, "speed": 500, "forward": false, "referenced": false, "0": 0}
-{"name": "T", "pos": 0, "dest": -1, "speed": 500, "forward": false, "referenced": false, "0": 0}
-{"name": "A", "pos": 0, "dest": -1, "speed": 500, "forward": false, "referenced": false, "0": 0}
-{"name": "B", "pos": 0, "dest": -1, "speed": 500, "forward": false, "referenced": false, "0": 0}
-{"name": "Z", "pos": 0, "dest": -1, "speed": 500, "forward": false, "referenced": false, "dest_angle": 0, "0": 0}
-{"axis_X": "", "axis_Y": "", "axis_T": "", "axis_A": "", "axis_B": "", "axis_Z": "}[36;1mTesting axisByName[0m
-[32mPASSED[0m (Should be case insensitive) - Expected: X, Got: X
-Testing axisByName
-[32mPASSED[0m (testing macro) - Expected: X, Got: X
-[36;1mTesting parseMove[0m
 Done referencing axis X
 Done referencing axis Y
 Done referencing axis T
 Done referencing axis A
 Done referencing axis B
 Done referencing axis Z
-[32mPASSED[0m (X10) - Expected: 10, Got: 10
-[32mPASSED[0m (Cursor should go forward) - Expected: 3, Got: 3
-[32mPASSED[0m (Y20X20) - Expected: 20, Got: 20
-[32mPASSED[0m (Y20X20) - Expected: 20, Got: 20
-[32mPASSED[0m (Cursor should go forward) - Expected: 6, Got: 6
-[36;1mTesting stop[0m
-Done referencing axis Y
-[32mPASSED[0m (position) - Expected: 10, Got: 9.94964
-[32mPASSED[0m (destination) - Expected: 10, Got: 9.94964
-[32mPASSED[0m - Expected: 0, Got: 0
-[36;1mTesting parseInput[0m
-Referencing...
-Done referencing axis X
-Cmd: HX
-[32mPASSED[0m (HX should reference X) - Expected: 0, Got: 0
-[32mPASSED[0m (HX should not refence Y) - Expected: 100, Got: 100
-[32mPASSED[0m (Should increase the cursor by 2) - Expected: 2, Got: 2
-Referencing...
-Done referencing axis X
-Cmd: HX
-[32mPASSED[0m (HHX index 1 should not refence Y) - Expected: 100, Got: 100
-Referencing...
-Done referencing axis X
-Done referencing axis Y
-Done referencing axis T
-Done referencing axis A
-Done referencing axis B
-Done referencing axis Z
-Cmd: H
-[32mPASSED[0m (H should reference Y) - Expected: 0, Got: 0
-[32mPASSED[0m (Should increase the cursor by 1) - Expected: 1, Got: 1
-[36;1mTesting handleAxis[0m
-Done referencing axis X
-[32mPASSED[0m (Should not be working at first) - Expected: 0, Got: 0
-[32mPASSED[0m (After a move it should work) - Expected: 1, Got: 1
-[36;1mTesting move Z[0m
-Done referencing axis X
-Done referencing axis Y
-Done referencing axis T
-Done referencing axis A
-Done referencing axis B
-Done referencing axis Z
-[32mPASSED[0m (Beginning position Z) - Expected: 0, Got: 0
-[32mPASSED[0m (Beginning destination Z) - Expected: 0, Got: 0
-Move: MZ340
-ok
-Cmd: MZ340
-done
-[32mPASSED[0m (MZ(RAYON) position Z) - Expected: 340, Got: 340
-[32mPASSED[0m (MZ(RAYON) destination Z) - Expected: 340, Got: 340
-[36;1mTesting move z moves x[0m
-Done referencing axis X
-Done referencing axis Y
-Done referencing axis T
-Done referencing axis A
-Done referencing axis B
-Done referencing axis Z
-[32mPASSED[0m (Beginning position X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning destination X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning delta X) - Expected: 340, Got: 340
-Move: MX100
-ok
-Cmd: MX100
-done
-[32mPASSED[0m (MX100 position X) - Expected: 100, Got: 100.004
-[32mPASSED[0m (MX100 destination X) - Expected: 100, Got: 100
-[32mPASSED[0m (MX100 delta X) - Expected: -340, Got: -340
-Done referencing axis X
-Done referencing axis Y
-Done referencing axis T
-Done referencing axis A
-Done referencing axis B
-Done referencing axis Z
-Move: MZ340
-ok
-Cmd: MZ340
-done
-[32mPASSED[0m (MZ380 position X) - Expected: 340, Got: 340.009
-[32mPASSED[0m (MZ380 destination X) - Expected: 340, Got: 340
-[32mPASSED[0m (MZ380 delta X) - Expected: 0, Got: 2.0819e-14
-Move: MX0
-ok
-Cmd: MX0
-done
-[32mPASSED[0m (MX0 position X) - Expected: 0, Got: -0.0120013
-[32mPASSED[0m (MX0 destination X) - Expected: 0, Got: 0
-[32mPASSED[0m (MX0 delta X) - Expected: 0, Got: 2.0819e-14
-[36;1mTesting move square[0m
-Done referencing axis X
-Done referencing axis Y
-Done referencing axis T
-Done referencing axis A
-Done referencing axis B
-Done referencing axis Z
-[32mPASSED[0m (Beginning position X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning destination X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning delta X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning position Z) - Expected: 0, Got: 0
-[32mPASSED[0m (Beginning destination Z) - Expected: 0, Got: 0
-Move: MZ340
-ok
-Cmd: MZ340
-done
-[32mPASSED[0m (MZ380 position X) - Expected: 340, Got: 340.009
-[32mPASSED[0m (MZ380 destination X) - Expected: 340, Got: 340
-[32mPASSED[0m (MZ380 delta X) - Expected: 0, Got: 2.0819e-14
-[32mPASSED[0m (MZ380 position Z) - Expected: 340, Got: 340
-[32mPASSED[0m (MZ380 destination Z) - Expected: 340, Got: 340
-Move: MX0
-ok
-Cmd: MX0
-done
-[32mPASSED[0m (MX0 position X) - Expected: 0, Got: -0.0120013
-[32mPASSED[0m (MX0 destination X) - Expected: 0, Got: 0
-[32mPASSED[0m (MX0 delta X) - Expected: 0, Got: 2.0819e-14
-[32mPASSED[0m (MX0 position Z) - Expected: 340, Got: 340
-[32mPASSED[0m (MX0 destination Z) - Expected: 340, Got: 340
-Move: MZ0
-ok
-Cmd: MZ0
-done
-[32mPASSED[0m (MZ0 position X) - Expected: 0, Got: 0.00896346
-[32mPASSED[0m (MZ0 destination X) - Expected: 0, Got: 0
-[32mPASSED[0m (MZ0 delta X) - Expected: -340, Got: -340
-[32mPASSED[0m (MZ0 position Z) - Expected: 0, Got: 4.1638e-14
-[32mPASSED[0m (MZ0 destination Z) - Expected: 0, Got: 0
-Move: MX340
-ok
-Cmd: MX340
-done
-[32mPASSED[0m (MX380 position X) - Expected: 340, Got: 340
-[32mPASSED[0m (MX380 destination X) - Expected: 340, Got: 340
-[32mPASSED[0m (MX380 delta X) - Expected: 340, Got: 340
-[32mPASSED[0m (MX380 position Z) - Expected: 0, Got: 0
-[32mPASSED[0m (MX380 destination Z) - Expected: 0, Got: 0
-[36;1mTesting move x flips z[0m
-Done referencing axis X
-Done referencing axis Y
-Done referencing axis T
-Done referencing axis A
-Done referencing axis B
-Done referencing axis Z
-[32mPASSED[0m (Beginning position X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning destination X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning delta X) - Expected: 340, Got: 340
-[32mPASSED[0m (Beginning position Z) - Expected: 0, Got: 0
-[32mPASSED[0m (Beginning destination Z) - Expected: 0, Got: 0
-[32mPASSED[0m (Beginning angle Z) - Expected: 0, Got: 0
-Move: MX0
-ok
-Cmd: MX0
-done
-[32mPASSED[0m (MX0 position X) - Expected: 0, Got: 0.00896346
-[32mPASSED[0m (MX0 destination X) - Expected: 0, Got: 0
-[32mPASSED[0m (MX0 delta X) - Expected: -340, Got: -340
-[32mPASSED[0m (MX0 position Z) - Expected: 0, Got: 4.1638e-14
-[32mPASSED[0m (MX0 angle Z) - Expected: 180, Got: 180
-Move: MX640
-ok
-Cmd: MX640
-done
-[32mPASSED[0m (MX_max position X) - Expected: 640, Got: 640.009
-[32mPASSED[0m (MX_max destination X) - Expected: 640, Got: 640
-[32mPASSED[0m (MX_max delta X) - Expected: 340, Got: 340
-[32mPASSED[0m (MX_max position Z) - Expected: 0, Got: 0
-[32mPASSED[0m (MX_max angle Z) - Expected: 0, Got: 0
+[31mFAILED[0m (dest) - Expected: 0, Got: 340
+[31mFAILED[0m (pos) - Expected: 0, Got: -nan
+[32mPASSED[0m (isReferenced) - Expected: 1, Got: 1
+[32mPASSED[0m (isReferencing) - Expected: 1, Got: 1
+[32mPASSED[0m (forward) - Expected: 1, Got: 1
 <end of output>
-Test time =   2.59 sec
+Test time =   0.03 sec
 ----------------------------------------------------------
 Test Passed.
-"regularTests" end time: Jul 08 15:48 EDT
-"regularTests" time elapsed: 00:00:02
+"regularTests" end time: Jul 09 10:42 EDT
+"regularTests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Jul 08 15:48 EDT
+End testing: Jul 09 10:42 EDT

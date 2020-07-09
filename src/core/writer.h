@@ -51,33 +51,4 @@ Writer& operator<<(Writer& writer, int val) {
   return writer;
 }
 
-template <typename T>
-void writeJson(T& writer, const char* key, const char* val) {
-  writer << "\"" << key << "\": \"" << val << "\", ";
-}
-template <typename T>
-void writeJson(T& writer, const char* key, bool val) {
-  writer << "\"" << key << "\": " << (val ? "true" : "false") << ", ";
-}
-template <typename T>
-void writeJson(T& writer, const char* key, char val) {
-  writer << "\"" << key << "\": \"" << val << "\", ";
-}
-template <typename T>
-void writeJson(T& writer, const char* key, double val) {
-  writer << "\"" << key << "\": " << val << ", ";
-}
-template <typename T>
-void writeJson(T& writer, const char* key, int val) {
-  writer << "\"" << key << "\": " << val << ", ";
-}
-template <typename T>
-void writeJson(T& writer, const char* key, long val) {
-  writer << "\"" << key << "\": " << val << ", ";
-}
-template <typename T>
-void writeJson(T& writer, const char* key, unsigned long val) {
-  writer << "\"" << key << "\": " << val << ", ";
-}
-
 #endif

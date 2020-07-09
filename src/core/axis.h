@@ -45,6 +45,10 @@ class Axis {
       m_min_position = 0;
     }
 
+
+    //template <typename T>
+    //friend void serialize(Axis* axis, T& out);
+
     void setReverseMotorDirection(bool val) {
       m_reverse_motor_direction = val;
     }
@@ -57,16 +61,16 @@ class Axis {
       maxPosition = maxP;
     }
 
-    virtual Writer& serialize(Writer& out) {
+    /*virtual Writer& serialize(Writer& out) {
       writeJson(out, "name", name);
-      writeJson(out, "pos", getPosition());
+      writeJson(out, "pos", getPositionSteps());
       writeJson(out, "dest", getDestination());
       writeJson(out, "forward", isForward);
       writeJson(out, "referenced", isReferenced);
-      writeJson(out, "referenced", isReferenced);
+      writeJson(out, "referencing", isReferencing);
       out << "\"speed\": " << speed; // CAREFULL: MUST NOT END WITH COMMA
       //writeJson("", );
-      /*doc["pos"] = getPosition();
+      doc["pos"] = getPosition();
       doc["dest"] = getDestination();
       doc["speed"] = speed;
       doc["forward"] = isForward;
@@ -80,8 +84,8 @@ class Axis {
       doc["pinStep"] = stepPin;
       doc["pinLimitSwitch"] = limitSwitchPin;
       doc["stepsPerUnit"] = stepsPerUnit;
-      doc["positionSteps"] = ;*/
-    }
+      doc["positionSteps"] = ;
+    }*/
 
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
@@ -215,6 +219,14 @@ class Axis {
     }
 
     virtual void afterInput() {
+    }
+
+    void setIsReferenced(bool isRef) {
+      isReferenced = isRef;
+    }
+
+    void setIsReferencing(bool isRef) {
+      isReferencing = isRef;
     }
 
     // Returns true if the axis is still working.
@@ -351,12 +363,12 @@ class HorizontalAxis : public Axis {
       //setPositionSteps(RAYON * stepsPerUnit);
     }
 
-    Writer& serialize(Writer& out) {
+    /*Writer& serialize(Writer& out) {
       out << "{";
       writeJson(out, "delta_pos", m_delta_position);
       Axis::serialize(out);
       out << "}";
-    }
+    }*/
 
   private:
     // The horizontal distance between the tip and the base.
@@ -472,10 +484,10 @@ Axis* axisByLetter(Axis** axes, char letter) {
   return NULL;
 }
 
-Writer& operator<<(Writer& out, Axis &axis) {
+/*Writer& operator<<(Writer& out, Axis &axis) {
   out << "{";
   axis.serialize(out);
   return out << "}";
-}
+}*/
 
 #endif

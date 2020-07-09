@@ -13,6 +13,7 @@
 
 #include <signal.h>
 
+#include "core/serialize.h"
 #include "core/fake_program.h"
 #include "core/string_writer.h"
 
@@ -316,13 +317,34 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
 void testSerialize() {
   title("Testing serialize");
 
-  /*StringWriter writer;
+  ConsoleWriter writer;
   FakeProgram prog(writer);
   setupAxes(&prog.getWriter(), prog.axes);
+  referenceAll(prog.axes);
+  
+  Axis* beforeX = axisByLetter(prog.axes, 'x');
+  beforeX->setIsReferenced(true);
+  beforeX->setIsReferencing(true);
+  beforeX->isForward = true;
 
-  ss << prog;
+  stringstream ss;
+  serialize<ostream>(prog, ss);
 
-  cout << writer.getString();*/
+  //writer << prog;
+  //string json_str;
+  //writer.getString(json_str);
+  
+  ConsoleWriter resultWriter;
+  FakeProgram result(resultWriter);
+  
+  deserialize(result, ss.str());
+  Axis* axisX = axisByLetter(result.axes, 'x');
+
+  assertTest("dest", 0.0, axisX->getDestination());
+  assertTest("pos", 0.0, axisX->getPosition());
+  assertTest("isReferenced", true, axisX->isReferenced);
+  assertTest("isReferencing", true, axisX->isReferencing);
+  assertTest("forward", true, axisX->isForward);
 }
 
 int main (int argc, char *argv[]) {
@@ -337,7 +359,7 @@ int main (int argc, char *argv[]) {
 
   // FIXME: MX10.0
   testSerialize();
-  testAxisByLetter(p.axes);
+  /*testAxisByLetter(p.axes);
   testParseMove(p.axes);
   testStop(axisByLetter(p.axes,'Y'));
   testParseInput(p);
@@ -345,6 +367,6 @@ int main (int argc, char *argv[]) {
   testMoveZ(&p.getWriter(), p.axes);
   testMoveZMovesX(&p.getWriter(), p.axes);
   testMoveSquare(&p.getWriter(), p.axes);
-  testMoveXFlipsZ(&p.getWriter(), p.axes);
+  testMoveXFlipsZ(&p.getWriter(), p.axes);*/
 
 }

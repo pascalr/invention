@@ -3,6 +3,7 @@
 
 #include <ctype.h>
 #include "axis.h"
+#include "serialize.h"
 
 class Program {
   public:
@@ -28,9 +29,9 @@ class Program {
     
     bool isWorking = false;
 
-    friend Writer& operator<<(Writer& writer, const char* theString);
+    //friend Writer& operator<<(Writer& writer, const char* theString);
 
-    void serialize(Writer& out) {
+    /*void serialize(Writer& out) {
       out << "{";
       for (int i = 0; axes[i] != NULL; i++) {
         out << "\"axis_" << axes[i]->name << "\": ";
@@ -40,10 +41,13 @@ class Program {
         }
       }
       out << "}";
-    }
+    }*/
 };
 
-Writer& operator<<(Writer& out, const Program &p) {
+template <typename T>
+void serialize(Program& p, T& out);
+
+/*Writer& operator<<(Writer& out, const Program &p) {
   out << "{";
   for (int i = 0; p.axes[i] != NULL; i++) {
     out << "\"axis_" << p.axes[i]->name << "\": ";
@@ -53,7 +57,7 @@ Writer& operator<<(Writer& out, const Program &p) {
     }
   }
   return out << "}";
-}
+}*/
 
 bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.' || c == '-';
@@ -143,7 +147,7 @@ int parseInput(const char* input, Program& p, int oldCursor) {
     #endif
   } else if (cmd == '?') {
     p.getWriter() << "\n" << MESSAGE_JSON << "\n";
-    p.getWriter() << p;
+    serialize<Writer>(p, p.getWriter());
     p.getWriter() << "\n";
   } else if (cmd == '+') {
     Axis* axis = axisByLetter(p.axes, input[cursor]);
@@ -203,7 +207,7 @@ void myLoop(Program& p) {
         p.isWorking = false;
       } else if (cmd == '?') {
         p.getWriter() << "\n" << MESSAGE_JSON << "\n";
-        p.getWriter() << p;
+        serialize<Writer>(p, p.getWriter());
         p.getWriter() << "\n";
       } else if (cmd == '@') { // asking for position
         p.getWriter() << MESSAGE_INVALID_PENDING << '\n';
