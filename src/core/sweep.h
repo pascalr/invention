@@ -18,6 +18,7 @@
 #include "../lib/serial.h"
 #include "../helper/helper.h"
 #include "../config/setup.h"
+#include "../config/constants.h"
 #include "deserialize.h"
 #include "fake_program.h"
 #include "string_writer.h"
@@ -71,11 +72,14 @@ class Sweep {
     }
 
     void askPosition(double &x, double &z) {
+      // FIXME: Clear buffer maybe
+      m_port.lock(SERIAL_KEY_SWEEP);
       m_port.writePort("?");
       m_port.waitUntilMessageReceived(MESSAGE_JSON);
 
       string programJson;
       m_port.waitUntilMessageReceived(programJson);
+      m_port.unlock();
 
       StringWriter w;
       FakeProgram p(w);
@@ -92,8 +96,8 @@ class Sweep {
       string str = txt;
       str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
       cout << "Writing: " << str << endl;
+      m_port.lock(SERIAL_KEY_SWEEP);
       m_port.writePort(str);
-
       while (!m_port.messageReceived(MESSAGE_DONE)) {
         Mat frame;
         m_cap.read(frame);
@@ -116,6 +120,7 @@ class Sweep {
         
         this_thread::sleep_for(chrono::milliseconds(50));
       }
+      m_port.unlock();
     }
 
     void run(vector<Jar>& jars) {

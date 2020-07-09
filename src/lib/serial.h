@@ -165,6 +165,17 @@ class SerialPort {
     void writePort(const char* str) {
       write(m_serial_port, str, strlen(str));
     }
+
+    void lock(int key) {
+      while (m_key) {
+        this_thread::sleep_for(chrono::milliseconds(10));
+      }
+      m_key = key;
+    }
+
+    void unlock() {
+      m_key = 0;
+    }
   
   private:
     int readBytes(char* buf, int length) {
@@ -185,6 +196,7 @@ class SerialPort {
     string input;
     bool separatorFound = false;
     bool m_is_opened = false;
+    int m_key = 0;
 };
 
 #endif

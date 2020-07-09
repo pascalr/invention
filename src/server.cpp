@@ -133,23 +133,29 @@ int main(int argc, char** argv) {
   server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (p.isOpen()) {
       thread work_thread([&p,response] {
-        while (!p.inputAvailable()) {
+        while (true) {
+          p.lock(SERIAL_KEY_POLL);
+          if (p.inputAvailable()) {
+            string s;
+            p.getInput(s);
+            p.unlock();
+            cout << "Arduino: " << s;
+                                                                             
+            ptree pt;
+            stringstream ss;
+            pt.put("log", s);
+            json_parser::write_json(ss, pt);
+                                                                             
+            string str = ss.str();
+            SimpleWeb::CaseInsensitiveMultimap header;
+            header.emplace("Content-Length", to_string(str.length()));
+            header.emplace("Content-Type", "application/json");
+            response->write(SimpleWeb::StatusCode::success_ok, str, header);
+            return;
+          }
+          p.unlock();
           this_thread::sleep_for(chrono::milliseconds(10));
         }
-        string s;
-        p.getInput(s);
-        cout << "Arduino: " << s;
-
-        ptree pt;
-        stringstream ss;
-        pt.put("log", s);
-        json_parser::write_json(ss, pt);
-
-	      string str = ss.str();
-	      SimpleWeb::CaseInsensitiveMultimap header;
-	      header.emplace("Content-Length", to_string(str.length()));
-	      header.emplace("Content-Type", "application/json");
-        response->write(SimpleWeb::StatusCode::success_ok, str, header);
       });
       work_thread.detach();
     }
