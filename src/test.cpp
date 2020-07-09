@@ -38,22 +38,22 @@ FakeProgram p(w);
     vector<int> positions;
 };*/
 
-template <class P>
-void assertNearby(const char* info, P t1, P t2) {
+template <class P1, class P2>
+void assertNearby(const char* info, P1 t1, P2 t2) {
   cout << ((t1 - t2) < 0.5 && (t2 - t1) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " (" << info << ")";
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
-template <class P>
-void assertTest(const char* info, P t1, P t2) {
+template <class P1, class P2>
+void assertTest(const char* info, P1 t1, P2 t2) {
   cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " (" << info << ")";
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
 
-template <class P>
-void assertTest(P t1, P t2) {
+template <class P1, class P2>
+void assertTest(P1 t1, P2 t2) {
   cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
   cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
 }
@@ -146,20 +146,20 @@ void testParseInput(Program& p) {
 
   Axis* axisX = axisByLetter(p.axes, 'X');
   Axis* axisY = axisByLetter(p.axes, 'Y');
-  axisX->setPositionSteps(100.0);
-  axisY->setPositionSteps(100.0);
+  axisX->setPositionSteps(100);
+  axisY->setPositionSteps(100);
   int cursor;
 
   cursor = parseInput("HX", p, 0);
-  assertTest("HX should reference X", 0.0, axisX->getPositionSteps());
-  assertTest("HX should not refence Y", 100.0, axisY->getPositionSteps());
+  assertTest("HX should reference X", 0, axisX->getPositionSteps());
+  assertTest("HX should not refence Y", 100, axisY->getPositionSteps());
   assertTest("Should increase the cursor by 2", 2, cursor);
   
   cursor = parseInput("HHX", p, 1);
-  assertTest("HHX index 1 should not refence Y", 100.0, axisY->getPositionSteps());
+  assertTest("HHX index 1 should not refence Y", 100, axisY->getPositionSteps());
 
   cursor = parseInput("H", p, 0);
-  assertTest("H should reference Y", 0.0, axisY->getPositionSteps());
+  assertTest("H should reference Y", 0, axisY->getPositionSteps());
   assertTest("Should increase the cursor by 1", 1, cursor);
 
 }

@@ -5,9 +5,22 @@ src/utils: Code with no dependencies
 src/lib:   Code with dependencies (e.g. Dependency on std so arduino cannot use it)
 src/core:  Code and models that are specific to my application
 src/arduino: Arduino files
-src/fake/:   Fake arduino files
-src/test/:   Test files
 src/config/: Config files
+
+BALAYAGE:
+
+Le bras robotique balais le comptoir et balais les tablettes si les portes on été ouvertes afin
+de déterminer la nouvelle position des pots.
+
+Lorsqu'il détecte un pot, il demande la position du bras. Par la position du bras et la position du pot dans l'image
+la position du pot est déterminée.
+
+Il garde alors en mémoire les positions des pots détectés et une image par pot. Ce sont des HRCodePositionObject.
+
+(Peut-être 2 images pour mieux déterminer la position.)
+
+Ensuite, les codes sont analyser et devienne des HRCodeObject.
+
 
 ----
 

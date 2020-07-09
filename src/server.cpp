@@ -46,7 +46,12 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 int main(int argc, char** argv) {
 
-  setupLogging();
+  boost::log::core::get()->set_filter(
+    boost::log::trivial::severity >= boost::log::trivial::trace // SHOW ALL in log file
+  );
+
+  boost::log::add_common_attributes();
+
 
   // ************** PARSE ARGS *******************
   string serverAddress;
@@ -103,18 +108,24 @@ int main(int argc, char** argv) {
   };
 
   server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    if (!p.isOpen()) {
-      response->write("Error arduino is not connected.");
-      return;
+    try {
+      if (!p.isOpen()) {
+        response->write("Error arduino is not connected.");
+        return;
+      }
+      Sweep sweep(p);
+      if(!sweep.init()) {
+        response->write("Error initializing sweep.");
+        return;
+      }
+      sweep.run(jars);
+      
+      response->write("Ok executing command sweeep");
+    } catch(...) {
+      std::exception_ptr p = std::current_exception();
+      std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+      response->write("Error an exception occured.");
     }
-    Sweep sweep(p);
-    if(!sweep.init()) {
-      response->write("Error initializing sweep.");
-      return;
-    }
-    sweep.run(jars);
-    
-    response->write("Ok executing command sweeep");
   };
 
   server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {

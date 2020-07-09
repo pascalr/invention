@@ -153,7 +153,7 @@ class Axis {
       m_position_steps = posSteps;
     }
 
-    virtual double getPositionSteps() {
+    virtual long getPositionSteps() {
       return m_position_steps;
     }
 

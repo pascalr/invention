@@ -74,23 +74,20 @@ class Sweep {
     void askPosition(double &x, double &z) {
       BOOST_LOG_TRIVIAL(debug) << "Asking position.";
 
-      BOOST_LOG_TRIVIAL(debug) << "Locking serial port sweep.";
-      m_port.lock(SERIAL_KEY_SWEEP);
-
       BOOST_LOG_TRIVIAL(debug) << "Writing ? to port.";
       m_port.writePort("?"); // FIXME: Clear buffer maybe
-      BOOST_LOG_TRIVIAL(debug) << "Waiting untill JSON message is received.";
+      BOOST_LOG_TRIVIAL(debug) << "Waiting until JSON message is received.";
       m_port.waitUntilMessageReceived(MESSAGE_JSON);
 
-      BOOST_LOG_TRIVIAL(debug) << "Waiting untill actual message is received.";
+      BOOST_LOG_TRIVIAL(debug) << "Waiting until actual message is received.";
       string programJson;
       m_port.waitUntilMessageReceived(programJson);
-      BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
-      m_port.unlock();
+      BOOST_LOG_TRIVIAL(debug) << "Waiting until DONE message is received.";
+      m_port.waitUntilMessageReceived(MESSAGE_DONE);
 
-      StringWriter w;
+      ConsoleWriter w;
       FakeProgram p(w);
-      BOOST_LOG_TRIVIAL(debug) << "Deserializing.";
+      BOOST_LOG_TRIVIAL(debug) << "Deserializing " << programJson;
       deserialize(p, programJson);
 
       Axis* axisX = axisByLetter(p.axes, 'X');
