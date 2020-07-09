@@ -18,7 +18,6 @@
 #include "../lib/serial.h"
 #include "../helper/helper.h"
 #include "../config/setup.h"
-#include "serialize.h"
 #include "deserialize.h"
 #include "fake_program.h"
 #include "string_writer.h"
@@ -81,6 +80,12 @@ class Sweep {
       StringWriter w;
       FakeProgram p(w);
       deserialize(p, programJson);
+
+      Axis* axisX = axisByLetter(p.axes, 'X');
+      Axis* axisZ = axisByLetter(p.axes, 'Z');
+
+      x = axisX->getPosition();
+      z = axisZ->getPosition();
     }
 
     void move(const char* txt, double pos, vector<Jar>& jars) {
@@ -102,7 +107,9 @@ class Sweep {
         for (auto it = codes.begin(); it != codes.end(); it++) {
           HRCode code = *it;
           //jars.push_back();
-          cerr << "FOUND: " << code << endl;
+          double x, z;
+          askPosition(x, z);
+          cerr << "FOUND: " << code << " at (" << x << ", " << z << ")" << endl;
         }
         this_thread::sleep_for(chrono::milliseconds(50));
       }
