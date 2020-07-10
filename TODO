@@ -5,7 +5,7 @@ Ok I need to prioritize what I am working on. This will be an ordered list.
 - Lumiere pour eclairer ce que la camera voit
 - Pince étau
 - See live camera
-- FIX MX1.0
+- Instead of saying error received command when already doing one, simply keep the char in memory.... char pendingChar = cmd; if (!pendingChar......)
 - Balance
 - Axe vertical
 - Simulation 3d

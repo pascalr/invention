@@ -98,8 +98,10 @@ int main(int argc, char** argv) {
     for(auto &field : query_fields) {
       if (field.first == "cmd") {
         if (field.second == "info") { // FIXME: Temporary fix until ?cmd=? works
+          cout << "Querying arduino for info.";
           p.writePort("?");
         } else {
+          cout << "Giving arduino cmd = " << field.second;
           p.writePort(field.second);
         }
       }
