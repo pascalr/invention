@@ -224,7 +224,7 @@ void myLoop(Program& p) {
       p.isWorking = true;
       int code = parseActionCommand(cmd, p);
       if (code < 0) {
-        p.getWriter() << "Exception: Code: " << code;
+        p.getWriter() << "Exception: Code: " << code << '\n';
       }
       return;
     }

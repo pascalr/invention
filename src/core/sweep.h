@@ -21,7 +21,6 @@
 #include "../config/constants.h"
 #include "deserialize.h"
 #include "fake_program.h"
-#include "string_writer.h"
 
 #include <chrono>
 #include <thread>
@@ -101,12 +100,12 @@ class Sweep {
     }
 
     void moveThanDetect(const char* txt, double pos, vector<DetectedHRCodePosition> &detected) {
-      //string str = txt;
-      //str += to_string(pos);
+      string str = txt;
+      str += to_string(pos);
       //str += to_string((int)pos);
-      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << txt;
+      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << str;
       m_port.lock(SERIAL_KEY_SWEEP);
-      m_port.writePort(txt);
+      m_port.writePort(str);
       BOOST_LOG_TRIVIAL(debug) << "Waiting for message 'done'.";
       m_port.waitUntilMessageReceived(MESSAGE_DONE);
       m_port.unlock();
@@ -148,17 +147,17 @@ class Sweep {
       bool xUp = false; // Wheter the x axis goes from 0 to MAX or from MAX to 0
 
       m_x = MAX_X;
-      m_z = 0;
+      m_z = 0.0;
 
       for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
         m_y = heights[i];
-        moveThanDetect("MZ",0, detected);
+        moveThanDetect("MZ",0.0, detected);
         bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
 
         moveThanDetect("MY",heights[i], detected);
-        for (m_x = xUp ? 0 : MAX_X; xUp ? m_x <= MAX_X : m_x >= 0; m_x += xStep * (xUp ? 1 : -1)) {
+        for (m_x = xUp ? 0.0 : MAX_X; xUp ? m_x <= MAX_X : m_x >= 0.0; m_x += xStep * (xUp ? 1 : -1)) {
           moveThanDetect("MX",m_x, detected);
-          for (m_z = zUp ? 0 : MAX_Z; zUp ? m_z <= MAX_Z : m_z >= 0; m_z += zStep * (zUp ? 1 : -1)) {
+          for (m_z = zUp ? 0.0 : MAX_Z; zUp ? m_z <= MAX_Z : m_z >= 0.0; m_z += zStep * (zUp ? 1 : -1)) {
             moveThanDetect("MZ",m_z, detected);
           }
           zUp = !zUp;

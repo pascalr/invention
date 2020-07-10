@@ -16,6 +16,7 @@ class ConsoleWriter : public Writer {
     }
     double doDigitalRead(int pin) {
       //cerr << "digitalRead(" << pin << ")" << endl;
+      return 0.0;
     }
     void doPrint(const char* val) {
       //cerr << val;

@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "../lib/lib.h"
+#include "../config/constants.h"
 #include <thread>
 #include <chrono>
 
@@ -97,6 +98,7 @@ class SerialPort {
         return -1;
       }
 
+      waitUntilMessageReceived(MESSAGE_READY); // TODO: timeout
       m_is_opened = true;
 
       return m_serial_port;
@@ -140,6 +142,7 @@ class SerialPort {
       string str;
       getInput(str);
       trim(str);
+      cout << "Serial: Received: " << str << endl;
       return str == msg;
     }
 
@@ -165,6 +168,7 @@ class SerialPort {
     void writePort(const char* str) {
       write(m_serial_port, str, strlen(str));
       write(m_serial_port, &m_separator, 1);
+      cout << "Serial: Writing: " << str << endl;
     }
 
     void lock(int key) {

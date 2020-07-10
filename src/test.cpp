@@ -17,7 +17,6 @@
 #include "core/serialize.h"
 #include "core/deserialize.h"
 #include "core/fake_program.h"
-#include "core/string_writer.h"
 
 using namespace std;
 namespace plt = matplotlibcpp;

@@ -46,6 +46,7 @@ class IOProgram : public Program {
 
       strcpy(buf, str.c_str());
       rtrim(buf);
+      return true;
     }
 
     bool inputAvailable() {

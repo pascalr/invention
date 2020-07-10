@@ -11,18 +11,21 @@
 int main(int argc, char *argv[])
 {
   setupInterrupt();
-  setupLogging();
+  // setupLogging();
 
+  cerr << "Opening arduino port...";
   SerialPort p;
   if (p.openPort("/dev/ttyACM0") < 0) {
     cerr << "Error opening arduino port.";
     return -1;
   }
-  cout << "Doing reference...";
+
+  cerr << "Doing reference...";
   p.writePort("H");
+  cerr << "Waiting until receives message done...";
   p.waitUntilMessageReceived(MESSAGE_DONE);
 
-  cout << "Reference done. Sweeping...";
+  cerr << "Reference done. Sweeping...";
   Sweep sweep(p);
   if(!sweep.init()) {
     cerr << "Error initializing sweep.\n";
