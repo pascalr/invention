@@ -33,6 +33,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ADD_LIBRARY(MyLibsModule
+  src/utils/io_common.cpp
+  src/utils/utils.cpp
   src/core/fake_program.cpp
   src/core/writer.cpp
   src/core/axis.cpp
