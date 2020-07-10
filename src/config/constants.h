@@ -38,6 +38,11 @@
 #define PROPERTY_REFERENCED "referenced"
 #define PROPERTY_REFERENCING "referencing"
 #define PROPERTY_SPEED "speed"
+#define PROPERTY_MOTOR_ENABLED "mot_en"
+#define PROPERTY_FORCE_ROTATION "force"
+#define PROPERTY_DESTINATION_ANGLE "dest_angle"
+#define PROPERTY_ANGLE "angle"
+#define PROPERTY_DELTA_POSITION "d_pos"
 
 #define SERIAL_KEY_POLL 1111
 #define SERIAL_KEY_SWEEP 1112
