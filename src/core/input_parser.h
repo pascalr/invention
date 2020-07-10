@@ -45,6 +45,9 @@ double parseNumber(Program& p) {
   while (i < MAX_NUMBER_CHAR - 1 && isNumberSymbol(c = p.getChar())) {
     number[i] = c;
   }
+  if (i == 0) {
+    throw ParseInputException("Expected a valid number.");
+  }
   number[i+1] = '\0';
   return atof(number);
 }
