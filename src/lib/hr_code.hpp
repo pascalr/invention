@@ -6,10 +6,6 @@
 //
 // With characters having a fix position, I expect the accuracy to be very high.
 
-#include <opencv2/opencv.hpp>
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
-#include <opencv2/core.hpp>
 #include <string>
 
 #include <iostream>
@@ -25,6 +21,7 @@
 // trace debug info warning error fatal
 
 #include "../lib/lib.h"
+#include "../lib/opencv.h"
 
 #include <vector>
 

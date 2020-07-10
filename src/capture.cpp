@@ -1,13 +1,8 @@
-#include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <string>
 #include <chrono>
-
-#include "lib/lib.h"
+#include "lib/opencv.h"
 
 //#include <filesystem>
 //namespace fs = std::filesystem;

@@ -9,7 +9,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "lib/lib.h"
+#include "lib/opencv.h"
 
 using namespace std;
 using namespace cv;

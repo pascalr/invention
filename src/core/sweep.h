@@ -6,16 +6,13 @@
 #include <vector>
 #include <zbar.h>
 
-#include <opencv2/core.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
 #include <string>
 
 #include "../utils/io_common.h"
 #include "../lib/lib.h"
 #include "../lib/hr_code.hpp"
 #include "../lib/serial.h"
+#include "../lib/opencv.h"
 #include "../helper/logging.h"
 #include "../config/setup.h"
 #include "../config/constants.h"
