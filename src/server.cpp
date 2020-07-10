@@ -89,8 +89,10 @@ int main(int argc, char** argv) {
   //FakeSerialPort fake;
 
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /run/arduino" << endl;
     if (!p.isOpen()) {
       response->write("Error arduino is not connected.");
+      cout << "Error arduino is not connected." << endl;
       return;
     }
     
@@ -98,10 +100,10 @@ int main(int argc, char** argv) {
     for(auto &field : query_fields) {
       if (field.first == "cmd") {
         if (field.second == "info") { // FIXME: Temporary fix until ?cmd=? works
-          cout << "Querying arduino for info.";
+          cout << "Querying arduino for info." << endl;
           p.writePort("?");
         } else {
-          cout << "Giving arduino cmd = " << field.second;
+          cout << "Giving arduino cmd = " << field.second << endl;
           p.writePort(field.second);
         }
       }
