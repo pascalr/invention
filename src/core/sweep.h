@@ -30,11 +30,18 @@ using namespace std;
 using namespace cv;
 using namespace zbar;
 
-typedef struct {
-  string type;
-  string data;
-  vector <Point> location;
-} DecodedObject;
+class DetectedHRCodePosition {
+  public:
+    DetectedHRCodePosition(HRCodePosition pos, double x0, double y0, double z0) : position(pos), x(x0), y(y0), z(z0) {
+    }
+    HRCodePosition position;
+    double x;
+    double y;
+    double z;
+};
+ostream &operator<<(std::ostream &os, const DetectedHRCodePosition &c) {
+  return os << c.position << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
+}
 
 class Jar {
   public:
@@ -43,7 +50,7 @@ class Jar {
     double position_z; // mm
 };
 
-void addUniqueToJars(vector<Jar> jars, vector<HRCodePosition> positions, double toolX, double toolZ, double angle) {
+void addUniqueToJars(vector<HRCodePosition> positions, double toolX, double toolZ, double angle) {
 
   double camDeltaX = (RAYON - CAMERA_OFFSET) * cos(angle / 180 * PI);
   double camDeltaZ = (RAYON - CAMERA_OFFSET) * sin(angle / 180 * PI);
@@ -89,53 +96,25 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
+      
       return true;
     }
 
-    void askPosition(double &x, double &z) {
-      BOOST_LOG_TRIVIAL(debug) << "Asking position.";
-
-      BOOST_LOG_TRIVIAL(debug) << "Writing ? to port.";
-      m_port.writePort("?"); // FIXME: Clear buffer maybe
-      BOOST_LOG_TRIVIAL(debug) << "Waiting until JSON message is received.";
-      m_port.waitUntilMessageReceived(MESSAGE_JSON);
-
-      BOOST_LOG_TRIVIAL(debug) << "Waiting until actual message is received.";
-      string programJson;
-      m_port.waitUntilMessageReceived(programJson);
-      BOOST_LOG_TRIVIAL(debug) << "Waiting until DONE message is received.";
-      m_port.waitUntilMessageReceived(MESSAGE_DONE);
-
-      FakeProgram p;
-      BOOST_LOG_TRIVIAL(debug) << "Deserializing " << programJson;
-      deserialize(p, programJson);
-
-      Axis* axisX = axisByLetter(p.axes, 'X');
-      Axis* axisZ = axisByLetter(p.axes, 'Z');
-
-      x = axisX->getPosition();
-      z = axisZ->getPosition();
-      
-      BOOST_LOG_TRIVIAL(debug) << "Ask position done. x = " << x << ", z = " << z << ".";
-    }
-
-    void moveDirectly(const char* txt, double pos, vector<Jar> jars, double posX, double posY, double posZ) {
-      string str = txt;
-      str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
-      cout << "Writing: " << str << endl;
-      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << str;
-      BOOST_LOG_TRIVIAL(debug) << "Locking serial port sweep.";
+    void moveThanDetect(const char* txt, double pos, vector<DetectedHRCodePosition> &detected) {
+      //string str = txt;
+      //str += to_string(pos);
+      //str += to_string((int)pos);
+      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << txt;
       m_port.lock(SERIAL_KEY_SWEEP);
-      m_port.writePort(str);
+      m_port.writePort(txt);
       BOOST_LOG_TRIVIAL(debug) << "Waiting for message 'done'.";
       m_port.waitUntilMessageReceived(MESSAGE_DONE);
-      BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
       m_port.unlock();
-
-      captureAndDetect(jars, posX, posY, posZ);
+      
+      captureAndDetect(detected);
     }
 
-    void captureAndDetect(vector<Jar>& jars, double posX, double posY, double posZ) {
+    void captureAndDetect(vector<DetectedHRCodePosition> &detected) {
       BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
       Mat frame;
       m_cap.read(frame);
@@ -152,83 +131,50 @@ class Sweep {
 
       if (!positions.empty()) {
         BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
-        //addUniqueToJars(m_jars, positions, posX, posZ);
-      }
-    }
-
-    void move(const char* txt, double pos, vector<Jar>& jars) {
-      string str = txt;
-      str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
-      cout << "Writing: " << str << endl;
-      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << str;
-      BOOST_LOG_TRIVIAL(debug) << "Locking serial port sweep.";
-      m_port.lock(SERIAL_KEY_SWEEP);
-      m_port.writePort(str);
-      while (!m_port.messageReceived(MESSAGE_DONE)) {
-        BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
-        Mat frame;
-        m_cap.read(frame);
-        if (frame.empty()) {
-          cerr << "ERROR! blank frame grabbed\n";
-          this_thread::sleep_for(chrono::milliseconds(1));
-          continue;
+        for (auto it = positions.begin(); it != positions.end(); ++it) {
+          DetectedHRCodePosition d(*it, m_x, m_y, m_z);
+          detected.push_back(d);
         }
-
-        BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
- 
-        HRCodeParser parser(0.2, 0.2);
-        vector<HRCodePosition> positions;
-        parser.findHRCodePositions(frame, positions, 100);
-
-	      if (!positions.empty()) {
-          BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
-          double x, z;
-          askPosition(x, z);
-          //addUniqueToJars(m_jars, positions, x, z);
-          this_thread::sleep_for(chrono::milliseconds(500)); // To make sure it goes forward before stopping arduino again... Maybe "?100" so arduino runs 100 ms before returning position.
-	      }
-        
-        this_thread::sleep_for(chrono::milliseconds(10));
       }
-      BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
-      m_port.unlock();
     }
 
-    void run(vector<Jar>& jars) {
-      jars.clear();
+    void run(vector<DetectedHRCodePosition>& detected) {
+
       double heights[] = {0.0};
       //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};
-      double zStep = MAX_Z / 1;
+      double zStep = MAX_Z / 4;
       double xStep = MAX_X / 4;
 
       bool xUp = false; // Wheter the x axis goes from 0 to MAX or from MAX to 0
 
-      double x = MAX_X;
-      double z = 0;
+      m_x = MAX_X;
+      m_z = 0;
 
       for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
-        double y = heights[i];
-        moveDirectly("MZ",0, jars, x, y, z);
+        m_y = heights[i];
+        moveThanDetect("MZ",0, detected);
         bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
 
-        moveDirectly("MY",heights[i], jars, x, y, z);
-        for (x = xUp ? 0 : MAX_X; xUp ? x <= MAX_X : x >= 0; x += xStep * (xUp ? 1 : -1)) {
-          moveDirectly("MX",x, jars, x, y, z);
-          for (z = zUp ? 0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0; z += zStep * (zUp ? 1 : -1)) {
-            moveDirectly("MZ",z, jars, x, y, z);
-            // Detect new ones and move to them to get exact position.
-            // findBarCodes();
-            
+        moveThanDetect("MY",heights[i], detected);
+        for (m_x = xUp ? 0 : MAX_X; xUp ? m_x <= MAX_X : m_x >= 0; m_x += xStep * (xUp ? 1 : -1)) {
+          moveThanDetect("MX",m_x, detected);
+          for (m_z = zUp ? 0 : MAX_Z; zUp ? m_z <= MAX_Z : m_z >= 0; m_z += zStep * (zUp ? 1 : -1)) {
+            moveThanDetect("MZ",m_z, detected);
           }
           zUp = !zUp;
         }
         xUp = !xUp;
       }
+
+      BOOST_LOG_TRIVIAL(debug) << "Sweep done. There are " << detected.size() << " possible candidates.";
     }
 
   private:
     VideoCapture m_cap;
     SerialPort& m_port;
+    double m_x;
+    double m_y;
+    double m_z;
 };
 
 #endif

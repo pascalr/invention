@@ -123,9 +123,10 @@ int main(int argc, char** argv) {
         response->write("Error initializing sweep.");
         return;
       }
-      sweep.run(jars);
+      vector<DetectedHRCodePosition> candidates;
+      sweep.run(candidates);
       
-      response->write("Ok executing command sweeep");
+      response->write("Ok executed command sweep");
     } catch(...) {
       std::exception_ptr p = std::current_exception();
       std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;

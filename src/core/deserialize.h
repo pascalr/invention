@@ -36,4 +36,31 @@ void deserialize(Program& p, const string& json_str) {
   }
 }
 
+/*void askPosition(double &x, double &z) {
+  BOOST_LOG_TRIVIAL(debug) << "Asking position.";
+
+  BOOST_LOG_TRIVIAL(debug) << "Writing ? to port.";
+  m_port.writePort("?"); // FIXME: Clear buffer maybe
+  BOOST_LOG_TRIVIAL(debug) << "Waiting until JSON message is received.";
+  m_port.waitUntilMessageReceived(MESSAGE_JSON);
+
+  BOOST_LOG_TRIVIAL(debug) << "Waiting until actual message is received.";
+  string programJson;
+  m_port.waitUntilMessageReceived(programJson);
+  BOOST_LOG_TRIVIAL(debug) << "Waiting until DONE message is received.";
+  m_port.waitUntilMessageReceived(MESSAGE_DONE);
+
+  FakeProgram p;
+  BOOST_LOG_TRIVIAL(debug) << "Deserializing " << programJson;
+  deserialize(p, programJson);
+
+  Axis* axisX = axisByLetter(p.axes, 'X');
+  Axis* axisZ = axisByLetter(p.axes, 'Z');
+
+  x = axisX->getPosition();
+  z = axisZ->getPosition();
+  
+  BOOST_LOG_TRIVIAL(debug) << "Ask position done. x = " << x << ", z = " << z << ".";
+}*/
+
 #endif

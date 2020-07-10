@@ -13,12 +13,28 @@ int main(int argc, char *argv[])
   setupInterrupt();
   setupLogging();
 
-  /*Sweep sweep;
+  SerialPort p;
+  if (p.openPort("/dev/ttyACM0") < 0) {
+    cerr << "Error opening arduino port.";
+    return -1;
+  }
+  cout << "Doing reference...";
+  p.writePort("H");
+  p.waitUntilMessageReceived(MESSAGE_DONE);
+
+  cout << "Reference done. Sweeping...";
+  Sweep sweep(p);
   if(!sweep.init()) {
     cerr << "Error initializing sweep.\n";
     return -1;
   }
-  sweep.run();*/
+
+  vector<DetectedHRCodePosition> candidates;
+  sweep.run(candidates);
+
+  for (auto it = candidates.begin(); it != candidates.end(); it++) {
+    cout << "FOUND " << *it << std::endl;
+  }
 
   return 0;
 }

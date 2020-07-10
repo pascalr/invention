@@ -35,6 +35,9 @@ class HRCodePosition {
   public:
     HRCodePosition(Mat& mat, double x1, double y1, int o1, int o2, double s1) : img(mat), x(x1), y(y1), originalImageWidth(o1), originalImageHeight(o2), scale(s1) {
     }
+
+    friend ostream &operator<<(std::ostream &os, const HRCodePosition &c);
+
     Mat img;
     double x;
     double y;
@@ -42,6 +45,12 @@ class HRCodePosition {
     int originalImageHeight;
     double scale;
 };
+
+ostream &operator<<(std::ostream &os, const HRCodePosition &c) {
+  os << "(" << c.x << ", " << c.y << ")";
+  os << "[" << c.originalImageWidth << ", " << c.originalImageHeight << "]";
+  return os << "{" << c.scale << "}";
+}
 
 class HRCodeParser {
   public:
