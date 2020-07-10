@@ -3,7 +3,7 @@
 
 #include "../utils/utils.h"
 #include "../utils/io_common.h"
-#include "../core/program.h"
+#include "program.h"
 #include <thread>
 #include <chrono>
 #include "console_writer.h"

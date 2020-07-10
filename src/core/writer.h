@@ -16,39 +16,13 @@ class Writer {
     virtual void doPrint(unsigned long val) = 0;
 };
 
-Writer& operator<<(Writer& writer, const char* theString) {
-  writer.doPrint(theString);
-  return writer;
-}
 
-Writer& operator<<(Writer& writer, char val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, double val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, long val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, unsigned long val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, bool val) {
-  writer.doPrint(val);
-  return writer;
-}
-
-Writer& operator<<(Writer& writer, int val) {
-  writer.doPrint(val);
-  return writer;
-}
+Writer& operator<<(Writer& writer, const char* theString);
+Writer& operator<<(Writer& writer, char val);
+Writer& operator<<(Writer& writer, double val);
+Writer& operator<<(Writer& writer, long val);
+Writer& operator<<(Writer& writer, unsigned long val);
+Writer& operator<<(Writer& writer, bool val);
+Writer& operator<<(Writer& writer, int val);
 
 #endif

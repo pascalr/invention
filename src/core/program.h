@@ -37,31 +37,6 @@ class Program {
     
     bool isWorking = false;
 
-    //friend Writer& operator<<(Writer& writer, const char* theString);
-
-    /*void serialize(Writer& out) {
-      out << "{";
-      for (int i = 0; axes[i] != NULL; i++) {
-        out << "\"axis_" << axes[i]->name << "\": ";
-        out << axes[i];
-        if (axes[i+1] != NULL) {
-          out << ", ";
-        }
-      }
-      out << "}";
-    }*/
 };
-
-/*Writer& operator<<(Writer& out, const Program &p) {
-  out << "{";
-  for (int i = 0; p.axes[i] != NULL; i++) {
-    out << "\"axis_" << p.axes[i]->name << "\": ";
-    p.axes[i]->serialize(out);
-    if (p.axes[i+1] != NULL) {
-      out << ", ";
-    }
-  }
-  return out << "}";
-}*/
 
 #endif

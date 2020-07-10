@@ -32,8 +32,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} )
+ADD_LIBRARY(MyLibsModule
+  src/core/fake_program.cpp
+  src/core/writer.cpp
+  src/core/axis.cpp
+)
+
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule)
 set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
+
 #message(STATUS "HERE!!!")
 #message(STATUS ${Python2_INCLUDE_DIRS})
 #message(STATUS "THERE!!!")
@@ -68,9 +75,9 @@ target_link_libraries( video_capture ${MyLibs} )
 add_executable( usbreset src/usbreset.c )
 target_link_libraries( usbreset ${MyLibs} )
 
-add_executable( run_tests src/test.cpp )
+add_executable( run_tests ${MyCpp} src/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
-target_link_libraries( run_tests ${MyLibs} )
+target_link_libraries( run_tests ${MyLibs})
 
 add_executable( fake src/fake.cpp )
 target_include_directories(fake PRIVATE ${MyDirs})

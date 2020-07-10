@@ -1,6 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <cstring>
+#include <cmath>
+
 bool startsWith(const char *pre, const char *str) {
   return strncmp(pre, str, strlen(pre)) == 0;
 }
