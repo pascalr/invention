@@ -112,6 +112,7 @@ int main(int argc, char** argv) {
   };
 
   server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /sweep" << endl;
     try {
       if (!p.isOpen()) {
         response->write("Error arduino is not connected.");
@@ -133,6 +134,7 @@ int main(int argc, char** argv) {
   };
 
   server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /connect" << endl;
     // FIXME: Also handle fake arduino too
     if (p.openPort("/dev/ttyACM0") < 0) {
       response->write("Error opening arduino port.");
@@ -142,6 +144,7 @@ int main(int argc, char** argv) {
   };
 
   server.resource["^/close$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /close" << endl;
     // FIXME: Also handle fake arduino too
     p.closePort();
     response->write("Port closed.");

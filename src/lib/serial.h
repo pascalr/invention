@@ -164,6 +164,7 @@ class SerialPort {
 
     void writePort(const char* str) {
       write(m_serial_port, str, strlen(str));
+      write(m_serial_port, &m_separator, 1);
     }
 
     void lock(int key) {
