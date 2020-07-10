@@ -93,6 +93,81 @@ int parseInput(const char* input, Program& p, int oldCursor) {
   return cursor;
 }
 
+void parseMoveByte() {
+}
+
+void parseActionCommand(char action, Program& p) {
+  for (int i = 0; p.axes[i] != NULL; i++) {
+    p.axes[i]->prepare(p.getCurrentTime());
+  }
+
+  char input[256];
+  if (p.getInput(input, 250)) {
+    p.getWriter() << MESSAGE_RECEIVED << '\n';
+  } else {
+    p.getWriter() << MESSAGE_INVALID_INPUT << '\n';
+    return;
+  }
+  
+  int cursorPos = parseInput(input, p, 0);
+
+  for (int i = 0; p.axes[i] != NULL; i++) {
+    p.axes[i]->afterInput();
+  }
+}
+
+void myLoopByte(Program& p) {
+  if (p.inputAvailable()) {
+    int incomingByte = p.getByte();
+    if (incomingByte < 0) {
+      return;
+    }
+    char cmd = (char) incomingByte;
+
+    // stop
+    if (cmd == 's' || cmd == 'S') {
+      for (int i = 0; p.axes[i] != NULL; i++) {
+        p.axes[i]->stop();
+      }
+      p.getWriter() << "Stopped\n";
+      p.isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
+
+    // info
+    } else if (cmd == '?') { // info
+      p.getWriter() << "\n" << MESSAGE_JSON << "\n";
+      serialize<Writer>(p, p.getWriter());
+      p.getWriter() << "\n";
+
+    // position (faster than info)
+    } else if (cmd == '@') { // TODO
+      
+    // ignore
+    } else if (cmd == '\r' || cmd == '\n') {
+    
+    // others are action command, so the program should not be working already..
+    } else if (p.isWorking) {
+      p.getWriter() << "Error, received an action command when previous was not over.\n";
+    } else {
+      p.isWorking = true;
+      parseActionCommand(cmd, p);
+    }
+  }
+  if (!p.isWorking) {
+    p.sleepMs(10);
+    return;
+  }
+
+  bool stillWorking = false;
+  for (int i = 0; p.axes[i] != NULL; i++) {
+    stillWorking = stillWorking || p.axes[i]->handleAxis(p.getCurrentTime());
+  }
+
+  if (!stillWorking) {
+    p.isWorking = false;
+    p.getWriter() << MESSAGE_DONE << '\n';
+  }
+}
+
 void myLoop(Program& p) {
   if (p.isWorking) {
 
