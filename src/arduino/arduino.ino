@@ -86,7 +86,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Setup...");
 
-  setupAxes(&p.getWriter(), p.axes);
+  setupAxes(p);
   
   Serial.println(MESSAGE_READY);
 }

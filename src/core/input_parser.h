@@ -4,23 +4,7 @@
 #include "program.h"
 #include "serialize.h"
 
-#include <exception>
-
-class ParseInputException : public exception {};
-
-class ExpectedNumberException : public ParseInputException {
-  virtual const char* what() const throw() {
-    return "An error occur while parsing the input. Expected a number.";
-  }
-};
-
-class ExpectedAxisException : public ParseInputException {
-  virtual const char* what() const throw() {
-    return "An error occur while parsing the input. Expected an axis.";
-  }
-};
-
-bool isNumberSymbol(char c) {
+/*bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.';
 }
 
@@ -36,10 +20,9 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
     }
   }
   return i;
-}
+}*/
 
-#define MAX_NUMBER_CHAR 12
-double parseNumber(Program& p) {
+int parseNumber(Program& p, double& n) {
 
   char number[MAX_NUMBER_CHAR + 1];
   bool periodFound = false;
@@ -69,26 +52,35 @@ double parseNumber(Program& p) {
     number[i] = c;
   }
   if (i == 0) {
-    throw ExpectedNumberException();
+    return -1;
   }
   number[i+1] = '\0';
-  return atof(number);
+  n = atof(number);
+  return 1;
 }
 
-Axis* parseInputAxis(Program& p) {
+Axis* parseInputAxis(Program& p, Axis* &axis) {
   char name = p.getChar();
-  Axis* axis = axisByLetter(p.axes, name);
-  if (!axis) {
-    throw ExpectedAxisException();
-  }
+  axis = axisByLetter(p.axes, name);
+  return axis;
 }
 
-void parseInputCommand(char cmd, Program& p) {
+int parseActionCommand(char cmd, Program& p) {
+
+  Axis* axis;
+  double number;
+
+  // Prepare
+  for (int i = 0; p.axes[i] != NULL; i++) {
+    p.axes[i]->prepare(p.getCurrentTime());
+  }
+
   // Move
   if (cmd == 'M' || cmd == 'm') {
-    Axis* axis = parseInputAxis(p);
-    double destination = parseNumber(p);
-    axis->setDestination(destination);
+    if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
+    if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    axis->setDestination(number);
+    axis->setMotorEnabled(true);
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
@@ -99,24 +91,31 @@ void parseInputCommand(char cmd, Program& p) {
 
   // Wait or sleep for some time
   } else if (cmd == 'w' || cmd == 'W') {
-    double waitTime = parseNumber(p);
-    p.sleepMs(waitTime);
+    if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    p.sleepMs(number);
 
   // Move forward
   } else if (cmd == '+') {
-    Axis* axis = parseInputAxis(p);
+    if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
     axis->rotate(FORWARD);
 
   // Move backward
   } else if (cmd == '-') {
-    Axis* axis = parseInputAxis(p);
+    if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
     axis->rotate(REVERSE);
   }
 
   p.getWriter() << "Cmd: " << cmd << "\n";
+
+  // After input
+  for (int i = 0; p.axes[i] != NULL; i++) {
+    p.axes[i]->afterInput();
+  }
+
+  return 0;
 }
 
-int parseInput(const char* input, Program& p, int oldCursor) {
+/*int parseInput(const char* input, Program& p, int oldCursor) {
 
   // Should the cursor passed to the function be a pointer?
   int cursor = oldCursor + 1;
@@ -182,57 +181,16 @@ int parseInput(const char* input, Program& p, int oldCursor) {
   
   /*char sint[5];
   itoa(cmd, sint, 10);
-  writer->doPrintLn(sint);*/
+  writer->doPrintLn(sint);
 
   return cursor;
-}
+}*/
 
-void parseMoveByte() {
-}
-
-void parseActionCommand(char cmd, Program& p) {
-  for (int i = 0; p.axes[i] != NULL; i++) {
-    p.axes[i]->prepare(p.getCurrentTime());
-  }
-
-  // Move
-  if (cmd == 'M' || cmd == 'm') {
-    Axis* axis = parseInputAxis(p);
-    double destination = parseNumber(p);
-    axis->setDestination(destination);
-
-  // Home (referencing) (currently only supports referencing all (not HX or HY)
-  } else if (cmd == 'H' || cmd == 'h') {
-    p.getWriter() << "Referencing...\n";
-    for (int i = 0; p.axes[i] != NULL; i++) {
-      p.axes[i]->startReferencing();
-    }
-
-  // Wait or sleep for some time
-  } else if (cmd == 'w' || cmd == 'W') {
-    double waitTime = parseNumber(p);
-    p.sleepMs(waitTime);
-
-  // Move forward
-  } else if (cmd == '+') {
-    Axis* axis = parseInputAxis(p);
-    axis->rotate(FORWARD);
-
-  // Move backward
-  } else if (cmd == '-') {
-    Axis* axis = parseInputAxis(p);
-    axis->rotate(REVERSE);
-  }
-
-  p.getWriter() << "Cmd: " << cmd << "\n";
-
-  for (int i = 0; p.axes[i] != NULL; i++) {
-    p.axes[i]->afterInput();
-  }
-}
+void debug() {}
 
 void myLoop(Program& p) {
   if (p.inputAvailable()) {
+    debug();
     int incomingByte = p.getByte();
     if (incomingByte < 0) {
       return;
@@ -261,10 +219,14 @@ void myLoop(Program& p) {
     
     // others are action command, so the program should not be working already..
     } else if (p.isWorking) {
-      p.getWriter() << "Error, received an action command when previous was not over.\n";
+      p.getWriter() << "Error, received an action command when previous was not over. Cmd = " << cmd << '\n';
     } else {
       p.isWorking = true;
-      parseActionCommand(cmd, p);
+      int code = parseActionCommand(cmd, p);
+      if (code < 0) {
+        p.getWriter() << "Exception: Code: " << code;
+      }
+      return;
     }
   }
   if (!p.isWorking) {
@@ -283,7 +245,7 @@ void myLoop(Program& p) {
   }
 }
 
-void oldMyLoop(Program& p) {
+/*void oldMyLoop(Program& p) {
   if (p.isWorking) {
 
     if (p.inputAvailable()) {
@@ -348,6 +310,6 @@ void oldMyLoop(Program& p) {
     }
 
   }
-}
+}*/
 
 #endif

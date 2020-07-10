@@ -63,7 +63,7 @@ class FakeProgram : public Program {
     }
 
     void setFakeInput(const char* str) {
-      fake_input = str;
+      fake_input.assign(str);
     }
 
     void setFakeInput(string& str) {

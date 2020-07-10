@@ -72,9 +72,9 @@ add_executable( run_tests src/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs} )
 
-#add_executable( fake src/fake.cpp )
-#target_include_directories(fake PRIVATE ${MyDirs})
-#target_link_libraries( fake ${MyLibs} )
+add_executable( fake src/fake.cpp )
+target_include_directories(fake PRIVATE ${MyDirs})
+target_link_libraries( fake ${MyLibs} )
 
 add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )

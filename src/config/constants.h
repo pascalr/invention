@@ -48,5 +48,9 @@
 #define SERIAL_KEY_SWEEP 1112
 #define SERIAL_DELIMITER '\n'
 
+#define ERROR_EXPECTED_NUMBER -1
+#define ERROR_EXPECTED_AXIS -2
+
+#define MAX_NUMBER_CHAR 12
 
 #endif

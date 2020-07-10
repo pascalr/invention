@@ -9,13 +9,10 @@
 #include "lib/lib.h"
 #include "core/axis.h"
 #include "core/console_writer.h"
-#include "core/fake_program.h"
+#include "core/io_program.h"
 #include "core/input_parser.h"
 #include "config/setup.h"
       
-#include <chrono>
-#include <thread>
-
 using namespace std;
 namespace plt = matplotlibcpp;
 
@@ -94,8 +91,8 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  FakeProgram p;
-  setupAxes(&p.getWriter(), p.axes);
+  IOProgram p;
+  setupAxes(p);
 
   cerr << ">> ";
   draw(p.axes);
