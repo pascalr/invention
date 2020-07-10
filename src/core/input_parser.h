@@ -4,6 +4,21 @@
 #include "program.h"
 #include "serialize.h"
 
+#include <exception>
+
+class ParseInputException : public exception
+{
+public:
+  ParseInputException(const char* details) : m_details(details) {
+  }
+  virtual const char* what() const throw()
+  {
+    return "An error occur parsing the input.";
+  }
+private:
+  const char* m_details;
+};
+
 bool isNumberSymbol(char c) {
   return (c >= '0' && c <= '9') || c == '.' || c == '-';
 }
@@ -20,6 +35,59 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
     }
   }
   return i;
+}
+
+#define MAX_NUMBER_CHAR 12
+double parseNumber(Program& p) {
+  char c;
+  char number[MAX_NUMBER_CHAR];
+  int i = 0;
+  while (i < MAX_NUMBER_CHAR - 1 && isNumberSymbol(c = p.getChar())) {
+    number[i] = c;
+  }
+  number[i+1] = '\0';
+  return atof(number);
+}
+
+Axis* parseInputAxis(Program& p) {
+  char name = p.getChar():
+  Axis* axis = axisByLetter(p.axes, name);
+  if (!axis) {
+    throw ParseInputException("Expected a valid axis name.");
+  }
+}
+
+void parseInputCommand(char cmd, Program& p) {
+  // Move
+  if (cmd == 'M' || cmd == 'm') {
+    Axis* axis = parseInputAxis(p);
+    double destination = parseNumber(p);
+    axis->setDestination(destination);
+
+  // Home (referencing) (currently only supports referencing all (not HX or HY)
+  } else if (cmd == 'H' || cmd == 'h') {
+    p.getWriter() << "Referencing...\n";
+    for (int i = 0; p.axes[i] != NULL; i++) {
+      p.axes[i]->startReferencing();
+    }
+
+  // Wait or sleep for some time
+  } else if (cmd == 'w' || cmd == 'W') {
+    double waitTime = parseNumber(p);
+    p.sleepMs(waitTime);
+
+  // Move forward
+  } else if (cmd == '+') {
+    Axis* axis = parseInputAxis(p);
+    axis->rotate(FORWARD);
+
+  // Move backward
+  } else if (cmd == '-') {
+    Axis* axis = parseInputAxis(p);
+    axis->rotate(REVERSE);
+  }
+
+  p.getWriter() << "Cmd: " << cmd << "\n";
 }
 
 int parseInput(const char* input, Program& p, int oldCursor) {

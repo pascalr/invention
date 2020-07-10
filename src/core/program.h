@@ -16,6 +16,14 @@ class Program {
     virtual bool inputAvailable() = 0;
     virtual bool getInput(char* buf, int size) = 0;
     virtual int getByte() = 0;
+    
+    char getChar() {
+      int receivedByte;
+      while ((receivedByte = getByte()) < 0) {
+        sleepMs(1);
+      }
+      return (char) receivedByte;
+    }
 
     VerticalAxis axisY;
     HorizontalAxis axisX;
