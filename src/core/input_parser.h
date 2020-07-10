@@ -6,21 +6,22 @@
 
 #include <exception>
 
-class ParseInputException : public exception
-{
-public:
-  ParseInputException(const char* details) : m_details(details) {
+class ParseInputException : public exception {};
+
+class ExpectedNumberException : public ParseInputException {
+  virtual const char* what() const throw() {
+    return "An error occur while parsing the input. Expected a number.";
   }
-  virtual const char* what() const throw()
-  {
-    return "An error occur parsing the input.";
+};
+
+class ExpectedAxisException : public ParseInputException {
+  virtual const char* what() const throw() {
+    return "An error occur while parsing the input. Expected an axis.";
   }
-private:
-  const char* m_details;
 };
 
 bool isNumberSymbol(char c) {
-  return (c >= '0' && c <= '9') || c == '.' || c == '-';
+  return (c >= '0' && c <= '9') || c == '.';
 }
 
 int parseMove(Axis** axes, const char* cmd, int oldCursor) {
@@ -39,24 +40,46 @@ int parseMove(Axis** axes, const char* cmd, int oldCursor) {
 
 #define MAX_NUMBER_CHAR 12
 double parseNumber(Program& p) {
-  char c;
-  char number[MAX_NUMBER_CHAR];
+
+  char number[MAX_NUMBER_CHAR + 1];
+  bool periodFound = false;
+
   int i = 0;
-  while (i < MAX_NUMBER_CHAR - 1 && isNumberSymbol(c = p.getChar())) {
+  for(; i < MAX_NUMBER_CHAR; i++) {
+    char c = p.getChar();
+
+    // ignore whitespaces
+    if (c == ' ') {
+      i--;
+
+    // digits are always ok
+    } else if (c >= '0' && c <= '9') {
+   
+    // sign at beginning is ok 
+    } else if (i == 0 && (c == '-' || c == '+')) {
+
+    // period found
+    } else if (!periodFound && c == '.') {
+      periodFound = true;
+    
+    // end of number
+    } else {
+      break;
+    }
     number[i] = c;
   }
   if (i == 0) {
-    throw ParseInputException("Expected a valid number.");
+    throw ExpectedNumberException();
   }
   number[i+1] = '\0';
   return atof(number);
 }
 
 Axis* parseInputAxis(Program& p) {
-  char name = p.getChar():
+  char name = p.getChar();
   Axis* axis = axisByLetter(p.axes, name);
   if (!axis) {
-    throw ParseInputException("Expected a valid axis name.");
+    throw ExpectedAxisException();
   }
 }
 
@@ -167,27 +190,48 @@ int parseInput(const char* input, Program& p, int oldCursor) {
 void parseMoveByte() {
 }
 
-void parseActionCommand(char action, Program& p) {
+void parseActionCommand(char cmd, Program& p) {
   for (int i = 0; p.axes[i] != NULL; i++) {
     p.axes[i]->prepare(p.getCurrentTime());
   }
 
-  char input[256];
-  if (p.getInput(input, 250)) {
-    p.getWriter() << MESSAGE_RECEIVED << '\n';
-  } else {
-    p.getWriter() << MESSAGE_INVALID_INPUT << '\n';
-    return;
+  // Move
+  if (cmd == 'M' || cmd == 'm') {
+    Axis* axis = parseInputAxis(p);
+    double destination = parseNumber(p);
+    axis->setDestination(destination);
+
+  // Home (referencing) (currently only supports referencing all (not HX or HY)
+  } else if (cmd == 'H' || cmd == 'h') {
+    p.getWriter() << "Referencing...\n";
+    for (int i = 0; p.axes[i] != NULL; i++) {
+      p.axes[i]->startReferencing();
+    }
+
+  // Wait or sleep for some time
+  } else if (cmd == 'w' || cmd == 'W') {
+    double waitTime = parseNumber(p);
+    p.sleepMs(waitTime);
+
+  // Move forward
+  } else if (cmd == '+') {
+    Axis* axis = parseInputAxis(p);
+    axis->rotate(FORWARD);
+
+  // Move backward
+  } else if (cmd == '-') {
+    Axis* axis = parseInputAxis(p);
+    axis->rotate(REVERSE);
   }
-  
-  int cursorPos = parseInput(input, p, 0);
+
+  p.getWriter() << "Cmd: " << cmd << "\n";
 
   for (int i = 0; p.axes[i] != NULL; i++) {
     p.axes[i]->afterInput();
   }
 }
 
-void myLoopByte(Program& p) {
+void myLoop(Program& p) {
   if (p.inputAvailable()) {
     int incomingByte = p.getByte();
     if (incomingByte < 0) {
@@ -239,7 +283,7 @@ void myLoopByte(Program& p) {
   }
 }
 
-void myLoop(Program& p) {
+void oldMyLoop(Program& p) {
   if (p.isWorking) {
 
     if (p.inputAvailable()) {

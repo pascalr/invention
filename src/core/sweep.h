@@ -89,7 +89,6 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
-      m_jars.clear();
       return true;
     }
 
@@ -107,8 +106,7 @@ class Sweep {
       BOOST_LOG_TRIVIAL(debug) << "Waiting until DONE message is received.";
       m_port.waitUntilMessageReceived(MESSAGE_DONE);
 
-      ConsoleWriter w;
-      FakeProgram p(w);
+      FakeProgram p;
       BOOST_LOG_TRIVIAL(debug) << "Deserializing " << programJson;
       deserialize(p, programJson);
 
@@ -121,7 +119,7 @@ class Sweep {
       BOOST_LOG_TRIVIAL(debug) << "Ask position done. x = " << x << ", z = " << z << ".";
     }
 
-    void moveDirectly(const char* txt, double pos) {
+    void moveDirectly(const char* txt, double pos, vector<Jar> jars, double posX, double posY, double posZ) {
       string str = txt;
       str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
       cout << "Writing: " << str << endl;
@@ -133,6 +131,8 @@ class Sweep {
       m_port.waitUntilMessageReceived(MESSAGE_DONE);
       BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
       m_port.unlock();
+
+      captureAndDetect(jars, posX, posY, posZ);
     }
 
     void captureAndDetect(vector<Jar>& jars, double posX, double posY, double posZ) {
@@ -141,8 +141,7 @@ class Sweep {
       m_cap.read(frame);
       if (frame.empty()) {
         cerr << "ERROR! blank frame grabbed\n";
-        this_thread::sleep_for(chrono::milliseconds(1));
-        continue;
+        return;
       }
 
       BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
@@ -208,14 +207,15 @@ class Sweep {
       double z = 0;
 
       for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
-        move("MZ",0, jars);
+        double y = heights[i];
+        moveDirectly("MZ",0, jars, x, y, z);
         bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
 
-        move("MY",heights[i], jars);
+        moveDirectly("MY",heights[i], jars, x, y, z);
         for (x = xUp ? 0 : MAX_X; xUp ? x <= MAX_X : x >= 0; x += xStep * (xUp ? 1 : -1)) {
-          move("MX",x, jars);
+          moveDirectly("MX",x, jars, x, y, z);
           for (z = zUp ? 0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0; z += zStep * (zUp ? 1 : -1)) {
-            move("MZ",z, jars);
+            moveDirectly("MZ",z, jars, x, y, z);
             // Detect new ones and move to them to get exact position.
             // findBarCodes();
             
@@ -229,7 +229,6 @@ class Sweep {
   private:
     VideoCapture m_cap;
     SerialPort& m_port;
-    vector<Jar> m_jars;
 };
 
 #endif

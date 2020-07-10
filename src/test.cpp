@@ -22,8 +22,7 @@
 using namespace std;
 namespace plt = matplotlibcpp;
 
-ConsoleWriter w;
-FakeProgram p(w);
+FakeProgram p;
 
 /*class PlotWriter : public ConsoleWriter {
   public:
@@ -68,6 +67,7 @@ void move(const char* dest, Writer* writer, Axis** axes, bool plot=false) {
   cout << "Move: " << dest << endl;
 
   string str = dest;
+  str += '\n';
   p.setFakeInput(str);
 
   p.setCurrentTime(0);
@@ -319,8 +319,7 @@ void testMoveZMovesX(Writer* writer, Axis** axes) {
 void testSerialize() {
   title("Testing serialize");
 
-  ConsoleWriter writer;
-  FakeProgram prog(writer);
+  FakeProgram prog;
   setupAxes(&prog.getWriter(), prog.axes);
   referenceAll(prog.axes);
   
@@ -333,8 +332,7 @@ void testSerialize() {
   stringstream ss;
   serialize<ostream>(prog, ss);
 
-  ConsoleWriter resultWriter;
-  FakeProgram result(resultWriter);
+  FakeProgram result;
   
   deserialize(result, ss.str());
   ZAxis* axisZ = (ZAxis*)axisByLetter(result.axes, 'z');
@@ -354,43 +352,43 @@ void testInputParserParseNumber() {
   double val;
 
   try {
-    p.setFakeInput("m123");
+    p.setFakeInput("m123\n");
     parseNumber(p);
     assertTest("invalid number should throw exception (m123)", true, false);
   } catch(ParseInputException e) {
     assertTest("invalid number should throw exception (m123)", true, true);
   }
 
-  p.setFakeInput("123");
+  p.setFakeInput("123\n");
   val = parseNumber(p);
   assertNearby("123", 123.0, val);
 
-  p.setFakeInput("-123");
+  p.setFakeInput("-123\n");
   val = parseNumber(p);
   assertNearby("-123", -123.0, val);
   
-  p.setFakeInput("+123");
+  p.setFakeInput("+123\n");
   val = parseNumber(p);
   assertNearby("+123", 123.0, val);
 
-  p.setFakeInput("12+3");
+  p.setFakeInput("12+3\n");
   val = parseNumber(p);
   assertNearby("12+3", 12.0, val);
 
-  p.setFakeInput("12-3");
+  p.setFakeInput("12-3\n");
   val = parseNumber(p);
   assertNearby("12-3", 12.0, val);
   
-  p.setFakeInput("123.45");
+  p.setFakeInput("123.45\n");
   val = parseNumber(p);
   assertNearby("123.45", 123.45, val);
 
   try {
     p.setFakeInput("\n");
     parseNumber(p);
-    assertTest("invalid number should throw exception (newline)", true, false);
+    assertTest("invalid number should throw exception (empty)", true, false);
   } catch(ParseInputException e) {
-    assertTest("invalid number should throw exception (newline)", true, true);
+    assertTest("invalid number should throw exception (empty)", true, true);
   }
 }
 

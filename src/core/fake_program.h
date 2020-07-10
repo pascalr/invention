@@ -12,7 +12,7 @@ using namespace std;
 
 class FakeProgram : public Program {
   public:
-    FakeProgram(Writer& writer) : m_writer(writer), Program(writer) {
+    FakeProgram() : Program(m_writer) {
     }
 
     Writer& getWriter() {
@@ -62,6 +62,10 @@ class FakeProgram : public Program {
       rtrim(buf);*/
     }
 
+    void setFakeInput(const char* str) {
+      fake_input = str;
+    }
+
     void setFakeInput(string& str) {
       fake_input.assign(str);
     }
@@ -75,7 +79,7 @@ class FakeProgram : public Program {
     }
 
   protected:
-    Writer& m_writer;
+    ConsoleWriter m_writer;
     unsigned long currentTime = 0;
     string fake_input;
 };
