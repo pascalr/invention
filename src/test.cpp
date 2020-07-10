@@ -328,25 +328,70 @@ void testSerialize() {
   beforeZ->setIsReferenced(true);
   beforeZ->setIsReferencing(true);
   beforeZ->isForward = true;
+  beforeZ->setDestination(RAYON);
 
   stringstream ss;
   serialize<ostream>(prog, ss);
 
-  //writer << prog;
-  //string json_str;
-  //writer.getString(json_str);
-  
   ConsoleWriter resultWriter;
   FakeProgram result(resultWriter);
   
   deserialize(result, ss.str());
-  Axis* axisZ = axisByLetter(result.axes, 'z');
+  ZAxis* axisZ = (ZAxis*)axisByLetter(result.axes, 'z');
 
-  assertNearby("dest", 0.0, axisZ->getDestination());
+  assertNearby("dest", RAYON, axisZ->getDestination());
   assertNearby("pos", 0.0, axisZ->getPosition());
   assertTest("isReferenced", true, axisZ->isReferenced);
   assertTest("isReferencing", true, axisZ->isReferencing);
   assertTest("forward", true, axisZ->isForward);
+  assertNearby("dest_angle", 90.0, axisZ->getDestinationAngle());
+  assertNearby("angle", 0.0, axisZ->getPositionAngle());
+}
+
+void testInputParserParseNumber() {
+  title("Testing input_parser parseNumber");
+  FakeProgram p;
+  double val;
+
+  try {
+    p.setFakeInput("m123");
+    parseNumber(p);
+    assertTest("invalid number should throw exception (m123)", true, false);
+  } catch(ParseInputException e) {
+    assertTest("invalid number should throw exception (m123)", true, true);
+  }
+
+  p.setFakeInput("123");
+  val = parseNumber(p);
+  assertNearby("123", 123.0, val);
+
+  p.setFakeInput("-123");
+  val = parseNumber(p);
+  assertNearby("-123", -123.0, val);
+  
+  p.setFakeInput("+123");
+  val = parseNumber(p);
+  assertNearby("+123", 123.0, val);
+
+  p.setFakeInput("12+3");
+  val = parseNumber(p);
+  assertNearby("12+3", 12.0, val);
+
+  p.setFakeInput("12-3");
+  val = parseNumber(p);
+  assertNearby("12-3", 12.0, val);
+  
+  p.setFakeInput("123.45");
+  val = parseNumber(p);
+  assertNearby("123.45", 123.45, val);
+
+  try {
+    p.setFakeInput("\n");
+    parseNumber(p);
+    assertTest("invalid number should throw exception (newline)", true, false);
+  } catch(ParseInputException e) {
+    assertTest("invalid number should throw exception (newline)", true, true);
+  }
 }
 
 int main (int argc, char *argv[]) {
@@ -360,6 +405,7 @@ int main (int argc, char *argv[]) {
   //plt::ion();
 
   // FIXME: MX10.0
+  testInputParserParseNumber();
   testSerialize();
   testAxisByLetter(p.axes);
   testParseMove(p.axes);

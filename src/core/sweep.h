@@ -121,6 +121,42 @@ class Sweep {
       BOOST_LOG_TRIVIAL(debug) << "Ask position done. x = " << x << ", z = " << z << ".";
     }
 
+    void moveDirectly(const char* txt, double pos) {
+      string str = txt;
+      str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0
+      cout << "Writing: " << str << endl;
+      BOOST_LOG_TRIVIAL(debug) << "About to move to: " << str;
+      BOOST_LOG_TRIVIAL(debug) << "Locking serial port sweep.";
+      m_port.lock(SERIAL_KEY_SWEEP);
+      m_port.writePort(str);
+      BOOST_LOG_TRIVIAL(debug) << "Waiting for message 'done'.";
+      m_port.waitUntilMessageReceived(MESSAGE_DONE);
+      BOOST_LOG_TRIVIAL(debug) << "Unlocking serial port sweep.";
+      m_port.unlock();
+    }
+
+    void captureAndDetect(vector<Jar>& jars, double posX, double posY, double posZ) {
+      BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
+      Mat frame;
+      m_cap.read(frame);
+      if (frame.empty()) {
+        cerr << "ERROR! blank frame grabbed\n";
+        this_thread::sleep_for(chrono::milliseconds(1));
+        continue;
+      }
+
+      BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
+ 
+      HRCodeParser parser(0.2, 0.2);
+      vector<HRCodePosition> positions;
+      parser.findHRCodePositions(frame, positions, 100);
+
+      if (!positions.empty()) {
+        BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
+        //addUniqueToJars(m_jars, positions, posX, posZ);
+      }
+    }
+
     void move(const char* txt, double pos, vector<Jar>& jars) {
       string str = txt;
       str += to_string((int)pos); // FIXME: Double should work too e.g. mx1.0

@@ -1,6 +1,8 @@
 #ifndef MY_SERIALIZE_H
 #define MY_SERIALIZE_H
 
+// Implementing a custom json serializer for arduino.
+
 #include "program.h"
 #include "axis.h"
 #include "../config/constants.h"
@@ -56,6 +58,14 @@ void serialize(Axis* axis, T& out) {
   writeJson(out, PROPERTY_FORWARD, axis->isForward);
   writeJson(out, PROPERTY_REFERENCED, axis->isReferenced);
   writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
+  writeJson(out, PROPERTY_MOTOR_ENABLED, axis->isMotorEnabled);
+  writeJson(out, PROPERTY_FORCE_ROTATION, axis->forceRotation);
+  if (axis->name == 'x') {
+    writeJson(out, PROPERTY_DELTA_POSITION, ((HorizontalAxis*)axis)->getDeltaPosition());
+  } else if (axis->name == 'z') {
+    writeJson(out, PROPERTY_DESTINATION_ANGLE, ((ZAxis*)axis)->getDestinationAngle());
+    writeJson(out, PROPERTY_ANGLE, ((ZAxis*)axis)->getPositionAngle());
+  }
   out << "\"" << PROPERTY_SPEED << "\": " << axis->speed; 
   // CAREFULL: JSON MUST NOT END WITH COMMA
   out << "}";
