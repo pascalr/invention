@@ -28,12 +28,13 @@ using namespace zbar;
 
 class DetectedHRCodePosition {
   public:
-    DetectedHRCodePosition(HRCodePosition pos, double x0, double y0, double z0) : position(pos), x(x0), y(y0), z(z0) {
+    DetectedHRCodePosition(HRCodePosition pos, double x0, double y0, double z0, double a0) : position(pos), x(x0), y(y0), z(z0), angle(a0) {
     }
     HRCodePosition position;
     double x;
     double y;
     double z;
+    double angle;
 };
 ostream &operator<<(std::ostream &os, const DetectedHRCodePosition &c) {
   return os << c.position << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
@@ -45,34 +46,6 @@ class Jar {
     double position_y; // mm
     double position_z; // mm
 };
-
-void addUniqueToJars(vector<HRCodePosition> positions, double toolX, double toolZ, double angle) {
-
-  double camDeltaX = (RAYON - CAMERA_OFFSET) * cos(angle / 180 * PI);
-  double camDeltaZ = (RAYON - CAMERA_OFFSET) * sin(angle / 180 * PI);
-  double camX = toolX - camDeltaX;
-  double camZ = toolZ - camDeltaZ;
-
-  // Field of view distance = 2 * distance * tan(FOV[angle] / 2)
-  // Selon la loi du rapport des côtés d'un triangle b1/h1 = b2/h2 (triangle semblables)
-  // (opposé sur adjacent egal opposé sur adjacent)
-  // À une hauteur de 205mm, le code mesure ... de diamètre en pixel.
-  // Si la hauteur double, le code mesure va diviser par 2.
-  //
-  // Le facteur de mouvement en x, y est proportionnel à la hauteur.
-  //
-  // ATTENTION: Je dois transférer les coordonées x,y et données x,z; Je dois tourner...
-
-  for (auto pos = positions.begin(); pos != positions.end(); ++pos) {
-    double scale = pos->scale;
-    double imgDeltaX = pos->x - pos->originalImageWidth / 2.0 * scale;
-    double imgDeltaY = pos->y - pos->originalImageHeight / 2.0 * scale;
-
-    // x is side by side error, y is forward and backward error.
-    //pos->y;
-  }
-
-}
 
 #define MAX_X AXIS_X_MAX_POS
 #define MAX_Z AXIS_Z_MAX_POS
@@ -92,6 +65,8 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
+      initAxes(simulation);
+      simulation.execute("H");
       
       return true;
     }
@@ -106,6 +81,7 @@ class Sweep {
       BOOST_LOG_TRIVIAL(debug) << "Waiting for message 'done'.";
       m_port.waitUntilMessageReceived(MESSAGE_DONE);
       m_port.unlock();
+      simulation.execute(str);
       
       captureAndDetect(detected);
     }
@@ -128,7 +104,7 @@ class Sweep {
       if (!positions.empty()) {
         BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
         for (auto it = positions.begin(); it != positions.end(); ++it) {
-          DetectedHRCodePosition d(*it, m_x, m_y, m_z);
+          DetectedHRCodePosition d(*it, m_x, m_y, m_z, simulation.axisZ.getPositionAngle());
           detected.push_back(d);
         }
       }
@@ -166,6 +142,9 @@ class Sweep {
     }
 
   private:
+    // The angle is required. Instead of asking for it. Run a simulation and
+    // ask the simulation what angle the arm is in.
+    FakeProgram simulation;
     VideoCapture m_cap;
     SerialPort& m_port;
     double m_x;

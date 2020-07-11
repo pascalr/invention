@@ -38,6 +38,7 @@ void drawArmCenterAxis(HorizontalAxis* axisX, Axis* axisZ) {
 }
 
 // TODO: Do my own thing I think, because yeah not sure what lib to use anyways...
+// I will try to use Eigen333
 class Point {
   public:
     Point(double valX, double valY) : x(valX), y(valY) {}

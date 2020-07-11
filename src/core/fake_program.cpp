@@ -40,3 +40,28 @@ void FakeProgram::setFakeInput(std::string& str) {
 bool FakeProgram::inputAvailable() {
   return !fake_input.empty();
 }
+
+void FakeProgram::execute(const char* dest) {
+  unsigned long currentTime = 0;
+
+  // cout << "Move: " << dest << endl;
+
+  string str = dest;
+  str += '\n';
+  setFakeInput(str);
+
+  setCurrentTime(0);
+  myLoop(*this);
+  while (isWorking) {
+    setCurrentTime(getCurrentTime() + 5);
+    myLoop(*this);
+  }
+
+}
+
+void FakeProgram::move(char axis, double destination) {
+  string str0 = "M";
+  str0 += axis;
+  str0 += to_string(destination);
+  move(str0.c_str());
+}

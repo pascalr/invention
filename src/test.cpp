@@ -59,31 +59,6 @@ void title(const char* str) {
   cout << "\033[36;1m" << str << "\033[0m" << endl;
 }
 
-void move(const char* dest, FakeProgram& p, bool plot=false) {
-  unsigned long currentTime = 0;
-
-  cout << "Move: " << dest << endl;
-
-  string str = dest;
-  str += '\n';
-  p.setFakeInput(str);
-
-  p.setCurrentTime(0);
-  myLoop(p);
-  while (p.isWorking) {
-    p.setCurrentTime(p.getCurrentTime() + 5);
-    myLoop(p);
-  }
-
-}
-
-void move(char axis, double destination, FakeProgram& p, bool plot=false) {
-  string str0 = "M";
-  str0 += axis;
-  str0 += to_string((int)destination); // FIXME
-  move(str0.c_str(), p, plot);
-}
-
 void referenceAll(Axis** axes) {
   for (int i = 0; axes[i] != NULL; i++) {
     axes[i]->referenceReached();
@@ -140,7 +115,7 @@ void testMoveZ() {
   assertNearby("Beginning position Z", 0.0, p.axisZ.getPosition());
   assertNearby("Beginning destination Z", 0.0, p.axisZ.getDestination());
 
-  move('Z', RAYON, p);
+  p.move('Z', RAYON);
   
   assertNearby("MZ(RAYON) position Z", RAYON, p.axisZ.getPosition());
   assertNearby("MZ(RAYON) destination Z", RAYON, p.axisZ.getDestination());
@@ -168,7 +143,7 @@ void testMoveSquare() {
   assertNearby("Beginning position Z", 0.0, p.axisZ.getPosition());
   assertNearby("Beginning destination Z", 0.0, p.axisZ.getDestination());
 
-  move('Z', RAYON, p, true);
+  p.move('Z', RAYON);
   
   assertNearby("MZ380 position X", RAYON, p.axisX.getPosition());
   assertNearby("MZ380 destination X", RAYON, p.axisX.getDestination());
@@ -176,7 +151,7 @@ void testMoveSquare() {
   assertNearby("MZ380 position Z", RAYON, p.axisZ.getPosition());
   assertNearby("MZ380 destination Z", RAYON, p.axisZ.getDestination());
   
-  move("MX0", p, true);
+  p.move('X', 0.0);
   
   assertNearby("MX0 position X", 0.0, p.axisX.getPosition());
   assertNearby("MX0 destination X", 0.0, p.axisX.getDestination());
@@ -184,7 +159,7 @@ void testMoveSquare() {
   assertNearby("MX0 position Z", RAYON, p.axisZ.getPosition());
   assertNearby("MX0 destination Z", RAYON, p.axisZ.getDestination());
 
-  move("MZ0", p, true);
+  p.move('Z', 0.0);
   
   assertNearby("MZ0 position X", 0.0, p.axisX.getPosition());
   assertNearby("MZ0 destination X", 0.0, p.axisX.getDestination());
@@ -192,7 +167,7 @@ void testMoveSquare() {
   assertNearby("MZ0 position Z", 0.0, p.axisZ.getPosition());
   assertNearby("MZ0 destination Z", 0.0, p.axisZ.getDestination());
 
-  move('X', RAYON, p, true);
+  p.move('X', RAYON);
 
   assertNearby("MX380 position X", RAYON, p.axisX.getPosition());
   assertNearby("MX380 destination X", RAYON, p.axisX.getDestination());
@@ -216,7 +191,7 @@ void testMoveXFlipsZ() {
   assertNearby("Beginning destination Z", 0.0, p.axisZ.getDestination());
   assertNearby("Beginning angle Z", 0.0, p.axisZ.getDestinationAngle());
 
-  move("MX0", p, true);
+  p.move('X', 0.0);
   
   assertNearby("MX0 position X", 0.0, p.axisX.getPosition());
   assertNearby("MX0 destination X", 0.0, p.axisX.getDestination());
@@ -224,7 +199,7 @@ void testMoveXFlipsZ() {
   assertNearby("MX0 position Z", 0.0, p.axisZ.getPosition());
   assertNearby("MX0 angle Z", 180.0, p.axisZ.getDestinationAngle());
 
-  move('X', AXIS_X_MAX_POS, p, true);
+  p.move('X', AXIS_X_MAX_POS);
   
   assertNearby("MX_max position X", AXIS_X_MAX_POS, p.axisX.getPosition());
   assertNearby("MX_max destination X", AXIS_X_MAX_POS, p.axisX.getDestination());
@@ -246,20 +221,20 @@ void testMoveZMovesX() {
   assertNearby("Beginning destination X", RAYON, p.axisX.getDestination());
   assertNearby("Beginning delta X", RAYON, p.axisX.getDeltaPosition());
 
-  move("MX100", p);
+  p.move('X', 100.0);
   
   assertNearby("MX100 position X", 100.0, p.axisX.getPosition());
   assertNearby("MX100 destination X", 100.0, p.axisX.getDestination());
   assertNearby("MX100 delta X", -RAYON, p.axisX.getDeltaPosition());
   
   referenceAll(p.axes);
-  move('Z',RAYON, p);
+  p.move('Z',RAYON);
   
   assertNearby("MZ380 position X", RAYON, p.axisX.getPosition());
   assertNearby("MZ380 destination X", RAYON, p.axisX.getDestination());
   assertNearby("MZ380 delta X", 0.0, p.axisX.getDeltaPosition());
 
-  move("MX0", p);
+  p.move('X', 0.0);
   
   assertNearby("MX0 position X", 0.0, p.axisX.getPosition());
   assertNearby("MX0 destination X", 0.0, p.axisX.getDestination());

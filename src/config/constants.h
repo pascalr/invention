@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "camera_constants.h"
+
 #define AXIS_X_MAX_POS 640.0 // mm
 #define AXIS_Z_MAX_POS RAYON
 
@@ -11,8 +13,8 @@
 #define ARMOIRE_DEPTH 609.6 // mm
 #define ARMOIRE_HEIGHT 1905.0 // mm
 
+#define DISTANCE_CAMERA_SHELF 1234
 #define CAMERA_OFFSET 263.0 // mm
-#define CAMERA_FIELD_OF_VIEW 75.0 // degrees
 
 #define OFFSET_X 164.0 // mm, the distance between the sidewall and x = 0
 #define OFFSET_Z 160.0 // mm, the distance between the back and z = 0
@@ -51,6 +53,9 @@
 #define ERROR_EXPECTED_NUMBER -1
 #define ERROR_EXPECTED_AXIS -2
 
+// Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12
+
+#define HR_CODE_WIDTH 31 // mm
 
 #endif

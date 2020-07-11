@@ -31,6 +31,10 @@ class FakeProgram : public Program {
 
     bool inputAvailable();
 
+    void execute(const char* dest);
+
+    void move(char axis, double destination);
+
   protected:
     ConsoleWriter m_writer;
     unsigned long currentTime = 0;

@@ -30,7 +30,7 @@ using namespace cv;
 
 class HRCodePosition {
   public:
-    HRCodePosition(Mat& mat, double x1, double y1, int o1, int o2, double s1) : img(mat), x(x1), y(y1), originalImageWidth(o1), originalImageHeight(o2), scale(s1) {
+    HRCodePosition(Mat& mat, double x1, double y1, double s1) : img(mat), x(x1), y(y1), scale(s1) {
     }
 
     friend ostream &operator<<(std::ostream &os, const HRCodePosition &c);
@@ -38,14 +38,11 @@ class HRCodePosition {
     Mat img;
     double x;
     double y;
-    int originalImageWidth;
-    int originalImageHeight;
     double scale;
 };
 
 ostream &operator<<(std::ostream &os, const HRCodePosition &c) {
   os << "(" << c.x << ", " << c.y << ")";
-  os << "[" << c.originalImageWidth << ", " << c.originalImageHeight << "]";
   return os << "{" << c.scale << "}";
 }
 
@@ -125,7 +122,7 @@ class HRCodeParser {
         if (child < 0) continue;
         
         BOOST_LOG_TRIVIAL(debug) << "Child found.";
-        
+       
         float scale = radius[i] / 36.0; // mm
         float insideDiameter = 30 * scale; // mm
 
@@ -171,8 +168,9 @@ class HRCodeParser {
         Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
         Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
         warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
-   
-        HRCodePosition codePos(rotatedHRCode, centers[i].x, centers[i].y, src.cols, src.rows, scale); 
+  
+        double pixelsPerMm = radius[i]*2 / HR_CODE_WIDTH;
+        HRCodePosition codePos(rotatedHRCode, centers[i].x, centers[i].y, src.cols, src.rows, pixelsPerMM); 
         detectedCodes.push_back(codePos);
       }
       //imshow( "Contours", drawing );
