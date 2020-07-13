@@ -17,12 +17,12 @@ class DetectedHRCodeAbsolutePosition {
 };
 
 double calculateJarHeight(double perceivedWidth) {
-  double distanceFromCam = HRCODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
+  double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
   return DISTANCE_CAMERA_SHELF - distanceFromCam;
 }
 
 class Jar {
-  vector3d position;
+  Vector3d position;
 };
 
 // This is separate from sweep because this does not require the sweep action.
@@ -34,7 +34,7 @@ class Jar {
 // and later ask the user to translate
 class JarParser {
 public:
-  void run(vector<DetectedHRCodePositions> input, vector<Jar> result) {
+  void run(vector<DetectedHRCodePosition> input, vector<Jar> result) {
     
   }
 };

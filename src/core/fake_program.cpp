@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "fake_program.h"
+#include "input_parser.h"
 
 using namespace std;
 
@@ -63,5 +64,5 @@ void FakeProgram::move(char axis, double destination) {
   string str0 = "M";
   str0 += axis;
   str0 += to_string(destination);
-  move(str0.c_str());
+  execute(str0.c_str());
 }

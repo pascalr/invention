@@ -23,6 +23,8 @@
 #include "../lib/lib.h"
 #include "../lib/opencv.h"
 
+#include "../config/constants.h"
+
 #include <vector>
 
 using namespace std;
@@ -170,7 +172,7 @@ class HRCodeParser {
         warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
   
         double pixelsPerMm = radius[i]*2 / HR_CODE_WIDTH;
-        HRCodePosition codePos(rotatedHRCode, centers[i].x, centers[i].y, src.cols, src.rows, pixelsPerMM); 
+        HRCodePosition codePos(rotatedHRCode, centers[i].x, centers[i].y, pixelsPerMm); 
         detectedCodes.push_back(codePos);
       }
       //imshow( "Contours", drawing );

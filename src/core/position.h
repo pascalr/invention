@@ -23,10 +23,10 @@ Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d
   imgDelta *= scale; // Translate pixels dimensions into mm.
 
   // I must rotate the offset value because the camera is rotated.
-  Transform t(rot2(angle / 180 * PI));
-  imgDelta.rotate(t);
+  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(angle / 180 * PI));
+  imgDelta = t * imgDelta;
 
-  return cameraPos + imgDelta
+  return cameraPos + imgDelta;
 }
 
 #endif

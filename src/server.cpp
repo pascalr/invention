@@ -25,6 +25,7 @@
 #include <unistd.h> // To parse arguments
 
 #include "helper/logging.h"
+#include "core/jar_parser.h"
 
 using namespace std;
 // Added for the json-example:

@@ -58,7 +58,7 @@ class Sweep {
         cerr << "ERROR! Unable to open camera. Aborting sweep.\n";
         return false;
       }
-      initAxes(simulation);
+      setupAxes(simulation);
       simulation.execute("H");
       
       return true;
@@ -74,7 +74,7 @@ class Sweep {
       BOOST_LOG_TRIVIAL(debug) << "Waiting for message 'done'.";
       m_port.waitUntilMessageReceived(MESSAGE_DONE);
       m_port.unlock();
-      simulation.execute(str);
+      simulation.execute(str.c_str());
       
       captureAndDetect(detected);
     }
