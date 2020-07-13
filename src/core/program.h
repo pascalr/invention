@@ -32,8 +32,8 @@ class Program {
     ZAxis axisZ;
     Axis axisT;
       
-    Axis* axes[10] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL}; // FIXME: CAREFULL WITH SIZE!!!
-    //Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, NULL};
+    Axis* axes[10] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    //Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, 0};
     
     bool isWorking = false;
 

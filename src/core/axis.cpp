@@ -1,13 +1,13 @@
 #include "axis.h"
 
-#include <cctype> 
+#include <ctype.h> 
 
 Axis* axisByLetter(Axis** axes, char letter) {
-  for (int i = 0; axes[i] != NULL; i++) {
+  for (int i = 0; axes[i] != 0; i++) {
     if (toupper(letter) == axes[i]->name) {
       return axes[i];
     }
   }
 
-  return NULL;
+  return 0;
 }

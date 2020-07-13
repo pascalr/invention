@@ -1,6 +1,8 @@
 #include "program.h"
 #include "serialize.h"
 
+#include <stdlib.h>
+
 int parseNumber(Program& p, double& n) {
 
   char number[MAX_NUMBER_CHAR + 1];
@@ -50,7 +52,7 @@ int parseActionCommand(char cmd, Program& p) {
   double number;
 
   // Prepare
-  for (int i = 0; p.axes[i] != NULL; i++) {
+  for (int i = 0; p.axes[i] != 0; i++) {
     p.axes[i]->prepare(p.getCurrentTime());
   }
 
@@ -64,7 +66,7 @@ int parseActionCommand(char cmd, Program& p) {
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
     p.getWriter() << "Referencing...\n";
-    for (int i = 0; p.axes[i] != NULL; i++) {
+    for (int i = 0; p.axes[i] != 0; i++) {
       p.axes[i]->startReferencing();
     }
 
@@ -87,7 +89,7 @@ int parseActionCommand(char cmd, Program& p) {
   p.getWriter() << "Cmd: " << cmd << "\n";
 
   // After input
-  for (int i = 0; p.axes[i] != NULL; i++) {
+  for (int i = 0; p.axes[i] != 0; i++) {
     p.axes[i]->afterInput();
   }
 
@@ -104,7 +106,7 @@ void myLoop(Program& p) {
 
     // stop
     if (cmd == 's' || cmd == 'S') {
-      for (int i = 0; p.axes[i] != NULL; i++) {
+      for (int i = 0; p.axes[i] != 0; i++) {
         p.axes[i]->stop();
       }
       p.getWriter() << "Stopped\n";
@@ -140,7 +142,7 @@ void myLoop(Program& p) {
   }
 
   bool stillWorking = false;
-  for (int i = 0; p.axes[i] != NULL; i++) {
+  for (int i = 0; p.axes[i] != 0; i++) {
     stillWorking = stillWorking || p.axes[i]->handleAxis(p.getCurrentTime());
   }
 

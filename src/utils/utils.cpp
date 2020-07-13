@@ -1,5 +1,5 @@
-#include <cstring>
-#include <cmath>
+#include <string.h>
+#include <math.h>
 
 bool startsWith(const char *pre, const char *str) {
   return strncmp(pre, str, strlen(pre)) == 0;

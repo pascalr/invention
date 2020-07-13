@@ -58,5 +58,4 @@ class IOProgram : public Program {
     unsigned long currentTime = 0;
 };
 
-
 #endif

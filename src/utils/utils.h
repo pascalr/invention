@@ -1,8 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <cstring>
-#include <cmath>
+#include <string.h>
+#include <math.h>
 
 bool startsWith(const char *pre, const char *str);
 

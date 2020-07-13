@@ -5,6 +5,7 @@
 
 #include "program.h"
 #include "axis.h"
+#include "writer.h"
 #include "../config/constants.h"
 
 template <typename T>
@@ -39,10 +40,10 @@ void writeJson(T& writer, const char* key, unsigned long val) {
 template <typename T>
 void serialize(Program& p, T& out) {
   out << "{";
-  for (int i = 0; p.axes[i] != NULL; i++) {
+  for (int i = 0; p.axes[i] != 0; i++) {
     out << "\"axis_" << p.axes[i]->name << "\": ";
     serialize(p.axes[i], out);
-    if (p.axes[i+1] != NULL) {
+    if (p.axes[i+1] != 0) {
       out << ", ";
     }
   }

@@ -8,7 +8,7 @@
 
 #include "writer.h"
 #include "../config/constants.h"
-#include <cmath>
+#include <math.h>
 
 #ifndef LOW
 #define LOW 0
@@ -286,7 +286,7 @@ class Axis {
 
     // Resets some stuff.
     virtual void prepare(unsigned long time) {
-      m_following_axis = NULL;
+      m_following_axis = 0;
       previousStepTime = time;
     }
     

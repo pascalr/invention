@@ -1,6 +1,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#define ARDUINO_RELEASE \
+  defined(__AVR_ATmega168__) || \
+  defined(__AVR_ATmega328P__) || \
+  defined(__AVR_ATmega1280__) || \
+  defined(__AVR_ATmega2560__)
+
 #include "camera_constants.h"
 
 #define AXIS_X_MAX_POS 640.0 // mm
