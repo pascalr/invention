@@ -19,30 +19,21 @@ using namespace std;
 // Then I can always get the distance from the other values.
 // D’ = (W x F) / P
 
-// This can be cool because it gives me the height of the jar after.
-// Compute the focal point with the average of some data one dimension at a time.
-/*double computeFocalPoint1d(vector<double> perceivedWidths, double distanceFromCamera, double actualWidth) {
+// The focal point can be used to determine the distance of an object.
+double computeFocalPoint(double perceivedWidth, double distanceFromCamera, double actualWidth) {
 
-  vector<double> focalPoints(perceivedWidth.size());
-
-  for (auto it = perceivedWidths.begin(); it != perceivedWidths.end; it++) {
-    double focalPoint = *it * distanceFromCamera / actualWidth;
-    focalPoints.push_back(focalPoint);
-    cout << "Focal point = " << focalPoint << endl;
-  }
-
-  double average = accumulate( focalPoints.begin(), focalPoints.end(), 0.0)/focalPoints.size();              
-  return average;
-}*/
+  return perceivedWidth * distanceFromCamera / actualWidth;
+}
 
 int main(int argc, char** argv)
 { // 21 mm and 31 mm
   Mat frame;
   captureVideoImage(frame);
+
  
   // TODO: Ask arduino for arm position.
   cout << "WARNING: Assuming arm is at home position.";
-
+  
   vector<DetectedHRCode> detected;
   detect(frame, detected, RAYON, 0.0, 0.0, 0.0);
 
@@ -50,9 +41,17 @@ int main(int argc, char** argv)
     cerr << "Error did not detect any HRCode. Aborting...";
     return -1;
   }
+  
+  // TODO: Latter take multiple images have a reference. Go up and down to take many images.
+  cout << "WARNING: Assuming camera to jar label distance to be 202 mm.";
+  double cameraDistance = 202;
 
   DetectedHRCode code = *detected.begin();
+  double pixelsPerMm = code.code.scale;
   cout << "Pixels per mm: " << code.code.scale << endl;
+
+  double codePixelsWidth = pixelsPerMm * HR_CODE_WIDTH;
+  double focalPoint = computeFocalPoint(codePixelsWidth, cameraDistance, HR_CODE_WIDTH);
 
   ofstream myfile;
   myfile.open ("src/config/camera_constants.h");
@@ -66,7 +65,7 @@ int main(int argc, char** argv)
 
   //myfile << "#define CAMERA_FIELD_OF_VIEW 75.0 // degrees\n";
   // TODO: Camera focal point
-  // myfile << "#define CAMERA_FOCAL_POINT 1234\n";
+  myfile << "#define CAMERA_FOCAL_POINT " << focalPoint << "\n";
   myfile << "\n";
   myfile << "#endif\n";
 
