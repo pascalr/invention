@@ -115,7 +115,7 @@ class Sweep {
       m_x = MAX_X;
       m_z = 0.0;
 
-      for (int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
+      for (unsigned int i = 0; i < (sizeof(heights) / sizeof(double)); i++) {
         m_y = heights[i];
         moveThanDetect("MZ",0.0, detected);
         bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0

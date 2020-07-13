@@ -51,12 +51,12 @@ class Point {
 };
 
 void drawArmBoundingBox(HorizontalAxis* axisX, ZAxis* axisZ) {
-  double angle = axisZ->getPositionAngle();
+  /*double angle = axisZ->getPositionAngle();
 
   double a[4][2] = {{0,0},
                    {ARM_WIDTH, 0},
                    {ARM_WIDTH, ARM_LENGTH},
-                   {0, ARM_LENGTH}};
+                   {0, ARM_LENGTH}};*/
 
 
 }

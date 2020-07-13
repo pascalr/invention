@@ -12,8 +12,8 @@ using namespace std;
 
 Vector2d cameraPosition(Vector2d toolPosition, double angle) {
 
-  double offset = RAYON - CAMERA_OFFSET;
-  Vector2d cameraOffset(offset*cos(angle / 180 * PI),offset*sin(angle / 180 * PI));
+  double offset = CAMERA_TOOL_DISTANCE;
+  Vector2d cameraOffset(offset*cosd(angle),offset*sind(angle));
   return toolPosition - cameraOffset;
 }
 

@@ -3,6 +3,9 @@
 
 #include "camera_constants.h"
 
+#define sind(x) (sin(fmod((x),360) * M_PI / 180))
+#define cosd(x) (cos(fmod((x),360) * M_PI / 180))
+
 #define RAYON 340.0
 
 #ifndef LOW
@@ -27,7 +30,11 @@
 #define ARMOIRE_HEIGHT 1905.0 // mm
 
 #define DISTANCE_CAMERA_SHELF 1234
-#define CAMERA_OFFSET 263.0 // mm
+
+#define CAMERA_TOOL_DISTANCE 62.0 // mm
+#define BASE_TOOL_DISTANCE RAYON
+
+#define BASE_CAMERA_DISTANCE (BASE_TOOL_DISTANCE - CAMERA_TOOL_DISTANCE)
 
 #define OFFSET_X 164.0 // mm, the distance between the sidewall and x = 0
 #define OFFSET_Z 160.0 // mm, the distance between the back and z = 0

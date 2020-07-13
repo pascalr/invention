@@ -39,7 +39,7 @@ class IOProgram : public Program {
       string str;
       cin >> str;
 
-      if (str.length() >= size-1) {
+      if (((int) str.length()) >= size-1) {
         cerr << "Message is too long. Maximum: " << size << ". Was: " << str.length() << ".\n";
         return false;
       }

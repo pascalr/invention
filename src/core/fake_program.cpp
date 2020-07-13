@@ -43,9 +43,6 @@ bool FakeProgram::inputAvailable() {
 }
 
 void FakeProgram::execute(const char* dest) {
-  unsigned long currentTime = 0;
-
-  // cout << "Move: " << dest << endl;
 
   string str = dest;
   str += '\n';

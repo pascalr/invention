@@ -17,6 +17,9 @@ class PositionedHRCode {
     double y;
     double z;
 };
+ostream &operator<<(std::ostream &os, const PositionedHRCode &c) {
+  return os << c.code << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
+}
 
 double calculateJarHeight(double perceivedWidth) {
   double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
@@ -36,13 +39,25 @@ class Jar {
 // and later ask the user to translate
 class JarPositionAnalyzer {
 public:
-  PositionedHRCode convert(DetectedHRCode input) {
+  PositionedHRCode convert(DetectedHRCode& input) {
 
+    Vector2d toolPosition;
+    toolPosition << input.x, input.z;
 
+    Vector2d jarCenter;
+    jarCenter << input.code.x, input.code.y;
+
+    Vector2d jarPosition = convertToAbsolutePosition(toolPosition, input.angle, jarCenter, input.code.scale);
+
+    PositionedHRCode result(input.code, jarPosition(0), 0, jarPosition(1));
+    return result;
   }
 
-  void run(vector<DetectedHRCode> input, vector<PositionedHRCode> result) {
-    
+  void run(vector<DetectedHRCode> input, vector<PositionedHRCode>& result) {
+    for (auto it = input.begin(); it != input.end(); ++it) {
+      PositionedHRCode p = convert(*it);
+      result.push_back(p);
+    }
   }
 };
 

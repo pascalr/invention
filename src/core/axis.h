@@ -384,7 +384,6 @@ class ZAxis : public Axis {
 
     bool baseDestinationOutOfBounds() {
       double tipPositionX = m_horizontal_axis->getDestination();
-      double tipPositionZ = getDestination();
       
       double basePositionX = tipPositionX - (RAYON * cos(getDestinationAngle() / 180 * PI));
 

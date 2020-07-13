@@ -25,7 +25,7 @@
 #include <unistd.h> // To parse arguments
 
 #include "helper/logging.h"
-#include "core/jar_position_detector.h"
+#include "core/jar_position_analyzer.h"
 
 using namespace std;
 // Added for the json-example:

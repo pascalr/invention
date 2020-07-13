@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 2.8)
 project( DisplayImage )
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -DBOOST_LOG_DYN_LINK -DDEBUG -DWITHOUT_NUMPY -Wno-psabi")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -DBOOST_LOG_DYN_LINK -DDEBUG -DWITHOUT_NUMPY -Wno-psabi -Wall")
 
 find_package(PythonLibs 2.7)
 set(Python2_INCLUDE_DIRS "/usr/include/python2.7" )
@@ -82,9 +82,9 @@ add_executable( run_tests ${MyCpp} src/test/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs})
 
-add_executable( test_jar_position_detector ${MyCpp} src/test/jar_position_detector.cpp )
-target_include_directories(test_jar_position_detector PRIVATE ${MyDirs})
-target_link_libraries(test_jar_position_detector ${MyLibs})
+add_executable( test_jar_position_analyzer ${MyCpp} src/test/jar_position_analyzer.cpp )
+target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
+target_link_libraries(test_jar_position_analyzer ${MyLibs})
 
 add_executable( fake src/fake.cpp )
 target_include_directories(fake PRIVATE ${MyDirs})
@@ -98,5 +98,6 @@ target_include_directories( server PRIVATE "/usr/local/include/simple-web-server
 
 enable_testing()
 add_test( regularTests bin/run_tests )
+add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )
 
 add_custom_target(check COMMAND make && ${CMAKE_CTEST_COMMAND} --verbose)
