@@ -61,12 +61,12 @@ int main(int argc, char** argv)
   myfile << "#ifndef CAMERA_CONSTANTS\n";
   myfile << "#define CAMERA_CONSTANTS\n";
   myfile << "\n";
-  myfile << "#define CAMERA_WIDTH" << frame.cols << "\n";
-  myfile << "#define CAMERA_HEIGHT" << frame.rows << "\n";
+  myfile << "#define CAMERA_WIDTH " << frame.cols << "\n";
+  myfile << "#define CAMERA_HEIGHT " << frame.rows << "\n";
 
   //myfile << "#define CAMERA_FIELD_OF_VIEW 75.0 // degrees\n";
   // TODO: Camera focal point
-  myfile << "#define CAMERA_FOCAL_POINT 1234\n";
+  // myfile << "#define CAMERA_FOCAL_POINT 1234\n";
   myfile << "\n";
   myfile << "#endif\n";
 
