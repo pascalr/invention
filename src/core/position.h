@@ -1,25 +1,32 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include <Eigen/Dense>
+// TODO: Only keep Eigen/Core in header file
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 using namespace Eigen;
 using namespace std;
 
 Vector2d cameraPosition(Vector2d toolPosition, double angle) {
+
+  double offset = RAYON - CAMERA_OFFSET;
+  Vector2d cameraOffset(offset*cos(angle / 180 * PI),offset*sin(angle / 180 * PI));
+  return toolPosition - cameraOffset;
+}
+
+Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d jarCenter, double scale) {
+  
+  Vector2d cameraPos = cameraPosition(toolPosition, angle);
+
+  Vector2d imgDelta = jarCenter - Vector2d(CAMERA_WIDTH/2, CAMERA_HEIGHT/2);
+  imgDelta *= scale; // Translate pixels dimensions into mm.
+
+  // I must rotate the offset value because the camera is rotated.
   Transform t(rot2(angle / 180 * PI));
-  //Transform t;
-  //t = Rotation2D<float> rot2(angle / 180 * PI);
-  double camDeltaX = (RAYON - CAMERA_OFFSET) * cos(pos.angle / 180 * PI);
-  double camDeltaZ = (RAYON - CAMERA_OFFSET) * sin(pos.angle / 180 * PI);
-  double camX = toolX - camDeltaX;
-  double camZ = toolZ - camDeltaZ;
-  Vector2d cameraToTool = ();
-  Vector2d cameraPos(CAMERA_OFFSET*sin(pos.angle / 180 * PI),CAMERA_OFFSET*cos);
+  imgDelta.rotate(t);
 
-  Vector2d result = toolPosition - ;
-
-  Vector3d v(1,2,3);
+  return cameraPos + imgDelta
 }
 
 #endif

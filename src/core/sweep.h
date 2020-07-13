@@ -40,13 +40,6 @@ ostream &operator<<(std::ostream &os, const DetectedHRCodePosition &c) {
   return os << c.position << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
 }
 
-class Jar {
-  public:
-    double position_x; // mm
-    double position_y; // mm
-    double position_z; // mm
-};
-
 #define MAX_X AXIS_X_MAX_POS
 #define MAX_Z AXIS_Z_MAX_POS
 

@@ -178,6 +178,7 @@ class HRCodeParser {
 
 };
 
+// TODO: This is too specific for my application, this is not only HRCode...
 class HRCode {
   public:
     HRCode() {}

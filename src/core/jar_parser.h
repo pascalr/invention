@@ -1,7 +1,7 @@
 #ifndef JAR_PARSER_H
 #define JAR_PARSER_H
 
-#include <Eigen/Dense>
+#include "position.h"
  
 using namespace std;
 using namespace Eigen;
@@ -21,26 +21,22 @@ double calculateJarHeight(double perceivedWidth) {
   return DISTANCE_CAMERA_SHELF - distanceFromCam;
 }
 
-void convertToAbsolutePosition(DetectedHrCodePosition& pos, DetectedHrCodeAbsolutePosition& result) {
-  Transform t(AngleAxis(angle,axis));
-  Vector3d v(1,2,3);
+class Jar {
+  vector3d position;
+};
 
-  double camDeltaX = (RAYON - CAMERA_OFFSET) * cos(pos.angle / 180 * PI);
-  double camDeltaZ = (RAYON - CAMERA_OFFSET) * sin(pos.angle / 180 * PI);
-  double camX = toolX - camDeltaX;
-  double camZ = toolZ - camDeltaZ;
-
-  // ATTENTION: Je dois transférer les coordonées x,y et données x,z; Je dois tourner...
-
-  for (auto pos = positions.begin(); pos != positions.end(); ++pos) {
-    double pixelsPerMM = pos->scale;
-    double imgDeltaX = (pos->x - CAMERA_WIDTH / 2.0) * scale;
-    double imgDeltaY = (pos->y - CAMERA_HEIGHT / 2.0) * scale;
-
-    // x is side by side error, y is forward and backward error.
-    //pos->y;
+// This is separate from sweep because this does not require the sweep action.
+// This is done afterward.
+// Step1: detect the position of the jar
+// Step2: remove near duplicates
+// Step3: parse the text
+// Step4: if the text is not readable, store into data/negatives
+// and later ask the user to translate
+class JarParser {
+public:
+  void run(vector<DetectedHRCodePositions> input, vector<Jar> result) {
+    
   }
-
-}
+};
 
 #endif
