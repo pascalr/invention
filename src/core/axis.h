@@ -17,9 +17,6 @@ class Axis {
   
     Axis(Writer& writer, char theName);
 
-    //template <typename T>
-    //friend void serialize(Axis* axis, T& out);
-
     void setReverseMotorDirection(bool val) {
       m_reverse_motor_direction = val;
     }
@@ -31,32 +28,6 @@ class Axis {
     virtual void setMaxPosition(double maxP) {
       maxPosition = maxP;
     }
-
-    /*virtual Writer& serialize(Writer& out) {
-      writeJson(out, "name", name);
-      writeJson(out, "pos", getPositionSteps());
-      writeJson(out, "dest", getDestination());
-      writeJson(out, "forward", isForward);
-      writeJson(out, "referenced", isReferenced);
-      writeJson(out, "referencing", isReferencing);
-      out << "\"speed\": " << speed; // CAREFULL: MUST NOT END WITH COMMA
-      //writeJson("", );
-      doc["pos"] = getPosition();
-      doc["dest"] = getDestination();
-      doc["speed"] = speed;
-      doc["forward"] = isForward;
-      doc["referenced"] = isReferenced;
-      doc["referencing"] = isReferencing;
-      doc["enabled"] = isMotorEnabled;
-      doc["step"] = isStepHigh;
-      doc["rotate"] = forceRotation;
-      doc["pinEnabled"] = enabledPin;
-      doc["pinDirection"] = dirPin;
-      doc["pinStep"] = stepPin;
-      doc["pinLimitSwitch"] = limitSwitchPin;
-      doc["stepsPerUnit"] = stepsPerUnit;
-      doc["positionSteps"] = ;
-    }*/
 
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
@@ -315,13 +286,6 @@ class HorizontalAxis : public Axis {
       //setPositionSteps(RAYON * stepsPerUnit);
     }
 
-    /*Writer& serialize(Writer& out) {
-      out << "{";
-      writeJson(out, "delta_pos", m_delta_position);
-      Axis::serialize(out);
-      out << "}";
-    }*/
-
   private:
     // The horizontal distance between the tip and the base.
     double m_delta_position;
@@ -426,11 +390,5 @@ class VerticalAxis: public Axis {
 };
 
 Axis* axisByLetter(Axis** axes, char letter);
-
-/*Writer& operator<<(Writer& out, Axis &axis) {
-  out << "{";
-  axis.serialize(out);
-  return out << "}";
-}*/
 
 #endif
