@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  vector<DetectedHRCodePosition> candidates;
+  vector<DetectedHRCode> candidates;
   sweep.run(candidates);
 
   for (auto it = candidates.begin(); it != candidates.end(); it++) {

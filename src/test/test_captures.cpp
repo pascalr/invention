@@ -7,8 +7,8 @@
 #include <string>
 #include <chrono>
 
-#include "lib/lib.h"
-#include "lib/hr_code.hpp"
+#include "../lib/lib.h"
+#include "../lib/hr_code.hpp"
 
 #include "dirent.h"
 

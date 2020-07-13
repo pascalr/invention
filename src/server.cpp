@@ -25,7 +25,7 @@
 #include <unistd.h> // To parse arguments
 
 #include "helper/logging.h"
-#include "core/jar_parser.h"
+#include "core/jar_position_detector.h"
 
 using namespace std;
 // Added for the json-example:
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
         response->write("Error initializing sweep.");
         return;
       }
-      vector<DetectedHRCodePosition> candidates;
+      vector<DetectedHRCode> candidates;
       sweep.run(candidates);
       
       response->write("Ok executed command sweep");

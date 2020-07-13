@@ -1,22 +1,9 @@
 #ifndef AXIS_H
 #define AXIS_H
 
-#define RAYON 340.0
-
-#define FORWARD true
-#define REVERSE false
-
 #include "writer.h"
 #include "../config/constants.h"
 #include <math.h>
-
-#ifndef LOW
-#define LOW 0
-#define HIGH 1
-#define INPUT 0
-#define OUTPUT 1
-#define PI 3.1415926535897932384626433832795
-#endif
 
 #define AXIS(t) (axisByLetter(axes, t))
 
@@ -28,24 +15,7 @@
 class Axis {
   public:
   
-    Axis(Writer& writer, char theName) : m_writer(writer) {
-      name = theName;
-      destination = -1;
-      previousStepTime = 0;
-      isStepHigh = false;
-      isMotorEnabled = false;
-      isForward = false;
-      isReferenced = false;
-      isReferencing = false;
-      speed = 500;
-      forceRotation = false;
-      maxPosition = 999999;
-      m_position_steps = 0;
-      //m_destination_steps = 0;
-      m_reverse_motor_direction = false;
-      m_min_position = 0;
-    }
-
+    Axis(Writer& writer, char theName);
 
     //template <typename T>
     //friend void serialize(Axis* axis, T& out);
@@ -231,26 +201,7 @@ class Axis {
     }
 
     // Returns true if the axis is still working.
-    virtual bool handleAxis(unsigned long currentTime) {
-      unsigned int delay = getDelay();
-      
-      if (isReferencing) {
-        return moveToReference();
-      } else if (canMove() && (forceRotation || !isDestinationReached())) {
-        unsigned long deltaTime = currentTime - previousStepTime;
-        if (deltaTime > delay) {
-          turnOneStep();
-          // TODO: Instead of this, call a function named prepareToMove, that updates the previousStepTime
-          if (deltaTime > 2*delay) {
-            previousStepTime = currentTime; // refreshing previousStepTime when it is the first step and the motor was at a stop
-          } else {
-            previousStepTime = previousStepTime + delay; // This is more accurate to ensure all the motors are synchronysed
-          }
-        }
-        return true;
-      }
-      return false;
-    }
+    bool handleAxis(unsigned long currentTime);
   
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.

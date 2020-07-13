@@ -1,13 +1,20 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define ARDUINO_RELEASE \
-  defined(__AVR_ATmega168__) || \
-  defined(__AVR_ATmega328P__) || \
-  defined(__AVR_ATmega1280__) || \
-  defined(__AVR_ATmega2560__)
-
 #include "camera_constants.h"
+
+#define RAYON 340.0
+
+#ifndef LOW
+#define LOW 0
+#define HIGH 1
+#define INPUT 0
+#define OUTPUT 1
+#define PI 3.1415926535897932384626433832795
+#endif
+
+#define FORWARD true
+#define REVERSE false
 
 #define AXIS_X_MAX_POS 640.0 // mm
 #define AXIS_Z_MAX_POS RAYON

@@ -66,8 +66,8 @@ target_link_libraries( main ${MyLibs} )
 add_executable( communicate src/communicate.cpp )
 target_link_libraries( communicate ${MyLibs} )
 
-add_executable( test_captures src/test_captures.cpp )
-target_link_libraries( test_captures ${MyLibs} )
+#add_executable( test_captures src/test/test_captures.cpp )
+#target_link_libraries( test_captures ${MyLibs} )
 
 add_executable( sweep src/sweep.cpp )
 target_link_libraries( sweep ${MyLibs} )
@@ -78,9 +78,13 @@ target_link_libraries( video_capture ${MyLibs} )
 add_executable( usbreset src/usbreset.c )
 target_link_libraries( usbreset ${MyLibs} )
 
-add_executable( run_tests ${MyCpp} src/test.cpp )
+add_executable( run_tests ${MyCpp} src/test/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs})
+
+add_executable( test_jar_position_detector ${MyCpp} src/test/jar_position_detector.cpp )
+target_include_directories(test_jar_position_detector PRIVATE ${MyDirs})
+target_link_libraries(test_jar_position_detector ${MyLibs})
 
 add_executable( fake src/fake.cpp )
 target_include_directories(fake PRIVATE ${MyDirs})

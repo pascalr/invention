@@ -26,18 +26,18 @@ using namespace std;
 using namespace cv;
 using namespace zbar;
 
-class DetectedHRCodePosition {
+class DetectedHRCode {
   public:
-    DetectedHRCodePosition(HRCodePosition pos, double x0, double y0, double z0, double a0) : position(pos), x(x0), y(y0), z(z0), angle(a0) {
+    DetectedHRCode(HRCode cod, double x0, double y0, double z0, double a0) : code(cod), x(x0), y(y0), z(z0), angle(a0) {
     }
-    HRCodePosition position;
+    HRCode code;
     double x;
     double y;
     double z;
     double angle;
 };
-ostream &operator<<(std::ostream &os, const DetectedHRCodePosition &c) {
-  return os << c.position << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
+ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
+  return os << c.code << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
 }
 
 #define MAX_X AXIS_X_MAX_POS
@@ -64,7 +64,7 @@ class Sweep {
       return true;
     }
 
-    void moveThanDetect(const char* txt, double pos, vector<DetectedHRCodePosition> &detected) {
+    void moveThanDetect(const char* txt, double pos, vector<DetectedHRCode> &detected) {
       string str = txt;
       str += to_string(pos);
       //str += to_string((int)pos);
@@ -79,7 +79,7 @@ class Sweep {
       captureAndDetect(detected);
     }
 
-    void captureAndDetect(vector<DetectedHRCodePosition> &detected) {
+    void captureAndDetect(vector<DetectedHRCode> &detected) {
       BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
       Mat frame;
       m_cap.read(frame);
@@ -91,19 +91,19 @@ class Sweep {
       BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
  
       HRCodeParser parser(0.2, 0.2);
-      vector<HRCodePosition> positions;
-      parser.findHRCodePositions(frame, positions, 100);
+      vector<HRCode> positions;
+      parser.findHRCodes(frame, positions, 100);
 
       if (!positions.empty()) {
         BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
         for (auto it = positions.begin(); it != positions.end(); ++it) {
-          DetectedHRCodePosition d(*it, m_x, m_y, m_z, simulation.axisZ.getPositionAngle());
+          DetectedHRCode d(*it, m_x, m_y, m_z, simulation.axisZ.getPositionAngle());
           detected.push_back(d);
         }
       }
     }
 
-    void run(vector<DetectedHRCodePosition>& detected) {
+    void run(vector<DetectedHRCode>& detected) {
 
       double heights[] = {0.0};
       //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};

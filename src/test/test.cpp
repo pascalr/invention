@@ -2,25 +2,26 @@
 #include <cstring>
 #include <math.h>
 
-#include "lib/lib.h"
-#include "lib/matplotlibcpp.h"
-#include "core/console_writer.h"
-#include "core/axis.h"
-#include "core/input_parser.h"
-#include "config/setup.h"
+#include "../lib/lib.h"
+#include "../lib/matplotlibcpp.h"
+#include "../core/console_writer.h"
+#include "../core/axis.h"
+#include "../core/input_parser.h"
+#include "../config/setup.h"
       
 #include <chrono> // for sleep
 #include <thread> // for sleep
 
 #include <signal.h>
 
-#include "core/serialize.h"
-#include "core/deserialize.h"
-#include "core/fake_program.h"
+#include "../core/serialize.h"
+#include "../core/deserialize.h"
+#include "../core/fake_program.h"
+
+#include "test.h"
 
 using namespace std;
 namespace plt = matplotlibcpp;
-
 
 /*class PlotWriter : public ConsoleWriter {
   public:
@@ -35,29 +36,6 @@ namespace plt = matplotlibcpp;
     vector<int> positions;
 };*/
 
-template <class P1, class P2>
-void assertNearby(const char* info, P1 t1, P2 t2) {
-  cout << ((t1 - t2) < 0.5 && (t2 - t1) < 0.5 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
-  cout << " (" << info << ")";
-  cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
-}
-
-template <class P1, class P2>
-void assertTest(const char* info, P1 t1, P2 t2) {
-  cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
-  cout << " (" << info << ")";
-  cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
-}
-
-template <class P1, class P2>
-void assertTest(P1 t1, P2 t2) {
-  cout << (t1 == t2 ? "\033[32mPASSED\033[0m" : "\033[31mFAILED\033[0m");
-  cout << " - Expected: " << t1 << ", " << "Got: " << t2 << endl;
-}
-
-void title(const char* str) {
-  cout << "\033[36;1m" << str << "\033[0m" << endl;
-}
 
 void referenceAll(Axis** axes) {
   for (int i = 0; axes[i] != NULL; i++) {

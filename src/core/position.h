@@ -1,6 +1,8 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include "../config/constants.h"
+
 // TODO: Only keep Eigen/Core in header file
 #include <Eigen/Core>
 #include <Eigen/Geometry>
