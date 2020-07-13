@@ -37,7 +37,7 @@ class DetectedHRCode {
     double angle;
 };
 ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
-  return os << c.code << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
+  return os << c.code << " at (" << c.x << ", " << c.y << ", " << c.z << ", angle = " << c.angle <<")";
 }
 
 #define MAX_X AXIS_X_MAX_POS
