@@ -48,6 +48,20 @@ ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
 // When a sticker disappers, it asks the arduino what position it is.
 // It can then triangulate the real position of the 
 
+void detect(Mat& frame, vector<DetectedHRCode> &detected, double x, double y, double z, double angle) {
+
+  HRCodeParser parser(0.2, 0.2);
+  vector<HRCode> positions;
+  parser.findHRCodes(frame, positions, 100);
+
+  if (!positions.empty()) {
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
+      DetectedHRCode d(*it, x, y, z, angle);
+      detected.push_back(d);
+    }
+  }
+}
+
 class Sweep {
   public:
     Sweep(SerialPort& p) : m_port(p) {
@@ -79,6 +93,8 @@ class Sweep {
       captureAndDetect(detected);
     }
 
+    
+
     void captureAndDetect(vector<DetectedHRCode> &detected) {
       BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
       Mat frame;
@@ -89,18 +105,7 @@ class Sweep {
       }
 
       BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
- 
-      HRCodeParser parser(0.2, 0.2);
-      vector<HRCode> positions;
-      parser.findHRCodes(frame, positions, 100);
-
-      if (!positions.empty()) {
-        BOOST_LOG_TRIVIAL(debug) << "Positions detected.";
-        for (auto it = positions.begin(); it != positions.end(); ++it) {
-          DetectedHRCode d(*it, m_x, m_y, m_z, simulation.axisZ.getPositionAngle());
-          detected.push_back(d);
-        }
-      }
+      detect(frame, detected, m_x, m_y, m_z, simulation.axisZ.getPositionAngle()); 
     }
 
     void run(vector<DetectedHRCode>& detected) {

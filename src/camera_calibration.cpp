@@ -1,6 +1,7 @@
-#include "core/jar_parser.h"
 #include <iostream>
 #include <fstream>
+
+#include "core/sweep.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ using namespace std;
 
 // This can be cool because it gives me the height of the jar after.
 // Compute the focal point with the average of some data one dimension at a time.
-double computeFocalPoint1d(vector<double> perceivedWidths, double distanceFromCamera, double actualWidth) {
+/*double computeFocalPoint1d(vector<double> perceivedWidths, double distanceFromCamera, double actualWidth) {
 
   vector<double> focalPoints(perceivedWidth.size());
 
@@ -32,12 +33,26 @@ double computeFocalPoint1d(vector<double> perceivedWidths, double distanceFromCa
 
   double average = accumulate( focalPoints.begin(), focalPoints.end(), 0.0)/focalPoints.size();              
   return average;
-}
+}*/
 
 int main(int argc, char** argv)
 { // 21 mm and 31 mm
   Mat frame;
   captureVideoImage(frame);
+ 
+  // TODO: Ask arduino for arm position.
+  cout << "WARNING: Assuming arm is at home position.";
+
+  vector<DetectedHRCode> detected;
+  detect(frame, detected, RAYON, 0.0, 0.0, 0.0);
+
+  if (detected.size() < 1) {
+    cerr << "Error did not detect any HRCode. Aborting...";
+    return -1;
+  }
+
+  DetectedHRCode code = *detected.begin();
+  cout << "Pixels per mm: " << code.code.scale << endl;
 
   ofstream myfile;
   myfile.open ("src/config/camera_constants.h");

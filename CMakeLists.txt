@@ -94,6 +94,8 @@ add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )
 target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
 
+add_executable( calibrate_camera src/camera_calibration.cpp )
+target_link_libraries( calibrate_camera ${MyLibs}  )
 
 
 enable_testing()
