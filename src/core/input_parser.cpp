@@ -46,6 +46,44 @@ Axis* parseInputAxis(Program& p, Axis* &axis) {
   return axis;
 }
 
+// Do I need a Zaxis or not? The idea is that I have to check for flips too.
+// But the nice thing about Zaxis is simply to behave the same way as the others.
+
+// Calculates whether a flip is required and sets the proper speeds.
+// Gives a speed function and an amount of time to run.
+// Later, the speed function will accelerate and deccelerate.
+// Parse all the movement asked. Because it must be able to do mx10y20z30
+// This will check if a flip is required, but this will NOT check if it must
+// hide the arm to change level to go higher or lower, this should have
+// been done before. It should not be done on the arduino.
+/*int parseMoveCommand(Program& p) {
+
+  bool zDestinationSet = false;
+  double zDestination;
+  while (true) {
+    char name = p.getChar();
+    if (name == 'z' || name == 'Z') {
+    } else {
+      Axis* axis = axisByLetter(p.axes, name);
+      if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
+      if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+      axis->setDestination(number);
+    }
+  }
+  return axis;
+
+}*/
+
+// Checks if a flip is required.
+// Tells the Zaxis which way to turn.
+// Tells all the axis what speed to go to.
+// Checks for collisions.
+// Does the heavy work.
+// Maybe the validation is only done in a simulation to avoid
+// overloading the arduino. Yeah I think so. To be done later.
+void processMoveCommand(Program& p) {
+}
+
 int parseActionCommand(char cmd, Program& p) {
 
   Axis* axis;
@@ -58,10 +96,11 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Move
   if (cmd == 'M' || cmd == 'm') {
+    // TODO: Parse mx10y20z30, the movement should be done diagonally at once.
     if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
     if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
     axis->setDestination(number);
-    axis->setMotorEnabled(true);
+    processMoveCommand(p);
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {

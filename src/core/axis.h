@@ -7,6 +7,13 @@
 
 #define AXIS(t) (axisByLetter(axes, t))
 
+// I would like to transform the mouvement asked into an optimal path with optimal speed for all axis.
+// If I the arm is at z0 and I ask mz340, I expect it to be in a straight line.
+// The speed of the x axis will be constant (easier for now) v
+// The speed of the theta axis would be (for theta=0 to theta=90) cos(theta)
+// The axis all synchronized with the time, so it's ok.
+// If they lag behing they will try to go a little faster.
+
 // Y0 is on the floor
 // X0 is on the left
 // Z0 is aligned with the wheels that go up and down
