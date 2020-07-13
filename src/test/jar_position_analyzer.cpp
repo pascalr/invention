@@ -31,6 +31,55 @@ void testCameraPosition() {
 void testImageDelta() {
 }
 
+void testTransform() {
+  title("Testing transform");
+
+  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(90 / 180 * PI));
+
+  Vector2d val;
+  val << 100.0, 0.0;
+
+  //val*=jarCenter = t * jarCenter;
+}
+
+void testJarOffset() {
+  title("Testing jar offset");
+  
+  Vector2d result;
+
+  Vector2d imgCenterLeftOfImage;
+  imgCenterLeftOfImage << CAMERA_WIDTH/4, CAMERA_HEIGHT/2; 
+
+  double pixelsPerMm = 10;
+  double pixelsOffset = CAMERA_WIDTH/4;
+  double offsetMm = pixelsOffset / pixelsPerMm;
+
+  // At 0 degree, left of image is z positive
+  result = jarOffset(imgCenterLeftOfImage, 0.0, pixelsPerMm);
+  assertNearby("0 degree, x", 0.0, result(0));
+  assertNearby("0 degree, z", offsetMm, result(1));
+
+  // At 90 degree, left of image is x negative
+  result = jarOffset(imgCenterLeftOfImage, 90.0, pixelsPerMm);
+  assertNearby("0 degree, x", -offsetMm, result(0));
+  assertNearby("0 degree, z", 0.0, result(1));
+
+}
+
+void testConvertToAbsolutePosition() {
+  title("Testing convert to absolute position");
+
+
+  /*Vector2d toolPosition;
+  toolPosition << BASE_TOOL_DISTANCE, 0;
+  Vector2d cameraPos = cameraPosition(toolPosition, 0);
+
+  double angle = 0;
+
+  Vector2d imgCenter;
+  double scale;*/
+}
+
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
@@ -71,6 +120,8 @@ int main (int argc, char *argv[]) {
   //FOUND (366.035, 237.621)[640, 480]{1.19183} at (160, 0, 170)
 
   testCameraPosition();
+  testConvertToAbsolutePosition();
+  testJarOffset();
   testImageDelta();
 
 }
