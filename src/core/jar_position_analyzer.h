@@ -21,10 +21,10 @@ ostream &operator<<(std::ostream &os, const PositionedHRCode &c) {
   return os << c.code << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
 }
 
-//double calculateJarHeight(double perceivedWidth) {
-//  double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
-//  return DISTANCE_CAMERA_SHELF - distanceFromCam;
-//}
+double calculateJarHeight(double perceivedWidth) {
+  double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
+  return DISTANCE_CAMERA_SHELF - distanceFromCam;
+}
 
 class Jar {
   Vector3d position;

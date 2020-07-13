@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   }
   
   // TODO: Latter take multiple images have a reference. Go up and down to take many images.
-  cout << "WARNING: Assuming camera to jar label distance to be 202 mm.";
+  cout << "WARNING: Assuming camera to jar label distance to be 202 mm.\n";
   double cameraDistance = 202;
 
   DetectedHRCode code = *detected.begin();
