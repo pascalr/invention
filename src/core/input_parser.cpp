@@ -182,10 +182,19 @@ int parseActionCommand(char cmd, Program& p) {
   // Move
   if (cmd == 'M' || cmd == 'm') {
     // TODO: Parse mx10y20z30, the movement should be done diagonally at once.
-    if (!parseInputMovingAxis(p, axis)) {p.stopMoving(); return ERROR_EXPECTED_AXIS;}
-    if (parseNumber(p,number) < 0) {p.stopMoving(); return ERROR_EXPECTED_NUMBER;}
-    if ((status = axis->setDestination(number)) < 0) {p.stopMoving(); return status;}
-    if ((status = processMoveCommand(p)) < 0) {p.stopMoving(); return status;}
+    // later call p.stopMoving whenever an error occur, because
+    // if multiple destinations are set, they must be unset if one of them
+    // is an error.
+    // But right now it does not work I don't know why. There is a bug
+    // that it waits for a char???
+    //if (!parseInputMovingAxis(p, axis)) {p.stopMoving(); return ERROR_EXPECTED_AXIS;}
+    //if (parseNumber(p,number) < 0) {p.stopMoving(); return ERROR_EXPECTED_NUMBER;}
+    //if ((status = axis->setDestination(number)) < 0) {p.stopMoving(); return status;}
+    //if ((status = processMoveCommand(p)) < 0) {p.stopMoving(); return status;}
+    if (!parseInputMovingAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
+    if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    if ((status = axis->setDestination(number)) < 0) {return status;}
+    if ((status = processMoveCommand(p)) < 0) {return status;}
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
@@ -246,7 +255,7 @@ void myLoop(Program& p) {
       p.isWorking = true;
       int code = parseActionCommand(cmd, p);
       if (code < 0) {
-        p.getWriter() << "Exception: Code: " << code << ".";
+        p.getWriter() << "Exception: Code: " << code << ".\n";
         /*while (true) { Doesnt work yet because parseActionCommand might have read the \n already
           char throwAway = p.getChar();
           if (throwAway == '\n') {break;}

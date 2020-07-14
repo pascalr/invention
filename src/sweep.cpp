@@ -35,8 +35,11 @@ int main(int argc, char *argv[])
   vector<DetectedHRCode> candidates;
   sweep.run(candidates);
 
-  for (auto it = candidates.begin(); it != candidates.end(); it++) {
-    cout << "FOUND " << *it << std::endl;
+  for (int i = 0; i < candidates.size(); i++) {
+    HRCode& code = candidates[i].code;
+    cout << "HRCode code" << i << "(mat, " << code.x << ", " << code.y << ", " << code.scale << ");\n";
+    cout << "DetectedHRCode detected" << i << "(code" << i << ", ";
+    cout << candidates[i].x << ", " << candidates[i].y << ", " << candidates[i].z << ", " << candidates[i].angle << ");\n";
   }
 
   return 0;

@@ -46,8 +46,8 @@ class Axis {
 
     virtual int setDestination(double dest) {
 
-      if (dest >= m_max_position + 0.0000001) {return ERROR_DESTINATION_TOO_HIGH;}
-      if (dest <= m_min_position - 0.0000001) {return ERROR_DESTINATION_TOO_LOW;}
+      if (dest >= m_max_position + 0.1) {return ERROR_DESTINATION_TOO_HIGH;}
+      if (dest <= m_min_position - 0.1) {return ERROR_DESTINATION_TOO_LOW;}
 
       m_destination = dest;
       updateDirection();
