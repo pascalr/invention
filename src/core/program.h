@@ -8,7 +8,7 @@ class Program {
   public:
     Program(Writer& writer) :
         axisT(writer, 'T'), axisZ(writer, 'Z', axisT),
-        baseAxisX(writer, 'Q'), axisX(writer, 'X', baseAxisX, axisT),
+        baseAxisX(writer, 'Q', axisT), axisX(writer, 'X', baseAxisX, axisT),
         axisA(writer, 'A'), axisY(writer, 'Y'), axisB(writer, 'B') {
     }
 
@@ -38,7 +38,7 @@ class Program {
     MotorAxis axisT; // Real one
     ZAxis axisZ; // Virtual one
 
-    MotorAxis baseAxisX; // Real one
+    BaseXAxis baseAxisX; // Real one
     XAxis axisX; // Virtual one
 
     MotorAxis axisA;

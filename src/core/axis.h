@@ -161,6 +161,10 @@ class MotorAxis : public Axis {
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
     }
 
+    void setPosition(double pos) {
+      m_position_steps = pos * stepsPerUnit;
+    }
+
     void setPositionSteps(double posSteps) {
       m_position_steps = posSteps;
     }
@@ -387,6 +391,34 @@ class ZAxis : public Axis {
     
   private:
     Axis& m_theta_axis;
+};
+
+#include <iostream>
+
+class BaseXAxis : public MotorAxis {
+  public:
+    BaseXAxis(Writer& writer, char name, MotorAxis& thetaAxis) : MotorAxis(writer, name), m_theta_axis(thetaAxis) {
+    }
+    
+    /*void prepare(unsigned long time) {
+      MotorAxis::prepare();
+      m_start_time = time;
+    }*/
+
+    virtual double getDelay() {
+      // Maybe use my own time because the theta position directly could get out of sync
+
+      double angularSpeedRad = m_theta_axis.getSpeed() / 180 * PI;
+      double angle = m_theta_axis.getPosition();
+      double vx = RAYON * angularSpeedRad * sind(angle);
+      double frequency = vx * stepsPerUnit;
+      if (frequency == 0) return 999999999;
+      return 1000000 / frequency;
+    }
+
+  private:
+    //unsigned long m_start_time;
+    MotorAxis& m_theta_axis;
 };
 
 Axis* axisByLetter(Axis** axes, char letter);

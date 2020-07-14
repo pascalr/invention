@@ -280,6 +280,18 @@ void testInputParserParseNumber() {
   assertTest("invalid number (empty)", -1, parseNumber(p,val));
 }
 
+void testBaseXAxisSpeed() {
+  title("Testing BaseXAxis getDelay");
+  FakeProgram p;
+  setupAxes(p);
+  referenceAll(p.motorAxes);
+
+  p.axisT.setPosition(0.0);
+  assertNearby("theta=0.0", 500, p.baseAxisX.getDelay());
+  p.axisT.setPosition(90.0);
+  assertNearby("theta=90.0", 0, p.baseAxisX.getDelay());
+}
+
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
@@ -290,11 +302,12 @@ int main (int argc, char *argv[]) {
 
   //testSerialize();
   testMoveZMovesX();
-  /*testMoveXFlipsZ();
+  testMoveXFlipsZ();
   testStop();
   testMoveZ();
   testParseInput();
   testInputParserParseNumber();
-  testMoveSquare();*/
+  testMoveSquare();
+  testBaseXAxisSpeed();
 
 }
