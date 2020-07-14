@@ -6,15 +6,11 @@
 //
 // With characters having a fix position, I expect the accuracy to be very high.
 
-#include <string>
-
 #include <iostream>
 #include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <tesseract/baseapi.h>
-#include <leptonica/allheaders.h>
 //#include <opencv2/text/ocr.hpp>
 
 #include <boost/log/trivial.hpp>

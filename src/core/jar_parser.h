@@ -1,117 +1,160 @@
 #ifndef JAR_PARSER_H
 #define JAR_PARSER_H
 
+#include <tesseract/baseapi.h>
+#include <leptonica/allheaders.h>
+
+#include <string>
+
 class JarLabel {
   public:
-    HRCode() {}
+    JarLabel() {}
 
-    void setJarId(string s) {
-      trim(s);
-      if (s.length() != 3) {
-        BOOST_LOG_TRIVIAL(debug) << "Error jar id length was " << s.length() << " expected 3.";
-        return;
-      }
-      char* p;
-      m_jar_id = strtol(s.c_str(), &p, 10);
-      if (*p == 0) {
-        m_jar_id_valid = true;
-      } else {
-        logError("Error jar id bad conversion to number.");
-      }
+    string getJarIdStr() {
+      return m_jar_id;
     }
 
-    void setWeight(string s) {
-      trim(s);
-      if (s.length() != 7) {
-        BOOST_LOG_TRIVIAL(debug) << "Error weight length was " << s.length() << " expected 7.";
-        return;
-      }
-      char* p;
-      m_weight = strtof(s.substr(0,5).c_str(), &p);
-      if (*p == 0) {
-        m_weight_valid = true;
-      } else {
-        logError("Error weight bad conversion to number.");
-      }
+    int getJarId() {
+      return strtol(m_jar_id.c_str(), &p, 10);
     }
 
-    // Maybe latter make sure that the content id matches the name
-    // but for now it doesn't.
-    void setName(string s) {
-      trim(s);
-      m_name = s;
-    }
-
-    void setContentId(string s) {
-      trim(s);
-      if (s.length() != 4 && s.length() != 3) {
-        BOOST_LOG_TRIVIAL(debug) << "Error content id length was " << s.length() << " expected 3 or 4.";
-        return;
+    bool isJarIdValid(string& err = "") {
+      if (m_jar_id.length() != 3) {
+        err += "Error jar id length was " << m_jar_id.length() << " expected 3.\n";
+        return false;
       }
       char* p;
-      m_content_id = strtol(s.c_str(), &p, 10);
-      if (*p == 0) {
-        m_content_id_valid = true;
-      } else {
-        logError("Error contentId conversion to number.");
+      strtol(m_jar_id.c_str(), &p, 10);
+      if (*p != 0) {
+        err += "Error jar id bad conversion to number.\n";
+        return false;
       }
+      return true;
+    }
+
+    void setJarId(const string& s) {
+      m_jar_id.assign(s);
+      trim(m_jar_id);
+    }
+
+    string getWeightStr() {
+      return m_weight;
+    }
+
+    float getWeight() {
+      char *p;
+      return strtof(m_weight.substr(0,5).c_str(), &p, 10);
+    }
+
+    bool isWeightValid(string& err = "") {
+      if (m_weight.length() != 7) {
+        err += "Error weight length was " << m_weight.length() << " expected 7.\n";
+        return false;
+      }
+      char* p;
+      strtof(m_weight.substr(0,5).c_str(), &p, 10);
+      if (*p != 0) {
+        err += "Error weight bad conversion to number.\n";
+        return false;
+      }
+      return true;
+    }
+
+    void setWeight(const string& s) {
+      m_weight.assign(s);
+      trim(m_weight);
+    }
+
+    string getContentName() {
+      // Maybe latter make sure that the content id matches the name
+      // but for now it doesn't.
+      return m_content_name;
+    }
+
+    bool isContentNameValid(string& err = "") {
+      return true;
+    }
+
+    void setContentName(const string& s) {
+      m_content_name.assign(s);
+      trim(m_content_name);
+    }
+
+    string getContentIdStr() {
+      return m_content_id;
+    }
+
+    int getContentId() {
+      char *p;
+      return strtol(m_content_id.c_str(), &p, 10);
+    }
+
+    bool isContentIdValid(string& err = "") {
+      if (m_content_id.length() != 4) {
+        err += "Error content id length was " << m_jar_id.length() << " expected 4.\n";
+        return false;
+      }
+      char* p;
+      strtol(m_content_id.c_str(), &p, 10);
+      if (*p != 0) {
+        err += "Error content id bad conversion to number.\n";
+        return false;
+      }
+      return true;
+    }
+
+    void setContentId(const string& s) {
+      m_content_id.assign(s);
+      trim(m_content_id);
     }
 
     friend ostream &operator<<(std::ostream &os, const HRCode &m);
     
     bool isValid() {
-      return m_jar_id_valid && m_weight_valid && m_name_valid && m_content_id_valid;
+      return isJarIdValid() && isWeightValid() && isNameValid() && isContentIdValid();
     }
     
-    double centerX;
-    double centerY;
+    double x;
+    double y;
+    double z;
 
   private:
 
-    bool logError(const char* msg) {
-      BOOST_LOG_TRIVIAL(info) << msg;
-      return false;
-    }
-
-    bool m_jar_id_valid = false;
-    bool m_weight_valid = false;
-    bool m_name_valid = true;
-    bool m_content_id_valid = false;
-    int m_jar_id = -1;
-    float m_weight = 0;
-    string m_name;
-    int m_content_id;
+    string m_jar_id;
+    string m_weight;
+    string m_content_name;
+    string m_content_id;
 };
 
 ostream &operator<<(std::ostream &os, const HRCode &m) {
-  os << "#" << m.m_jar_id << "[" << m.m_weight << " kg]: ";
-  return os << m.m_name << " (" << m.m_content_id << ")";
+  os << "#" << m.getJarIdStr() << "[" << m.getWeightStr() << " kg]: ";
+  return os << m.getContentName() << " (" << m.mContentIdStr() << ")";
 }
 
 string parseLineTesseract(Mat& im) {
-	tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
+  tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
   char config_name[] = "chars";
   char* config_ptr = config_name;
   //char config[][10] = {"chars"};
-	//ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
-	ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
+  //ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
+  ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
   ocr->SetVariable("user_defined_dpi", "300"); // FIXME: Is it
   //ocr->SetVariable("user_words_suffix", "eng.user-words"); Does this work? Rebuild and retrain my own dictionnary I think with only words that can be content.
   // But that means everytime a user adds a new product, it must retrain et rebuild everything??? Maybe, if it's fast to do...
-	ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
+  ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
   // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
-	ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
-	string outText = string(ocr->GetUTF8Text());
+  ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
+  string outText = string(ocr->GetUTF8Text());
   trim(outText);
 
-	BOOST_LOG_TRIVIAL(debug) << outText;
+  BOOST_LOG_TRIVIAL(debug) << outText;
   ocr->End();
 
   return outText;
 }
 
-HRCode parseHRCode(HRCodePosition& p) {
+JarLabel parseJarLabel(HRCodePosition& p) {
   Mat gray;
   cvtColor(p.img, gray, COLOR_GRAY2BGR );
   BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
@@ -149,27 +192,11 @@ HRCode parseHRCode(HRCodePosition& p) {
   code.setWeight(rawHRCode[1]);
   code.setName(rawHRCode[2]);
   code.setContentId(rawHRCode[3]);
-  code.centerX = p.x;
-  code.centerY = p.y;
   if (code.isValid()) {
     BOOST_LOG_TRIVIAL(info) << "Detected code: " << code;
   }
 
   return code;
-}
-
-vector<HRCode> detectHRCodes(Mat& src) {
-
-  HRCodeParser parser(0.2, 0.2);
-  vector<HRCodePosition> positions;
-  parser.findHRCodePositions(src, positions, 100);
-
-  vector<HRCode> codes(positions.size());
-  for(size_t i = 0; i < positions.size(); i++) {
-    codes[i] = parseHRCode(positions[i]);
-  }
-
-  return codes;
 }
 
 #endif
