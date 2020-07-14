@@ -19,7 +19,16 @@
 #define FORWARD true
 #define REVERSE false
 
-#define AXIS_X_MAX_POS 640.0 // mm
+#define TOOL_X_MIN 0.0 // mm
+#define TOOL_X_MAX 640.0 // mm
+#define TOOL_Z_MIN -10.0 // mm
+#define TOOL_Z_MAX RAYON
+
+#define BASE_X_MIN 0.0 // mm
+#define BASE_X_MAX 640.0 // mm
+#define BASE_X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
+
+#define AXIS_X_MAX_POS BASE_X_MAX
 #define AXIS_Z_MAX_POS RAYON
 
 #define ARM_WIDTH 111.0 // mm
@@ -72,6 +81,8 @@
 
 #define ERROR_EXPECTED_NUMBER -1
 #define ERROR_EXPECTED_AXIS -2
+#define ERROR_DESTINATION_TOO_HIGH -3
+#define ERROR_DESTINATION_TOO_LOW -3
 
 // Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12

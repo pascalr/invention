@@ -19,116 +19,151 @@
 // Z0 is aligned with the wheels that go up and down
 // The arm starts at theta 0 degree. Counterclockwise is forward.
 
+// TODO: A simple axis has a destination and a position.
+// Add a class MotorAxis
+// A motor axis has pins and all the stuff.
+//
+// You cannot go forward or backward with x and z axis, because they are not MotorAxis
+
 class Axis {
   public:
-  
-    Axis(Writer& writer, char theName);
+    Axis(Writer& writer, char name) : m_writer(writer) {
+      m_name = name;
+      m_destination = -1;
+      m_max_position = 999999;
+      m_min_position = 0;
+    }
 
+    char getName() {
+      return m_name;
+    }
+    
+    double getDestination() {
+      return m_destination;
+    }
+
+    virtual double getPosition() = 0;
+
+    int setDestination(double dest) {
+      
+      m_destination = dest;
+      if (m_destination > m_max_position) {return ERROR_DESTINATION_TOO_HIGH;}
+      if (m_destination < 0) {return ERROR_DESTINATION_TOO_LOW;}
+      updateDirection();
+    }
+    
+    virtual void updateDirection() {}
+
+    void setMaxPosition(double maxP) {
+      m_max_position = maxP;
+    }
+
+    double getMaxPosition() {
+      return m_max_position;
+    }
+
+  protected:
+    Writer& m_writer;
+    char m_name;
+    double m_destination;
+    double m_max_position;
+    double m_min_position;
+};
+
+class MotorAxis : public Axis {
+  public:
+
+    MotorAxis(Writer& writer, char theName) : Axis(writer, theName) {
+      isForward = false;
+      m_previous_step_time = 0;
+      isStepHigh = false;
+      isMotorEnabled = false;
+      isReferenced = false;
+      isReferencing = false;
+      speed = 500;
+      forceRotation = false;
+      m_position_steps = 0;
+      m_reverse_motor_direction = false;
+      m_min_position = 0;
+    }
+    
     void setReverseMotorDirection(bool val) {
       m_reverse_motor_direction = val;
-    }
-
-    virtual double getMaxPosition() {
-      return maxPosition;
-    }
-
-    virtual void setMaxPosition(double maxP) {
-      maxPosition = maxP;
     }
 
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
     // The value is multiplied by two because we have to write LOW then HIGH for one step
-    virtual void setStepsPerUnit(double ratio) {
+    void setStepsPerUnit(double ratio) {
       stepsPerUnit = ratio;
     }
 
-    virtual double getStepsPerUnit() {
+    double getStepsPerUnit() {
       return stepsPerUnit;
     }
 
-    virtual double getSpeed() {
+    double getSpeed() {
       double frequency = 1 / getDelay() * 1000000;
       double theSpeed = frequency / stepsPerUnit;
       return theSpeed;
     }
 
-    virtual void setupPins() {
+    void setupPins() {
       m_writer.doPinMode(stepPin, OUTPUT);
       m_writer.doPinMode(dirPin, OUTPUT);
       m_writer.doPinMode(enabledPin, OUTPUT);
     }
 
-    virtual void rotate(bool direction) {
+    void rotate(bool direction) {
       setMotorDirection(direction);
       forceRotation = true;
       setMotorEnabled(true);
     }
 
-    virtual bool notGoingOutOfBounds() {
+    bool notGoingOutOfBounds() {
       double p = getPosition();
       return isForward ? p <= getMaxPosition() : p >= m_min_position;
     }
 
-    virtual bool canMove() {
+    bool canMove() {
       return isReferenced && isMotorEnabled && notGoingOutOfBounds();
     }
 
-    virtual double getPosition() {
+    double getPosition() {
       return m_position_steps / stepsPerUnit;
     }
 
-    virtual double getDestination() {
-      return destination;
-    }
-
-    //virtual double getDestinationSteps() {
-    //  return m_destination_steps;
-    //}
-
-    virtual void stop() {
+    void stop() {
       //setMotorsEnabled(false);
       setDestination(getPosition());
       forceRotation = false;
     }
 
-    virtual void turnOneStep() {
+    void turnOneStep() {
       m_writer.doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
       isStepHigh = !isStepHigh;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
     }
 
-    virtual void setPositionSteps(double posSteps) {
+    void setPositionSteps(double posSteps) {
       m_position_steps = posSteps;
     }
 
-    virtual long getPositionSteps() {
+    long getPositionSteps() {
       return m_position_steps;
     }
 
-    virtual void updateDirection() {
-      //std::cout << "Destination steps " << getDestinationSteps() << std::endl;
-      //std::cout << "Position steps " << getPositionSteps() << std::endl;
-      //setMotorDirection(getDestinationSteps() > getPositionSteps());
+    void updateDirection() {
       setMotorDirection(getDestination() > getPosition());
     }
-
-    virtual void setDestination(double dest) {
-      
-      destination = dest;
-      if (destination > maxPosition) {destination = maxPosition;}
-      if (destination < 0) {destination = 0;}
-      //m_destination_steps = dest * stepsPerUnit;
-      updateDirection();
-    }
     
-    virtual void setMotorEnabled(bool value) {
+    void setMotorEnabled(bool value) {
       m_writer.doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(enabledPin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
 
-    virtual void setMotorDirection(bool forward) {
+    void setMotorDirection(bool forward) {
       bool val = forward ? LOW : HIGH;
       val = m_reverse_motor_direction ? !val : val;
       m_writer.doDigitalWrite(dirPin, val);
@@ -153,7 +188,7 @@ class Axis {
     }
 
     virtual void referenceReached() {
-      m_writer << "Done referencing axis " << name << '\n';
+      m_writer << "Done referencing axis " << getName() << '\n';
       setPositionSteps(0);
       setDestination(0);
       setMotorEnabled(true);
@@ -167,9 +202,6 @@ class Axis {
       return true;
     }
 
-    virtual void afterInput() {
-    }
-
     void setIsReferenced(bool isRef) {
       isReferenced = isRef;
     }
@@ -178,13 +210,8 @@ class Axis {
       isReferencing = isRef;
     }
 
-    // Returns true if the axis is still working.
-    bool handleAxis(unsigned long currentTime);
-  
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.
-    double destination; // mm or degrees
-    double maxPosition; // mm or degrees
     double speed; // delay in microseconds
     double stepsPerUnit;
     
@@ -193,7 +220,6 @@ class Axis {
     int stepPin;
     int limitSwitchPin;
     
-    unsigned long previousStepTime;
     
     bool isStepHigh;
     bool isMotorEnabled;
@@ -201,7 +227,8 @@ class Axis {
     bool isReferenced;
     bool isReferencing;
     bool forceRotation;
-    char name;
+
+
 
     // Get the delay untill the next step
     virtual double getDelay() {
@@ -209,96 +236,42 @@ class Axis {
       return speed;
     }
 
-    virtual void setFollowingAxis(Axis* axis) {
-      m_following_axis = axis;
+    //double m_destination_steps;
+
+    // Returns true if the axis is still working.
+    virtual bool handleAxis(unsigned long currentTime) {
+      unsigned int delay = getDelay();
+      
+      if (isReferencing) {
+        return moveToReference();
+      } else if (canMove() && (forceRotation || !isDestinationReached())) {
+        unsigned long deltaTime = currentTime - m_previous_step_time;
+        if (deltaTime > delay) {
+          turnOneStep();
+          // TODO: Instead of this, call a function named prepareToMove, that updates the m_previous_step_time
+          if (deltaTime > 2*delay) {
+            m_previous_step_time = currentTime; // refreshing m_previous_step_time when it is the first step and the motor was at a stop
+          } else {
+            m_previous_step_time = m_previous_step_time + delay; // This is more accurate to ensure all the motors are synchronysed
+          }
+        }
+        return true;
+      }
+      return false;
     }
 
     // Resets some stuff.
     virtual void prepare(unsigned long time) {
-      m_following_axis = 0;
-      previousStepTime = time;
+      m_previous_step_time = time;
     }
-    
   protected:
-    Writer& m_writer;
 
-    Axis* m_following_axis;
-
+    unsigned long m_previous_step_time;
     long m_position_steps;
-
     bool m_reverse_motor_direction;
-    double m_min_position;
-    //double m_destination_steps;
 };
 
-// I DO MX0 at reference: I WANT:
-// The x axis to do nothing at first because it is already at 0.
-// The z axis to flip because it knows it has to.
-// The z axis moves the delta x.
-// The x axis compensates.
-// axisX.setDestination(0); Does nothing, already at 0.
-// axisZ.afterInput();
-// axisZ.setDestinationAngle(180);
-// moves Z
-// x follows
-
-// Destination refers to the tip
-// Position refers to the tip
-// Delta is the difference between the tip and the base
-// Base = Tip - Delta
-// The positionSteps refers to the base, these must start at zero
-class HorizontalAxis : public Axis {
-  public:
-    HorizontalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
-    }
-
-    void setDeltaPosition(double pos) {
-      m_delta_position = pos;
-      updateDirection();
-    }
-
-    double getDeltaPosition() {
-      return m_delta_position;
-    }
-
-    double getPosition() {
-      return Axis::getPosition() + m_delta_position;
-    }
-
-    bool baseNotGoingOutOfBounds() {
-      double p = Axis::getPosition();
-      return isForward ? p <= getMaxPosition() : p >= m_min_position;
-    }
-
-    virtual bool canMove() {
-      return Axis::canMove() && baseNotGoingOutOfBounds();
-    }
-    //double getPositionSteps() {
-    //  return Axis::getPositionSteps() + m_delta_position * stepsPerUnit;
-    //}
-
-    //double getDestinationSteps() { TODO: Remove this function everywhere
-    //  return Axis::getDestinationSteps() + m_delta_position * stepsPerUnit;
-    //}
-
-    /*void setDestination(double dest) {
-      Axis::setDestination(dest);
-      te
-    }*/
-
-    virtual void referenceReached() {
-      Axis::referenceReached();
-      m_delta_position = RAYON;
-      setDestination(RAYON);
-      //setPositionSteps(RAYON * stepsPerUnit);
-    }
-
-  private:
-    // The horizontal distance between the tip and the base.
-    double m_delta_position;
-};
-
-// The ZAxis is the TAxis.
+/*// The ZAxis is the TAxis.
 class ZAxis : public Axis {
   public:
     ZAxis(Writer& theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
@@ -353,31 +326,7 @@ class ZAxis : public Axis {
       setMotorDirection(getDestinationAngle() > getPositionAngle());
     }
 
-    bool baseDestinationOutOfBounds() {
-      double tipPositionX = m_horizontal_axis->getDestination();
-      
-      double basePositionX = tipPositionX - (RAYON * cos(getDestinationAngle() / 180 * PI));
-
-      return (basePositionX < 0 || basePositionX > AXIS_X_MAX_POS);
-    }
-
-    void flip() {
-      if(m_destination_angle < 90) {
-        m_destination_angle = 180 - m_destination_angle;
-      } else {
-        m_destination_angle = 90 - (m_destination_angle - 90);
-      }
-      updateDirection();
-    }
-
-    virtual void afterInput() {
-      //std::cout << "getDestination" << std::endl;
-      //std::cout << m_horizontal_axis->getDestination() << std::endl;
-      // If a flip is required, do one
-      if (baseDestinationOutOfBounds()) {
-        flip();
-      }
-    }
+    
 
     double getDestinationAngle() {
       return m_destination_angle;
@@ -387,13 +336,33 @@ class ZAxis : public Axis {
     HorizontalAxis* m_horizontal_axis;
     double m_destination_angle;
     bool m_is_clockwise;
+};*/
+
+class XAxis : public Axis {
+  public:
+    XAxis(Writer& writer, char name, Axis& baseXAxis, Axis& thetaAxis) : Axis(writer, name), m_base_x_axis(baseXAxis), m_theta_axis(thetaAxis) {
+    }
+
+    double getPosition() {
+      return m_base_x_axis.getPosition() + RAYON * cosd(m_theta_axis.getPosition());
+    }
+
+  private:
+    Axis& m_base_x_axis;
+    Axis& m_theta_axis;
 };
 
-class VerticalAxis: public Axis {
+class ZAxis : public Axis {
   public:
-    VerticalAxis(Writer& theWriter, char theName) : Axis(theWriter, theName) {
-      
+    ZAxis(Writer& writer, char name, Axis& thetaAxis) : Axis(writer, name), m_theta_axis(thetaAxis) {
     }
+
+    double getPosition() {
+      return RAYON * sind(m_theta_axis.getPosition());
+    }
+
+  private:
+    Axis& m_theta_axis;
 };
 
 Axis* axisByLetter(Axis** axes, char letter);

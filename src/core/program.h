@@ -6,8 +6,10 @@
 
 class Program {
   public:
-    Program(Writer& writer) : axisY(writer, 'Y'), axisX(writer, 'X'), axisA(writer, 'A'),
-        axisB(writer, 'B'), axisZ(writer, 'Z', &axisX), axisT(writer, 'T') {
+    Program(Writer& writer) :
+        axisT(writer, 'T'), axisZ(writer, 'Z', axisT),
+        baseAxisX(writer, 'Q'), axisX(writer, 'X', baseAxisX, axisT),
+        axisA(writer, 'A'), axisY(writer, 'Y'), axisB(writer, 'B') {
     }
 
     virtual Writer& getWriter() = 0;
@@ -24,16 +26,22 @@ class Program {
       }
       return (char) receivedByte;
     }
+    
+    MotorAxis axisT; // Real one
+    ZAxis axisZ; // Virtual one
 
-    VerticalAxis axisY;
-    HorizontalAxis axisX;
-    Axis axisA;
-    Axis axisB;
-    ZAxis axisZ;
-    Axis axisT;
-      
-    Axis* axes[10] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, 0}; // FIXME: CAREFULL WITH SIZE!!!
-    //Axis* axes[] = {&axisX, &axisY, &axisT, &axisA, &axisB, &axisZ, 0};
+    MotorAxis baseAxisX; // Real one
+    XAxis axisX; // Virtual one
+
+    MotorAxis axisA;
+    MotorAxis axisY;
+    MotorAxis axisB;
+     
+    // These axes actually moves the motors. 
+    MotorAxis* motorAxes[10] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
+
+    // These axes are the ones you can move. mx100, mz100, etc...
+    Axis* movingAxes[10] = {&axisX, &axisY, &axisZ, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
     
     bool isWorking = false;
 

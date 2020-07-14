@@ -3,6 +3,7 @@
 
 // Implementing a custom json serializer for arduino.
 
+
 #include "program.h"
 #include "axis.h"
 #include "writer.h"
@@ -40,10 +41,10 @@ void writeJson(T& writer, const char* key, unsigned long val) {
 template <typename T>
 void serialize(Program& p, T& out) {
   out << "{";
-  for (int i = 0; p.axes[i] != 0; i++) {
-    out << "\"axis_" << p.axes[i]->name << "\": ";
-    serialize(p.axes[i], out);
-    if (p.axes[i+1] != 0) {
+  for (int i = 0; p.movingAxes[i] != 0; i++) {
+    out << "\"axis_" << p.movingAxes[i]->getName() << "\": ";
+    serialize(p.movingAxes[i], out);
+    if (p.movingAxes[i+1] != 0) {
       out << ", ";
     }
   }
@@ -53,10 +54,9 @@ void serialize(Program& p, T& out) {
 template <typename T>
 void serialize(Axis* axis, T& out) {
   out << "{";
-  writeJson(out, PROPERTY_NAME, axis->name);
-  writeJson(out, PROPERTY_POSITION, axis->getPositionSteps());
-  writeJson(out, PROPERTY_DESTINATION, axis->getDestination());
-  writeJson(out, PROPERTY_FORWARD, axis->isForward);
+  writeJson(out, PROPERTY_NAME, axis->getName());
+  writeJson(out, PROPERTY_POSITION, axis->getPosition());
+  /*writeJson(out, PROPERTY_FORWARD, axis->isForward);
   writeJson(out, PROPERTY_REFERENCED, axis->isReferenced);
   writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
   writeJson(out, PROPERTY_MOTOR_ENABLED, axis->isMotorEnabled);
@@ -68,8 +68,11 @@ void serialize(Axis* axis, T& out) {
     writeJson(out, PROPERTY_ANGLE, ((ZAxis*)axis)->getPositionAngle());
   }
   out << "\"" << PROPERTY_SPEED << "\": " << axis->speed; 
+  */
+  out << "\"" << PROPERTY_DESTINATION << "\": " << axis->getDestination(); 
   // CAREFULL: JSON MUST NOT END WITH COMMA
   out << "}";
 }
+
 
 #endif

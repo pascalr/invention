@@ -42,7 +42,7 @@ int parseNumber(Program& p, double& n) {
 
 Axis* parseInputAxis(Program& p, Axis* &axis) {
   char name = p.getChar();
-  axis = axisByLetter(p.axes, name);
+  axis = axisByLetter(p.movingAxes, name);
   return axis;
 }
 
@@ -74,14 +74,67 @@ Axis* parseInputAxis(Program& p, Axis* &axis) {
 
 }*/
 
+/*bool baseDestinationOutOfBounds() {
+  double tipPositionX = m_horizontal_axis->getDestination();
+  
+  double basePositionX = tipPositionX - (RAYON * cos(getDestinationAngle() / 180 * PI));
+
+  return (basePositionX < 0 || basePositionX > AXIS_X_MAX_POS);
+}
+
+void flip() {
+  if(m_destination_angle < 90) {
+    m_destination_angle = 180 - m_destination_angle;
+  } else {
+    m_destination_angle = 90 - (m_destination_angle - 90);
+  }
+  updateDirection();
+}
+
+    bool baseNotGoingOutOfBounds() {
+      double p = Axis::getPosition();
+      return isForward ? p <= getMaxPosition() : p >= m_min_position;
+    }*/
 // Checks if a flip is required.
 // Tells the Zaxis which way to turn.
 // Tells all the axis what speed to go to.
+// Sets the base destination of the horizontal axis
+// Sets the angle destination of the Zaxis
 // Checks for collisions.
 // Does the heavy work.
 // Maybe the validation is only done in a simulation to avoid
 // overloading the arduino. Yeah I think so. To be done later.
-void processMoveCommand(Program& p) {
+int processMoveCommand(Program& p) {
+
+  bool mustFlip = false;
+
+  // asin returns the principal value between -pi/2 and pi/2
+  double angleDest = (asin(p.axisZ.getDestination() / RAYON) * 180.0 / PI);
+
+  // we must then check if it should be on the other side
+  // first check which way we were going already
+  // then check if we can continue to go that way
+
+  bool isRight = p.axisZ.getPositionAngle() > modulo regarder quel quartier...
+
+  if (p.axisX.getDestination() > BASE_X_MIDDLE)
+
+  // If tool tip destination is outside of bounding box, flip
+
+  double baseDest = ???;
+  if baseDest out of bounds flip 
+
+  p.baseAxisX.setDestination();
+
+  // If the arm is on the left (x=0)
+  if (p.axisX.getDestination() < RAYON) {
+    // ERROR OUT OF BOUNDS
+    mustFlip = true;
+  }
+  
+  if (baseDestinationOutOfBounds()) {
+    flip();
+  }
 }
 
 int parseActionCommand(char cmd, Program& p) {
@@ -90,8 +143,8 @@ int parseActionCommand(char cmd, Program& p) {
   double number;
 
   // Prepare
-  for (int i = 0; p.axes[i] != 0; i++) {
-    p.axes[i]->prepare(p.getCurrentTime());
+  for (int i = 0; p.motorAxes[i] != 0; i++) {
+    p.motorAxes[i]->prepare(p.getCurrentTime());
   }
 
   // Move
@@ -105,8 +158,8 @@ int parseActionCommand(char cmd, Program& p) {
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
     p.getWriter() << "Referencing...\n";
-    for (int i = 0; p.axes[i] != 0; i++) {
-      p.axes[i]->startReferencing();
+    for (int i = 0; p.motorAxes[i] != 0; i++) {
+      p.motorAxes[i]->startReferencing();
     }
 
   // Wait or sleep for some time
@@ -127,11 +180,6 @@ int parseActionCommand(char cmd, Program& p) {
 
   p.getWriter() << "Cmd: " << cmd << "\n";
 
-  // After input
-  for (int i = 0; p.axes[i] != 0; i++) {
-    p.axes[i]->afterInput();
-  }
-
   return 0;
 }
 
@@ -145,8 +193,8 @@ void myLoop(Program& p) {
 
     // stop
     if (cmd == 's' || cmd == 'S') {
-      for (int i = 0; p.axes[i] != 0; i++) {
-        p.axes[i]->stop();
+      for (int i = 0; p.motorAxes[i] != 0; i++) {
+        p.motorAxes[i]->stop();
       }
       p.getWriter() << "Stopped\n";
       p.isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
@@ -181,8 +229,8 @@ void myLoop(Program& p) {
   }
 
   bool stillWorking = false;
-  for (int i = 0; p.axes[i] != 0; i++) {
-    stillWorking = stillWorking || p.axes[i]->handleAxis(p.getCurrentTime());
+  for (int i = 0; p.motorAxes[i] != 0; i++) {
+    stillWorking = stillWorking || p.motorAxes[i]->handleAxis(p.getCurrentTime());
   }
 
   if (!stillWorking) {
