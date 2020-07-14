@@ -393,8 +393,6 @@ class ZAxis : public Axis {
     Axis& m_theta_axis;
 };
 
-#include <iostream>
-
 class BaseXAxis : public MotorAxis {
   public:
     BaseXAxis(Writer& writer, char name, MotorAxis& thetaAxis) : MotorAxis(writer, name), m_theta_axis(thetaAxis) {
