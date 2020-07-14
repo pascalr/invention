@@ -26,6 +26,14 @@ class Program {
       }
       return (char) receivedByte;
     }
+
+    void stopMoving() {
+      for (int i = 0; motorAxes[i] != 0; i++) {
+        motorAxes[i]->stop();
+      }
+      getWriter() << "Stopped\n";
+      isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
+    }
     
     MotorAxis axisT; // Real one
     ZAxis axisZ; // Virtual one

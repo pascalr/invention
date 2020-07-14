@@ -44,12 +44,15 @@ class Axis {
 
     virtual double getPosition() = 0;
 
-    int setDestination(double dest) {
-      
+    virtual int setDestination(double dest) {
+
+      if (dest >= m_max_position + 0.0000001) {return ERROR_DESTINATION_TOO_HIGH;}
+      if (dest <= m_min_position - 0.0000001) {return ERROR_DESTINATION_TOO_LOW;}
+
       m_destination = dest;
-      if (m_destination > m_max_position) {return ERROR_DESTINATION_TOO_HIGH;}
-      if (m_destination < 0) {return ERROR_DESTINATION_TOO_LOW;}
       updateDirection();
+
+      return 0;
     }
     
     virtual void updateDirection() {}
@@ -60,6 +63,14 @@ class Axis {
 
     double getMaxPosition() {
       return m_max_position;
+    }
+    
+    double getMinPosition() {
+      return m_min_position;
+    }
+
+    void setMinPosition(double pos) {
+      m_min_position = pos;
     }
 
   protected:
@@ -85,6 +96,11 @@ class MotorAxis : public Axis {
       m_position_steps = 0;
       m_reverse_motor_direction = false;
       m_min_position = 0;
+    }
+    
+    int setDestination(double dest) {
+      if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
+      return Axis::setDestination(dest);
     }
     
     void setReverseMotorDirection(bool val) {
@@ -189,11 +205,11 @@ class MotorAxis : public Axis {
 
     virtual void referenceReached() {
       m_writer << "Done referencing axis " << getName() << '\n';
+      isReferenced = true;
+      isReferencing = false;
       setPositionSteps(0);
       setDestination(0);
       setMotorEnabled(true);
-      isReferenced = true;
-      isReferencing = false;
     }
 
     // Only the vertical axis moves in order to do a reference
@@ -346,6 +362,10 @@ class XAxis : public Axis {
     double getPosition() {
       return m_base_x_axis.getPosition() + RAYON * cosd(m_theta_axis.getPosition());
     }
+    
+    void prepare(unsigned long time) {
+      setDestination(getPosition());
+    }
 
   private:
     Axis& m_base_x_axis;
@@ -361,6 +381,10 @@ class ZAxis : public Axis {
       return RAYON * sind(m_theta_axis.getPosition());
     }
 
+    void prepare(unsigned long time) {
+      setDestination(getPosition());
+    }
+    
   private:
     Axis& m_theta_axis;
 };

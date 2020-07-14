@@ -26,13 +26,13 @@ void drawToolPosition(double x, double z) {
   plt::plot(toVect(x),toVect(z),"ro");
 }
 
-void drawArmCenterAxis(HorizontalAxis* axisX, Axis* axisZ) {
+void drawArmCenterAxis(Program& p) {
   vector<double> x(2);
   vector<double> z(2);
 
-  x[0] = axisX->getPosition();
-  x[1] = axisX->getPosition() - axisX->getDeltaPosition();
-  z[0] = axisZ->getPosition();
+  x[0] = p.axisX.getPosition();
+  x[1] = p.baseAxisX.getPosition();
+  z[0] = p.axisZ.getPosition();
   z[1] = 0.0;
   plt::plot(x,z,"b-");
 }
@@ -50,16 +50,15 @@ class Point {
     double y;
 };
 
-void drawArmBoundingBox(HorizontalAxis* axisX, ZAxis* axisZ) {
-  /*double angle = axisZ->getPositionAngle();
+/*void drawArmBoundingBox(HorizontalAxis* axisX, ZAxis* axisZ) {
+  double angle = axisZ->getPositionAngle();
 
   double a[4][2] = {{0,0},
                    {ARM_WIDTH, 0},
                    {ARM_WIDTH, ARM_LENGTH},
-                   {0, ARM_LENGTH}};*/
+                   {0, ARM_LENGTH}};
 
-
-}
+} */
 
 void drawPossibleXPosition(double maxX) {
   vector<double> x(2);
@@ -71,15 +70,13 @@ void drawPossibleXPosition(double maxX) {
   plt::plot(x,z,"k-");
 }
 
-void draw(Axis** axes) {
-  HorizontalAxis* axisX = (HorizontalAxis*)axisByLetter(axes, 'X');
-  ZAxis* axisZ = (ZAxis*)axisByLetter(axes, 'Z');
+void draw(Program& p) {
   
   plt::clf();
   
-  drawPossibleXPosition(axisX->getMaxPosition());
-  drawArmCenterAxis(axisX, axisZ);
-  drawToolPosition(axisX->getPosition(),axisZ->getPosition());
+  drawPossibleXPosition(p.axisX.getMaxPosition());
+  drawArmCenterAxis(p);
+  drawToolPosition(p.axisX.getPosition(),p.axisZ.getPosition());
 
   plt::xlim(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X);
   plt::ylim(-OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z);
@@ -96,7 +93,7 @@ int main (int argc, char *argv[]) {
   setupAxes(p);
 
   cerr << ">> ";
-  draw(p.axes);
+  draw(p);
 
   while (true) {
     bool wasWorking = p.isWorking;
@@ -106,11 +103,11 @@ int main (int argc, char *argv[]) {
     myLoop(p);
     
     if (p.isWorking && p.getCurrentTime() % 200000 == 0) {
-      draw(p.axes);
+      draw(p);
     }
     if (wasWorking && !p.isWorking) {
       cerr << ">> ";
-      draw(p.axes);
+      draw(p);
     }
   }
 

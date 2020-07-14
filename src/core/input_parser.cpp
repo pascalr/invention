@@ -40,7 +40,20 @@ int parseNumber(Program& p, double& n) {
   return 1;
 }
 
-Axis* parseInputAxis(Program& p, Axis* &axis) {
+MotorAxis* parseInputMotorAxis(Program& p, MotorAxis* &axis) {
+  char name = p.getChar();
+
+  for (int i = 0; p.motorAxes[i] != 0; i++) {
+    if (toupper(name) == p.motorAxes[i]->getName()) {
+      axis = p.motorAxes[i];
+      return axis;
+    }
+  }
+
+  return 0;
+}
+
+Axis* parseInputMovingAxis(Program& p, Axis* &axis) {
   char name = p.getChar();
   axis = axisByLetter(p.movingAxes, name);
   return axis;
@@ -106,54 +119,73 @@ void flip() {
 // overloading the arduino. Yeah I think so. To be done later.
 int processMoveCommand(Program& p) {
 
-  bool mustFlip = false;
-
   // asin returns the principal value between -pi/2 and pi/2
   double angleDest = (asin(p.axisZ.getDestination() / RAYON) * 180.0 / PI);
 
-  // we must then check if it should be on the other side
+  // we must respect these conditions:
+  // 1. 
+
   // first check which way we were going already
   // then check if we can continue to go that way
-
-  bool isRight = p.axisZ.getPositionAngle() > modulo regarder quel quartier...
-
-  if (p.axisX.getDestination() > BASE_X_MIDDLE)
-
-  // If tool tip destination is outside of bounding box, flip
-
-  double baseDest = ???;
-  if baseDest out of bounds flip 
-
-  p.baseAxisX.setDestination();
-
-  // If the arm is on the left (x=0)
-  if (p.axisX.getDestination() < RAYON) {
-    // ERROR OUT OF BOUNDS
-    mustFlip = true;
+  bool lookingRight = p.axisT.getPosition() < 90.0;
+  if (lookingRight) {
+    angleDest = 180 - angleDest;
   }
+
+  double baseDest = p.axisX.getDestination() - RAYON * cosd(angleDest);
   
-  if (baseDestinationOutOfBounds()) {
-    flip();
+  if (p.baseAxisX.setDestination(baseDest) < 0) {
+    // try flipping
+    angleDest = 180 - angleDest;
+    baseDest = p.axisX.getDestination() - RAYON * cosd(angleDest);
+    int status = p.baseAxisX.setDestination(baseDest) < 0;
+    if (status < 0) {return status;}
   }
+
+  return p.axisT.setDestination(angleDest);
+
+  /*
+  // check for out of bounds min
+  if (baseDest < p.baseAxisX.getMinPosition()) {
+    if (!lookingRight) {return ERROR_OUT_OF_BOUNDS_MIN_X;}
+    // try flipping
+    angleDest = 180 - angleDest;
+    baseDest = p.axisX.getDestination() + RAYON * cosd(angleDest);
+    if (baseDest < p.baseAxisX.getMinPosition()) {return ERROR_OUT_OF_BOUNDS_MIN_X;}
+
+  // check for out of bounds max
+  } else if (baseDest > p.baseAxisX.getMaxPosition()) {
+    if (lookingRight) {return ERROR_OUT_OF_BOUNDS_MAX_X;}
+    // try flipping
+    angleDest = 180 - angleDest;
+    baseDest = p.axisX.getDestination() + RAYON * cosd(angleDest);
+    if (baseDest > p.baseAxisX.getMaxPosition()) {return ERROR_OUT_OF_BOUNDS_MAX_X;}
+  }
+  */
 }
 
 int parseActionCommand(char cmd, Program& p) {
 
   Axis* axis;
+  MotorAxis* motorAxis;
   double number;
+  int status;
 
   // Prepare
+  unsigned long time = p.getCurrentTime();
   for (int i = 0; p.motorAxes[i] != 0; i++) {
-    p.motorAxes[i]->prepare(p.getCurrentTime());
+    p.motorAxes[i]->prepare(time);
   }
+  p.axisX.prepare(time);
+  p.axisZ.prepare(time);
 
   // Move
   if (cmd == 'M' || cmd == 'm') {
     // TODO: Parse mx10y20z30, the movement should be done diagonally at once.
-    if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
-    if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
-    axis->setDestination(number);
-    processMoveCommand(p);
+    if (!parseInputMovingAxis(p, axis)) {p.stopMoving(); return ERROR_EXPECTED_AXIS;}
+    if (parseNumber(p,number) < 0) {p.stopMoving(); return ERROR_EXPECTED_NUMBER;}
+    if ((status = axis->setDestination(number)) < 0) {p.stopMoving(); return status;}
+    if ((status = processMoveCommand(p)) < 0) {p.stopMoving(); return status;}
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
@@ -169,13 +201,13 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Move forward
   } else if (cmd == '+') {
-    if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
-    axis->rotate(FORWARD);
+    if (!parseInputMotorAxis(p, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    motorAxis->rotate(FORWARD);
 
   // Move backward
   } else if (cmd == '-') {
-    if (!parseInputAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
-    axis->rotate(REVERSE);
+    if (!parseInputMotorAxis(p, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    motorAxis->rotate(REVERSE);
   }
 
   p.getWriter() << "Cmd: " << cmd << "\n";
@@ -193,11 +225,7 @@ void myLoop(Program& p) {
 
     // stop
     if (cmd == 's' || cmd == 'S') {
-      for (int i = 0; p.motorAxes[i] != 0; i++) {
-        p.motorAxes[i]->stop();
-      }
-      p.getWriter() << "Stopped\n";
-      p.isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
+      p.stopMoving();
 
     // info
     } else if (cmd == '?') { // info
@@ -218,7 +246,13 @@ void myLoop(Program& p) {
       p.isWorking = true;
       int code = parseActionCommand(cmd, p);
       if (code < 0) {
-        p.getWriter() << "Exception: Code: " << code << '\n';
+        p.getWriter() << "Exception: Code: " << code << ".";
+        /*while (true) { Doesnt work yet because parseActionCommand might have read the \n already
+          char throwAway = p.getChar();
+          if (throwAway == '\n') {break;}
+          p.getWriter() << throwAway;
+        }
+        p.getWriter() << ".\n";*/
       }
       return;
     }
@@ -230,7 +264,7 @@ void myLoop(Program& p) {
 
   bool stillWorking = false;
   for (int i = 0; p.motorAxes[i] != 0; i++) {
-    stillWorking = stillWorking || p.motorAxes[i]->handleAxis(p.getCurrentTime());
+    stillWorking = p.motorAxes[i]->handleAxis(p.getCurrentTime()) || stillWorking;
   }
 
   if (!stillWorking) {

@@ -82,7 +82,10 @@
 #define ERROR_EXPECTED_NUMBER -1
 #define ERROR_EXPECTED_AXIS -2
 #define ERROR_DESTINATION_TOO_HIGH -3
-#define ERROR_DESTINATION_TOO_LOW -3
+#define ERROR_DESTINATION_TOO_LOW -4
+#define ERROR_OUT_OF_BOUNDS_MIN_X -5
+#define ERROR_OUT_OF_BOUNDS_MAX_X -6
+#define ERROR_AXIS_NOT_REFERENCED -7
 
 // Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12

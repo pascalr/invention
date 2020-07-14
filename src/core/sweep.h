@@ -105,7 +105,7 @@ class Sweep {
       }
 
       BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
-      detect(frame, detected, m_x, m_y, m_z, simulation.axisZ.getPositionAngle()); 
+      detect(frame, detected, m_x, m_y, m_z, simulation.axisT.getPosition()); 
     }
 
     void run(vector<DetectedHRCode>& detected) {
