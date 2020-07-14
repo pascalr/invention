@@ -407,7 +407,7 @@ class BaseXAxis : public MotorAxis {
 
     virtual double getDelay() {
       // Maybe use my own time because the theta position directly could get out of sync
-
+      if (m_theta_axis.isDestinationReached()) {return speed;}
       double angularSpeedRad = m_theta_axis.getSpeed() / 180 * PI;
       double angle = m_theta_axis.getPosition();
       double vx = RAYON * angularSpeedRad * sind(angle);
