@@ -303,17 +303,17 @@ class MotorAxis : public Axis {
       int status = Axis::setDestination(dest);
       if (status < 0) {return status;}
 
-      double halfDistance = ((dest - getPosition()) / 2) * stepsPerUnit / m_steps_per_turn; // tours [turns]
-      m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // [RPM]
+      double halfDistance = ((dest - getPosition()) / 2) * stepsPerUnit / m_steps_per_turn; // tr
+      m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // tr/s
       
-      double timeToAccelerate = m_max_speed_reached / m_acceleration; 
-      m_time_to_reach_middle_us = timeToAccelerate*1000000; // us
+      double timeToAccelerate = m_max_speed_reached / m_acceleration; // s
+      m_time_to_reach_middle_us = (unsigned long) timeToAccelerate*1000000.0; // us
 
       if (m_max_speed_reached > m_max_speed) {
-        m_max_speed_reached = m_max_speed;
+        m_max_speed_reached = m_max_speed; // s
 
-        double distanceAccelerating = timeToAccelerate * m_acceleration; // tours [turns]
-        double halfDistanceLeft = halfDistance - distanceAccelerating; // tours [turns]
+        double distanceAccelerating = 0.5 * m_acceleration * pow(timeToAccelerate, 2); // tr
+        double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
 
         m_time_to_reach_middle_us += (halfDistanceLeft / m_max_speed) * 1000000; // us
       }
