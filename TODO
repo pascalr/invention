@@ -1,5 +1,8 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+- make should only compile when needed when i have to run something
+- make server, should compile and run server
+
 - Fix sweep, ask for position should be at the same time of take picture, otherwise the arm has moved...
 - Imprimer des etiquettes vides (Juste un gros cercle et deux petits cercle,
 et peut-être des carrés comme ça ça guide ou ecrire)

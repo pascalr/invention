@@ -301,6 +301,8 @@ class MotorAxis : public Axis {
     void calculateMovement(double dest) {
 
       double halfDistance = ((dest - getPosition()) / 2) * stepsPerUnit / m_steps_per_turn; // tr
+      halfDistance *= (halfDistance < 0) ? -1 : 1;
+
       m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // tr/s
       
       if (m_max_speed_reached > m_max_speed) {m_max_speed_reached = m_max_speed;} // s
