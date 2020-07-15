@@ -307,18 +307,18 @@ class MotorAxis : public Axis {
       m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // tr/s
       
       double timeToAccelerate = m_max_speed_reached / m_acceleration; // s
-      m_time_to_reach_middle_us = (unsigned long) timeToAccelerate*1000000.0; // us
+      m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * 1000000.0)); // us
 
       if (m_max_speed_reached > m_max_speed) {
         m_max_speed_reached = m_max_speed; // s
 
-        double distanceAccelerating = 0.5 * m_acceleration * pow(timeToAccelerate, 2); // tr
+        double distanceAccelerating = 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
         double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
 
-        m_time_to_reach_middle_us += (halfDistanceLeft / m_max_speed) * 1000000; // us
+        m_time_to_reach_middle_us += ((unsigned long) ((halfDistanceLeft / m_max_speed) * 1000000.0)); // us
       }
      
-      m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - (timeToAccelerate * 1000000); // us
+      m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - ((unsigned long)(timeToAccelerate * 1000000.0)); // us
 
       return 0;
     }
@@ -329,41 +329,42 @@ class MotorAxis : public Axis {
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
-      double speed;
-      unsigned long deltaTime = currentTime - m_start_time;
-      double deltaTimeS = deltaTime / 1000000;
+      double speed; // tr/s
+      unsigned long deltaTime = currentTime - m_start_time; // us
+      double deltaTimeS = deltaTime / 1000000.0; // s
 
       // Accelerate or go top speed
       if (deltaTime <= m_time_to_reach_middle_us) {
         
-        //std::cout << "First half.\n";
+        std::cout << "First half.\n";
 
-        speed = m_acceleration * deltaTimeS;
-        if (speed > m_max_speed) {speed = m_max_speed;}
+        speed = m_acceleration * deltaTimeS; // tr/s
+        if (speed > m_max_speed) {speed = m_max_speed;} // tr/s
 
       // Go top speed
       } else if (currentTime < m_time_to_start_decelerating_us) {
 
-        //std::cout << "Top speed.\n";
+        std::cout << "Top speed.\n";
         // I am worried that a step could be missed due to calculation imprecision
         // This is why I use m_max_speed_reached instead of m_max_speed.
-        speed = m_max_speed_reached;
+        speed = m_max_speed_reached; // tr/s
 
       // Decelerate
       } else {
 
-        //std::cout << "Decelerating.\n";
-        double t_s = (currentTime - m_time_to_start_decelerating_us) / 1000000;
-        speed = m_max_speed_reached - (m_acceleration * t_s);
+        std::cout << "Decelerating.\n";
+        double t_s = (currentTime - m_time_to_start_decelerating_us) / 1000000.0; // s
+        speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
       }
 
-      if (speed <= 0) {
-        //std::cout << "Maximum delay.\n";
-        m_next_step_time = currentTime + MAX_STEP_DELAY; return;
+      if (speed <= 0.001) {
+        std::cout << "Maximum delay.\n";
+        m_next_step_time = currentTime + MAX_STEP_DELAY; return; // us
       }
 
-      m_next_step_time = currentTime + (1000000 / (speed * m_steps_per_turn));
-      //std::cout << "Delay: " << (1000000 / (speed * m_steps_per_turn)) << " us.\n";
+      m_next_step_time = currentTime + ((unsigned long)(1000000.0 / (speed * m_steps_per_turn))); // us
+      std::cout << "Speed: " << speed << " tr/s.\n";
+      std::cout << "Delay: " << (1000000 / (speed * m_steps_per_turn)) << " us.\n";
     }
 
     // Returns true if the axis is still working.
