@@ -11,6 +11,7 @@
 
 #ifndef ARDUINO
 #include <iostream>
+using namespace std;
 #endif
 
 // I would like to transform the mouvement asked into an optimal path with optimal speed for all axis.
@@ -297,20 +298,17 @@ class MotorAxis : public Axis {
       return m_time_to_reach_middle_us * 2;
     }
 
-    int setDestination(double dest) {
-      if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
-
-      int status = Axis::setDestination(dest);
-      if (status < 0) {return status;}
+    void calculateMovement(double dest) {
 
       double halfDistance = ((dest - getPosition()) / 2) * stepsPerUnit / m_steps_per_turn; // tr
       m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // tr/s
       
+      if (m_max_speed_reached > m_max_speed) {m_max_speed_reached = m_max_speed;} // s
+
       double timeToAccelerate = m_max_speed_reached / m_acceleration; // s
       m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * 1000000.0)); // us
 
-      if (m_max_speed_reached > m_max_speed) {
-        m_max_speed_reached = m_max_speed; // s
+      if (m_max_speed_reached == m_max_speed) {
 
         double distanceAccelerating = 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
         double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
@@ -319,15 +317,22 @@ class MotorAxis : public Axis {
       }
      
       m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - ((unsigned long)(timeToAccelerate * 1000000.0)); // us
+      //std::cout << "m_time_to_start_decelerating_us: " << m_time_to_start_decelerating_us << std::endl;
+      //std::cout << "m_time_to_reach_middle_us : " << m_time_to_reach_middle_us << std::endl;
+      //std::cout << "timeToAccelerate : " << timeToAccelerate << std::endl;
+    }
 
+    int setDestination(double dest) {
+      if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
+
+      int status = Axis::setDestination(dest);
+      if (status < 0) {return status;}
+
+      calculateMovement(dest);
       return 0;
     }
 
-
-    void turnOneStep(unsigned long currentTime) {
-      m_writer.doDigitalWrite(stepPin, m_is_step_high ? LOW : HIGH);
-      m_is_step_high = !m_is_step_high;
-      m_position_steps = m_position_steps + (isForward ? 1 : -1);
+    unsigned long calculateNextStepDelay(unsigned long currentTime) {
 
       double speed; // tr/s
       unsigned long deltaTime = currentTime - m_start_time; // us
@@ -336,15 +341,13 @@ class MotorAxis : public Axis {
       // Accelerate or go top speed
       if (deltaTime <= m_time_to_reach_middle_us) {
         
-        std::cout << "First half.\n";
-
         speed = m_acceleration * deltaTimeS; // tr/s
         if (speed > m_max_speed) {speed = m_max_speed;} // tr/s
 
       // Go top speed
       } else if (currentTime < m_time_to_start_decelerating_us) {
 
-        std::cout << "Top speed.\n";
+        //std::cout << "Top speed.\n";
         // I am worried that a step could be missed due to calculation imprecision
         // This is why I use m_max_speed_reached instead of m_max_speed.
         speed = m_max_speed_reached; // tr/s
@@ -352,24 +355,33 @@ class MotorAxis : public Axis {
       // Decelerate
       } else {
 
-        std::cout << "Decelerating.\n";
+        //std::cout << "Decelerating.\n";
         double t_s = (currentTime - m_time_to_start_decelerating_us) / 1000000.0; // s
         speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
       }
 
       if (speed <= 0.001) {
-        std::cout << "Maximum delay.\n";
-        m_next_step_time = currentTime + MAX_STEP_DELAY; return; // us
+        return MAX_STEP_DELAY; // us
       }
 
-      m_next_step_time = currentTime + ((unsigned long)(1000000.0 / (speed * m_steps_per_turn))); // us
-      std::cout << "Speed: " << speed << " tr/s.\n";
-      std::cout << "Delay: " << (1000000 / (speed * m_steps_per_turn)) << " us.\n";
+      return ((unsigned long)(1000000.0 / (speed * m_steps_per_turn))); // us
+    }
+
+    void turnOneStep(unsigned long currentTime) {
+      m_writer.doDigitalWrite(stepPin, m_is_step_high ? LOW : HIGH);
+      m_is_step_high = !m_is_step_high;
+      m_position_steps = m_position_steps + (isForward ? 1 : -1);
+
+      m_next_step_time = currentTime + calculateNextStepDelay(currentTime); 
     }
 
     // Returns true if the axis is still working.
     virtual bool handleAxis(unsigned long currentTime) {
       //unsigned int delay = getDelay();
+      
+      //if (currentTime % 1000000 == 0) {
+        //cout << "A second passed! \n";
+      //}
       
       if (isReferencing) {
         return moveToReference();
@@ -388,8 +400,6 @@ class MotorAxis : public Axis {
       m_previous_step_time = time;
       m_next_step_time = time;
     }
-
-  protected:
 
     bool m_is_step_high;
 

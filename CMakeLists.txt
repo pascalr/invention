@@ -86,9 +86,9 @@ set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 #target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
 #target_link_libraries(test_jar_position_analyzer ${MyLibs})
 
-#add_executable( test_axis ${MyCpp} src/test/axis.cpp )
-#target_include_directories(test_axis PRIVATE ${MyDirs})
-#target_link_libraries(test_axis ${MyLibs})
+add_executable( test_axis ${MyCpp} src/test/axis.cpp )
+target_include_directories(test_axis PRIVATE ${MyDirs})
+target_link_libraries(test_axis ${MyLibs})
 
 add_executable( fake src/fake.cpp )
 target_include_directories(fake PRIVATE ${MyDirs})
