@@ -48,43 +48,43 @@ set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 #message(STATUS ${Python2_INCLUDE_DIRS})
 #message(STATUS "THERE!!!")
 
-#add_executable( detect_chessboard src/detect_chessboard.cpp )
-#target_link_libraries( detect_chessboard ${MyLibs} )
+add_executable( detect_chessboard src/detect_chessboard.cpp )
+target_link_libraries( detect_chessboard ${MyLibs} )
 
-#add_executable( scan_qr_code src/scan_qr_code.cpp )
-#target_link_libraries( scan_qr_code ${MyLibs} )
+add_executable( scan_qr_code src/scan_qr_code.cpp )
+target_link_libraries( scan_qr_code ${MyLibs} )
 
-#add_executable( capture src/capture.cpp )
-#target_link_libraries( capture ${MyLibs} )
+add_executable( capture src/capture.cpp )
+target_link_libraries( capture ${MyLibs} )
 
 #add_executable( write_font_sticker write_font_sticker.cpp )
 #target_link_libraries( write_font_sticker ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
 
-#add_executable( main src/main.cpp )
-#target_link_libraries( main ${MyLibs} )
+add_executable( main src/main.cpp )
+target_link_libraries( main ${MyLibs} )
 
-#add_executable( communicate src/communicate.cpp )
-#target_link_libraries( communicate ${MyLibs} )
+add_executable( communicate src/communicate.cpp )
+target_link_libraries( communicate ${MyLibs} )
 
 #add_executable( test_captures src/test/test_captures.cpp )
 #target_link_libraries( test_captures ${MyLibs} )
 
-#add_executable( sweep src/sweep.cpp )
-#target_link_libraries( sweep ${MyLibs} )
+add_executable( sweep src/sweep.cpp )
+target_link_libraries( sweep ${MyLibs} )
 
-#add_executable( video_capture src/video_capture.cpp )
-#target_link_libraries( video_capture ${MyLibs} )
+add_executable( video_capture src/video_capture.cpp )
+target_link_libraries( video_capture ${MyLibs} )
 
-#add_executable( usbreset src/usbreset.c )
-#target_link_libraries( usbreset ${MyLibs} )
+add_executable( usbreset src/usbreset.c )
+target_link_libraries( usbreset ${MyLibs} )
 
-#add_executable( run_tests ${MyCpp} src/test/test.cpp )
-#target_include_directories(run_tests PRIVATE ${MyDirs})
-#target_link_libraries( run_tests ${MyLibs})
+add_executable( run_tests ${MyCpp} src/test/test.cpp )
+target_include_directories(run_tests PRIVATE ${MyDirs})
+target_link_libraries( run_tests ${MyLibs})
 
-#add_executable( test_jar_position_analyzer ${MyCpp} src/test/jar_position_analyzer.cpp )
-#target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
-#target_link_libraries(test_jar_position_analyzer ${MyLibs})
+add_executable( test_jar_position_analyzer ${MyCpp} src/test/jar_position_analyzer.cpp )
+target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
+target_link_libraries(test_jar_position_analyzer ${MyLibs})
 
 add_executable( test_axis ${MyCpp} src/test/axis.cpp )
 target_include_directories(test_axis PRIVATE ${MyDirs})
@@ -94,17 +94,17 @@ add_executable( fake src/fake.cpp )
 target_include_directories(fake PRIVATE ${MyDirs})
 target_link_libraries( fake ${MyLibs} )
 
-#add_executable( server src/server.cpp )
-#target_link_libraries( server ${MyLibs}  )
-#target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
+add_executable( server src/server.cpp )
+target_link_libraries( server ${MyLibs}  )
+target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
 
-#add_executable( calibrate_camera src/camera_calibration.cpp )
-#target_link_libraries( calibrate_camera ${MyLibs}  )
+add_executable( calibrate_camera src/camera_calibration.cpp )
+target_link_libraries( calibrate_camera ${MyLibs}  )
 
 
-#enable_testing()
-#add_test( regularTests bin/run_tests )
-#add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )
-#add_test( testAxis bin/test_axis )
+enable_testing()
+add_test( regularTests bin/run_tests )
+add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )
+add_test( testAxis bin/test_axis )
 
 add_custom_target(check COMMAND make && ${CMAKE_CTEST_COMMAND} --verbose)

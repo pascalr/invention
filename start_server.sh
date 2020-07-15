@@ -1,6 +1,6 @@
 #!/bin/bash
 cmake .
-make
+make server
 ./update_arduino.sh
 bin/server -a lan -p 8083 "$@"
 #(cd frontend && node index.js lan)
