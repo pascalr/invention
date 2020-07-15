@@ -293,8 +293,8 @@ class MotorAxis : public Axis {
 
     // TODO: All the units should simply be steps... NOOOOOOOOOO All units are in turns!
     // WARNING: THIS ONLY WORKS AT THE BEGINNING, DOES NOT COMPUTE ALL THE TIME
-    double timeToReachDestinationUs() {
-      return m_time_to_reach_destination_us;
+    unsigned long timeToReachDestinationUs() {
+      return m_time_to_reach_middle_us * 2;
     }
 
     int setDestination(double dest) {
@@ -307,7 +307,7 @@ class MotorAxis : public Axis {
       m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // [RPM]
       
       double timeToAccelerate = m_max_speed_reached / m_acceleration; 
-      m_time_to_reach_destination_us = (timeToAccelerate * 2)*1000000; // us
+      m_time_to_reach_middle_us = timeToAccelerate*1000000; // us
 
       if (m_max_speed_reached > m_max_speed) {
         m_max_speed_reached = m_max_speed;
@@ -315,10 +315,10 @@ class MotorAxis : public Axis {
         double distanceAccelerating = timeToAccelerate * m_acceleration; // tours [turns]
         double halfDistanceLeft = halfDistance - distanceAccelerating; // tours [turns]
 
-        m_time_to_reach_destination_us += ((halfDistanceLeft / m_max_speed) * 2) * 1000000; // us
+        m_time_to_reach_middle_us += (halfDistanceLeft / m_max_speed) * 1000000; // us
       }
      
-      m_time_to_start_decelerating_us = m_time_to_reach_destination_us - (timeToAccelerate * 1000000); // us
+      m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - (timeToAccelerate * 1000000); // us
 
       return 0;
     }
@@ -331,16 +331,20 @@ class MotorAxis : public Axis {
 
       double speed;
       unsigned long deltaTime = currentTime - m_start_time;
+      double deltaTimeS = deltaTime / 1000000;
 
       // Accelerate or go top speed
-      if (deltaTime <= m_time_to_reach_destination_us) {
+      if (deltaTime <= m_time_to_reach_middle_us) {
+        
+        std::cout << "First half.\n";
 
-        speed = m_acceleration * deltaTime;
+        speed = m_acceleration * deltaTimeS;
         if (speed > m_max_speed) {speed = m_max_speed;}
 
       // Go top speed
       } else if (currentTime < m_time_to_start_decelerating_us) {
 
+        std::cout << "Top speed.\n";
         // I am worried that a step could be missed due to calculation imprecision
         // This is why I use m_max_speed_reached instead of m_max_speed.
         speed = m_max_speed_reached;
@@ -348,11 +352,13 @@ class MotorAxis : public Axis {
       // Decelerate
       } else {
 
-        speed = m_max_speed_reached - (m_acceleration * (currentTime - m_time_to_start_decelerating_us));
+        std::cout << "Decelerating.\n";
+        double t_s = (currentTime - m_time_to_start_decelerating_us) / 1000000;
+        speed = m_max_speed_reached - (m_acceleration * t_s);
       }
 
       if (speed <= 0) {
-        //std::cout << "Maximum delay.\n";
+        std::cout << "Maximum delay.\n";
         m_next_step_time = currentTime + MAX_STEP_DELAY; return;
       }
 
@@ -393,9 +399,8 @@ class MotorAxis : public Axis {
     double m_max_speed_reached;
     unsigned long m_next_step_time; // us
     unsigned long m_start_time; // us
-    unsigned long m_time_to_reach_destination_us; // us
+    unsigned long m_time_to_reach_middle_us; // us
     unsigned long m_time_to_start_decelerating_us; // us
-    //unsigned long m_time_to_reach_destination;
    
     double m_acceleration; // tour/s^2 [turn/sec^2]
     double m_max_speed; // tour/s [turn/sec]
