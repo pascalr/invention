@@ -7,7 +7,8 @@
 
 #define AXIS(t) (axisByLetter(axes, t))
 
-#define MAX_STEP_DELAY 50000 // us (50 ms)
+// there is a bug so this is too slow #define MAX_STEP_DELAY 50000 // us (50 ms)
+#define MAX_STEP_DELAY 5000 // us (5 ms)
 
 #ifndef ARDUINO
 #include <iostream>
@@ -93,7 +94,6 @@ class MotorAxis : public Axis {
 
     MotorAxis(Writer& writer, char theName) : Axis(writer, theName) {
       isForward = false;
-      m_previous_step_time = 0;
       m_is_step_high = false;
       isMotorEnabled = false;
       isReferenced = false;
@@ -381,10 +381,6 @@ class MotorAxis : public Axis {
     virtual bool handleAxis(unsigned long currentTime) {
       //unsigned int delay = getDelay();
       
-      //if (currentTime % 1000000 == 0) {
-        //cout << "A second passed! \n";
-      //}
-      
       if (isReferencing) {
         return moveToReference();
       } else if (canMove() && (forceRotation || !isDestinationReached())) {
@@ -399,13 +395,11 @@ class MotorAxis : public Axis {
     // Resets some stuff.
     virtual void prepare(unsigned long time) {
       m_start_time = time;
-      m_previous_step_time = time;
       m_next_step_time = time;
     }
 
     bool m_is_step_high;
 
-    unsigned long m_previous_step_time;
     long m_position_steps;
     bool m_reverse_motor_direction;
 

@@ -238,6 +238,7 @@ void myLoop(Program& p) {
 
     // info
     } else if (cmd == '?') { // info
+      p.getWriter() << "\nTime: " << p.getCurrentTime();
       p.getWriter() << "\n" << MESSAGE_JSON << "\n";
       serialize<Writer>(p, p.getWriter());
       p.getWriter() << "\n";
