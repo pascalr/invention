@@ -1,6 +1,10 @@
 #include "test.h"
+#include "../utils/io_common.h"
+#include "../config/constants.h"
 
-#include "axis.h"
+#include "../core/axis.h"
+#include "../core/fake_program.h"
+#include "../config/setup.h"
 
 using namespace std;
 
@@ -10,13 +14,22 @@ void testTimeToReachDestination() {
   FakeProgram p;
   setupAxes(p);
 
-  p.axisY.setAcceleration(100); // tour/s^2
-  p.axisY.setRpmMax(100); // tour/s
-  p.axisY.setPosition(0);
-  p.axisY.setDestination(100);
+  MotorAxis& axis = p.axisY;
+  axis.referenceReached();
+  axis.setAcceleration(10); // tour/s^2
+  axis.setMaxSpeed(10); // tour/s
+  axis.setPosition(0);
+
+  double turns = 10;
+  double units = turns * axis.getStepsPerTurn() / axis.getStepsPerUnit();
+
+  axis.setDestination(units);
   
-  double dx = p.axisY.getDestination() - p.axisY.getPosition();
-  double t = sqrt(2*dx/)
+  //double dx = axis.getDestination() - axis.getPosition();
+  //double t = sqrt(2*dx/axis.getAccelerationInUnits());
+  double t = sqrt(2*turns/axis.getAcceleration());
+
+  assertNearby("t", t*1000000, axis.timeToReachDestinationUs());
 
   // So it should take one second to reach the destination
 }
@@ -27,7 +40,7 @@ void testSetDestination() {
   setupAxes(p);
 
   p.axisY.setAcceleration(100); // tour/s^2
-  p.axisY.setRpmMax(100); // tour/s
+  p.axisY.setMaxSpeed(100); // tour/s
 
   // So it should take one second to reach the destination
 }

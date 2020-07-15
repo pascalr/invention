@@ -48,23 +48,23 @@ set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 #message(STATUS ${Python2_INCLUDE_DIRS})
 #message(STATUS "THERE!!!")
 
-add_executable( detect_chessboard src/detect_chessboard.cpp )
-target_link_libraries( detect_chessboard ${MyLibs} )
+#add_executable( detect_chessboard src/detect_chessboard.cpp )
+#target_link_libraries( detect_chessboard ${MyLibs} )
 
-add_executable( scan_qr_code src/scan_qr_code.cpp )
-target_link_libraries( scan_qr_code ${MyLibs} )
+#add_executable( scan_qr_code src/scan_qr_code.cpp )
+#target_link_libraries( scan_qr_code ${MyLibs} )
 
-add_executable( capture src/capture.cpp )
-target_link_libraries( capture ${MyLibs} )
+#add_executable( capture src/capture.cpp )
+#target_link_libraries( capture ${MyLibs} )
 
 #add_executable( write_font_sticker write_font_sticker.cpp )
 #target_link_libraries( write_font_sticker ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar )
 
-add_executable( main src/main.cpp )
-target_link_libraries( main ${MyLibs} )
+#add_executable( main src/main.cpp )
+#target_link_libraries( main ${MyLibs} )
 
-add_executable( communicate src/communicate.cpp )
-target_link_libraries( communicate ${MyLibs} )
+#add_executable( communicate src/communicate.cpp )
+#target_link_libraries( communicate ${MyLibs} )
 
 #add_executable( test_captures src/test/test_captures.cpp )
 #target_link_libraries( test_captures ${MyLibs} )
@@ -72,11 +72,11 @@ target_link_libraries( communicate ${MyLibs} )
 add_executable( sweep src/sweep.cpp )
 target_link_libraries( sweep ${MyLibs} )
 
-add_executable( video_capture src/video_capture.cpp )
-target_link_libraries( video_capture ${MyLibs} )
+#add_executable( video_capture src/video_capture.cpp )
+#target_link_libraries( video_capture ${MyLibs} )
 
-add_executable( usbreset src/usbreset.c )
-target_link_libraries( usbreset ${MyLibs} )
+#add_executable( usbreset src/usbreset.c )
+#target_link_libraries( usbreset ${MyLibs} )
 
 add_executable( run_tests ${MyCpp} src/test/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
@@ -98,8 +98,8 @@ add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )
 target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
 
-add_executable( calibrate_camera src/camera_calibration.cpp )
-target_link_libraries( calibrate_camera ${MyLibs}  )
+#add_executable( calibrate_camera src/camera_calibration.cpp )
+#target_link_libraries( calibrate_camera ${MyLibs}  )
 
 
 enable_testing()

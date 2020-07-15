@@ -9,6 +9,10 @@
 
 #define MAX_STEP_DELAY 50000 // us (50 ms)
 
+#ifndef ARDUINO
+#include <iostream>
+#endif
+
 // I would like to transform the mouvement asked into an optimal path with optimal speed for all axis.
 // If I the arm is at z0 and I ask mz340, I expect it to be in a straight line.
 // The speed of the x axis will be constant (easier for now) v
@@ -98,8 +102,8 @@ class MotorAxis : public Axis {
       m_position_steps = 0;
       m_reverse_motor_direction = false;
 
-      m_rpm_max = 500;
-      m_acceleration = 300; // tour/s^2 [turn/sec^2]
+      m_max_speed = 1;
+      m_acceleration = 0.2; // tour/s^2 [turn/sec^2]
 
     }
 
@@ -107,8 +111,8 @@ class MotorAxis : public Axis {
       m_acceleration = accel;
     }
 
-    void setRpmMax(double rpm) {
-      m_rpm_max = rpm;
+    void setMaxSpeed(double s) {
+      m_max_speed = s;
     }
 
     double getAcceleration() {
@@ -119,8 +123,8 @@ class MotorAxis : public Axis {
       return m_acceleration * m_steps_per_turn / stepsPerUnit;
     }
 
-    double getRpmMax() {
-      return m_rpm_max;
+    double getMaxSpeed() {
+      return m_max_speed;
     }
     
     void setReverseMotorDirection(bool val) {
@@ -191,6 +195,14 @@ class MotorAxis : public Axis {
 
     long getPositionSteps() {
       return m_position_steps;
+    }
+
+    double getDestinationSteps() {
+      return getDestination() * stepsPerUnit;
+    }
+
+    double getDestinationTurns() {
+      return getDestination() * m_steps_per_turn;
     }
 
     void updateDirection() {
@@ -279,17 +291,10 @@ class MotorAxis : public Axis {
       return theSpeed;
     }*/
 
-    // TODO: All the units should simply be steps...
-
-    double timeToReachDestination() {
-      double timeToAccelerate = m_max_rpm_reached / m_acceleration; 
-      double maxSpeedReached = m_max_rpm_reached * stepsPerUnit / m_steps_per_turn;
-
-      double distanceAccelerating = timeToAccelerate * m_acceleration;
-      double distanceLeftToReachMiddle = (m_half_distance_to_travel) - distanceAccelerating;
-      double timeConstantSpeed = distanceLeftToReachMiddle / maxSpeedReached;
-
-      return (timeToAccelerate + timeConstantSpeed)*2;
+    // TODO: All the units should simply be steps... NOOOOOOOOOO All units are in turns!
+    // WARNING: THIS ONLY WORKS AT THE BEGINNING, DOES NOT COMPUTE ALL THE TIME
+    double timeToReachDestinationUs() {
+      return m_time_to_reach_destination_us;
     }
 
     int setDestination(double dest) {
@@ -298,47 +303,61 @@ class MotorAxis : public Axis {
       int status = Axis::setDestination(dest);
       if (status < 0) {return status;}
 
-      m_half_distance_to_travel = (dest - getPosition()) / 2;
+      double halfDistance = ((dest - getPosition()) / 2) * stepsPerUnit / m_steps_per_turn; // tours [turns]
+      m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // [RPM]
+      
+      double timeToAccelerate = m_max_speed_reached / m_acceleration; 
+      m_time_to_reach_destination_us = (timeToAccelerate * 2)*1000000; // us
 
-      double maxSpeedReached = sqrt(2 * getAccelerationInUnits() * m_half_distance_to_travel);
-      m_max_rpm_reached = maxSpeedReached * stepsPerUnit / m_steps_per_turn;
+      if (m_max_speed_reached > m_max_speed) {
+        m_max_speed_reached = m_max_speed;
 
-      if (m_max_rpm_reached > m_rpm_max) {m_max_rpm_reached = m_rpm_max;}
+        double distanceAccelerating = timeToAccelerate * m_acceleration; // tours [turns]
+        double halfDistanceLeft = halfDistance - distanceAccelerating; // tours [turns]
 
-      double timeToDecelerate = m_max_rpm_reached / m_acceleration; 
-      m_time_to_start_decelerating = timeToReachDestination() - timeToDecelerate;
+        m_time_to_reach_destination_us += ((halfDistanceLeft / m_max_speed) * 2) * 1000000; // us
+      }
+     
+      m_time_to_start_decelerating_us = m_time_to_reach_destination_us - (timeToAccelerate * 1000000); // us
 
       return 0;
     }
+
 
     void turnOneStep(unsigned long currentTime) {
       m_writer.doDigitalWrite(stepPin, m_is_step_high ? LOW : HIGH);
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
-      double rpm;
+      double speed;
+      unsigned long deltaTime = currentTime - m_start_time;
 
       // Accelerate or go top speed
-      if (getPosition() < m_half_distance_to_travel) {
+      if (deltaTime <= m_time_to_reach_destination_us) {
 
-        rpm = m_acceleration * (currentTime - m_start_time);
-        if (rpm > m_rpm_max) {rpm = m_rpm_max;}
+        speed = m_acceleration * deltaTime;
+        if (speed > m_max_speed) {speed = m_max_speed;}
 
       // Go top speed
-      } else if (currentTime < m_time_to_start_decelerating) {
+      } else if (currentTime < m_time_to_start_decelerating_us) {
 
         // I am worried that a step could be missed due to calculation imprecision
-        rpm = m_max_rpm_reached;
+        // This is why I use m_max_speed_reached instead of m_max_speed.
+        speed = m_max_speed_reached;
 
       // Decelerate
       } else {
 
-        rpm = m_max_rpm_reached - (m_acceleration * (currentTime - m_time_to_start_decelerating));
+        speed = m_max_speed_reached - (m_acceleration * (currentTime - m_time_to_start_decelerating_us));
       }
 
-      if (rpm <= 0) {m_next_step_time = currentTime + MAX_STEP_DELAY; return;}
+      if (speed <= 0) {
+        //std::cout << "Maximum delay.\n";
+        m_next_step_time = currentTime + MAX_STEP_DELAY; return;
+      }
 
-      m_next_step_time = currentTime + (1000000 / (speed * stepsPerUnit));
+      m_next_step_time = currentTime + (1000000 / (speed * m_steps_per_turn));
+      //std::cout << "Delay: " << (1000000 / (speed * m_steps_per_turn)) << " us.\n";
     }
 
     // Returns true if the axis is still working.
@@ -371,14 +390,15 @@ class MotorAxis : public Axis {
     long m_position_steps;
     bool m_reverse_motor_direction;
 
-    double m_max_rpm_reached;
-    unsigned long m_time_to_start_decelerating;
-    unsigned long m_next_step_time;
-    unsigned long m_start_time;
-    double m_half_distance_to_travel; 
+    double m_max_speed_reached;
+    unsigned long m_next_step_time; // us
+    unsigned long m_start_time; // us
+    unsigned long m_time_to_reach_destination_us; // us
+    unsigned long m_time_to_start_decelerating_us; // us
+    //unsigned long m_time_to_reach_destination;
    
     double m_acceleration; // tour/s^2 [turn/sec^2]
-    double m_rpm_max; // tour/s [turn/sec]
+    double m_max_speed; // tour/s [turn/sec]
 
 
 
