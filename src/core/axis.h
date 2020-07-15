@@ -336,7 +336,7 @@ class MotorAxis : public Axis {
       // Accelerate or go top speed
       if (deltaTime <= m_time_to_reach_middle_us) {
         
-        std::cout << "First half.\n";
+        //std::cout << "First half.\n";
 
         speed = m_acceleration * deltaTimeS;
         if (speed > m_max_speed) {speed = m_max_speed;}
@@ -344,7 +344,7 @@ class MotorAxis : public Axis {
       // Go top speed
       } else if (currentTime < m_time_to_start_decelerating_us) {
 
-        std::cout << "Top speed.\n";
+        //std::cout << "Top speed.\n";
         // I am worried that a step could be missed due to calculation imprecision
         // This is why I use m_max_speed_reached instead of m_max_speed.
         speed = m_max_speed_reached;
@@ -352,13 +352,13 @@ class MotorAxis : public Axis {
       // Decelerate
       } else {
 
-        std::cout << "Decelerating.\n";
+        //std::cout << "Decelerating.\n";
         double t_s = (currentTime - m_time_to_start_decelerating_us) / 1000000;
         speed = m_max_speed_reached - (m_acceleration * t_s);
       }
 
       if (speed <= 0) {
-        std::cout << "Maximum delay.\n";
+        //std::cout << "Maximum delay.\n";
         m_next_step_time = currentTime + MAX_STEP_DELAY; return;
       }
 
