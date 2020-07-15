@@ -280,7 +280,7 @@ void testInputParserParseNumber() {
   assertTest("invalid number (empty)", -1, parseNumber(p,val));
 }
 
-void testBaseXAxisSpeed() {
+/*void testBaseXAxisSpeed() {
   title("Testing BaseXAxis getDelay");
   FakeProgram p;
   setupAxes(p);
@@ -290,7 +290,7 @@ void testBaseXAxisSpeed() {
   assertNearby("theta=0.0", 500, p.baseAxisX.getDelay());
   p.axisT.setPosition(90.0);
   assertNearby("theta=90.0", 0, p.baseAxisX.getDelay());
-}
+}*/
 
 int main (int argc, char *argv[]) {
 
@@ -308,6 +308,6 @@ int main (int argc, char *argv[]) {
   testParseInput();
   testInputParserParseNumber();
   testMoveSquare();
-  testBaseXAxisSpeed();
+  //testBaseXAxisSpeed();
 
 }

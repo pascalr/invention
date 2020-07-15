@@ -86,6 +86,10 @@ add_executable( test_jar_position_analyzer ${MyCpp} src/test/jar_position_analyz
 target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
 target_link_libraries(test_jar_position_analyzer ${MyLibs})
 
+add_executable( test_axis ${MyCpp} src/test/axis.cpp )
+target_include_directories(test_axis PRIVATE ${MyDirs})
+target_link_libraries(test_axis ${MyLibs})
+
 add_executable( fake src/fake.cpp )
 target_include_directories(fake PRIVATE ${MyDirs})
 target_link_libraries( fake ${MyLibs} )
@@ -101,5 +105,6 @@ target_link_libraries( calibrate_camera ${MyLibs}  )
 enable_testing()
 add_test( regularTests bin/run_tests )
 add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )
+add_test( testAxis bin/test_axis )
 
 add_custom_target(check COMMAND make && ${CMAKE_CTEST_COMMAND} --verbose)

@@ -7,6 +7,8 @@
 
 #define AXIS(t) (axisByLetter(axes, t))
 
+#define MAX_STEP_DELAY 50000 // us (50 ms)
+
 // I would like to transform the mouvement asked into an optimal path with optimal speed for all axis.
 // If I the arm is at z0 and I ask mz340, I expect it to be in a straight line.
 // The speed of the x axis will be constant (easier for now) v
@@ -87,7 +89,7 @@ class MotorAxis : public Axis {
     MotorAxis(Writer& writer, char theName) : Axis(writer, theName) {
       isForward = false;
       m_previous_step_time = 0;
-      isStepHigh = false;
+      m_is_step_high = false;
       isMotorEnabled = false;
       isReferenced = false;
       isReferencing = false;
@@ -95,12 +97,30 @@ class MotorAxis : public Axis {
       forceRotation = false;
       m_position_steps = 0;
       m_reverse_motor_direction = false;
-      m_min_position = 0;
+
+      m_rpm_max = 500;
+      m_acceleration = 300; // tour/s^2 [turn/sec^2]
+
     }
-    
-    int setDestination(double dest) {
-      if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
-      return Axis::setDestination(dest);
+
+    void setAcceleration(double accel) {
+      m_acceleration = accel;
+    }
+
+    void setRpmMax(double rpm) {
+      m_rpm_max = rpm;
+    }
+
+    double getAcceleration() {
+      return m_acceleration;
+    }
+
+    double getAccelerationInUnits() {
+      return m_acceleration * m_steps_per_turn / stepsPerUnit;
+    }
+
+    double getRpmMax() {
+      return m_rpm_max;
     }
     
     void setReverseMotorDirection(bool val) {
@@ -114,15 +134,19 @@ class MotorAxis : public Axis {
       stepsPerUnit = ratio;
     }
 
+    void setStepsPerTurn(double ratio) {
+      m_steps_per_turn = ratio;
+    }
+
+    double getStepsPerTurn() {
+      return m_steps_per_turn;
+    }
+
     double getStepsPerUnit() {
       return stepsPerUnit;
     }
 
-    double getSpeed() {
-      double frequency = 1 / getDelay() * 1000000;
-      double theSpeed = frequency / stepsPerUnit;
-      return theSpeed;
-    }
+    
 
     void setupPins() {
       m_writer.doPinMode(stepPin, OUTPUT);
@@ -155,11 +179,7 @@ class MotorAxis : public Axis {
       forceRotation = false;
     }
 
-    void turnOneStep() {
-      m_writer.doDigitalWrite(stepPin, isStepHigh ? LOW : HIGH);
-      isStepHigh = !isStepHigh;
-      m_position_steps = m_position_steps + (isForward ? 1 : -1);
-    }
+    
 
     void setPosition(double pos) {
       m_position_steps = pos * stepsPerUnit;
@@ -234,46 +254,102 @@ class MotorAxis : public Axis {
     // Linear axes units are mm. Rotary axes units are degrees.
     double speed; // delay in microseconds
     double stepsPerUnit;
+    double m_steps_per_turn;
     
     int enabledPin;
     int dirPin;
     int stepPin;
     int limitSwitchPin;
     
-    
-    bool isStepHigh;
     bool isMotorEnabled;
     bool isForward;
     bool isReferenced;
     bool isReferencing;
     bool forceRotation;
 
-
-
     // Get the delay untill the next step
-    virtual double getDelay() {
+    /*virtual double getDelay() {
       // TODO: The speed is not fixed.
       return speed;
+    }*/
+
+    /*double getSpeed() {
+      double frequency = 1 / getDelay() * 1000000;
+      double theSpeed = frequency / stepsPerUnit;
+      return theSpeed;
+    }*/
+
+    // TODO: All the units should simply be steps...
+
+    double timeToReachDestination() {
+      double timeToAccelerate = m_max_rpm_reached / m_acceleration; 
+      double maxSpeedReached = m_max_rpm_reached * stepsPerUnit / m_steps_per_turn;
+
+      double distanceAccelerating = timeToAccelerate * m_acceleration;
+      double distanceLeftToReachMiddle = (m_half_distance_to_travel) - distanceAccelerating;
+      double timeConstantSpeed = distanceLeftToReachMiddle / maxSpeedReached;
+
+      return (timeToAccelerate + timeConstantSpeed)*2;
     }
 
-    //double m_destination_steps;
+    int setDestination(double dest) {
+      if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
+
+      int status = Axis::setDestination(dest);
+      if (status < 0) {return status;}
+
+      m_half_distance_to_travel = (dest - getPosition()) / 2;
+
+      double maxSpeedReached = sqrt(2 * getAccelerationInUnits() * m_half_distance_to_travel);
+      m_max_rpm_reached = maxSpeedReached * stepsPerUnit / m_steps_per_turn;
+
+      if (m_max_rpm_reached > m_rpm_max) {m_max_rpm_reached = m_rpm_max;}
+
+      double timeToDecelerate = m_max_rpm_reached / m_acceleration; 
+      m_time_to_start_decelerating = timeToReachDestination() - timeToDecelerate;
+
+      return 0;
+    }
+
+    void turnOneStep(unsigned long currentTime) {
+      m_writer.doDigitalWrite(stepPin, m_is_step_high ? LOW : HIGH);
+      m_is_step_high = !m_is_step_high;
+      m_position_steps = m_position_steps + (isForward ? 1 : -1);
+
+      double rpm;
+
+      // Accelerate or go top speed
+      if (getPosition() < m_half_distance_to_travel) {
+
+        rpm = m_acceleration * (currentTime - m_start_time);
+        if (rpm > m_rpm_max) {rpm = m_rpm_max;}
+
+      // Go top speed
+      } else if (currentTime < m_time_to_start_decelerating) {
+
+        // I am worried that a step could be missed due to calculation imprecision
+        rpm = m_max_rpm_reached;
+
+      // Decelerate
+      } else {
+
+        rpm = m_max_rpm_reached - (m_acceleration * (currentTime - m_time_to_start_decelerating));
+      }
+
+      if (rpm <= 0) {m_next_step_time = currentTime + MAX_STEP_DELAY; return;}
+
+      m_next_step_time = currentTime + (1000000 / (speed * stepsPerUnit));
+    }
 
     // Returns true if the axis is still working.
     virtual bool handleAxis(unsigned long currentTime) {
-      unsigned int delay = getDelay();
+      //unsigned int delay = getDelay();
       
       if (isReferencing) {
         return moveToReference();
       } else if (canMove() && (forceRotation || !isDestinationReached())) {
-        unsigned long deltaTime = currentTime - m_previous_step_time;
-        if (deltaTime > delay) {
-          turnOneStep();
-          // TODO: Instead of this, call a function named prepareToMove, that updates the m_previous_step_time
-          if (deltaTime > 2*delay) {
-            m_previous_step_time = currentTime; // refreshing m_previous_step_time when it is the first step and the motor was at a stop
-          } else {
-            m_previous_step_time = m_previous_step_time + delay; // This is more accurate to ensure all the motors are synchronysed
-          }
+        if (currentTime >= m_next_step_time) {
+          turnOneStep(currentTime);
         }
         return true;
       }
@@ -282,81 +358,34 @@ class MotorAxis : public Axis {
 
     // Resets some stuff.
     virtual void prepare(unsigned long time) {
+      m_start_time = time;
       m_previous_step_time = time;
+      m_next_step_time = time;
     }
+
   protected:
+
+    bool m_is_step_high;
 
     unsigned long m_previous_step_time;
     long m_position_steps;
     bool m_reverse_motor_direction;
+
+    double m_max_rpm_reached;
+    unsigned long m_time_to_start_decelerating;
+    unsigned long m_next_step_time;
+    unsigned long m_start_time;
+    double m_half_distance_to_travel; 
+   
+    double m_acceleration; // tour/s^2 [turn/sec^2]
+    double m_rpm_max; // tour/s [turn/sec]
+
+
+
+    // TODO:
+    // bool m_jog_forward; No more forceRotation.
+    // bool m_jog_reverse; No more isForward.
 };
-
-/*// The ZAxis is the TAxis.
-class ZAxis : public Axis {
-  public:
-    ZAxis(Writer& theWriter, char theName, HorizontalAxis* hAxis) : Axis(theWriter, theName) {
-      m_horizontal_axis = hAxis;
-    }
-
-    // It is not about if the horizontal axis should go forward or not,
-    // it is about whether the T axis should turn clockwise or counter clockwise to get to the z position.
-    // The x axis just follows.
-
-    virtual void turnOneStep() {
-      Axis::turnOneStep();
-      double angle = m_position_steps / stepsPerUnit;
-      double deltaX = RAYON * cos(angle / 180 * PI);
-      m_horizontal_axis->setDeltaPosition(deltaX);
-    }
-
-    virtual double getPositionAngle() {
-      return m_position_steps / stepsPerUnit;
-    }
-
-    virtual double getPosition() {
-      return RAYON * sin(getPositionAngle() / 180 * PI);
-    }
-
-    virtual bool isDestinationReached() {
-      //double destSteps = getDestinationSteps();
-      //double posSteps = getPositionSteps();
-      //return (isForward && posSteps >= destSteps) ||
-      //       (!isForward && posSteps <= destSteps);
-      return (isForward && getPositionAngle() >= getDestinationAngle()) ||
-             (!isForward && getPositionAngle() <= getDestinationAngle());
-    }
-
-    //double getDestinationSteps() {
-    //  return m_destination_angle * stepsPerUnit;
-    //}
-
-    void setDestination(double dest) {
-      //std::cout << "Set destination " << dest << std::endl;
-      //std::cout << "Is forward " << isForward << std::endl;
-
-      m_destination_angle = (asin(dest / RAYON) * 180.0 / PI);
-
-      Axis::setDestination(dest);
-      //std::cout << "destination angle : " << m_destination_angle << std::endl;
-      //std::cout << "Is forward " << isForward << std::endl;
-      
-    }
-
-    virtual void updateDirection() {
-      setMotorDirection(getDestinationAngle() > getPositionAngle());
-    }
-
-    
-
-    double getDestinationAngle() {
-      return m_destination_angle;
-    }
-
-  private:
-    HorizontalAxis* m_horizontal_axis;
-    double m_destination_angle;
-    bool m_is_clockwise;
-};*/
 
 class XAxis : public Axis {
   public:
@@ -403,7 +432,7 @@ class BaseXAxis : public MotorAxis {
       m_start_time = time;
     }*/
 
-    virtual double getDelay() {
+    /*virtual double getDelay() {
       // Maybe use my own time because the theta position directly could get out of sync
       if (m_theta_axis.isDestinationReached()) {return speed;}
       double angularSpeedRad = m_theta_axis.getSpeed() / 180 * PI;
@@ -412,7 +441,7 @@ class BaseXAxis : public MotorAxis {
       double frequency = vx * stepsPerUnit;
       if (frequency == 0) return 999999999;
       return 1000000 / frequency;
-    }
+    }*/
 
   private:
     //unsigned long m_start_time;
