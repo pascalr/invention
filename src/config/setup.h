@@ -18,7 +18,7 @@ void setupAxes(Program& p) {
   p.axisT.setMinPosition(-45);
   p.axisT.setMaxPosition(225);
   p.axisT.setMaxSpeed(0.2);
-  p.axisT.setAcceleration(0.05);
+  p.axisT.setAcceleration(0.2);
 
   p.axisZ.setMaxPosition(RAYON);
   p.axisZ.setDestination(0.0);
@@ -32,7 +32,7 @@ void setupAxes(Program& p) {
   p.baseAxisX.setupPins();
   p.baseAxisX.setMaxPosition(AXIS_X_MAX_POS);
   p.baseAxisX.setMaxSpeed(1.5);
-  p.baseAxisX.setAcceleration(0.2);
+  p.baseAxisX.setAcceleration(1.5);
 
   p.axisX.setMaxPosition(AXIS_X_MAX_POS);
   p.axisX.setDestination(RAYON);
