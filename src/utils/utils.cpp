@@ -1,6 +1,15 @@
 #include <string.h>
 #include <math.h>
 
+unsigned long timeDifference(unsigned long oldTime, unsigned long currentTime) {
+  // Check if the time has wrapped around.
+  if (currentTime < oldTime) {
+    unsigned long maxLong = 0; maxLong--;
+    return maxLong - oldTime + currentTime;
+  }
+  return currentTime - oldTime;
+}
+
 bool startsWith(const char *pre, const char *str) {
   return strncmp(pre, str, strlen(pre)) == 0;
 }

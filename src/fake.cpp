@@ -98,11 +98,11 @@ int main (int argc, char *argv[]) {
   while (true) {
     bool wasWorking = p.isWorking;
 
-    p.setCurrentTime((p.isWorking) ? p.currentTime + 5 : 0);
+    p.setCurrentTime((p.isWorking) ? p.getCurrentTime() + 5 : 0);
 
     myLoop(p);
     
-    if (p.isWorking && p.currentTime % 200000 == 0) {
+    if (p.isWorking && p.getCurrentTime() % 200000 == 0) {
       draw(p);
     }
     if (wasWorking && !p.isWorking) {

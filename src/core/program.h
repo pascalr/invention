@@ -54,20 +54,10 @@ class Program {
     Axis* movingAxes[10] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
     
     bool isWorking = false;
-
-  protected:
-
+    
     virtual unsigned long getCurrentTime() = 0;
 };
 
-unsigned long timeDifference(unsigned long oldTime, unsigned long currentTime) {
-  unsigned long time = currentTime;
-  // If the time wrapped around (it does about every 70 minutes.
-  if (time < oldTime) {
-    unsigned long maxLong = 0; maxLong--;
-    return maxLong - oldTime + time;
-  }
-  return time;
-}
+
 
 #endif

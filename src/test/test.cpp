@@ -20,6 +20,8 @@
 
 #include "test.h"
 
+#include <limits.h>
+
 using namespace std;
 namespace plt = matplotlibcpp;
 
@@ -292,6 +294,19 @@ void testInputParserParseNumber() {
   assertNearby("theta=90.0", 0, p.baseAxisX.getDelay());
 }*/
 
+void testTimeDifference() {
+  title("Testing timeDifference");
+  unsigned long t1 = 1000;
+  unsigned long t2 = 2000;
+  assertTest("Normal time", t2-t1,timeDifference(t1, t2));
+
+  unsigned long maxLong = ULONG_MAX;
+  unsigned long t3 = ULONG_MAX - 1000;
+  unsigned long t4 = 1000;
+  assertTest("Overflow time", t4 + maxLong - t3,timeDifference(t3, t4));
+
+}
+
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
@@ -301,6 +316,7 @@ int main (int argc, char *argv[]) {
   //plt::ion();
 
   //testSerialize();
+  testTimeDifference();
   testMoveZMovesX();
   testMoveXFlipsZ();
   testStop();

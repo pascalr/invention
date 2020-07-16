@@ -3,6 +3,7 @@
 
 #include "writer.h"
 #include "../config/constants.h"
+#include "../utils/utils.h"
 #include <math.h>
 
 #define AXIS(t) (axisByLetter(axes, t))
