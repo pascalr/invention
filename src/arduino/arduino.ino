@@ -54,9 +54,7 @@ class ArduinoProgram : public Program {
     Writer& getWriter() {
       return m_writer;
     }
-    unsigned long getCurrentTime() {
-      return micros();
-    }
+    
     void sleepMs(int time) {
       delay(time); // FIXME: Should be sleep, not busy wait..
     }
@@ -74,6 +72,12 @@ class ArduinoProgram : public Program {
       rtrim(buf);
       return true;
     }
+
+    unsigned long getCurrentTime() {
+      return micros();
+    }
+
+  protected:
 
     ArduinoWriter m_writer;
 };

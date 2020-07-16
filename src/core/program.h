@@ -13,7 +13,9 @@ class Program {
     }
 
     virtual Writer& getWriter() = 0;
-    virtual unsigned long getCurrentTime() = 0;
+
+    
+
     virtual void sleepMs(int time) = 0;
     virtual bool inputAvailable() = 0;
     virtual bool getInput(char* buf, int size) = 0;
@@ -53,6 +55,19 @@ class Program {
     
     bool isWorking = false;
 
+  protected:
+
+    virtual unsigned long getCurrentTime() = 0;
 };
+
+unsigned long timeDifference(unsigned long oldTime, unsigned long currentTime) {
+  unsigned long time = currentTime;
+  // If the time wrapped around (it does about every 70 minutes.
+  if (time < oldTime) {
+    unsigned long maxLong = 0; maxLong--;
+    return maxLong - oldTime + time;
+  }
+  return time;
+}
 
 #endif

@@ -1,5 +1,10 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+- show the current speed in axis
+
+- use prog.getTimeDifference qui vérifie si le compteur de micros n'est pas rendu au bout et n'a pas donner un temps
+qui repart de 0. Si le nouveau temps est plus petit que l'ancien temps, alors c'est ça qui est arrivé...
+
 - make should only compile when needed when i have to run something
 - make server, should compile and run server
 

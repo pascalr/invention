@@ -18,9 +18,6 @@ class IOProgram : public Program {
     Writer& getWriter() {
       return m_writer;
     }
-    unsigned long getCurrentTime() {
-      return currentTime;
-    }
     void setCurrentTime(unsigned long time) {
       currentTime = time;
     }
@@ -53,9 +50,14 @@ class IOProgram : public Program {
       return linuxInputAvailable();
     }
 
+    unsigned long getCurrentTime() {
+      return currentTime;
+    }
+
   protected:
     ConsoleWriter m_writer;
     unsigned long currentTime = 0;
+    
 };
 
 #endif

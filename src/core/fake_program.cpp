@@ -51,7 +51,7 @@ void FakeProgram::execute(const char* dest) {
   setCurrentTime(0);
   myLoop(*this);
   while (isWorking) {
-    setCurrentTime(getCurrentTime() + 5);
+    setCurrentTime(currentTime + 5);
     myLoop(*this);
   }
 

@@ -12,9 +12,6 @@ class FakeProgram : public Program {
     Writer& getWriter() {
       return m_writer;
     }
-    unsigned long getCurrentTime() {
-      return currentTime;
-    }
     void setCurrentTime(unsigned long time) {
       currentTime = time;
     }
@@ -35,9 +32,15 @@ class FakeProgram : public Program {
 
     void move(char axis, double destination);
 
-  protected:
-    ConsoleWriter m_writer;
     unsigned long currentTime = 0;
+
+    unsigned long getCurrentTime() {
+      return currentTime;
+    }
+
+  protected:
+
+    ConsoleWriter m_writer;
     std::string fake_input;
 };
 

@@ -98,7 +98,6 @@ class MotorAxis : public Axis {
       isMotorEnabled = false;
       isReferenced = false;
       isReferencing = false;
-      speed = 500;
       forceRotation = false;
       m_position_steps = 0;
       m_reverse_motor_direction = false;
@@ -265,7 +264,6 @@ class MotorAxis : public Axis {
 
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.
-    double speed; // delay in microseconds
     double stepsPerUnit;
     double m_steps_per_turn;
     
@@ -291,6 +289,8 @@ class MotorAxis : public Axis {
       double theSpeed = frequency / stepsPerUnit;
       return theSpeed;
     }*/
+
+    // distance: steps, time: microseconds
 
     // TODO: All the units should simply be steps... NOOOOOOOOOO All units are in turns!
     // WARNING: THIS ONLY WORKS AT THE BEGINNING, DOES NOT COMPUTE ALL THE TIME
@@ -334,39 +334,32 @@ class MotorAxis : public Axis {
       return 0;
     }
 
-    unsigned long calculateNextStepDelay(unsigned long currentTime) {
+    double getCurrentSpeed() {
+      return m_speed;
+    }
 
-      double speed; // tr/s
-      unsigned long deltaTime = currentTime - m_start_time; // us
-      double deltaTimeS = deltaTime / 1000000.0; // s
+    unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
+      // Time to accelerate
       // Accelerate or go top speed
-      if (deltaTime <= m_time_to_reach_middle_us) {
+      if (timeSinceStart <= m_time_to_reach_middle_us) {
         
-        speed = m_acceleration * deltaTimeS; // tr/s
-        if (speed > m_max_speed) {speed = m_max_speed;} // tr/s
-
-      // Go top speed
-      } else if (currentTime < m_time_to_start_decelerating_us) {
-
-        //std::cout << "Top speed.\n";
-        // I am worried that a step could be missed due to calculation imprecision
-        // This is why I use m_max_speed_reached instead of m_max_speed.
-        speed = m_max_speed_reached; // tr/s
+        m_speed = m_acceleration * (timeSinceStart / 1000000.0); // tr/s
+        if (m_speed > m_max_speed) {m_speed = m_max_speed;} // tr/s
 
       // Decelerate
-      } else {
+      } else if (timeSinceStart > m_time_to_start_decelerating_us) {
 
         //std::cout << "Decelerating.\n";
-        double t_s = (currentTime - m_time_to_start_decelerating_us) / 1000000.0; // s
-        speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
+        double t_s = (timeSinceStart - m_time_to_start_decelerating_us) / 1000000.0; // s
+        m_speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
       }
 
-      if (speed <= 0.001) {
+      if (m_speed <= 0.001) {
         return MAX_STEP_DELAY; // us
       }
 
-      return ((unsigned long)(1000000.0 / (speed * m_steps_per_turn))); // us
+      return ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
     }
 
     void turnOneStep(unsigned long currentTime) {
@@ -384,8 +377,9 @@ class MotorAxis : public Axis {
       if (isReferencing) {
         return moveToReference();
       } else if (canMove() && (forceRotation || !isDestinationReached())) {
+        unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
         if (currentTime >= m_next_step_time) {
-          turnOneStep(currentTime);
+          turnOneStep(timeSinceStart);
         }
         return true;
       }
@@ -396,6 +390,7 @@ class MotorAxis : public Axis {
     virtual void prepare(unsigned long time) {
       m_start_time = time;
       m_next_step_time = time;
+      m_speed = 0;
     }
 
     bool m_is_step_high;
@@ -411,6 +406,7 @@ class MotorAxis : public Axis {
    
     double m_acceleration; // tour/s^2 [turn/sec^2]
     double m_max_speed; // tour/s [turn/sec]
+    double m_speed;
 
 
 
