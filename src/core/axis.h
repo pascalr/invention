@@ -353,6 +353,33 @@ class MotorAxis : public Axis {
       return m_speed;
     }
 
+    /*virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
+
+      double distanceDecelerating = 0.5 * m_speed * m_speed / m_acceleration; // tr
+      double position = getPosition();
+      double distanceToGo = abs(getDestination() - position);
+      double distanceToCollision = isForward ? getMaxPosition() - position : position - getMinPosition();
+
+      // decelerate
+      if (distanceDecelerating > distanceToGo || distanceDecelerating > distanceToCollision) {
+       
+        cout << "Decelerating!" << endl;
+        m_speed -= m_acceleration * (m_next_step_time / 1000000.0); // tr/s
+
+      // accelerate
+      } else if (m_speed < getMaxSpeed()) {
+
+        cout << "Accelerating!" << endl;
+        m_speed += m_acceleration * (m_next_step_time / 1000000.0); // tr/s
+      }
+      
+      if (m_speed <= 0.001) {
+        return MAX_STEP_DELAY; // us
+      }
+
+      return ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
+    }*/
+
     virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
       // Time to accelerate

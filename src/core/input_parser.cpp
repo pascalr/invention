@@ -122,6 +122,11 @@ void flip() {
 // overloading the arduino. Yeah I think so. To be done later.
 int processMoveCommand(Program& p) {
 
+  // If asking to move axis theta directly, dont overwrite it.
+  if (p.axisT.getPosition() != p.axisT.getDestination()) {
+    return 0;
+  }
+
   // asin returns the principal value between -pi/2 and pi/2
   double angleDest = (asin(p.axisZ.getDestination() / RAYON) * 180.0 / PI);
 
@@ -147,8 +152,17 @@ int processMoveCommand(Program& p) {
   int status = p.axisT.setDestination(angleDest);
   if (status < 0) {return status;}
 
-  unsigned long timeX = p.baseAxisX.timeToReachDestinationUs();
-  unsigned long timeT = p.axisT.timeToReachDestinationUs();
+  //unsigned long timeX = p.baseAxisX.timeToReachDestinationUs();
+  //unsigned long timeT = p.axisT.timeToReachDestinationUs();
+
+  // Check for possible collision if the base x axis si too slow to move (It is slower than theta)
+  //double possibleX = p.baseAxisX.getPosition() + RAYON * cosd(angleDest);
+  //if (possibleX < 0 || possibleX > AXIS_X_MAX_POS) {
+  //}
+  // Calculate time until it's clear
+
+  //unsigned long timeX = p.baseAxisX.timeToReachDestinationUs();
+  //unsigned long timeT = p.axisT.timeToReachDestinationUs();
   
   //MotorAxis& axisToSlowDown = (timeX > timeT) ? p.axisT : p.baseAxisX;
   //unsigned long maxTime = (timeX > timeT) ? timeX : timeT;
