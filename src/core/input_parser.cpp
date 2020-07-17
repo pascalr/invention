@@ -108,6 +108,9 @@ void flip() {
       double p = Axis::getPosition();
       return isForward ? p <= getMaxPosition() : p >= m_min_position;
     }*/
+
+
+
 // Checks if a flip is required.
 // Tells the Zaxis which way to turn.
 // Tells all the axis what speed to go to.
@@ -141,8 +144,25 @@ int processMoveCommand(Program& p) {
     int status = p.baseAxisX.setDestination(baseDest) < 0;
     if (status < 0) {return status;}
   }
+  int status = p.axisT.setDestination(angleDest);
+  if (status < 0) {return status;}
 
-  return p.axisT.setDestination(angleDest);
+  unsigned long timeX = p.baseAxisX.timeToReachDestinationUs();
+  unsigned long timeT = p.axisT.timeToReachDestinationUs();
+  
+  //MotorAxis& axisToSlowDown = (timeX > timeT) ? p.axisT : p.baseAxisX;
+  //unsigned long maxTime = (timeX > timeT) ? timeX : timeT;
+
+  //cout << "timeX: " << p.baseAxisX.timeToReachDestinationUs() / 1000000.0 << endl;
+  //cout << "timeT: " << p.axisT.timeToReachDestinationUs() / 1000000.0 << endl;
+
+  //slowDownAxis(axisToSlowDown, maxTime);
+
+  //cout << "After slow down:" << endl;
+  //cout << "timeX: " << p.baseAxisX.timeToReachDestinationUs() / 1000000.0 << endl;
+  //cout << "timeT: " << p.axisT.timeToReachDestinationUs() / 1000000.0 << endl;
+
+  return 0;
 
   /*
   // check for out of bounds min

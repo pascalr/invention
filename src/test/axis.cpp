@@ -8,26 +8,42 @@
 
 using namespace std;
 
-void testCalculateNextStep() {
-  title("Testing Axis::calculateNextStep");
-
-  FakeProgram p;
+void setup(FakeProgram& p) {
   setupAxes(p);
-
-  unsigned long startTime = 0;
 
   MotorAxis& axis = p.axisY;
   axis.referenceReached();
   axis.setAcceleration(10); // tour/s^2
-  axis.setMaxSpeed(10); // tour/s
+  axis.setDefaultMaxSpeed(10); // tour/s
   axis.setPosition(0);
   
-  axis.prepare(startTime);
+  axis.prepare(0);
 
   double turns = 100; // A lot of turns to be sure the axis has reached full speed in the middle
   double units = turns * axis.getStepsPerTurn() / axis.getStepsPerUnit();
 
   axis.setDestination(units);
+}
+
+void testSlowDownAxis() {
+  title("Testing slowDownAxis");
+
+  FakeProgram p; setup(p);
+
+  unsigned long time = 100000000;
+
+  assertSmaller("Init timeToReachDestination must be small so we see it changes.", time, p.axisY.timeToReachDestinationUs());
+  slowDownAxis(p.axisY, time);
+  assertNearby("Should be nearby", time, p.axisY.timeToReachDestinationUs());
+}
+
+void testCalculateNextStep() {
+  title("Testing Axis::calculateNextStep");
+
+  FakeProgram p; setup(p);
+  MotorAxis& axis = p.axisY;
+
+  unsigned long startTime = 0;
   
   unsigned long middleTime = axis.timeToReachDestinationUs()/2;
   
@@ -47,8 +63,10 @@ void testTimeToReachDestination() {
   MotorAxis& axis = p.axisY;
   axis.referenceReached();
   axis.setAcceleration(10); // tour/s^2
-  axis.setMaxSpeed(10); // tour/s
+  axis.setDefaultMaxSpeed(10); // tour/s
   axis.setPosition(0);
+  
+  axis.prepare(0);
 
   double turns = 10;
   double units = turns * axis.getStepsPerTurn() / axis.getStepsPerUnit();
@@ -71,7 +89,9 @@ void testSetDestination() {
   setupAxes(p);
 
   p.axisY.setAcceleration(100); // tour/s^2
-  p.axisY.setMaxSpeed(100); // tour/s
+  p.axisY.setDefaultMaxSpeed(100); // tour/s
+  
+  p.axisY.prepare(0);
 
   // So it should take one second to reach the destination
 }
@@ -80,6 +100,7 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
+  testSlowDownAxis();
   testCalculateNextStep();
   testTimeToReachDestination();
   testSetDestination();

@@ -103,13 +103,17 @@ class MotorAxis : public Axis {
       m_position_steps = 0;
       m_reverse_motor_direction = false;
 
-      m_max_speed = 1;
+      m_default_max_speed = 1;
       m_acceleration = 0.2; // tour/s^2 [turn/sec^2]
 
     }
 
     void setAcceleration(double accel) {
       m_acceleration = accel;
+    }
+
+    void setDefaultMaxSpeed(double s) {
+      m_default_max_speed = s;
     }
 
     void setMaxSpeed(double s) {
@@ -124,6 +128,10 @@ class MotorAxis : public Axis {
       return m_acceleration * m_steps_per_turn / stepsPerUnit;
     }
 
+    double getDefaultMaxSpeed() {
+      return m_default_max_speed;
+    }
+    
     double getMaxSpeed() {
       return m_max_speed;
     }
@@ -299,10 +307,16 @@ class MotorAxis : public Axis {
       return m_time_to_reach_middle_us * 2;
     }
 
-    void calculateMovement(double dest) {
+    // tours [turns]
+    double distanceToReachDestination() {
+      double distance = (getDestination() - getPosition()) * stepsPerUnit / m_steps_per_turn; // tr
+      distance *= (distance < 0) ? -1 : 1;
+      return distance;
+    }
 
-      double halfDistance = ((dest - getPosition()) / 2) * stepsPerUnit / m_steps_per_turn; // tr
-      halfDistance *= (halfDistance < 0) ? -1 : 1;
+    void calculateMovement() {
+
+      double halfDistance = distanceToReachDestination() / 2;
 
       m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // tr/s
       
@@ -331,7 +345,7 @@ class MotorAxis : public Axis {
       int status = Axis::setDestination(dest);
       if (status < 0) {return status;}
 
-      calculateMovement(dest);
+      calculateMovement();
       return 0;
     }
 
@@ -339,7 +353,7 @@ class MotorAxis : public Axis {
       return m_speed;
     }
 
-    unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
+    virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
       // Time to accelerate
       // Accelerate or go top speed
@@ -392,6 +406,7 @@ class MotorAxis : public Axis {
       m_start_time = time;
       m_next_step_time = time;
       m_speed = 0;
+      m_max_speed = m_default_max_speed;
     }
 
     bool m_is_step_high;
@@ -407,6 +422,7 @@ class MotorAxis : public Axis {
    
     double m_acceleration; // tour/s^2 [turn/sec^2]
     double m_max_speed; // tour/s [turn/sec]
+    double m_default_max_speed; // tour/s [turn/sec]
     double m_speed;
 
 
@@ -461,14 +477,25 @@ class BaseXAxis : public MotorAxis {
       m_start_time = time;
     }*/
 
-    /*virtual double getDelay() {
+    /*unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
       // Maybe use my own time because the theta position directly could get out of sync
-      if (m_theta_axis.isDestinationReached()) {return speed;}
-      double angularSpeedRad = m_theta_axis.getSpeed() / 180 * PI;
+      if (m_theta_axis.isDestinationReached()) {return MAX_STEP_DELAY;}
+      double angularSpeedRad = m_theta_axis.getCurrentSpeed() / 180 * PI;
       double angle = m_theta_axis.getPosition();
       double vx = RAYON * angularSpeedRad * sind(angle);
+
+      if (vx <= 0.001) {
+        return MAX_STEP_DELAY; // us
+      }
+
       double frequency = vx * stepsPerUnit;
-      if (frequency == 0) return 999999999;
+      unsigned long delay = 1000000 / frequency;
+      cout << "delay: " << delay << endl;
+
+      if (delay > MAX_STEP_DELAY) {
+        return MAX_STEP_DELAY;
+      }
+
       return 1000000 / frequency;
     }*/
 
@@ -478,5 +505,6 @@ class BaseXAxis : public MotorAxis {
 };
 
 Axis* axisByLetter(Axis** axes, char letter);
+void slowDownAxis(MotorAxis& axis, unsigned long time_us);
 
 #endif
