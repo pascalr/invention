@@ -116,6 +116,25 @@ int main(int argc, char** argv) {
     response->write("Ok command given to arduino");
   };
 
+  server.resource["^/cam_capture.jpg$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    //cout << "GET /cam_capture" << endl;
+    Mat frame;
+    captureVideoImage(frame);
+    vector<uchar> encodeBuf(131072);
+    imencode(".jpg",frame,encodeBuf);
+    char* buf = reinterpret_cast<char*>(encodeBuf.data());
+    streamsize ss = static_cast<streamsize>(encodeBuf.size());
+
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Content-Length", to_string(encodeBuf.size()));
+    header.emplace("Content-Type", "image/jpeg");
+    //response->write(header, encodeBuf.size());
+    response->write(SimpleWeb::StatusCode::success_ok, header);
+    response->write(buf, ss);
+  };
+
+
+
   server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /sweep" << endl;
     try {
@@ -272,7 +291,7 @@ int main(int argc, char** argv) {
     // Note that connection timeouts will also call this handle with ec set to SimpleWeb::errc::operation_canceled
   };
 
-  thread capture_thread([] {
+  /*thread capture_thread([] {
     Mat frame;
     VideoCapture cap;
   
@@ -287,12 +306,12 @@ int main(int argc, char** argv) {
         cerr << "ERROR! blank frame grabbed\n";
         break;
       }
-      imwrite("data/capture.jpg", frame);
-      this_thread::sleep_for(chrono::milliseconds(100));
+      imwrite("frontend/capture.jpg", frame);
+      this_thread::sleep_for(chrono::milliseconds(2000));
     }
     //return 0;
   });
-  capture_thread.detach();
+  capture_thread.detach();*/
 
     // Start server and receive assigned port when server is listening for requests
   promise<unsigned short> server_port;

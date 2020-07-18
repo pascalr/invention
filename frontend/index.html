@@ -180,7 +180,14 @@ window.onload = () => menuItemClicked(document.getElementById("defaultMenuItem")
 <div style="display: flex;">
   <div>
     <div>
-      <img src="capture.jpg" id="captureImg" width="640" height="480">
+      <img src="cam_capture.jpg" id="captureImg" width="640" height="480">
+	    <!--<img src="capture.jpg" id="captureImg" width="640" height="480">-->
+<!--	    <video src="http://127.0.0.1:8082/go.ogg" autoplay></video>-->
+<!--<video width="700" src="http://127.0.0.1:8082/go.ogv" autoplay type="video/ogg; codecs=theora"></video>-->
+      <!--<video poster="poster.jpg" controls>
+	<source src="theora.ogv" type='video/ogg; codecs="theora, vorbis"'>
+	<p>This is fallback content to display for user agents that do not support the video tag.</p>
+      </video>-->
     </div>
     <div>
       <form action="#" onsubmit="sendMessage(); return false;" autocomplete="off">
@@ -454,12 +461,12 @@ function showVideo() {
 
   function refreshPicture() {
     var myImageElement = document.getElementById('captureImg');
-    myImageElement.src = 'capture.jpg?rand=' + Math.random();
+    myImageElement.src = 'cam_capture.jpg?rand=' + Math.random();
   }
 
   setInterval(function() {
     refreshPicture();
-  }, 100)
+  }, 2000)
 
 </script>
 
