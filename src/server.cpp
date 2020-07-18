@@ -27,6 +27,8 @@
 #include "helper/logging.h"
 #include "core/jar_position_analyzer.h"
 
+#include "lib/opencv.h"
+
 using namespace std;
 // Added for the json-example:
 using namespace boost::property_tree;
@@ -34,6 +36,8 @@ using namespace boost::property_tree;
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
+
+  
 //app.use(bodyParser.urlencoded({ extended: true }))
   //res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -267,6 +271,28 @@ int main(int argc, char** argv) {
     // Handle errors here
     // Note that connection timeouts will also call this handle with ec set to SimpleWeb::errc::operation_canceled
   };
+
+  thread capture_thread([] {
+    Mat frame;
+    VideoCapture cap;
+  
+    if (!initVideo(cap)) {
+      cerr << "ERROR! Unable to open camera\n";
+      //return -1;
+    }
+  
+    while (true) {
+      cap.read(frame);
+      if (frame.empty()) {
+        cerr << "ERROR! blank frame grabbed\n";
+        break;
+      }
+      imwrite("data/capture.jpg", frame);
+      this_thread::sleep_for(chrono::milliseconds(100));
+    }
+    //return 0;
+  });
+  capture_thread.detach();
 
     // Start server and receive assigned port when server is listening for requests
   promise<unsigned short> server_port;
