@@ -1,5 +1,44 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+
+
+- Pince qui dévisse les couvercles. Pince qui visse les couvercles. Celle qui visse pourrait aussi soulever les pots par le haut.
+- Pince qui prend par le haut
+- L'angle alpha est vers le bas, comme ça elle ne force pas pour tenir le pot. Et ça permet de visser et dévisser en même temps. Alright this is the plan.
+Perte d'espace mais fuck off c'est pas grave on va faire avec!
+
+- Inclinaison de 15 degré de l'angle alpha avec un outil 15 degré pour que ça devienne droit et que ça dépasse en bas un peu pour aller prendre les pots
+et les faire glisser. Je n'ai pas vraiment le choix de faire comme ça. Je ne peux pas prendre avec une pince par le centre, parce que pour ça il faudrait
+que mon bras aille directement vers l'avant. Peut-être plus tard une pince qui prend par le haut, ok je vais peut-être essayer ça en premier parce que
+de toute façon il va falloir que j'en fabrique une pour visser et dévisser les couvercles. Une pince qui glisse.
+
+- Pince fixe / étau pour tenir les pots
+
+- Balance
+
+- Système pour lever ou baisser la tablette (à moins que je réussisse à faire une pince qui prend par le haut...
+
+Je pense que la rotation alpha devrait être gauche droite au lieu d'être avant arrière. (Pour vider les pots (le tourner au complet))
+En fait je crois juste enlever l'angle alpha. Vérifions avec les actions nécessaires:
+Regardons avec l'angle nécessaire pour faire les trucs.
+
+Actions: (alpha nécessaire?)
+- Glisser les pots: N/A
+- Prendre les pots par le haut: Vers le bas
+- Prendre les pots par le devant: Vers l'avant
+- Visser les couvercles: Vers le bas
+- Dévisser les couvercles: Vers le bas
+- Visser une cuillère pour prendre les aliments: Vers l'avant (comme ça rotation gauche droite pour prendre du stock)
+- Mélanger de la nourriture: Vers le bas
+- Prendre un outils externe (bras coupant culinaire) peut importe
+
+Ce que je veux: Une sortie vers l'avant et une sortie vers le bas. L'outil prend celle qu'elle veut. Enlever le mouvement alpha.
+ 
+
+
+
+
+
 - show the current speed in axis
 
 - use prog.getTimeDifference qui vérifie si le compteur de micros n'est pas rendu au bout et n'a pas donner un temps
@@ -21,3 +60,9 @@ Si le robot n'est pas capable de lire ton ecriture, il va te demander ce qui est
 - Axe vertical
 - Simulation 3d
 - fix collisions
+
+
+La pince que j'ai fais normal, c'est pas très bon, parce que la force est appliquée quand même loin alors ça ne fais pas une très grande force. C'est mieux quand ça glisse proche.
+
+
+Le serveur devrait envoyer à l'arduino une liste de temps d'accélération, de vitesse constant et de décélération. Mt1,2,3,4,5...
