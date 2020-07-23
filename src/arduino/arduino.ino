@@ -4,6 +4,10 @@
 #include "program.h"
 #include "input_parser.h"
 
+#include "MeDCMotor.h"
+
+MeDCMotor motor1(8,9);
+
 class ArduinoWriter : public Writer {
   public:
     void doPinMode(int pin, bool type) {
@@ -96,5 +100,6 @@ void setup() {
 }
 
 void loop() {
-  myLoop(p);
+  motor1.run(50);
+  //myLoop(p);
 }

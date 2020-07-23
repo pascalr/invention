@@ -42,3 +42,12 @@ git clone https://gitlab.com/eidheim/Simple-Web-Server.git
 sudo apt-get install libssl-dev libboost-filesystem-dev libboost-thread-dev
 
 (cd .. && git clone https://gitlab.com/libeigen/eigen.git)
+
+# install makeblock librairies for motor controller
+https://github.com/Makeblock-official/Makeblock-Libraries
+
+wget https://codeload.github.com/Makeblock-official/Makeblock-Libraries/zip/master
+
+Arduino IDE: "Sketch-> Include Library-> Add .ZIP Library-> select the downloaded file-> Open"
+MeDCMotor.h -> Remove include "MeConfig.h"
+MeDCMotor.cpp -> Add #ifdef ME_PORT_DEFINED around the two reset functions
