@@ -40,7 +40,7 @@ int parseNumber(Program& p, double& n) {
   return 1;
 }
 
-MotorAxis* parseInputMotorAxis(Program& p, MotorAxis* &axis) {
+Motor* parseInputMotorAxis(Program& p, Motor* &axis) {
   char name = p.getChar();
 
   for (int i = 0; p.motorAxes[i] != 0; i++) {
@@ -201,7 +201,7 @@ int processMoveCommand(Program& p) {
 int parseActionCommand(char cmd, Program& p) {
 
   Axis* axis;
-  MotorAxis* motorAxis;
+  Motor* motorAxis;
   double number;
   int status;
 

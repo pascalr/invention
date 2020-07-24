@@ -12,6 +12,7 @@ Axis* axisByLetter(Axis** axes, char letter) {
   return 0;
 }
 
+/*
 // WARNING THERE ARE NO CHECKS THAT THE AXIS SLOWS DOWN. IT SETS THE MAX SPEED SO IT WORKS.
 void slowDownAxis(MotorAxis& axis, unsigned long time_us) {
 
@@ -33,3 +34,4 @@ void slowDownAxis(MotorAxis& axis, unsigned long time_us) {
   axis.setMaxSpeed(maxSpeed);
   axis.calculateMovement();
 }
+*/

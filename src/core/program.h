@@ -3,6 +3,7 @@
 
 #include <ctype.h>
 #include "axis.h"
+#include "StepperMotor.h"
 
 class Program {
   public:
@@ -37,18 +38,18 @@ class Program {
       isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
     }
     
-    MotorAxis axisT; // Real one
+    StepperMotor axisT; // Real one
     ZAxis axisZ; // Virtual one
 
     BaseXAxis baseAxisX; // Real one
     XAxis axisX; // Virtual one
 
-    MotorAxis axisA;
-    MotorAxis axisY;
-    MotorAxis axisB;
+    StepperMotor axisA;
+    StepperMotor axisY;
+    StepperMotor axisB;
      
     // These axes actually moves the motors. 
-    MotorAxis* motorAxes[10] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    StepperMotor* motorAxes[10] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
 
     // These axes are the ones you can move. mx100, mz100, etc...
     Axis* movingAxes[10] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!

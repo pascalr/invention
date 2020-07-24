@@ -52,7 +52,7 @@ void serialize(Program& p, T& out) {
 }
 
 template <typename T>
-void serialize(MotorAxis* axis, T& out) {
+void serialize(StepperMotor* axis, T& out) {
   out << "{";
   writeJson(out, PROPERTY_NAME, axis->getName());
   writeJson(out, PROPERTY_POSITION, axis->getPosition());
