@@ -40,8 +40,8 @@ namespace plt = matplotlibcpp;
 
 
 void referenceAll(Program& p) {
-  for (int i = 0; p.motorAxes[i] != NULL; i++) {
-    p.motorAxes[i]->referenceReached();
+  for (int i = 0; p.motors[i] != NULL; i++) {
+    p.motors[i]->referenceReached();
   }
 }
 

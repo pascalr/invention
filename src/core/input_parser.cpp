@@ -43,9 +43,9 @@ int parseNumber(Program& p, double& n) {
 Motor* parseInputMotorAxis(Program& p, Motor* &axis) {
   char name = p.getChar();
 
-  for (int i = 0; p.motorAxes[i] != 0; i++) {
-    if (toupper(name) == p.motorAxes[i]->getName()) {
-      axis = p.motorAxes[i];
+  for (int i = 0; p.motors[i] != 0; i++) {
+    if (toupper(name) == p.motors[i]->getName()) {
+      axis = p.motors[i];
       return axis;
     }
   }
@@ -207,8 +207,8 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Prepare
   unsigned long time = p.getCurrentTime();
-  for (int i = 0; p.motorAxes[i] != 0; i++) {
-    p.motorAxes[i]->prepare(time);
+  for (int i = 0; p.motors[i] != 0; i++) {
+    p.motors[i]->prepare(time);
   }
   p.axisX.prepare(time);
   p.axisZ.prepare(time);
@@ -233,8 +233,8 @@ int parseActionCommand(char cmd, Program& p) {
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
     p.getWriter() << "Referencing...\n";
-    for (int i = 0; p.motorAxes[i] != 0; i++) {
-      p.motorAxes[i]->startReferencing();
+    for (int i = 0; p.motors[i] != 0; i++) {
+      p.motors[i]->startReferencing();
     }
 
   // Wait or sleep for some time
@@ -307,8 +307,8 @@ void myLoop(Program& p) {
   }
 
   bool stillWorking = false;
-  for (int i = 0; p.motorAxes[i] != 0; i++) {
-    stillWorking = p.motorAxes[i]->handleAxis(p.getCurrentTime()) || stillWorking;
+  for (int i = 0; p.motors[i] != 0; i++) {
+    stillWorking = p.motors[i]->handleAxis(p.getCurrentTime()) || stillWorking;
   }
 
   if (!stillWorking) {

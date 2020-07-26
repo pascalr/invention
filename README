@@ -150,3 +150,5 @@ POWER et GROUND sont partages pour tous.
 Ça serait vraiment malade si le robot était capable d'écrire ses propres étiquettes, quand tu as un nouveau pot et tu veux mettre un nouvel ingrédients, tu mets le pot vide. Il va le peser, inscrire le poids dessus, te demander ce que tu veux mettre dedans, inscrire le code et le nom. Ça serait malade!!!!!
 
 J'aimerais que ma machine possède un outil probe pour les distances. Elle pourrait ainsi déterminé ses propres limites.
+
+C'est mieux des steppers pour les axes de positionnement parce que ça garde la position. (Pas besoin de freins)

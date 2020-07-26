@@ -2,19 +2,16 @@
 #define STEPPER_MOTOR_H
 
 #include "Motor.h"
+#include "../lib/ArduinoMock.h"
 
 class StepperMotor : public Motor {
   public:
 
     StepperMotor(Writer& writer, char theName) : Motor(writer, theName) {
-      isForward = false;
       m_is_step_high = false;
-      isMotorEnabled = false;
-      isReferenced = false;
-      isReferencing = false;
+      isMotorEnabled = true;
       forceRotation = false;
       m_position_steps = 0;
-      m_reverse_motor_direction = false;
 
       m_default_max_speed = 1;
       m_acceleration = 0.2; // tour/s^2 [turn/sec^2]
@@ -49,9 +46,6 @@ class StepperMotor : public Motor {
       return m_max_speed;
     }
     
-    void setReverseMotorDirection(bool val) {
-      m_reverse_motor_direction = val;
-    }
 
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
@@ -72,12 +66,14 @@ class StepperMotor : public Motor {
       return stepsPerUnit;
     }
 
-    
+    void setupPins(int enabledPin, int dirPin, int stepPin) {
+      m_enabled_pin = enabledPin;
+      m_dir_pin = dirPin;
+      m_step_pin = stepPin;
 
-    void setupPins() {
-      m_writer.doPinMode(stepPin, OUTPUT);
-      m_writer.doPinMode(dirPin, OUTPUT);
-      m_writer.doPinMode(enabledPin, OUTPUT);
+      pinMode(m_enabled_pin, OUTPUT);
+      pinMode(m_dir_pin, OUTPUT);
+      pinMode(m_step_pin, OUTPUT);
     }
 
     void rotate(bool direction) {
@@ -105,8 +101,6 @@ class StepperMotor : public Motor {
       forceRotation = false;
     }
 
-    
-
     void setPosition(double pos) {
       m_position_steps = pos * stepsPerUnit;
     }
@@ -132,25 +126,11 @@ class StepperMotor : public Motor {
     }
     
     void setMotorEnabled(bool value) {
-      m_writer.doDigitalWrite(enabledPin, LOW); // FIXME: ALWAYS ENABLED
-      //digitalWrite(enabledPin, value ? LOW : HIGH);
+      m_writer.doDigitalWrite(m_enabled_pin, LOW); // FIXME: ALWAYS ENABLED
+      //digitalWrite(m_enabled_pin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
 
-    void setMotorDirection(bool forward) {
-      bool val = forward ? LOW : HIGH;
-      val = m_reverse_motor_direction ? !val : val;
-      m_writer.doDigitalWrite(dirPin, val);
-      isForward = forward;
-    }
-
-    virtual void startReferencing() {
-      referenceReached(); // FIMXE: Temporaty
-      
-      /*isReferencing = true;
-      setMotorDirection(CCW);
-      setMotorEnabled(true);*/
-    }
 
     virtual bool isDestinationReached() {
       //double destSteps = getDestinationSteps();
@@ -189,15 +169,11 @@ class StepperMotor : public Motor {
     double stepsPerUnit;
     double m_steps_per_turn;
     
-    int enabledPin;
-    int dirPin;
-    int stepPin;
+    int m_enabled_pin;
+    int m_step_pin;
     int limitSwitchPin;
     
     bool isMotorEnabled;
-    bool isForward;
-    bool isReferenced;
-    bool isReferencing;
     bool forceRotation;
 
     // Get the delay untill the next step
@@ -318,7 +294,7 @@ class StepperMotor : public Motor {
     }
 
     void turnOneStep(unsigned long currentTime) {
-      m_writer.doDigitalWrite(stepPin, m_is_step_high ? LOW : HIGH);
+      m_writer.doDigitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
@@ -352,7 +328,6 @@ class StepperMotor : public Motor {
     bool m_is_step_high;
 
     long m_position_steps;
-    bool m_reverse_motor_direction;
 
     double m_max_speed_reached;
     unsigned long m_next_step_time; // us
