@@ -26,10 +26,19 @@ class DCMotor : public Motor {
       m_duty_cycle = speed;
       analogWrite(m_pwm_pin, speed);
     }
+
+    void grab(int dutyCycle) {
+      setMotorDirection(FORWARD);
+      setDutyCycle(dutyCycle);
+    }
+
+    void release() {
+      // TODO
+    }
         
     void rotate(bool direction) {
       setMotorDirection(direction);
-      setDutyCycle(10);
+      setDutyCycle(50);
     }
 
     void setupPins(uint8_t dirPin, uint8_t pwmPin, uint8_t stepPin) {

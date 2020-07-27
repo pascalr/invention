@@ -242,9 +242,19 @@ int parseActionCommand(char cmd, Program& p) {
     if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
     p.sleepMs(number);
 
+  // Release
+  } else if (cmd == 'r') {
+    p.axisR.release();
+
+  // Grab
+  } else if (cmd == 'g') {
+    if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    p.axisR.grab(number);
+
   // Move forward
   } else if (cmd == '+') {
     if (!parseInputMotorAxis(p, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    parseNumber(p,number);
     motorAxis->rotate(FORWARD);
 
   // Move backward
