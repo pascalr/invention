@@ -50,10 +50,10 @@ class Program {
     DCMotor axisR;
      
     // These axes actually moves the motors. 
-    Motor* motors[10] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    Motor* motors[10] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
 
     // These axes are the ones you can move. mx100, mz100, etc...
-    Axis* movingAxes[10] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    Axis* movingAxes[10] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
     
     bool isWorking = false;
     

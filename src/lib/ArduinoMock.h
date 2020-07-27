@@ -1,6 +1,11 @@
 #ifndef ARDUINO_MOCK_H
 #define ARDUINO_MOCK_H
-#ifndef ARDUINO
+
+#ifdef ARDUINO
+
+#include "Arduino.h"
+
+#else
 
 #include <stdint.h>
 

@@ -17,3 +17,8 @@ cp src/core/program.h ../Arduino/libraries/core/program.h
 cp src/core/input_parser.h ../Arduino/libraries/core/input_parser.h
 cp src/core/input_parser.cpp ../Arduino/libraries/core/input_parser.cpp
 cp src/core/serialize.h ../Arduino/libraries/core/serialize.h
+cp src/core/Motor.h ../Arduino/libraries/core/Motor.h
+cp src/core/StepperMotor.h ../Arduino/libraries/core/StepperMotor.h
+cp src/core/DCMotor.h ../Arduino/libraries/core/DCMotor.h
+cp src/core/Encoder.h ../Arduino/libraries/core/Encoder.h
+cp src/lib/ArduinoMock.h ../Arduino/libraries/lib/ArduinoMock.h
