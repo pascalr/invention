@@ -84,10 +84,6 @@ class ArduinoProgram : public Program {
 
 ArduinoProgram p;
 
-unsigned long lastPrint = 0;
-int count = 0;
-bool wasHigh = false;
-
 void setup() {
 
   //Initiate Serial communication.
@@ -96,35 +92,11 @@ void setup() {
 
   setupAxes(p);
   
-  pinMode(LED_BUILTIN, OUTPUT);
+  //pinMode(LED_BUILTIN, OUTPUT);
 
-  wasHigh = analogRead(5) > 500;
-  
   Serial.println(MESSAGE_READY);
 }
 
 void loop() {
-  unsigned long time = millis();
-  if (time - lastPrint > 1000) {
-    Serial.print("RPM: ");
-    // There are 8 steps per turn
-    float rpm = count / 8.0 * 60;
-    Serial.println(rpm);
-    lastPrint = time;
-    count = 0;
-  }
-  if (analogRead(5) > 500) {
-    wasHigh = true;
-  } else if (wasHigh) {
-    wasHigh = false;
-    count += 1;
-  }
-  //delay(500);
-  //if (analogRead(5) > 500) {
-  //  digitalWrite(LED_BUILTIN, HIGH);
-  //} else {
-  //  digitalWrite(LED_BUILTIN, LOW);
-  //}
-  //motor1.run(50);
-  //myLoop(p);
+  myLoop(p);
 }

@@ -8,6 +8,7 @@
 #include "../utils/utils.h"
 #include <math.h>
 #include "../lib/ArduinoMock.h"
+#include "Encoder.h"
 
 #ifndef ARDUINO
 #include <iostream>
@@ -18,52 +19,60 @@ class DCMotor : public Motor {
   public:
 
     DCMotor(Writer& writer, char name) : Motor(writer, name) {
-      m_speed = 0;
+      m_duty_cycle = 0;
     }
 
-    void setSpeed(uint8_t speed) {
+    void setDutyCycle(uint8_t speed) {
+      m_duty_cycle = speed;
       analogWrite(m_pwm_pin, speed);
     }
         
     void rotate(bool direction) {
       setMotorDirection(direction);
-      setSpeed(10);
+      setDutyCycle(10);
     }
 
-    void setupPins(uint8_t dirPin, uint8_t pwmPin) {
+    void setupPins(uint8_t dirPin, uint8_t pwmPin, uint8_t stepPin) {
       m_pwm_pin = pwmPin;
       m_dir_pin = dirPin;
+  
+      m_encoder.setStepPin(stepPin);
 
       pinMode(m_dir_pin, OUTPUT);
       pinMode(m_pwm_pin, OUTPUT);
     }
 
     void setPosition(double pos) {
+      m_encoder.setPosition(pos);
     }
+
     double getPosition() {
-      return 0;
+      return m_encoder.getPosition();
     }
 
     void stop() {
-      setSpeed(0);
+      setDutyCycle(0);
     }
 
     bool handleAxis(unsigned long currentTime) {
-      if (m_speed == 0) {return false;}
+      if (m_duty_cycle == 0) {return false;}
 
+      m_encoder.checkPosition(currentTime, isForward);
+        
       // TODO: Handle acceleration and deceleration
-
       return true;
     }
 
     void prepare(unsigned long time) {
+      m_encoder.prepare(time);
     }
 
   protected:
 
+    Encoder m_encoder;
     uint8_t m_dir_pin;
     uint8_t m_pwm_pin;
-    int m_speed = 10; // Duty cycle from 0 to 255
+    int m_duty_cycle = 10; // Duty cycle from 0 to 255
 };
 
 #endif
