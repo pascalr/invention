@@ -39,6 +39,7 @@ ADD_LIBRARY(MyLibsModule
   src/core/writer.cpp
   src/core/axis.cpp
   src/core/input_parser.cpp
+  src/lib/ArduinoMock.cpp
 )
 
 set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule)

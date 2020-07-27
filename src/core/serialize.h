@@ -41,10 +41,10 @@ void writeJson(T& writer, const char* key, unsigned long val) {
 template <typename T>
 void serialize(Program& p, T& out) {
   out << "{";
-  for (int i = 0; p.motorAxes[i] != 0; i++) {
-    out << "\"axis_" << p.motorAxes[i]->getName() << "\": ";
-    serialize(p.motorAxes[i], out);
-    if (p.motorAxes[i+1] != 0) {
+  for (int i = 0; p.motors[i] != 0; i++) {
+    out << "\"axis_" << p.motors[i]->getName() << "\": ";
+    serialize(p.motors[i], out);
+    if (p.motors[i+1] != 0) {
       out << ", ";
     }
   }
@@ -52,7 +52,7 @@ void serialize(Program& p, T& out) {
 }
 
 template <typename T>
-void serialize(MotorAxis* axis, T& out) {
+void serialize(StepperMotor* axis, T& out) {
   out << "{";
   writeJson(out, PROPERTY_NAME, axis->getName());
   writeJson(out, PROPERTY_POSITION, axis->getPosition());

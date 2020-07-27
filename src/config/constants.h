@@ -1,20 +1,16 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#ifndef PI
+#define PI 3.1415926535897932384626433832795
+#endif
+
 #include "camera_constants.h"
 
 #define sind(x) (sin(fmod((x),360) * M_PI / 180))
 #define cosd(x) (cos(fmod((x),360) * M_PI / 180))
 
 #define RAYON 340.0
-
-#ifndef LOW
-#define LOW 0
-#define HIGH 1
-#define INPUT 0
-#define OUTPUT 1
-#define PI 3.1415926535897932384626433832795
-#endif
 
 #define FORWARD true
 #define REVERSE false
@@ -47,10 +43,6 @@
 
 #define OFFSET_X 164.0 // mm, the distance between the sidewall and x = 0
 #define OFFSET_Z 160.0 // mm, the distance between the back and z = 0
-
-#ifndef PI
-#define PI 3.1415926535897932384626433832795
-#endif
 
 #define MESSAGE_RECEIVED "ok"
 #define MESSAGE_DONE "done"

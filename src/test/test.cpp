@@ -39,9 +39,9 @@ namespace plt = matplotlibcpp;
 };*/
 
 
-void referenceAll(MotorAxis** axes) {
-  for (int i = 0; axes[i] != NULL; i++) {
-    axes[i]->referenceReached();
+void referenceAll(Program& p) {
+  for (int i = 0; p.motors[i] != NULL; i++) {
+    p.motors[i]->referenceReached();
   }
 }
 
@@ -89,7 +89,7 @@ void testMoveZ() {
   FakeProgram p;
   setupAxes(p);
 
-  referenceAll(p.motorAxes);
+  referenceAll(p);
   
   assertNearby("Beginning position Z", 0.0, p.axisZ.getPosition());
 
@@ -105,7 +105,7 @@ void testMoveSquare() {
   FakeProgram p;
   setupAxes(p);
 
-  referenceAll(p.motorAxes);
+  referenceAll(p);
 
   // (X,Z)
   // (RAYON,0) ->
@@ -159,7 +159,7 @@ void testMoveXFlipsZ() {
   FakeProgram p;
   setupAxes(p);
 
-  referenceAll(p.motorAxes);
+  referenceAll(p);
 
   assertNearby("Beginning position X", RAYON, p.axisX.getPosition());
   assertNearby("Beginning base X", 0.0, p.baseAxisX.getPosition());
@@ -189,7 +189,7 @@ void testMoveZMovesX() {
   FakeProgram p;
   setupAxes(p);
 
-  referenceAll(p.motorAxes);
+  referenceAll(p);
 
   // BEGINNING
   assertNearby("Beginning position X", RAYON, p.axisX.getPosition());
@@ -203,7 +203,7 @@ void testMoveZMovesX() {
 
   debug();
   
-  referenceAll(p.motorAxes);
+  referenceAll(p);
   p.move('Z',RAYON);
   
   assertNearby("MZ380 position X", RAYON, p.axisX.getPosition());
@@ -223,7 +223,7 @@ void testSerialize() {
 
   FakeProgram prog;
   setupAxes(prog);
-  referenceAll(prog.motorAxes);
+  referenceAll(prog);
   
   prog.axisY.setIsReferenced(true);
   prog.axisY.setIsReferencing(true);
@@ -286,7 +286,7 @@ void testInputParserParseNumber() {
   title("Testing BaseXAxis getDelay");
   FakeProgram p;
   setupAxes(p);
-  referenceAll(p.motorAxes);
+  referenceAll(p);
 
   p.axisT.setPosition(0.0);
   assertNearby("theta=0.0", 500, p.baseAxisX.getDelay());

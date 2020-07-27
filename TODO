@@ -1,5 +1,7 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+Tu peux seulement avoir un certain angle quand tu es à droite ou à gauche? Ça serait plus simple?
+
 
 
 - Pince qui dévisse les couvercles. Pince qui visse les couvercles. Celle qui visse pourrait aussi soulever les pots par le haut.
@@ -17,6 +19,14 @@ de toute façon il va falloir que j'en fabrique une pour visser et dévisser les
 - Balance
 
 - Système pour lever ou baisser la tablette (à moins que je réussisse à faire une pince qui prend par le haut...
+
+Une rotation axial nous donnerais:
+Possibilité de tourner un pot pour le vider (l'autre axe continue de le serrer)
+Possiblilité de tourner la caméra à 90deg pour prendre des photos, filmer, camera de surveillance.
+(Te rassure que la porte du réfrigérateur est bien fermé, que la cuisinnière est bien fermé)
+
+La pince pour prendre les pots par le dessus pourrait aussi être utilisé pour prendre les pots par en avant si je réussis à déporter
+les pinces 3 pouces par en avant et que ça reste assez fort, assez rigide.
 
 Je pense que la rotation alpha devrait être gauche droite au lieu d'être avant arrière. (Pour vider les pots (le tourner au complet))
 En fait je crois juste enlever l'angle alpha. Vérifions avec les actions nécessaires:
