@@ -271,6 +271,8 @@ class StepperMotor : public Motor {
 
     virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
+      if (forceRotation) {return MAX_STEP_DELAY;}
+
       // Time to accelerate
       // Accelerate or go top speed
       if (timeSinceStart <= m_time_to_reach_middle_us) {
