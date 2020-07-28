@@ -29,12 +29,73 @@
 
 #include "lib/opencv.h"
 
+#include "lib/NLTemplate.h"
+
 using namespace std;
-// Added for the json-example:
-using namespace boost::property_tree;
+using namespace NL::Template;
+using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+
+
+void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
+
+    stringstream ss;
+    json_parser::write_json(ss, pt);
+                                                                             
+    string str = ss.str();
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Content-Length", to_string(str.length()));
+    header.emplace("Content-Type", "application/json");
+    response->write(SimpleWeb::StatusCode::success_ok, str, header);
+}
+
+
+
+void addLayoutToContent(stringstream& withLayout, stringstream& content) {
+
+  LoaderFile loader;
+  Template t( loader );
+  t.load("frontend/layout.html");
+  t.set("root", content.str());
+  t.render(withLayout);
+}
+
+void writeRecipees(stringstream& ss) {
+  const char *titles[] = { "Chico", "Harpo", "Groucho" };
+  const char *details[] = { "Red", "Green", "Blue" };
+
+  LoaderFile loader; // Let's use the default loader that loads files from disk.
+  
+  Template t( loader );
+  
+  t.load("frontend/recette.html");               // Load & parse the main template and its dependencies.
+  t.set( "text", "Hello, world" );    // Set a top-level variable
+  t.block("items").repeat(3);     // We need to know in advance that the "items" block will repeat 3 times.
+  
+  // Let's fill in the data for the repeated block.
+  for ( int i=0; i < 3; i++ ) {
+      // Set title and text by accessing the variable directly
+      t.block( "items" )[ i ].set( "title", titles[ i ] );
+      t.block( "items" )[ i ].set( "text", "Lorem Ipsum" );
+      
+      // We can get a shortcut reference to a nested block
+      NL::Template::Block & block = t.block( "items" )[ i ].block( "details" );
+      block.set( "detail", details[ i ] );
+      
+      // Disable this block for the first item in the list. Can be useful for opening/closing HTML tables etc.
+      if ( i==0 ) {
+          block.disable();
+      }
+  }
+  
+  t.render(ss); // Render the template with the variables we've set above
+}
+
+
+
+
 
 
   
@@ -132,8 +193,33 @@ int main(int argc, char** argv) {
     response->write(SimpleWeb::StatusCode::success_ok, header);
     response->write(buf, ss);
   };
+  
+  server.resource["^/recette.html$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
+    stringstream ss; 
+    writeRecipees(ss);
 
+    stringstream withLayout; 
+    addLayoutToContent(withLayout, ss);
+
+    response->write(withLayout.str());
+  };
+
+  server.resource["^/listeIngredients$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /listeIngredients" << endl;
+   
+    ptree pt;
+    pt.put("ingredients", "empty");
+    sendJson(response, pt);
+  };
+
+  server.resource["^/listeRecettes$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /listeRecettes" << endl;
+   
+    ptree pt;
+    pt.put("recettes", "empty");
+    sendJson(response, pt);
+  };
 
   server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /sweep" << endl;
