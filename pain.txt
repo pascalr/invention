@@ -1,0 +1,10 @@
+// C'est du pseudo c++, chaque commande invoke une commande c++
+// Mais c'est fait runtime ou lieu de compile time
+// Ou bien le code est compilé.
+Pot(1)
+Ajouter(3, c_the, levure_vivante)
+Ajouter(3.5, t, farine)
+Ajouter(2, c_soupe, sucre)
+Ajouter(2, c_soupe, huile)
+Ajouter(1, c_the, sel)
+Brasser(15, min)

@@ -31,6 +31,8 @@
 
 #include "lib/NLTemplate.h"
 
+#include "controllers/recettes_controller.h"
+
 using namespace std;
 using namespace NL::Template;
 using namespace boost::property_tree; // json
@@ -51,52 +53,37 @@ void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
     response->write(SimpleWeb::StatusCode::success_ok, str, header);
 }
 
-
-
-void addLayoutToContent(stringstream& withLayout, stringstream& content) {
+void addLayoutToContent(stringstream& withLayout, string layoutName, stringstream& content) {
 
   LoaderFile loader;
   Template t( loader );
-  t.load("frontend/layout.html");
+  t.load(layoutName);
   t.set("root", content.str());
   t.render(withLayout);
 }
 
-void writeRecipees(stringstream& ss) {
-  const char *titles[] = { "Chico", "Harpo", "Groucho" };
-  const char *details[] = { "Red", "Green", "Blue" };
+void addRoute(HttpServer& server, const char* path, const char* method, void (*func)(NL::Template::Template&), string layoutName) {
+  server.resource[path][method] = [func, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-  LoaderFile loader; // Let's use the default loader that loads files from disk.
-  
-  Template t( loader );
-  
-  t.load("frontend/recette.html");               // Load & parse the main template and its dependencies.
-  t.set( "text", "Hello, world" );    // Set a top-level variable
-  t.block("items").repeat(3);     // We need to know in advance that the "items" block will repeat 3 times.
-  
-  // Let's fill in the data for the repeated block.
-  for ( int i=0; i < 3; i++ ) {
-      // Set title and text by accessing the variable directly
-      t.block( "items" )[ i ].set( "title", titles[ i ] );
-      t.block( "items" )[ i ].set( "text", "Lorem Ipsum" );
-      
-      // We can get a shortcut reference to a nested block
-      NL::Template::Block & block = t.block( "items" )[ i ].block( "details" );
-      block.set( "detail", details[ i ] );
-      
-      // Disable this block for the first item in the list. Can be useful for opening/closing HTML tables etc.
-      if ( i==0 ) {
-          block.disable();
-      }
-  }
-  
-  t.render(ss); // Render the template with the variables we've set above
+    LoaderFile loader;
+    Template t( loader );
+
+    func(t);
+
+    stringstream ss; 
+    t.render(ss);
+
+    stringstream withLayout; 
+    addLayoutToContent(withLayout, layoutName, ss);
+
+    response->write(withLayout.str());
+  };
 }
 
-
-
-
-
+void addRoutes(HttpServer& server) {
+  addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
+  addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
+}
 
   
 //app.use(bodyParser.urlencoded({ extended: true }))
@@ -193,17 +180,8 @@ int main(int argc, char** argv) {
     response->write(SimpleWeb::StatusCode::success_ok, header);
     response->write(buf, ss);
   };
-  
-  server.resource["^/recette.html$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-    stringstream ss; 
-    writeRecipees(ss);
-
-    stringstream withLayout; 
-    addLayoutToContent(withLayout, ss);
-
-    response->write(withLayout.str());
-  };
+  addRoutes(server);
 
   server.resource["^/listeIngredients$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /listeIngredients" << endl;
