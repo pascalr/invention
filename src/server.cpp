@@ -32,6 +32,7 @@
 #include "lib/NLTemplate.h"
 
 #include "controllers/recettes_controller.h"
+#include "controllers/ingredients_controller.h"
 
 using namespace std;
 using namespace NL::Template;
@@ -83,6 +84,10 @@ void addRoute(HttpServer& server, const char* path, const char* method, void (*f
 void addRoutes(HttpServer& server) {
   addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
   addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
+  
+  addRoute(server, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
+  addRoute(server, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
+  addRoute(server, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
 }
 
   
