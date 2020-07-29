@@ -29,13 +29,66 @@
 
 #include "lib/opencv.h"
 
+#include "lib/NLTemplate.h"
+
+#include "controllers/recettes_controller.h"
+#include "controllers/ingredients_controller.h"
+
 using namespace std;
-// Added for the json-example:
-using namespace boost::property_tree;
+using namespace NL::Template;
+using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
+
+void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
+
+    stringstream ss;
+    json_parser::write_json(ss, pt);
+                                                                             
+    string str = ss.str();
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Content-Length", to_string(str.length()));
+    header.emplace("Content-Type", "application/json");
+    response->write(SimpleWeb::StatusCode::success_ok, str, header);
+}
+
+void addLayoutToContent(stringstream& withLayout, string layoutName, stringstream& content) {
+
+  LoaderFile loader;
+  Template t( loader );
+  t.load(layoutName);
+  t.set("root", content.str());
+  t.render(withLayout);
+}
+
+void addRoute(HttpServer& server, const char* path, const char* method, void (*func)(NL::Template::Template&), string layoutName) {
+  server.resource[path][method] = [func, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+    LoaderFile loader;
+    Template t( loader );
+
+    func(t);
+
+    stringstream ss; 
+    t.render(ss);
+
+    stringstream withLayout; 
+    addLayoutToContent(withLayout, layoutName, ss);
+
+    response->write(withLayout.str());
+  };
+}
+
+void addRoutes(HttpServer& server) {
+  addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
+  addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
+  
+  addRoute(server, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
+  addRoute(server, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
+  addRoute(server, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
+}
 
   
 //app.use(bodyParser.urlencoded({ extended: true }))
@@ -133,7 +186,23 @@ int main(int argc, char** argv) {
     response->write(buf, ss);
   };
 
+  addRoutes(server);
 
+  server.resource["^/listeIngredients$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /listeIngredients" << endl;
+   
+    ptree pt;
+    pt.put("ingredients", "empty");
+    sendJson(response, pt);
+  };
+
+  server.resource["^/listeRecettes$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /listeRecettes" << endl;
+   
+    ptree pt;
+    pt.put("recettes", "empty");
+    sendJson(response, pt);
+  };
 
   server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /sweep" << endl;
