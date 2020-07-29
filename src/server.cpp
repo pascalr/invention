@@ -64,7 +64,10 @@ void addLayoutToContent(stringstream& withLayout, string layoutName, stringstrea
   t.render(withLayout);
 }
 
-void addRoute(HttpServer& server, const char* path, const char* method, void (*func)(NL::Template::Template&), string layoutName) {
+//template <typename F>
+//void addRoute(HttpServer& server, const char* path, const char* method, F&& func, string layoutName) {
+void addRoute(HttpServer& server, const char* path, const char* method, const std::function<void(NL::Template::Template&)>& func, string layoutName) {
+//void addRoute(HttpServer& server, const char* path, const char* method, void (*func)(NL::Template::Template&), string layoutName) {
   server.resource[path][method] = [func, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
     LoaderFile loader;
@@ -82,19 +85,6 @@ void addRoute(HttpServer& server, const char* path, const char* method, void (*f
   };
 }
 
-void addRoutes(HttpServer& server) {
-  addRoute(server, "^/$", "GET", Axes::index, "frontend/layout.html");
-  addRoute(server, "^/axes/index.html$", "GET", Axes::index, "frontend/layout.html");
-
-  addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
-  addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
-  
-  addRoute(server, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
-  addRoute(server, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
-  addRoute(server, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
-}
-
-  
 //app.use(bodyParser.urlencoded({ extended: true }))
   //res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -148,7 +138,18 @@ int main(int argc, char** argv) {
   
   SerialPort p;
   vector<Jar> jars;
-  //FakeSerialPort fake;
+  FakeProgram fake;
+ 
+  auto axesIndex = [&fake](Template& t) {Axes::index(t, fake);};
+  addRoute(server, "^/$", "GET", axesIndex, "frontend/axes/layout.html");
+  addRoute(server, "^/axes/index.html$", "GET", axesIndex, "frontend/axes/layout.html");
+
+  addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
+  addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
+  
+  addRoute(server, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
+  addRoute(server, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
+  addRoute(server, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
 
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /run/arduino" << endl;
@@ -189,8 +190,6 @@ int main(int argc, char** argv) {
     response->write(SimpleWeb::StatusCode::success_ok, header);
     response->write(buf, ss);
   };
-
-  addRoutes(server);
 
   server.resource["^/listeIngredients$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /listeIngredients" << endl;

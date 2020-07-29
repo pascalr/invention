@@ -6,6 +6,9 @@
 #include "StepperMotor.h"
 #include "DCMotor.h"
 
+#define NUMBER_OF_MOTORS 6
+#define NUMBER_OF_AXES 7
+
 class Program {
   public:
     Program(Writer& writer) :
@@ -50,10 +53,10 @@ class Program {
     DCMotor axisR;
      
     // These axes actually moves the motors. 
-    Motor* motors[10] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    Motor* motors[NUMBER_OF_MOTORS+1] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
 
     // These axes are the ones you can move. mx100, mz100, etc...
-    Axis* movingAxes[10] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    Axis* movingAxes[NUMBER_OF_AXES+1] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
     
     bool isWorking = false;
     
