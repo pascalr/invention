@@ -79,7 +79,6 @@ class DCMotor : public Motor {
   protected:
 
     Encoder m_encoder;
-    uint8_t m_dir_pin;
     uint8_t m_pwm_pin;
     int m_duty_cycle = 10; // Duty cycle from 0 to 255
 };

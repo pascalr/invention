@@ -26,6 +26,7 @@
 
 #define AXIS_X_MAX_POS BASE_X_MAX
 #define AXIS_Z_MAX_POS RAYON
+#define AXIS_Y_MAX_POS 670.0 // mm
 
 #define ARM_WIDTH 111.0 // mm
 #define ARM_LENGTH 370.0 // mm

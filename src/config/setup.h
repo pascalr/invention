@@ -47,11 +47,16 @@ void setupAxes(Program& p) {
   //p.axisB.limitSwitchPin = 12;
   p.axisB.setupPins(8,7,6);
 
-  p.axisY.setStepsPerUnit(200 * 2 * 8 / (2.625*25.4*3.1416));
-  p.axisY.setStepsPerTurn(200 * 2 * 8);
+  p.axisY.setStepsPerUnit(200 * 2 * 16 / (2.625*25.4*3.1416) * (51/13));
+  p.axisY.setStepsPerTurn(200 * 2 * 16);
   //p.axisY.limitSwitchPin = 12;
   p.axisY.setupPins(8,7,6);
-  
+  //p.axisY.setMaxPosition(AXIS_Y_MAX_POS);
+  p.axisY.setMaxPosition(900); // FIXME: stepsPerUnit is not OK
+  p.axisY.setDefaultMaxSpeed(1.5);
+  p.axisY.setAcceleration(1.5);
+  p.axisY.setReverseMotorDirection(true);
+
 }
 
 #endif
