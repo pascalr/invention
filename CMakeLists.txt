@@ -95,9 +95,9 @@ add_executable( test_axis ${MyCpp} src/test/axis.cpp )
 target_include_directories(test_axis PRIVATE ${MyDirs})
 target_link_libraries(test_axis ${MyLibs})
 
-add_executable( fake src/fake.cpp )
-target_include_directories(fake PRIVATE ${MyDirs})
-target_link_libraries( fake ${MyLibs} )
+add_executable( simulation src/simulation.cpp )
+target_include_directories(simulation PRIVATE ${MyDirs})
+target_link_libraries( simulation ${MyLibs} )
 
 add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )

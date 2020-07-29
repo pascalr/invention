@@ -33,6 +33,7 @@
 
 #include "controllers/recettes_controller.h"
 #include "controllers/ingredients_controller.h"
+#include "controllers/axes_controller.h"
 
 using namespace std;
 using namespace NL::Template;
@@ -82,6 +83,9 @@ void addRoute(HttpServer& server, const char* path, const char* method, void (*f
 }
 
 void addRoutes(HttpServer& server) {
+  addRoute(server, "^/$", "GET", Axes::index, "frontend/layout.html");
+  addRoute(server, "^/axes/index.html$", "GET", Axes::index, "frontend/layout.html");
+
   addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
   addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
   

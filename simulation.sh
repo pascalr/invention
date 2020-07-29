@@ -1,3 +1,2 @@
 #!/bin/bash
-make fake
-bin/fake
+make simulation && bin/simulation
