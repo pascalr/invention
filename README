@@ -1,3 +1,7 @@
+MODELS:
+
+Ingredient: name, fdc_id
+
 DIRECTORIES:
 
 src/: Directly in src are executable source files

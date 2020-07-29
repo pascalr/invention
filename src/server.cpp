@@ -1,4 +1,4 @@
-#include "client_http.hpp"
+//#include "client_http.hpp"
 #include "server_http.hpp"
 #include "status_code.hpp"
 #include <future>
@@ -31,17 +31,61 @@
 
 #include "lib/NLTemplate.h"
 
+#include "core/WebProgram.h"
+
+#include "controllers/controllers.h"
 #include "controllers/recettes_controller.h"
 #include "controllers/ingredients_controller.h"
 #include "controllers/axes_controller.h"
+#include "controllers/layout_controller.h"
+
+using namespace NL::Template;
 
 using namespace std;
 using namespace NL::Template;
 using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
-using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
+void addPostRoute(HttpServer& server, WebProgram& wp, const char* path, const std::function<void(WebProgram&, PostRequest&)>& func, const char* redirect) {
+  server.resource[path]["POST"] = [func, &wp, redirect](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+    try {
+      PostRequest postRequest(request);
+      func(wp, postRequest);
+    } catch (MissingFieldException& e) {
+      cout << "TODO handle missing field exception.";
+      response->write(SimpleWeb::StatusCode::client_error_forbidden);
+      return;
+    } catch (EmptyMandatoryFieldException& e) {
+      cout << "TODO handle empty mandatory field exception.";
+      response->write(SimpleWeb::StatusCode::client_error_forbidden);
+      return;
+    }
+
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Location", redirect);
+    response->write(SimpleWeb::StatusCode::redirection_see_other, header);
+  };
+}
+
+void addRoute(HttpServer& server, const char* path, const char* method, const std::function<void(NL::Template::Template&)>& func, string layoutName) {
+  server.resource[path][method] = [func, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+    LoaderFile loader;
+    Template t( loader );
+    
+    func(t);
+
+    stringstream ss; 
+    t.render(ss);
+
+    stringstream withLayout; 
+    addLayoutToContent(withLayout, layoutName, ss);
+
+    response->write(withLayout.str());
+  };
+}
 
 void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
 
@@ -53,36 +97,6 @@ void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
     header.emplace("Content-Length", to_string(str.length()));
     header.emplace("Content-Type", "application/json");
     response->write(SimpleWeb::StatusCode::success_ok, str, header);
-}
-
-void addLayoutToContent(stringstream& withLayout, string layoutName, stringstream& content) {
-
-  LoaderFile loader;
-  Template t( loader );
-  t.load(layoutName);
-  t.set("root", content.str());
-  t.render(withLayout);
-}
-
-//template <typename F>
-//void addRoute(HttpServer& server, const char* path, const char* method, F&& func, string layoutName) {
-void addRoute(HttpServer& server, const char* path, const char* method, const std::function<void(NL::Template::Template&)>& func, string layoutName) {
-//void addRoute(HttpServer& server, const char* path, const char* method, void (*func)(NL::Template::Template&), string layoutName) {
-  server.resource[path][method] = [func, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-
-    LoaderFile loader;
-    Template t( loader );
-
-    func(t);
-
-    stringstream ss; 
-    t.render(ss);
-
-    stringstream withLayout; 
-    addLayoutToContent(withLayout, layoutName, ss);
-
-    response->write(withLayout.str());
-  };
 }
 
 //app.use(bodyParser.urlencoded({ extended: true }))
@@ -139,6 +153,7 @@ int main(int argc, char** argv) {
   SerialPort p;
   vector<Jar> jars;
   FakeProgram fake;
+  WebProgram wp;
  
   auto axesIndex = [&fake](Template& t) {Axes::index(t, fake);};
   addRoute(server, "^/$", "GET", axesIndex, "frontend/axes/layout.html");
@@ -150,6 +165,7 @@ int main(int argc, char** argv) {
   addRoute(server, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
   addRoute(server, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
   addRoute(server, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
+  addPostRoute(server, wp, "^/ingredients/new$", Ingredients::do_create, "/ingredients/index.html");
 
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /run/arduino" << endl;

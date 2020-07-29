@@ -1,9 +1,12 @@
 #ifndef _INGREDIENTS_CONTROLLER_H
 #define _INGREDIENTS_CONTROLLER_H
 
-#include "../lib/NLTemplate.h"
+#include "controllers.h"
+
+using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
 using namespace NL::Template;
+using namespace std;
 
 namespace Ingredients {
 
@@ -17,6 +20,17 @@ namespace Ingredients {
   
   void create(Template& t) {
     t.load("frontend/ingredients/new.html");
+  }
+
+  void do_create(WebProgram& wp, PostRequest request) {
+
+    string name = request.getMandatoryVal("name");
+    string fdc_id = request.getVal("fdc_id");
+
+    std::cout << "Do_create name: " << name << std::endl;
+    std::cout << "Do_create id: " << fdc_id << std::endl;
+    
+    //wp.ingredients.push_back
   }
 
 }

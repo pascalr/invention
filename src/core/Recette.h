@@ -9,7 +9,7 @@ enum IngredientType { LIQUID, SOLID };
 class Ingredient {
   public:
     int id;
-    char[52] name;
+    string name;
     IngredientType type;
     double volumic_mass;
 
