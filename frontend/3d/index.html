@@ -1,0 +1,54 @@
+<script src="three.js"></script>
+<script src="STLLoader.js"></script>
+<script>
+  var scene = new THREE.Scene();
+ // var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+  camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
+	camera.position.set( 3, 0.15, 3 );
+
+	cameraTarget = new THREE.Vector3( 0, - 0.25, 0 );
+
+  var renderer = new THREE.WebGLRenderer();
+  //renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize( 1024, 768 );
+  document.body.appendChild( renderer.domElement );
+
+
+  // Ground
+
+	var plane = new THREE.Mesh(
+		new THREE.PlaneBufferGeometry( 40, 40 ),
+		new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+	);
+	plane.rotation.x = - Math.PI / 2;
+	plane.position.y = - 0.5;
+	scene.add( plane );
+
+	plane.receiveShadow = true;
+
+  var loader = new THREE.STLLoader();
+  loader.load( './models/armoire.stl', function ( geometry ) {
+    geometry.scale(THREE.Vector3( 0.001, 0.001, 0.001 ))
+    var armoire = new THREE.Mesh( geometry )
+    scene.add( armoire );
+  });
+
+  /*var geometry = new THREE.BoxGeometry();
+  var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+  var cube = new THREE.Mesh( geometry, material );
+  scene.add( cube );
+
+  camera.position.z = 5;
+
+  var animate = function () {
+    requestAnimationFrame( animate );
+
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+
+    renderer.render( scene, camera );
+  };
+
+  animate();*/
+</script>

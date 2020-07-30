@@ -19,7 +19,6 @@ void renderScene(double xMin, double xMax, double yMin, double yMax, const char*
 
   plt::xlim(xMin, xMax);
   plt::ylim(yMin, yMax);
-  plt::zlim(0, 10);
 
   plt::title("Position du bras");
   plt::pause(0.01);

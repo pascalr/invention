@@ -18,6 +18,7 @@ void addLayoutToContent(stringstream& withLayout, string layoutName, stringstrea
     "  <a class='item' href='/ingredients/index.html'>Ingredients</a>"
     "  <a class='item' href='/axes/index.html'>Manuel</a>"
     "  <a class='item' href='/visuel.html'>Visuel</a>"
+    "  <a class='item' href='/3d/index.html'>3d</a>"
     "</div>";
 
   t.set("menu", menuStr);

@@ -22,7 +22,7 @@ class Ingredient {
     Ingredient(string name, string aliment_id) : name(name), aliment_id(aliment_id) {}
 
     string name;
-    string aliment_id;
+    int aliment_id;
 };
 
 /*

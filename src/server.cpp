@@ -38,6 +38,7 @@
 #include "controllers/ingredients_controller.h"
 #include "controllers/axes_controller.h"
 #include "controllers/layout_controller.h"
+#include "controllers/3d_controller.h"
 
 using namespace NL::Template;
 
@@ -166,6 +167,8 @@ int main(int argc, char** argv) {
   addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
   addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
   addPostRoute(server, wp, "^/ingredients/new$", Ingredients::do_create, "/ingredients/index.html");
+
+  addRoute(server, wp, "^/3d/index.html$", "GET", ThreeD::index, "frontend/3d/layout.html");
 
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /run/arduino" << endl;

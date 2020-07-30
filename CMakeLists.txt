@@ -34,6 +34,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ADD_LIBRARY(ExternLibsModule
   src/lib/NLTemplate.cpp
+  src/lib/sqlite3.c
 )
 
 ADD_LIBRARY(MyLibsModule
@@ -46,7 +47,7 @@ ADD_LIBRARY(MyLibsModule
   src/lib/ArduinoMock.cpp
 )
 
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule)
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule dl pthread)
 set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 
 #message(STATUS "HERE!!!")
@@ -106,6 +107,11 @@ target_include_directories( server PRIVATE "/usr/local/include/simple-web-server
 add_executable( calibrate_camera src/camera_calibration.cpp )
 target_link_libraries( calibrate_camera ${MyLibs}  )
 
+add_executable( setup_db src/setup_db.cpp )
+target_link_libraries( setup_db ${MyLibs}  )
+
+add_executable( sqlite_shell src/lib/shell.c )
+target_link_libraries( sqlite_shell ${MyLibs}  )
 
 enable_testing()
 add_test( regularTests bin/run_tests )
