@@ -8,6 +8,7 @@ using namespace std;
 
 class WebProgram {
   public:
+    vector<Aliment> aliments;
     vector<Ingredient> ingredients;
     vector<Recette> recettes;
 };

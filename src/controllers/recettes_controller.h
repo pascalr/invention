@@ -2,12 +2,13 @@
 #define _RECETTES_CONTROLLER_H
 
 #include "../lib/NLTemplate.h"
+#include "controllers.h"
 
 using namespace NL::Template;
 
 namespace Recettes {
 
-  void index(Template& t) {
+  void index(WebProgram& wp, Template& t) {
     const char *titles[] = { "Chico", "Harpo", "Groucho" };
     const char *details[] = { "Red", "Green", "Blue" };
   
@@ -33,7 +34,7 @@ namespace Recettes {
     
   }
   
-  void create(Template& t) {
+  void create(WebProgram& wp, Template& t) {
     t.load("frontend/recettes/new.html");
   }
 

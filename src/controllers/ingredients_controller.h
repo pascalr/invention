@@ -10,27 +10,39 @@ using namespace std;
 
 namespace Ingredients {
 
-  void show(Template& t) {
+  void show(WebProgram& wp, Template& t) {
     t.load("frontend/ingredients/show.html");
   }
 
-  void index(Template& t) {
+  void index(WebProgram& wp, Template& t) {
+    
     t.load("frontend/ingredients/index.html");
+
+    int size = wp.ingredients.size();
+    t.block("ingredients").repeat(size);
+
+    for ( int i=0; i < size; i++ ) {
+
+      Ingredient ingredient = wp.ingredients[i];
+      t.block("ingredients")[i].set("name", ingredient.name);
+      t.block("ingredients")[i].set("aliment_id", ingredient.aliment_id);
+    }
   }
   
-  void create(Template& t) {
+  void create(WebProgram& wp, Template& t) {
     t.load("frontend/ingredients/new.html");
   }
 
   void do_create(WebProgram& wp, PostRequest request) {
 
     string name = request.getMandatoryVal("name");
-    string fdc_id = request.getVal("fdc_id");
+    string aliment_id = request.getVal("aliment_id");
 
     std::cout << "Do_create name: " << name << std::endl;
-    std::cout << "Do_create id: " << fdc_id << std::endl;
-    
-    //wp.ingredients.push_back
+    std::cout << "Do_create aliment_id: " << aliment_id << std::endl;
+
+    Ingredient ingredient(name, aliment_id);
+    wp.ingredients.push_back(ingredient);
   }
 
 }

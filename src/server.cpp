@@ -69,13 +69,13 @@ void addPostRoute(HttpServer& server, WebProgram& wp, const char* path, const st
   };
 }
 
-void addRoute(HttpServer& server, const char* path, const char* method, const std::function<void(NL::Template::Template&)>& func, string layoutName) {
-  server.resource[path][method] = [func, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+void addRoute(HttpServer& server, WebProgram& wp, const char* path, const char* method, const std::function<void(WebProgram&, NL::Template::Template&)>& func, string layoutName) {
+  server.resource[path][method] = [func, &wp, layoutName](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
     LoaderFile loader;
     Template t( loader );
     
-    func(t);
+    func(wp, t);
 
     stringstream ss; 
     t.render(ss);
@@ -155,16 +155,16 @@ int main(int argc, char** argv) {
   FakeProgram fake;
   WebProgram wp;
  
-  auto axesIndex = [&fake](Template& t) {Axes::index(t, fake);};
-  addRoute(server, "^/$", "GET", axesIndex, "frontend/axes/layout.html");
-  addRoute(server, "^/axes/index.html$", "GET", axesIndex, "frontend/axes/layout.html");
+  auto axesIndex = [&fake](WebProgram& wp, Template& t) {Axes::index(wp, t, fake);};
+  addRoute(server, wp, "^/$", "GET", axesIndex, "frontend/axes/layout.html");
+  addRoute(server, wp, "^/axes/index.html$", "GET", axesIndex, "frontend/axes/layout.html");
 
-  addRoute(server, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
-  addRoute(server, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
+  addRoute(server, wp, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
+  addRoute(server, wp, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
   
-  addRoute(server, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
-  addRoute(server, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
-  addRoute(server, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
+  addRoute(server, wp, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
+  addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
+  addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
   addPostRoute(server, wp, "^/ingredients/new$", Ingredients::do_create, "/ingredients/index.html");
 
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {

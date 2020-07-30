@@ -3,6 +3,29 @@
 
 using namespace std;
 
+// A unique aliment. I provide the list of aliment.
+// They have all the information, nutrional value, etc...
+class Aliment {
+  // sugar
+  // protein
+  // fat
+  // volum mass
+  // ...
+};
+
+// Ingredients in recipees are referred to by name.
+// You have your list of ingredients, you put anything in any language.
+// You can search and map your ingredient to a unique id with a search tool.
+class Ingredient {
+  public:
+    Ingredient(string name) : name(name) {}
+    Ingredient(string name, string aliment_id) : name(name), aliment_id(aliment_id) {}
+
+    string name;
+    string aliment_id;
+};
+
+/*
 // Liquid is in ml, solid is in g
 enum IngredientType { LIQUID, SOLID };
 
@@ -19,6 +42,7 @@ class Ingredient {
     void saveAsJson() {
     }
 };
+*/
 
 class Instruction {
 };

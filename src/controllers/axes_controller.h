@@ -8,7 +8,7 @@ using namespace NL::Template;
 
 namespace Axes {
 
-  void index(Template& t, Program& p) {
+  void index(WebProgram& wp, Template& t, Program& p) {
     t.load("frontend/axes/index.html");
     std::cout << "There are " << NUMBER_OF_AXES << " axes to prints.\n";
     //t.block("items").repeat(3);     // We need to know in advance that the "items" block will repeat 3 times.
