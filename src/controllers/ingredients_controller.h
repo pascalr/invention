@@ -39,12 +39,14 @@ namespace Ingredients {
   void do_create(WebProgram& wp, PostRequest& request) {
 
     string name = request.getMandatoryVal("name");
-    string aliment_id = request.getVal("aliment_id");
-
     std::cout << "Do_create name: " << name << std::endl;
-    std::cout << "Do_create aliment_id: " << aliment_id << std::endl;
 
-    Ingredient ingredient(name, stoi(aliment_id));
+    Ingredient ingredient(name);
+    try {
+      int alimentId = stoi(request.getVal("aliment_id"));
+      ingredient.aliment_id = alimentId;
+    } catch (...) {}
+
     wp.db.save(ingredient);
     
     request.redirect = "/ingredients/index";
