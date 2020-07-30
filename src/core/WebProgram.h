@@ -3,14 +3,19 @@
 
 #include "Recette.h"
 #include <vector>
+#include "Database.h"
 
 using namespace std;
 
 class WebProgram {
   public:
-    vector<Aliment> aliments;
-    vector<Ingredient> ingredients;
-    vector<Recette> recettes;
+    WebProgram() : db("data/test.db") {
+    }
+
+    //vector<Aliment> aliments;
+    //vector<Ingredient> ingredients;
+    //vector<Recette> recettes;
+    Database db;
 };
 
 #endif

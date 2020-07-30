@@ -18,14 +18,17 @@ namespace Ingredients {
     
     t.load("frontend/ingredients/index.html");
 
-    int size = wp.ingredients.size();
+    vector<Ingredient> ingredients;
+    wp.db.load(ingredients);
+
+    int size = ingredients.size();
     t.block("ingredients").repeat(size);
 
     for ( int i=0; i < size; i++ ) {
 
-      Ingredient ingredient = wp.ingredients[i];
+      Ingredient ingredient = ingredients[i];
       t.block("ingredients")[i].set("name", ingredient.name);
-      t.block("ingredients")[i].set("aliment_id", ingredient.aliment_id);
+      t.block("ingredients")[i].set("aliment_id", to_string(ingredient.aliment_id));
     }
   }
   
@@ -41,8 +44,9 @@ namespace Ingredients {
     std::cout << "Do_create name: " << name << std::endl;
     std::cout << "Do_create aliment_id: " << aliment_id << std::endl;
 
-    Ingredient ingredient(name, aliment_id);
-    wp.ingredients.push_back(ingredient);
+    Ingredient ingredient(name, stoi(aliment_id));
+    wp.db.save(ingredient);
+    //wp.ingredients.push_back(ingredient);
   }
 
 }

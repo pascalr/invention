@@ -51,3 +51,9 @@ wget https://codeload.github.com/Makeblock-official/Makeblock-Libraries/zip/mast
 Arduino IDE: "Sketch-> Include Library-> Add .ZIP Library-> select the downloaded file-> Open"
 MeDCMotor.h -> Remove include "MeConfig.h"
 MeDCMotor.cpp -> Add #ifdef ME_PORT_DEFINED around the two reset functions
+
+
+
+git clone https://github.com/SRombauts/SQLiteCpp et installer dans thirdparty, vient avec sqlite je crois
+
+git submodule add https://github.com/SRombauts/SQLiteCpp thirdparty/SQLiteCpp

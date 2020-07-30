@@ -26,15 +26,29 @@ find_package(Boost COMPONENTS program_options log log_setup system filesystem RE
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
-
 include_directories( ${OpenCV_INCLUDE_DIRS} "/usr/local/include/eigen3/")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp)
+
+include_directories(
+  ${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp/include
+)
+
+#ADD_LIBRARY(SQLiteCpp
+#  src/lib/SQLiteCpp/Backup.cpp
+#  src/lib/SQLiteCpp/Column.cpp
+#  src/lib/SQLiteCpp/Database.cpp
+#  src/lib/SQLiteCpp/Exception.cpp
+#  src/lib/SQLiteCpp/Statement.cpp
+#  src/lib/SQLiteCpp/Transaction.cpp
+#)
+
 ADD_LIBRARY(ExternLibsModule
   src/lib/NLTemplate.cpp
-  src/lib/sqlite3.c
+# src/lib/sqlite3.c
 )
 
 ADD_LIBRARY(MyLibsModule
@@ -47,7 +61,7 @@ ADD_LIBRARY(MyLibsModule
   src/lib/ArduinoMock.cpp
 )
 
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule dl pthread)
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule SQLiteCpp sqlite3 dl pthread)
 set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 
 #message(STATUS "HERE!!!")
@@ -106,9 +120,6 @@ target_include_directories( server PRIVATE "/usr/local/include/simple-web-server
 
 add_executable( calibrate_camera src/camera_calibration.cpp )
 target_link_libraries( calibrate_camera ${MyLibs}  )
-
-add_executable( setup_db src/setup_db.cpp )
-target_link_libraries( setup_db ${MyLibs}  )
 
 add_executable( sqlite_shell src/lib/shell.c )
 target_link_libraries( sqlite_shell ${MyLibs}  )
