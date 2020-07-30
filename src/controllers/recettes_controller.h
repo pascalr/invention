@@ -22,24 +22,26 @@ namespace Recettes {
 
       Recette recette = recettes[i];
       t.block("recettes")[i].set("name", recette.name);
+      t.block("recettes")[i].set("nameURL", encodeURL(recette.name));
     }
   }
 
   void remove(WebProgram& wp, Template& t) {
     
-    string name = wp.request->path_match[1].str();
+    string name = decodeURL(wp.request->path_match[1].str());
     Recette recette(name);
     wp.db.remove(recette, name);
   }
 
   void show(WebProgram& wp, Template& t) {
 
-    string name = wp.request->path_match[1].str();
+    string name = decodeURL(wp.request->path_match[1].str());
     Recette recette;
     wp.db.get(recette, name);
     
     t.load("frontend/recettes/show.html");
     t.set("name", recette.name);
+    t.set("nameURL", encodeURL(recette.name));
 
     string instructions = recette.instructions;
     instructions = replaceAll(instructions, "\n", "<br />");
@@ -49,13 +51,14 @@ namespace Recettes {
   
   void edit(WebProgram& wp, Template& t) {
 
-    string name = wp.request->path_match[1].str();
+    string name = decodeURL(wp.request->path_match[1].str());
     Recette recette;
     wp.db.get(recette, name);
     cout << "Instructions: " << recette.instructions << endl;
 
     t.load("frontend/recettes/edit.html");
     t.set("name", recette.name);
+    t.set("nameURL", encodeURL(recette.name));
     t.set("instructions", recette.instructions);
   }
 
@@ -79,7 +82,7 @@ namespace Recettes {
 
     std::cout << "Do_update " << std::endl;
 
-    string oldName = wp.request->path_match[1].str();
+    string oldName = decodeURL(wp.request->path_match[1].str());
     Recette oldRecette;
     wp.db.get(oldRecette, oldName);
 

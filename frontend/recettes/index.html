@@ -3,8 +3,8 @@
 {% block recettes %}
 <p>
   {{ name }}
-  <a href="/recettes/show/{{ name }}">voir</a>
-  <a href="/recettes/edit/{{ name }}">modifier</a>
-  <a data-method="delete" onclick="return confirm('Are you sure?')" href="/recettes/delete/{{ name }}" rel="nofollow">supprimer</a>
+  <a href="/recettes/show/{{ nameURL }}">voir</a>
+  <a href="/recettes/edit/{{ nameURL }}">modifier</a>
+  <a data-method="delete" onclick="return confirm('Are you sure?')" href="/recettes/delete/{{ nameURL }}" rel="nofollow">supprimer</a>
 </p>
 {% endblock %}

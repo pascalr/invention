@@ -181,11 +181,11 @@ int main(int argc, char** argv) {
   addRoute(server, wp, "^/recettes/index/?$", "GET", Recettes::index, "frontend/recettes/layout.html");
   addRoute(server, wp, "^/recettes/new/?$", "GET", Recettes::create, "frontend/recettes/layout.html");
   // FIXME: Match percent too..
-  addRoute(server, wp, "^/recettes/show/([_a-zA-Z0-9]+)/?$", "GET", Recettes::show, "frontend/recettes/layout.html");
-  addRoute(server, wp, "^/recettes/edit/([_a-zA-Z0-9]+)/?$", "GET", Recettes::edit, "frontend/recettes/layout.html");
-  addPostRoute(server, wp, "^/recettes/update/([_a-zA-Z0-9]+)/?$", Recettes::do_update); // FIXME: This should be PUT, be workaround needed since from only supports GET and POST
+  addRoute(server, wp, "^/recettes/show/([\\%_a-zA-Z0-9]+)/?$", "GET", Recettes::show, "frontend/recettes/layout.html");
+  addRoute(server, wp, "^/recettes/edit/([\\%_a-zA-Z0-9]+)/?$", "GET", Recettes::edit, "frontend/recettes/layout.html");
+  addPostRoute(server, wp, "^/recettes/update/([\\%_a-zA-Z0-9]+)/?$", Recettes::do_update); // FIXME: This should be PUT, be workaround needed since from only supports GET and POST
   addPostRoute(server, wp, "^/recettes/create/?$", Recettes::do_create);
-  addRoute(server, wp, "^/recettes/delete/([_a-zA-Z0-9]+)/?$", "GET", Recettes::remove, "frontend/recettes/layout.html"); // FIXME: DELETE, not GET
+  addRoute(server, wp, "^/recettes/delete/([\\%_a-zA-Z0-9]+)/?$", "GET", Recettes::remove, "frontend/recettes/layout.html"); // FIXME: DELETE, not GET
   
   addRoute(server, wp, "^/ingredients/index/?$", "GET", Ingredients::index, "frontend/ingredients/layout.html"); 
   addRoute(server, wp, "^/ingredients/new/?$", "GET", Ingredients::create, "frontend/ingredients/layout.html");

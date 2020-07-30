@@ -10,6 +10,9 @@ using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
 using namespace NL::Template;
 using namespace std;
+
+const auto decodeURL = SimpleWeb::Percent::decode;
+const auto encodeURL = SimpleWeb::Percent::encode;
     
 class MissingFieldException : public exception
 {
