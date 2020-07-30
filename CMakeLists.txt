@@ -121,9 +121,6 @@ target_include_directories( server PRIVATE "/usr/local/include/simple-web-server
 add_executable( calibrate_camera src/camera_calibration.cpp )
 target_link_libraries( calibrate_camera ${MyLibs}  )
 
-add_executable( sqlite_shell src/lib/shell.c )
-target_link_libraries( sqlite_shell ${MyLibs}  )
-
 enable_testing()
 add_test( regularTests bin/run_tests )
 add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )

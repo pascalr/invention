@@ -5,8 +5,14 @@
 #include <vector>
 #include "Database.h"
 
+#include "server_http.hpp"
+
+using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+
 using namespace std;
 
+// Rename this.
+// This is passed to every controller function
 class WebProgram {
   public:
     WebProgram() : db("data/test.db") {
@@ -16,6 +22,8 @@ class WebProgram {
     //vector<Ingredient> ingredients;
     //vector<Recette> recettes;
     Database db;
+
+    shared_ptr<HttpServer::Request> request;
 };
 
 #endif

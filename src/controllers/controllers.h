@@ -51,6 +51,8 @@ class PostRequest {
       }
       return val;
     }
+
+    string redirect;
      
   protected:  
     SimpleWeb::CaseInsensitiveMultimap vals;

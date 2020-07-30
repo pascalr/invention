@@ -1,15 +1,16 @@
 <h1>Recettes</h1>
-{% block items %}
+
+{% block recettes %}
 <p>
-  Title: {{ title }}<br/>
-  Text: {{ text }}<br/>
-  {% block details %}Detail: {{ detail }}{% endblock %}
+  {{ name }}
+  <a href="/recettes/show/{{ name }}">voir</a>
+  <a href="/recettes/edit/{{ name }}">modifier</a>
+  <a data-method="delete" onclick="return confirm('Are you sure?')" href="/recettes/delete/{{ name }}" rel="nofollow">supprimer</a>
 </p>
 {% endblock %}
 
-<!-- SECTION *Recette -->
-<div id="Recette">
-<h1>Recettes</h1>
+
+
 
 <h2>Entrées</h2>
 Soupe aux pois
@@ -31,5 +32,3 @@ Gateau aux carottes
 
 <h2>Codes</h2>
 Riz au jasmin: 1610
-
-</div>

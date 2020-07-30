@@ -5,10 +5,14 @@ CREATE TABLE COMPANY(
       ADDRESS        CHAR(50),
       SALARY         REAL );
 
+CREATE TABLE recette(
+      NAME           VARCHAR     NOT NULL,
+      INSTRUCTIONS   VARCHAR     );
+
 CREATE TABLE aliment(
       ID INT PRIMARY KEY         NOT NULL,
-      NAME           CHAR(50)    NOT NULL );
+      NAME           VARCHAR     NOT NULL);
 
 CREATE TABLE ingredient(
-      NAME           CHAR(50) PRIMARY KEY     NOT NULL,
+      NAME           VARCHAR     NOT NULL,
       ALIMENT_ID     INT );

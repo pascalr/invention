@@ -48,25 +48,34 @@ using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
-void addPostRoute(HttpServer& server, WebProgram& wp, const char* path, const std::function<void(WebProgram&, PostRequest&)>& func, const char* redirect) {
-  server.resource[path]["POST"] = [func, &wp, redirect](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+void addPostRoute(HttpServer& server, WebProgram& wp, const char* path, const std::function<void(WebProgram&, PostRequest&)>& func) {
+  server.resource[path]["POST"] = [func, &wp](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
     try {
       PostRequest postRequest(request);
+      wp.request = request;
       func(wp, postRequest);
+    
+      if (!postRequest.redirect.empty()) {
+        SimpleWeb::CaseInsensitiveMultimap header;
+        header.emplace("Location", postRequest.redirect);
+        response->write(SimpleWeb::StatusCode::redirection_see_other, header);
+        return;
+      }
+
     } catch (MissingFieldException& e) {
       cout << "TODO handle missing field exception.";
-      response->write(SimpleWeb::StatusCode::client_error_forbidden);
       return;
+
     } catch (EmptyMandatoryFieldException& e) {
       cout << "TODO handle empty mandatory field exception.";
-      response->write(SimpleWeb::StatusCode::client_error_forbidden);
       return;
-    }
 
-    SimpleWeb::CaseInsensitiveMultimap header;
-    header.emplace("Location", redirect);
-    response->write(SimpleWeb::StatusCode::redirection_see_other, header);
+    } catch (std::exception& e) {
+      std::cout << "exception: " << e.what() << std::endl;
+    }
+    
+    response->write(SimpleWeb::StatusCode::client_error_forbidden);
   };
 }
 
@@ -76,7 +85,12 @@ void addRoute(HttpServer& server, WebProgram& wp, const char* path, const char* 
     LoaderFile loader;
     Template t( loader );
     
-    func(wp, t);
+    try {
+      wp.request = request;
+      func(wp, t);
+    } catch (std::exception& e) {
+      std::cout << "exception: " << e.what() << std::endl;
+    }
 
     stringstream ss; 
     t.render(ss);
@@ -84,7 +98,7 @@ void addRoute(HttpServer& server, WebProgram& wp, const char* path, const char* 
     stringstream withLayout; 
     addLayoutToContent(withLayout, layoutName, ss);
 
-    response->write(withLayout.str());
+    response->write(withLayout.str()); // OPTIMIZE: Write the stream directly
   };
 }
 
@@ -155,20 +169,37 @@ int main(int argc, char** argv) {
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;
+
+  // WARNING: The routes are not in order...
+  // So my urls will be longer, but I think I will do it this way:
+  // /:model/:action/:id?
  
   auto axesIndex = [&fake](WebProgram& wp, Template& t) {Axes::index(wp, t, fake);};
-  addRoute(server, wp, "^/$", "GET", axesIndex, "frontend/axes/layout.html");
-  addRoute(server, wp, "^/axes/index.html$", "GET", axesIndex, "frontend/axes/layout.html");
+  addRoute(server, wp, "^/?$", "GET", axesIndex, "frontend/axes/layout.html");
+  addRoute(server, wp, "^/axes/index/?$", "GET", axesIndex, "frontend/axes/layout.html");
 
-  addRoute(server, wp, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html");
-  addRoute(server, wp, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html");
+  addRoute(server, wp, "^/recettes/index/?$", "GET", Recettes::index, "frontend/recettes/layout.html");
+  addRoute(server, wp, "^/recettes/new/?$", "GET", Recettes::create, "frontend/recettes/layout.html");
+  // FIXME: Match percent too..
+  addRoute(server, wp, "^/recettes/show/([_a-zA-Z0-9]+)/?$", "GET", Recettes::show, "frontend/recettes/layout.html");
+  addRoute(server, wp, "^/recettes/edit/([_a-zA-Z0-9]+)/?$", "GET", Recettes::edit, "frontend/recettes/layout.html");
+  addPostRoute(server, wp, "^/recettes/update/([_a-zA-Z0-9]+)/?$", Recettes::do_update); // FIXME: This should be PUT, be workaround needed since from only supports GET and POST
+  addPostRoute(server, wp, "^/recettes/create/?$", Recettes::do_create);
+  addRoute(server, wp, "^/recettes/delete/([_a-zA-Z0-9]+)/?$", "GET", Recettes::remove, "frontend/recettes/layout.html"); // FIXME: DELETE, not GET
   
-  addRoute(server, wp, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html");
-  addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html");
-  addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
-  addPostRoute(server, wp, "^/ingredients/new$", Ingredients::do_create, "/ingredients/index.html");
+  addRoute(server, wp, "^/ingredients/index/?$", "GET", Ingredients::index, "frontend/ingredients/layout.html"); 
+  addRoute(server, wp, "^/ingredients/new/?$", "GET", Ingredients::create, "frontend/ingredients/layout.html");
+  addPostRoute(server, wp, "^/ingredients/create/?$", Ingredients::do_create);
 
   addRoute(server, wp, "^/3d/index.html$", "GET", ThreeD::index, "frontend/3d/layout.html");
+ 
+  // Deprecated: Don't add .html to the end of the url 
+  addRoute(server, wp, "^/axes/index.html$", "GET", axesIndex, "frontend/axes/layout.html"); // deprecated
+  addRoute(server, wp, "^/ingredients/index.html$", "GET", Ingredients::index, "frontend/ingredients/layout.html"); // deprecated
+  addRoute(server, wp, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html"); // deprecated
+  addRoute(server, wp, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html"); // deprecated
+  //addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html"); // deprecated
+  addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html"); // deprecated
 
   server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /run/arduino" << endl;

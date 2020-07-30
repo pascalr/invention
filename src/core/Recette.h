@@ -24,7 +24,8 @@ class Ingredient : public Model {
     Ingredient(string name, int aliment_id) : name(name), aliment_id(aliment_id) {}
 
     string name;
-    int aliment_id;
+    int aliment_id = 0;
+    long rowid = 0;
 };
 
 /*
@@ -46,27 +47,21 @@ class Ingredient {
 };
 */
 
-class Instruction {
-};
-
 class Recette {
   public:
 
-    void saveAsHtml() {
+    Recette() {
     }
 
-    void saveAsJson() {
+    Recette(string name) : name(name) {
     }
 
-    //friend ostream &operator<<(std::ostream &os, const Recette &r);
+    Recette(string name, string instructions) : name(name), instructions(instructions) {
+    }
 
-  protected:
-
-    int m_version = 0;
-    vector<Ingredient> m_ingredients; // Only the id is saved and loaded.
-    vector<double> m_quantities;
-    vector<Instruction> m_instructions;
-
+    string name;
+    string instructions;
+    long rowid = 0;
 };
 
 

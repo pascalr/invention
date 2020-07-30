@@ -7,6 +7,9 @@
 
 using namespace std;
 
+// HUUUUUUUUGEEEE FIXME: I do not validate the user input. It could insert sql...
+// I should probably use ruby on rails which does all this already...
+
 class Database {
   public:
 
@@ -15,19 +18,61 @@ class Database {
 
     void load(vector<Ingredient>& ingredients) {
 
-      SQLite::Statement query(db, "SELECT * FROM ingredient");
+      SQLite::Statement query(db, "SELECT rowid,* FROM ingredient");
       
       while (query.executeStep())
       {
-        const char* name            = query.getColumn(0);
-        int         aliment_id      = query.getColumn(1);
+        const char* name            = query.getColumn(1);
+        int         aliment_id      = query.getColumn(2);
         Ingredient ingredient(name, aliment_id);
+        ingredient.rowid = query.getColumn(0);
         ingredients.push_back(ingredient);
       }
     }
 
     void save(Ingredient ingredient) {
       db.exec("INSERT INTO ingredient VALUES (\""+ingredient.name+"\", "+to_string(ingredient.aliment_id)+")");
+    }
+
+    void loadRecette(SQLite::Statement& query, Recette& recette) {
+
+        recette.rowid = query.getColumn(0);
+        recette.name = (const char*)query.getColumn(1);
+        recette.instructions = (const char*)query.getColumn(2);
+
+    }
+
+    void load(vector<Recette>& recettes) {
+
+      SQLite::Statement query(db, "SELECT rowid,* FROM recette");
+      
+      while (query.executeStep())
+      {
+        Recette recette;
+        loadRecette(query, recette);
+        recettes.push_back(recette);
+      }
+    }
+
+    void remove(Recette& recette, string name) {
+      db.exec("DELETE FROM recette WHERE name =  \""+name+"\"");
+    }
+
+    void get(Recette& recette, string name) {
+
+      SQLite::Statement query(db, "SELECT rowid,* FROM recette WHERE NAME = \"" + name + "\"");
+      query.executeStep();
+      loadRecette(query, recette);
+    }
+
+    void save(Recette recette) {
+      if (recette.rowid) {
+        cout << "Updating recipee\n";
+        db.exec("UPDATE recette SET name = \""+recette.name+"\", instructions = \""+recette.instructions+"\" WHERE rowid = " + to_string(recette.rowid));
+      } else {
+        cout << "Saving recipee\n";
+        db.exec("INSERT INTO recette VALUES (\""+recette.name+"\", \""+recette.instructions+"\")");
+      }
     }
 
     SQLite::Database db;

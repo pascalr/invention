@@ -36,7 +36,7 @@ namespace Ingredients {
     t.load("frontend/ingredients/new.html");
   }
 
-  void do_create(WebProgram& wp, PostRequest request) {
+  void do_create(WebProgram& wp, PostRequest& request) {
 
     string name = request.getMandatoryVal("name");
     string aliment_id = request.getVal("aliment_id");
@@ -46,7 +46,8 @@ namespace Ingredients {
 
     Ingredient ingredient(name, stoi(aliment_id));
     wp.db.save(ingredient);
-    //wp.ingredients.push_back(ingredient);
+    
+    request.redirect = "/ingredients/index";
   }
 
 }
