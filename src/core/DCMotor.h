@@ -67,6 +67,9 @@ class DCMotor : public Motor {
       if (m_duty_cycle == 0) {return false;}
 
       m_encoder.checkPosition(currentTime, isForward);
+      if (isReferencing && m_encoder.rpm < 0.001) {
+        referenceReached();
+      }
         
       // TODO: Handle acceleration and deceleration
       return true;
@@ -74,6 +77,11 @@ class DCMotor : public Motor {
 
     void prepare(unsigned long time) {
       m_encoder.prepare(time);
+    }
+
+    virtual void startReferencing() {
+      setMotorDirection(REVERSE);
+      setDutyCycle(25);
     }
 
   protected:

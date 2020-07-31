@@ -57,6 +57,9 @@ MeDCMotor.cpp -> Add #ifdef ME_PORT_DEFINED around the two reset functions
 git clone https://github.com/SRombauts/SQLiteCpp et installer dans thirdparty, vient avec sqlite je crois
 
 git submodule add https://github.com/SRombauts/SQLiteCpp.git thirdparty/SQLiteCpp
+cd thirdparty/SQLiteCpp
+git submodule init
+git submodule update
 
 sudo apt install libsqlite3-dev sqlite3
 

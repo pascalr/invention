@@ -16,6 +16,9 @@ Référencement: 2 situations:
 - Sinon:
     => Orienter le bras vers l'avant. Référencer l'axe horizontal, puis le vertical.
 
+Faire une séquence de référencement, à partir du input_parser dans l'arduino. Callbacks?
+À la fin du référencement, mettre les axes à la HOME_POSITION. Pince ouverte, tablette qu'on voit, cachée derrière.
+
 
 - Axe vertical
 - reférencement
@@ -49,3 +52,6 @@ La pince pour prendre les pots par le dessus pourrait aussi être utilisé pour 
 les pinces 3 pouces par en avant et que ça reste assez fort, assez rigide.
 
 Le serveur devrait envoyer à l'arduino une liste de temps d'accélération, de vitesse constant et de décélération. Mt1,2,3,4,5...
+
+
+Un V au lieu d'un U pour prendre les pots. Autant de points de contacts, et les trucs collerait mieux sur des surfaces droites que courbées. Priorité basse.
