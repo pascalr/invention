@@ -32,12 +32,13 @@ class Motor : public Axis {
     }
 
     virtual void referenceReached() {
-      m_writer << "Done referencing axis " << getName() << '\n';
+      stop();
       isReferenced = true;
       isReferencing = false;
       setPosition(0);
       setDestination(0);
       //setMotorEnabled(true);
+      m_writer << "Done referencing axis " << getName() << '\n';
     }
 
     virtual void stop() = 0;

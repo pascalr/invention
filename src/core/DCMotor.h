@@ -28,7 +28,7 @@ class DCMotor : public Motor {
     }
 
     void grab(int dutyCycle) {
-      setMotorDirection(FORWARD);
+      setMotorDirection(REVERSE);
       setDutyCycle(dutyCycle);
     }
 
@@ -67,7 +67,7 @@ class DCMotor : public Motor {
       if (m_duty_cycle == 0) {return false;}
 
       m_encoder.checkPosition(currentTime, isForward);
-      if (isReferencing && m_encoder.rpm < 0.001) {
+      if (isReferencing && m_encoder.rpm < 0.01) {
         referenceReached();
       }
         
@@ -80,6 +80,8 @@ class DCMotor : public Motor {
     }
 
     virtual void startReferencing() {
+      isReferencing = true;
+      isReferenced = false;
       setMotorDirection(REVERSE);
       setDutyCycle(25);
     }

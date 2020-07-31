@@ -92,7 +92,7 @@ void setup() {
 
   setupAxes(p);
   
-  //pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.println(MESSAGE_READY);
 }

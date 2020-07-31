@@ -20,6 +20,7 @@ class Encoder {
 
       if (analogRead(m_step_pin) > 500) { // Should be digital maybe, useless to be analog
         m_step_was_high = true;
+	digitalWrite(LED_BUILTIN, HIGH);
       } else if (m_step_was_high) {
         m_step_was_high = false;
         m_rpm_count += 1;
