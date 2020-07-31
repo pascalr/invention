@@ -11,7 +11,8 @@ class Encoder {
 
       if (timeDifference(m_last_rpm_time, currentTime) > 100000) { // Calculate RPM every 100ms.
         // There are 8 steps per turn FIXME: Pass this as an argument to the class.
-        rpm = m_rpm_count / 8.0 * 60;
+	m_is_rpm_calculated = true;
+        m_rpm = m_rpm_count / 8.0 * 60;
         m_last_rpm_time = currentTime;
         m_rpm_count = 0;
       }
@@ -42,20 +43,30 @@ class Encoder {
     }
 
     void prepare(unsigned long time) {
+      m_is_rpm_calculated = false;
       m_last_rpm_time = time;
       m_rpm_count = 0;
       m_step_was_high = analogRead(m_step_pin) > 500;
     }
-    
-    double rpm;
+
+    bool isRpmCalculated() {
+      return m_is_rpm_calculated;
+    }
+   
+    double getRpm() {
+      return m_rpm;
+    }
       
   protected:
+
+    bool m_is_rpm_calculated;
 
     bool m_step_was_high;
 
     unsigned long m_last_rpm_time;
     long m_position_steps;
 
+    double m_rpm;
     long m_rpm_count;
     
     uint8_t m_step_pin;

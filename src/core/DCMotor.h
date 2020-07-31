@@ -82,8 +82,11 @@ class DCMotor : public Motor {
       if (m_duty_cycle == 0) {return false;}
 
       m_encoder.checkPosition(currentTime, isForward);
-      if (isReferencing && m_encoder.rpm < 0.01) {
-        referenceReached();
+      if (m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01) {
+        if (isReferencing) {
+          referenceReached();
+        }
+	return false;
       }
         
       // TODO: Handle acceleration and deceleration
