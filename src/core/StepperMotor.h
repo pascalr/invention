@@ -82,15 +82,6 @@ class StepperMotor : public Motor {
       setMotorEnabled(true);
     }
 
-    bool notGoingOutOfBounds() {
-      double p = getPosition();
-      return isForward ? p <= getMaxPosition() : p >= m_min_position;
-    }
-
-    bool canMove() {
-      return isReferenced && isMotorEnabled && notGoingOutOfBounds();
-    }
-
     double getPosition() {
       return m_position_steps / stepsPerUnit;
     }
@@ -335,7 +326,7 @@ class StepperMotor : public Motor {
       
       if (isReferencing) {
         return moveToReference();
-      } else if (canMove() && (forceRotation || !isDestinationReached())) {
+      } else if (forceRotation || !isDestinationReached()) {
         unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
         if (currentTime >= m_next_step_time) {
           turnOneStep(timeSinceStart);

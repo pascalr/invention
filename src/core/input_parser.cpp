@@ -124,6 +124,8 @@ int processMoveCommand(Program& p) {
 
   // If asking to move axis theta directly, dont overwrite it.
   if (p.axisT.getPosition() != p.axisT.getDestination()) {
+    //p.axisX.setDestination(p.baseAxisX.getPosition() - RAYON * cosd(angleDest);
+    //p.axisZ.setDestination(...)
     return 0;
   }
 
