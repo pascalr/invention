@@ -23,6 +23,7 @@ void setupAxes(Program& p) {
   p.axisT.setDefaultMaxSpeed(0.2);
   p.axisT.setAcceleration(0.2);
 
+  p.axisZ.setMinPosition(-100);
   p.axisZ.setMaxPosition(RAYON);
   p.axisZ.setDestination(0.0);
 
