@@ -17,7 +17,7 @@ void setup(FakeProgram& p) {
   axis.setDefaultMaxSpeed(10); // tour/s
   axis.setPosition(0);
   
-  axis.prepare(0);
+  axis.prepareWorking(0);
 
   double turns = 100; // A lot of turns to be sure the axis has reached full speed in the middle
   double units = turns * axis.getStepsPerTurn() / axis.getStepsPerUnit();
@@ -66,7 +66,7 @@ void testTimeToReachDestination() {
   axis.setDefaultMaxSpeed(10); // tour/s
   axis.setPosition(0);
   
-  axis.prepare(0);
+  axis.prepareWorking(0);
 
   double turns = 10;
   double units = turns * axis.getStepsPerTurn() / axis.getStepsPerUnit();
@@ -91,7 +91,7 @@ void testSetDestination() {
   p.axisY.setAcceleration(100); // tour/s^2
   p.axisY.setDefaultMaxSpeed(100); // tour/s
   
-  p.axisY.prepare(0);
+  p.axisY.prepareWorking(0);
 
   // So it should take one second to reach the destination
 }

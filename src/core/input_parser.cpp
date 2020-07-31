@@ -198,6 +198,28 @@ int processMoveCommand(Program& p) {
   */
 }
 
+// Référencement: 2 situations:
+// - Le bras est orienté de manière à ce qu'il n'y ait pas de collision pour monter descendre:
+//     => Faire le référencement de l'axe vertical, puis descendre à la table de travail, faire les autres
+//        ( Parce que si le bras était en train de monter ou de descendre, il ne peut pas tourner s'il
+//        est vis à vis une tablette.) TODO: edge case, later, not a priority
+// - Sinon:
+//     => Orienter le bras vers l'avant. Référencer l'axe horizontal, puis le vertical.
+void doReferencingAll(Program& p) {
+  p.getWriter() << "Referencing...\n";
+  p.axisR.startReferencing();
+  p.axisT.startReferencing(); // TODO: Use the potentiometer to do the referencing. Move to 90 degrees.
+  p.axisT.doneWorkingCallback = [](Program& p) {
+    p.baseAxisX.startReferencing();
+    p.baseAxisX.doneWorkingCallback = [](Program& p) {
+      p.axisY.startReferencing();
+    };
+  };
+  //for (int i = 0; p.motors[i] != 0; i++) {
+  //  p.motors[i]->startReferencing();
+  //}
+}
+
 int parseActionCommand(char cmd, Program& p) {
 
   Axis* axis;
@@ -208,7 +230,7 @@ int parseActionCommand(char cmd, Program& p) {
   // Prepare
   unsigned long time = p.getCurrentTime();
   for (int i = 0; p.motors[i] != 0; i++) {
-    p.motors[i]->prepare(time);
+    p.motors[i]->prepareWorking(time);
   }
   p.axisX.prepare(time);
   p.axisZ.prepare(time);
@@ -232,10 +254,7 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
-    p.getWriter() << "Referencing...\n";
-    for (int i = 0; p.motors[i] != 0; i++) {
-      p.motors[i]->startReferencing();
-    }
+    doReferencingAll(p);
 
   // Wait or sleep for some time
   } else if (cmd == 'w' || cmd == 'W') {
@@ -318,7 +337,7 @@ void myLoop(Program& p) {
 
   bool stillWorking = false;
   for (int i = 0; p.motors[i] != 0; i++) {
-    stillWorking = p.motors[i]->handleAxis(p.getCurrentTime()) || stillWorking;
+    stillWorking = p.motors[i]->work(p, p.getCurrentTime()) || stillWorking;
   }
 
   if (!stillWorking) {

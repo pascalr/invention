@@ -40,7 +40,7 @@ class Program {
       isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
     }
     
-    StepperMotor axisT; // Real one
+    MotorT axisT; // Real one
     ZAxis axisZ; // Virtual one
 
     BaseXAxis baseAxisX; // Real one

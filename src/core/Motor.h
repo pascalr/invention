@@ -3,6 +3,9 @@
 
 #include "axis.h"
 #include "../lib/ArduinoMock.h"
+#include "program.h"
+
+class Program;
 
 // TODO: The referencing method should be independant of the motor.
 // This should be in another class.
@@ -43,23 +46,41 @@ class Motor : public Axis {
 
     virtual void stop() = 0;
 
-    virtual void startReferencing() {
-      referenceReached(); // FIMXE: Temporary
-      /*isReferencing = true;
-      setMotorDirection(CCW);
-      setMotorEnabled(true);*/
+    void startReferencing() {
+      isWorking = true;
+      doStartReferencing();
     }
     
-    virtual bool handleAxis(unsigned long currentTime) = 0;
-    
-    virtual void prepare(unsigned long time) = 0;
+    bool work(Program& p, unsigned long currentTime) {
+      bool isCurrentlyWorking = handleAxis(currentTime);
+      if (isWorking && !isCurrentlyWorking && doneWorkingCallback) {
+        doneWorkingCallback(p);
+        doneWorkingCallback = 0;
+      }
+      isWorking = isCurrentlyWorking;
+      return isWorking;
+    }
+
+    void prepareWorking(unsigned long time) {
+      isWorking = true;
+      prepare(time);
+    }
 
     bool isReferenced = false;
     bool isReferencing = false;
     bool isForward = false;
+    bool isWorking = false;
+
+    void (*doneWorkingCallback)(Program& p) = 0;
 
   protected:
+
+    virtual void doStartReferencing() = 0;
     
+    virtual void prepare(unsigned long time) = 0;
+    
+    virtual bool handleAxis(unsigned long currentTime) = 0;
+
     int m_dir_pin;
     bool m_reverse_motor_direction = false;
     

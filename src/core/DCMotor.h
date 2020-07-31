@@ -63,6 +63,21 @@ class DCMotor : public Motor {
       setDutyCycle(0);
     }
 
+
+
+  protected:
+
+    virtual void doStartReferencing() {
+      isReferencing = true;
+      isReferenced = false;
+      setMotorDirection(REVERSE);
+      setDutyCycle(25);
+    }
+
+    void prepare(unsigned long time) {
+      m_encoder.prepare(time);
+    }
+
     bool handleAxis(unsigned long currentTime) {
       if (m_duty_cycle == 0) {return false;}
 
@@ -74,19 +89,6 @@ class DCMotor : public Motor {
       // TODO: Handle acceleration and deceleration
       return true;
     }
-
-    void prepare(unsigned long time) {
-      m_encoder.prepare(time);
-    }
-
-    virtual void startReferencing() {
-      isReferencing = true;
-      isReferenced = false;
-      setMotorDirection(REVERSE);
-      setDutyCycle(25);
-    }
-
-  protected:
 
     Encoder m_encoder;
     uint8_t m_pwm_pin;

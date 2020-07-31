@@ -141,15 +141,6 @@ class StepperMotor : public Motor {
              (!isForward && getPosition() <= getDestination());
     }
 
-    virtual void referenceReached() {
-      m_writer << "Done referencing axis " << getName() << '\n';
-      isReferenced = true;
-      isReferencing = false;
-      setPositionSteps(0);
-      setDestination(0);
-      setMotorEnabled(true);
-    }
-
     // Only the vertical axis moves in order to do a reference
     virtual bool moveToReference() {
       referenceReached();
@@ -303,30 +294,6 @@ class StepperMotor : public Motor {
       m_next_step_time = currentTime + calculateNextStepDelay(currentTime); 
     }
 
-    // Returns true if the axis is still working.
-    virtual bool handleAxis(unsigned long currentTime) {
-      //unsigned int delay = getDelay();
-      
-      if (isReferencing) {
-        return moveToReference();
-      } else if (canMove() && (forceRotation || !isDestinationReached())) {
-        unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
-        if (currentTime >= m_next_step_time) {
-          turnOneStep(timeSinceStart);
-        }
-        return true;
-      }
-      return false;
-    }
-
-    // Resets some stuff.
-    virtual void prepare(unsigned long time) {
-      m_start_time = time;
-      m_next_step_time = time;
-      m_speed = 0;
-      m_max_speed = m_default_max_speed;
-    }
-
     bool m_is_step_high;
 
     long m_position_steps;
@@ -347,6 +314,37 @@ class StepperMotor : public Motor {
     // TODO:
     // bool m_jog_forward; No more forceRotation.
     // bool m_jog_reverse; No more isForward.
+
+  protected:
+
+    virtual void doStartReferencing() {
+      referenceReached();
+    }
+
+    // Resets some stuff.
+    virtual void prepare(unsigned long time) {
+      m_start_time = time;
+      m_next_step_time = time;
+      m_speed = 0;
+      m_max_speed = m_default_max_speed;
+    }
+
+    // Returns true if the axis is still working.
+    virtual bool handleAxis(unsigned long currentTime) {
+      //unsigned int delay = getDelay();
+      
+      if (isReferencing) {
+        return moveToReference();
+      } else if (canMove() && (forceRotation || !isDestinationReached())) {
+        unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
+        if (currentTime >= m_next_step_time) {
+          turnOneStep(timeSinceStart);
+        }
+        return true;
+      }
+      return false;
+    }
+
 };
 
 class BaseXAxis : public StepperMotor {
@@ -384,6 +382,20 @@ class BaseXAxis : public StepperMotor {
   private:
     //unsigned long m_start_time;
     Axis& m_theta_axis;
+};
+
+class MotorT : public StepperMotor {
+  public:
+
+    MotorT(Writer& writer, char theName) : StepperMotor(writer, theName) {
+    }
+
+    void referenceReached() {
+      Motor::referenceReached();
+      setPosition(90.0);
+      setDestination(90.0);
+    }
+
 };
 
 #endif
