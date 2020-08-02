@@ -11,6 +11,8 @@ cp src/utils/utils.cpp ../Arduino/libraries/utils/utils.cpp
 cp src/core/writer.h ../Arduino/libraries/core/writer.h
 cp src/core/writer.cpp ../Arduino/libraries/core/writer.cpp
 cp src/config/constants.h ../Arduino/libraries/config/constants.h
+cp src/config/shelves_constants.h ../Arduino/libraries/config/shelves_constants.h
+cp src/config/calibration_constants.h ../Arduino/libraries/config/calibration_constants.h
 cp src/config/camera_constants.h ../Arduino/libraries/config/camera_constants.h
 cp src/config/setup.h ../Arduino/libraries/config/setup.h
 cp src/core/program.h ../Arduino/libraries/core/program.h

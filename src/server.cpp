@@ -168,6 +168,7 @@ int main(int argc, char** argv) {
   server.config.port = serverPort ? serverPort : 8083;
  
   Heda heda; 
+  heda.init();
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;
