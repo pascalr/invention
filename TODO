@@ -12,6 +12,22 @@ TODO business:
 - Écrire un speech de vente.
 
 
+Use interupts to read rotary encoder.
+https://playground.arduino.cc/Main/RotaryEncoders/
+
+Upload with a single command to the arduino the new code with the arduino-cli:
+https://blog.arduino.cc/2018/08/24/announcing-the-arduino-command-line-interface-cli/
+https://arduino.github.io/arduino-cli/getting-started/
+
+Download et parser la liste d'ingredients avec leurs valeurs nutritives.
+https://fdc.nal.usda.gov/docs/Foundation_Foods_Documentation_Apr2020.pdf
+https://fdc.nal.usda.gov/download-datasets.html
+
+SQL injection prevention SQLite.
+https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+
+Dough hook?
+https://www.amazon.ca/Spiral-Coated-Metal-Dough-Hook/dp/B07WBZQGRL/ref=sr_1_2?dchild=1&keywords=knead+dough+hook&qid=1596200815&sr=8-2
 
 
 Actions:
@@ -75,3 +91,5 @@ Recettes:
 Soupe minestrone. Je l'ai de downloader sur mon chromebook et Céline me l'a envoyé.
 Pain hamburger maison
 Pain à hot dog
+
+BBQ sauce: https://www.ricardocuisine.com/en/recipes/8397-quick-and-easy-barbecue-sauce

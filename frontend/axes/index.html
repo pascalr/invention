@@ -1,5 +1,5 @@
 <script>
-(function poll() {
+/*(function poll() {
   $.get( "/poll", function( data ) {
     let log = document.getElementById("log")
     log.value += data.log;
@@ -22,7 +22,7 @@
 
     poll(); // FIXME: Possible deep stack error can I do a forever loop or it will jam? It's single threaded I think.
   });
-})()
+})()*/
 </script>
 
 <div id="Manuel" style="display: flex;">
@@ -51,47 +51,52 @@
     </div>
   </div>
   <div>
-    <button style="font-size: 28px; margin-bottom: 10px;" onclick="$.get('/run/arduino?cmd=H')">🏠</button><br/>
-    <button onclick="$.get('/run/arduino?cmd=HX')">🏠 X</button><br/>
-    <button onclick="$.get('/run/arduino?cmd=HY')">🏠 Y</button><br/>
-    <button onclick="$.get('/run/arduino?cmd=HZ')">🏠 Z</button><br/>
-    <button onclick="$.get('/run/arduino?cmd=HW')">🏠 W</button><br/>
+    <button style="font-size: 28px; margin-bottom: 10px;" onclick="$.get('/run?cmd=H')">🏠</button><br/>
+    <button onclick="$.get('/run?cmd=HX')">🏠 X</button><br/>
+    <button onclick="$.get('/run?cmd=HY')">🏠 Y</button><br/>
+    <button onclick="$.get('/run?cmd=HZ')">🏠 Z</button><br/>
+    <button onclick="$.get('/run?cmd=HW')">🏠 W</button><br/>
   </div>
   <div>
     <div>
       <button onclick="document.getElementById('log').value='';$.get('/connect');">Connect</button>
       <button onclick="$.get('/close')">Close</button>
-      <button onclick="$.get('/run/arduino?cmd=\?')">Info</button>
-      <button onclick="$.get('/run/arduino?cmd=\s')" style="color: red;">Stop</button>
+      <button onclick="$.get('/run?cmd=\?')">Info</button>
+      <button onclick="$.get('/run?cmd=\s')" style="color: red;">Stop</button>
       <button onclick="$.get('/takePicture'); refreshPicture()">Picture</button>
-      <button onclick="$.get('/sweep')">Sweep</button>
+    </div>
+    <div>
+      <form action="#" onsubmit="$.get(`/run?cmd=${encodeURI(this[0].value)}`);return false">
+        Command: <input name="name" type="text">
+        <input type="submit" value="Execute"/>
+      </form>
     </div>
     <div style="display: flex;">
       
       <div class="manuel_columns">
         <h2>Position</h2>
         Position X: <input id="Pos X" type="number" readonly>
-        <button onclick="$.get('/run/arduino?cmd=%2DX')">-</button>
-        <button onclick="$.get('/run/arduino?cmd=%2BX')">+</button>
+        <button onclick="$.get('/run?cmd=%2DX')">-</button>
+        <button onclick="$.get('/run?cmd=%2BX')">+</button>
         <br/>
         Position Y: <input id="Pos Y" type="number" readonly>
-        <button onmousedown="$.get('/run/arduino?cmd=%2DY')"
-        onclick="$.get('/run/arduino?cmd=s')">-</button>
-        <button onmousedown="$.get('/run/arduino?cmd=%2BY')"
-        onclick="$.get('/run/arduino?cmd=s')">+</button>
+        <button onmousedown="$.get('/run?cmd=%2DY')"
+        onclick="$.get('/run?cmd=s')">-</button>
+        <button onmousedown="$.get('/run?cmd=%2BY')"
+        onclick="$.get('/run?cmd=s')">+</button>
         <br/>
         Position Z: <input id="Pos Z" type="number" readonly>
-        <button onclick="$.get('/run/arduino?cmd=%2DZ')">-</button>
-        <button onclick="$.get('/run/arduino?cmd=%2BZ')">+</button>
+        <button onclick="$.get('/run?cmd=%2DZ')">-</button>
+        <button onclick="$.get('/run?cmd=%2BZ')">+</button>
         <br/>
         Position W: <input id="Pos W" type="number" readonly>
-        <button onclick="$.get('/run/arduino?cmd=%2DW')">-</button>
-        <button onclick="$.get('/run/arduino?cmd=%2BW')">+</button>
+        <button onclick="$.get('/run?cmd=%2DW')">-</button>
+        <button onclick="$.get('/run?cmd=%2BW')">+</button>
         <br/>
       </div>
       <div class="manuel_columns">
         <h2>Destination</h2>
-        <form action="#" onsubmit="$.get(`/run/arduino?cmd=MX${this[0].value}Y${this[1].value}Z${this[2].value}W${this[3].value}`);return false">
+        <form action="#" onsubmit="$.get(`/run?cmd=MX${this[0].value}Y${this[1].value}Z${this[2].value}W${this[3].value}`);return false">
         Position X: <input id="Dest X" type="number" readonly><br/>
         Position Y: <input id="Dest Y" type="number" readonly><br/>
         Position Z: <input id="Dest Z" type="number" readonly><br/>
@@ -123,7 +128,7 @@
           <option value="W">W</option>
         </select>
         <br/>
-        Speed: <input type="range" min="500" max="3000" value="500" style ="direction: rtl;" onchange="$.get('/run/arduino?cmd=v' + this.value)">
+        Speed: <input type="range" min="500" max="3000" value="500" style ="direction: rtl;" onchange="$.get('/run?cmd=v' + this.value)">
         <br/>
       </div>
     </div>
@@ -134,7 +139,7 @@
 <script>
 function sendMessage() {
   let v = document.getElementById('message');
-  $.get('/run/arduino?cmd=' + encodeURI(v.value));
+  $.get('/run?cmd=' + encodeURI(v.value));
   v.value = "";
 }
 </script>

@@ -1,3 +1,11 @@
+
+// TO print all exceptions
+    } catch(...) {
+      std::exception_ptr p = std::current_exception();
+      std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+      response->write("Error an exception occured.");
+    }
+
 MODELS:
 
 Ingredient: name, fdc_id

@@ -91,7 +91,6 @@ int main(int argc, char** argv)
   Heda heda;
   heda.init();
 
-  double workingShelfHeight;
   //calibrateShelvesHeight(workingShelfHeight);
   calibrateCamWithJarRef(heda);
 

@@ -40,6 +40,8 @@
 #include "controllers/layout_controller.h"
 #include "controllers/3d_controller.h"
 
+#include "core/Heda.h"
+
 using namespace NL::Template;
 
 using namespace std;
@@ -164,8 +166,8 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
-  
-  SerialPort p;
+ 
+  Heda heda; 
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;
@@ -201,30 +203,20 @@ int main(int argc, char** argv) {
   //addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html"); // deprecated
   addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html"); // deprecated
 
-  server.resource["^/run/arduino$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    cout << "GET /run/arduino" << endl;
-    if (!p.isOpen()) {
-      response->write("Error arduino is not connected.");
-      cout << "Error arduino is not connected." << endl;
-      return;
-    }
-    
+  server.resource["^/run$"]["GET"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /run" << endl;
+
     auto query_fields = request->parse_query_string();
     for(auto &field : query_fields) {
       if (field.first == "cmd") {
-        if (field.second == "info") { // FIXME: Temporary fix until ?cmd=? works
-          cout << "Querying arduino for info." << endl;
-          p.writePort("?");
-        } else {
-          cout << "Giving arduino cmd = " << field.second << endl;
-          p.writePort(field.second);
-        }
+
+        heda.execute(field.second);
       }
     }
     response->write("Ok command given to arduino");
   };
 
-  server.resource["^/cam_capture.jpg$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  /*server.resource["^/cam_capture.jpg$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
     Mat frame;
     captureVideoImage(frame);
@@ -239,9 +231,9 @@ int main(int argc, char** argv) {
     //response->write(header, encodeBuf.size());
     response->write(SimpleWeb::StatusCode::success_ok, header);
     response->write(buf, ss);
-  };
+  };*/
 
-  server.resource["^/listeIngredients$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/listeIngredients$"]["GET"] = [&jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /listeIngredients" << endl;
    
     ptree pt;
@@ -249,7 +241,7 @@ int main(int argc, char** argv) {
     sendJson(response, pt);
   };
 
-  server.resource["^/listeRecettes$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/listeRecettes$"]["GET"] = [&jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /listeRecettes" << endl;
    
     ptree pt;
@@ -257,30 +249,7 @@ int main(int argc, char** argv) {
     sendJson(response, pt);
   };
 
-  server.resource["^/sweep$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    cout << "GET /sweep" << endl;
-    try {
-      if (!p.isOpen()) {
-        response->write("Error arduino is not connected.");
-        return;
-      }
-      Sweep sweep(p);
-      if(!sweep.init()) {
-        response->write("Error initializing sweep.");
-        return;
-      }
-      vector<DetectedHRCode> candidates;
-      sweep.run(candidates);
-      
-      response->write("Ok executed command sweep");
-    } catch(...) {
-      std::exception_ptr p = std::current_exception();
-      std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
-      response->write("Error an exception occured.");
-    }
-  };
-
-  server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  /*server.resource["^/connect$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /connect" << endl;
     // FIXME: Also handle fake arduino too
     if (p.openPort("/dev/ttyACM0") < 0) {
@@ -295,9 +264,9 @@ int main(int argc, char** argv) {
     // FIXME: Also handle fake arduino too
     p.closePort();
     response->write("Port closed.");
-  };
+  };*/
  
-  server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  /*server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     if (p.isOpen()) {
       thread work_thread([&p,response] {
         while (true) {
@@ -326,7 +295,7 @@ int main(int argc, char** argv) {
       });
       work_thread.detach();
     }
-  };
+  };*/
 
   // Default GET-example. If no other matches, this anonymous function will be called.
   // Will respond with content in the web/-directory, and its subdirectories.

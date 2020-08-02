@@ -6,6 +6,8 @@
 #include "../lib/opencv.h"
 #include "sweep.h" // because it is sweep that detects HRCodes
 
+#include "command_parser.h"
+
 class HedaException : public exception {
 };
 
@@ -54,6 +56,19 @@ class Heda {
       }
     }
 
+    void execute(string cmd) {
+      cerr << "Executing cmd = " << cmd << "\n";
+      if (cmd == "grab") {
+        grab(50);
+      } else if (cmd == "release") {
+        release();
+      //} else if (cmd == "move") {
+      //  move();
+      } else if (cmd == "s" || cmd == "stop") {
+        stop();
+      }
+    }
+
     void captureFrame(Mat& frame) {
 
       for (int i = 0; i < 10; i++) {
@@ -90,8 +105,15 @@ class Heda {
       m_port.executeUntil("G" + to_string(strength), MESSAGE_DONE);
     }
 
+    void sweep() {
+    }
+
+    void stop() {
+      m_port.executeUntil("s", MESSAGE_DONE);
+    }
+
     void release() {
-      m_port.executeUntil("H", MESSAGE_DONE);
+      m_port.executeUntil("h", MESSAGE_DONE);
     }
 
   protected:
