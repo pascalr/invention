@@ -3,21 +3,81 @@
 
 #include "../config/constants.h"
 
+// COORDINATES:
+// Where does the 0 starts?
+// x 0 is at middle of carriage
+// y 0 is at height of lowest shelf
+// z 0 is at middle of carriage
+
 // TODO: Only keep Eigen/Core in header file
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <vector>
+
 using namespace Eigen;
 using namespace std;
 
-#define HOME_POSITION Vector3d::Constant(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z)
+#define HOME_POSITION PolarCoord::Constant(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z)
+
+
+using PolarCoord = Vector3d; // (x,y,t)
+using CartesianCoord = Vector3d; // (x,y,z)
+
+
+// Above which shelf is the arm on?
+int calculateLevel(PolarCoord position) {
+
+  double heights[SHELVES_TOTAL] = SHELVES_HEIGHT;
+
+  for (int i = 0; i < SHELVES_TOTAL; i++) {
+
+    if (position(1) < heights[i]) {
+      return i - 1;
+    }
+  }
+
+  return heights[SHELVES_TOTAL - 1];
+}
+
+class Movement {
+  public:
+    Movement(char axis, double destination) : axis(axis), destination(destination) {}
+    string str() {
+      return "M" + axis + to_string(destination);
+    }
+    char axis;
+    double destination;
+};
 
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 // Maybe asking arduino: @ => (120, 23.12, 123.00)
 // Will often do many moves like this: "MZ0\nMY500\nMX200Z200"
-string calculateMoveCommand(Vector3d position, Vector3d destination) {
-  string moveCommand = "M";
-  return moveCommand;
+void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
+
+  // TODO: Collision detection
+
+  int currentLevel = calculateLevel(position);
+  int destinationLevel = calculateLevel(destination);
+
+  // must change level
+  if (currentLevel != destinationLevel) {
+
+    double angleDest = ((position(0)) > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    movements.push_back(Movement('T', CHANGE_LEVEL_ANGLE_HIGH));
+  }
+
+  movements.push_back(Movement('Y', destination(1)));
+
+  double angleDest = (asin(destination(2) / CLAW_RADIUS) * 180.0 / PI);
+  if (destination(0) > X_MIDDLE) {
+    angleDest = 180 - angleDest;
+  }
+  
+  double xDest = destination(0) - CLAW_RADIUS * cosd(angleDest);
+
+  //bool xMovingForward = xDest -
+  
 }
 
 

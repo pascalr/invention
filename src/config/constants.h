@@ -1,11 +1,14 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "calibration_constants.h"
+
 #ifndef PI
 #define PI 3.1415926535897932384626433832795
 #endif
 
 #include "camera_constants.h"
+#include "shelves_constant.h"
 
 #define sind(x) (sin(fmod((x),360) * M_PI / 180))
 #define cosd(x) (cos(fmod((x),360) * M_PI / 180))
@@ -15,8 +18,10 @@
 #define FORWARD true
 #define REVERSE false
 
+#define Y_MIN LOWEST_SHELF_TO_UNDER_ARM // mm (Y 0 is the lowest shelf)
+
 #define HOME_POSITION_X 0.0 // mm
-#define HOME_POSITION_Y 0.0 // mm
+#define HOME_POSITION_Y Y_MIN // mm
 #define HOME_POSITION_Z RAYON // mm
 
 #define TOOL_X_MIN 0.0 // mm
@@ -29,6 +34,13 @@
 #define BASE_X_MIN 0.0 // mm
 #define BASE_X_MAX 640.0 // mm
 #define BASE_X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
+
+#define CHANGE_LEVEL_ANGLE_LOW -6
+#define CHANGE_LEVEL_ANGLE_HIGH 186
+
+#define X_MIN 0.0 // mm
+#define X_MAX 640.0 // mm
+#define X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
 
 #define AXIS_X_MAX_POS BASE_X_MAX
 #define AXIS_Z_MAX_POS RAYON

@@ -120,7 +120,7 @@ void flip() {
 // Does the heavy work.
 // Maybe the validation is only done in a simulation to avoid
 // overloading the arduino. Yeah I think so. To be done later.
-int processMoveCommand(Program& p) {
+/*int processMoveCommand(Program& p) {
 
   // If asking to move axis theta directly, dont overwrite it.
   if (p.axisT.getPosition() != p.axisT.getDestination()) {
@@ -180,7 +180,6 @@ int processMoveCommand(Program& p) {
 
   return 0;
 
-  /*
   // check for out of bounds min
   if (baseDest < p.baseAxisX.getMinPosition()) {
     if (!lookingRight) {return ERROR_OUT_OF_BOUNDS_MIN_X;}
@@ -197,8 +196,7 @@ int processMoveCommand(Program& p) {
     baseDest = p.axisX.getDestination() + RAYON * cosd(angleDest);
     if (baseDest > p.baseAxisX.getMaxPosition()) {return ERROR_OUT_OF_BOUNDS_MAX_X;}
   }
-  */
-}
+}*/
 
 // Référencement: 2 situations:
 // - Le bras est orienté de manière à ce qu'il n'y ait pas de collision pour monter descendre:
@@ -252,7 +250,7 @@ int parseActionCommand(char cmd, Program& p) {
     if (!parseInputMovingAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
     if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
     if ((status = axis->setDestination(number)) < 0) {return status;}
-    if ((status = processMoveCommand(p)) < 0) {return status;}
+    //if ((status = processMoveCommand(p)) < 0) {return status;}
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {

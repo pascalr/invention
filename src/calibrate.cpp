@@ -28,19 +28,24 @@ void writeConfig(string name, string value) {
   cout << "#define " << name << " " << value << "\n";
 }
 
-void calibrateShelvesHeight(double &workingShelfHeight) {
+/*void calibrateShelvesHeight(double &workingShelfHeight) {
   cerr << "TODO: calibrate shelves heights: The tooling is really simply. Grab a stick that sticks out. Force the stick down"
           " until a resistance is felt.\n";
 
   workingShelfHeight = 350.0;
   writeConfig("WORKING_SHELF_HEIGHT", to_string(workingShelfHeight));
-}
+  writeConfig("SHELVES_HEIGHT", "[150.0, 350.0]");
+  writeConfig("SHELVES_TOTAL", to_string(2));
+}*/
 
-void calibrateCamWithJarRef(Heda& heda, double workingShelfHeight) {
+void calibrateCamWithJarRef(Heda& heda) {
   
   char key;
 
   cerr << "Please clear the working shelf. Press any key when done..";
+  cin >> key;
+
+  cerr << "The shelves height must already be valid. Press any key to confirm..";
   cin >> key;
 
   cerr << "The tool in it's hand must a grabber. Press any key to confirm..";
@@ -52,10 +57,23 @@ void calibrateCamWithJarRef(Heda& heda, double workingShelfHeight) {
 
   cerr << "Moving to center of working shelf, at height=(" << height << "+4) mm.\n";
 
-  Vector3d destination;
-  destination << TOOL_X_MIDDLE, workingShelfHeight + height + 4, TOOL_Z_MIDDLE;
+  //Vector3d destination;
+  //destination << TOOL_X_MIDDLE, workingShelfHeight + height + 4, TOOL_Z_MIDDLE;
 
-  heda.moveTo(destination);
+  heda.reference(); // Make sure it is referenced.
+  heda.move(Movement('T', CHANGE_LEVEL_ANGLE_LOW));
+  heda.move(Movement('Y', WORKING_SHELF_HEIGHT+height+4));
+  heda.move(Movement('T', 30.0));
+
+  // Find the position
+
+
+  // FIXME: Move directly, so the angle is known. Move to requires CLAW_RADIUS which must be calculated.
+
+  // TODO: Calculate claw radius.
+  writeConfig("CLAW_RADIUS", to_string(340.0));
+  
+ 
   /*heda.release();
 
   cerr << "Please add the reference jar inside the jaws. Press any key when ready..";
@@ -74,8 +92,8 @@ int main(int argc, char** argv)
   heda.init();
 
   double workingShelfHeight;
-  calibrateShelvesHeight(workingShelfHeight);
-  calibrateCamWithJarRef(heda, workingShelfHeight);
+  //calibrateShelvesHeight(workingShelfHeight);
+  calibrateCamWithJarRef(heda);
 
   /*Mat frame;
   heda.captureFrame(frame);

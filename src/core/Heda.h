@@ -39,6 +39,7 @@ class Heda {
     void reference() {
       cerr << "Doing reference...";
       m_port.executeUntil("H", MESSAGE_DONE);
+      m_position = HOME_POSITION;
     }
 
     void detectOneCode() {
@@ -62,9 +63,27 @@ class Heda {
       throw FrameCaptureException();
     }
 
+    void move(Movement mvt) {
+
+      cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
+      m_port.executeUntil(mvt.str(), MESSAGE_DONE);
+
+      if (mvt.axis == 'x' || mvt.axis == 'X') {
+        m_position(0) = mvt.destination;
+      } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
+        m_position(1) = mvt.destination;
+      } else if (mvt.axis == 't' || mvt.axis == 'T') {
+        m_position(2) = mvt.destination;
+      }
+    }
+
     void moveTo(Vector3d destination) {
-      string mvt = calculateMoveCommand(HOME_POSITION, destination);
-      m_port.executeUntil(mvt, MESSAGE_DONE);
+
+      vector<Movement> mvts;
+      calculateMoveCommands(mvts, m_position, destination);
+      for (auto it = mvts.begin(); it != mvts.end(); it++) {
+        move(*it);
+      }
     }
 
     void grab(double strength) {
@@ -77,6 +96,7 @@ class Heda {
 
   protected:
     
+    PolarCoord m_position;
     SerialPort m_port;
     VideoCapture m_cap;
 };
