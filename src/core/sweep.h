@@ -108,7 +108,15 @@ class Sweep {
       detect(frame, detected, m_x, m_y, m_z, simulation.axisT.getPosition()); 
     }
 
-    void run(vector<DetectedHRCode>& detected) {
+    /*void run(vector<DetectedHRCode>& detected) {
+      vector<string> movements;
+      calculateMovements(movements);
+      for (auto it = movements.begin(); it != movements.end(); it++) {
+        moveThanDetect(*it, );
+      }
+    }*/
+
+    void calculateMovements(vector<string>& movements) {
 
       double heights[] = {0.0};
       //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};

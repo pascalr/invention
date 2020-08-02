@@ -161,6 +161,11 @@ class SerialPort {
       trim(str);
     }
 
+    void executeUntil(string str, string msg) {
+      writePort(str);
+      waitUntilMessageReceived(msg);
+    }
+
     void writePort(string str) {
       writePort(str.c_str());
     }

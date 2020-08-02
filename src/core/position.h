@@ -10,6 +10,17 @@
 using namespace Eigen;
 using namespace std;
 
+// TODO: #define HOME_POSITION Vector3d(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z);
+
+// Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
+// Maybe asking arduino: @ => (120, 23.12, 123.00)
+// Will often do many moves like this: "MZ0\nMY500\nMX200Z200"
+string calculateMoveCommand(Vector3d position, Vector3d destination) {
+  string moveCommand = "M";
+  return moveCommand;
+}
+
+
 Vector2d cameraPosition(Vector2d toolPosition, double angle) {
 
   double offset = CAMERA_TOOL_DISTANCE;

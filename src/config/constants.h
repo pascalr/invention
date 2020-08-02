@@ -17,8 +17,10 @@
 
 #define TOOL_X_MIN 0.0 // mm
 #define TOOL_X_MAX 640.0 // mm
+#define TOOL_X_MIDDLE ((TOOL_X_MAX + TOOL_X_MIN)/2)
 #define TOOL_Z_MIN -10.0 // mm
 #define TOOL_Z_MAX RAYON
+#define TOOL_Z_MIDDLE ((TOOL_Z_MAX + TOOL_Z_MIN)/2)
 
 #define BASE_X_MIN 0.0 // mm
 #define BASE_X_MAX 640.0 // mm
