@@ -15,6 +15,10 @@
 #define FORWARD true
 #define REVERSE false
 
+#define HOME_POSITION_X 0.0 // mm
+#define HOME_POSITION_Y 0.0 // mm
+#define HOME_POSITION_Z RAYON // mm
+
 #define TOOL_X_MIN 0.0 // mm
 #define TOOL_X_MAX 640.0 // mm
 #define TOOL_X_MIDDLE ((TOOL_X_MAX + TOOL_X_MIN)/2)

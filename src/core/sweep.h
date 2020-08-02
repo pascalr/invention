@@ -114,9 +114,10 @@ class Sweep {
       for (auto it = movements.begin(); it != movements.end(); it++) {
         moveThanDetect(*it, );
       }
+    void calculateMovements(vector<string>& movements) {
     }*/
 
-    void calculateMovements(vector<string>& movements) {
+    void run(vector<DetectedHRCode>& detected) {
 
       double heights[] = {0.0};
       //double xSweepIntervals[] = {0, 100, 200, 300, 400, 500, 600, 700, '\0'};

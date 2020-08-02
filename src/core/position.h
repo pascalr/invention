@@ -10,7 +10,7 @@
 using namespace Eigen;
 using namespace std;
 
-// TODO: #define HOME_POSITION Vector3d(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z);
+#define HOME_POSITION Vector3d::Constant(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z)
 
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 // Maybe asking arduino: @ => (120, 23.12, 123.00)

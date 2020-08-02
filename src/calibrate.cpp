@@ -1,7 +1,6 @@
 #include <iostream>
-#include <fstream>
 
-#include "core/sweep.h"
+#include "core/Heda.h"
 
 using namespace std;
 
@@ -34,17 +33,17 @@ void calibrateShelvesHeight(double &workingShelfHeight) {
           " until a resistance is felt.\n";
 
   workingShelfHeight = 350.0;
-  writeConfig("WORKING_SHELF_HEIGHT", workingShelfHeight);
+  writeConfig("WORKING_SHELF_HEIGHT", to_string(workingShelfHeight));
 }
 
-void calibrateCamWithJarRef(ProgramComm& comm, double workingShelfHeight) {
+void calibrateCamWithJarRef(Heda& heda, double workingShelfHeight) {
   
   char key;
 
-  cerr << "Please clear the working shelf. Press any key when done.."
+  cerr << "Please clear the working shelf. Press any key when done..";
   cin >> key;
 
-  cerr << "The tool in it's hand must a grabber. Press any key to confirm.."
+  cerr << "The tool in it's hand must a grabber. Press any key to confirm..";
   cin >> key;
 
   cerr << "To configure the camera, a reference jar with a sticker must be used. Please enter the reference jar height in mm.\n";
@@ -56,37 +55,36 @@ void calibrateCamWithJarRef(ProgramComm& comm, double workingShelfHeight) {
   Vector3d destination;
   destination << TOOL_X_MIDDLE, workingShelfHeight + height + 4, TOOL_Z_MIDDLE;
 
-  comm.moveTo(destination);
-  comm.release();
+  heda.moveTo(destination);
+  /*heda.release();
 
   cerr << "Please add the reference jar inside the jaws. Press any key when ready..";
   cin >> key;
 
   destination.y = MAX_WORKING_HEIGHT;
-  comm.moveTo(destination);
+  heda.moveTo(destination);
 
-  DetectedHRCode code = comm.detectOneCode();
-   
-
- 
+  DetectedHRCode code = heda.detectOneCode();*/
 }
 
 int main(int argc, char** argv)
 { // 21 mm and 31 mm
 
-  ProgramComm comm;
-  comm.init();
+  Heda heda;
+  heda.init();
 
-  calibrateCamWithJarRef();
+  double workingShelfHeight;
+  calibrateShelvesHeight(workingShelfHeight);
+  calibrateCamWithJarRef(heda, workingShelfHeight);
 
-  Mat frame;
-  captureVideoImage(frame);
+  /*Mat frame;
+  heda.captureFrame(frame);
 
   // TODO: Latter take multiple images have a reference. Go up and down to take many images.
   cerr << "WARNING: Assuming camera to jar label distance to be 202 mm.\n";
   double cameraDistance = 202;
 
-  DetectedHRCode code = *detected.begin();
+  DetectedHRCode code = heda.detectOneCode();
   double pixelsPerMm = code.code.scale;
   cerr << "Pixels per mm: " << code.code.scale << endl;
 
@@ -107,8 +105,7 @@ int main(int argc, char** argv)
   // TODO: Camera focal point
   cout << "#define CAMERA_FOCAL_POINT " << focalPoint << "\n";
   cout << "\n";
-  cout << "#endif\n";
-
+  cout << "#endif\n";*/
 
   return 0;
 }
