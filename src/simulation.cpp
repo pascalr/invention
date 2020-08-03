@@ -8,7 +8,8 @@
 #include "lib/lib.h"
 #include "core/axis.h"
 #include "core/console_writer.h"
-#include "core/serial_program.h"
+//#include "core/serial_program.h"
+#include "core/io_program.h"
 #include "core/input_parser.h"
 #include "config/setup.h"
 #include "lib/draw_matplotlib.h"
@@ -68,12 +69,12 @@ int main (int argc, char *argv[]) {
 
   cout << "Setup...\n";
 
-  SerialProgram p;
+  IOProgram p;
   setupAxes(p);
 
   cout << MESSAGE_READY;
 
-  //cerr << ">> ";
+  cerr << ">> ";
   draw(p);
 
   while (true) {
@@ -87,7 +88,7 @@ int main (int argc, char *argv[]) {
       draw(p);
     }
     if (wasWorking && !p.isWorking) {
-      //cerr << ">> ";
+      cerr << ">> ";
       draw(p);
     }
   }

@@ -13,7 +13,6 @@ class SerialWriter : public Writer {
     SerialWriter(const char* port) {
 
       cerr << "Opening port " << port << "..\n";
-      SerialPort m_port;
       if (m_port.openPort(port) < 0) {
         throw InitSerialPortException();
       }
@@ -49,7 +48,7 @@ class SerialWriter : public Writer {
       m_port.writePort(to_string(val));
     }
 
-    SerialPort& m_port;
+    SerialPort m_port;
 };
 
 #endif

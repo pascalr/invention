@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "core/Heda.h"
+#include "core/serial_writer.h"
 
 using namespace std;
 
@@ -88,8 +89,8 @@ void calibrateCamWithJarRef(Heda& heda) {
 int main(int argc, char** argv)
 { // 21 mm and 31 mm
 
-  Heda heda;
-  heda.init();
+  SerialWriter writer("/dev/ttyACM0"); 
+  Heda heda(writer);
 
   //calibrateShelvesHeight(workingShelfHeight);
   calibrateCamWithJarRef(heda);

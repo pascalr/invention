@@ -1,22 +1,15 @@
-#ifndef SERIAL_WRITER
-#define SERIAL_WRITER
+#ifndef STREAM_WRITER
+#define STREAM_WRITER
 
-#include <iostream>
 #include "writer.h"
-#include "../lib/serial.h"
 
 using namespace std;
 
-class SerialWriter : public Writer {
+class StreamWriter : public Writer {
   public:
 
-    SerialWriter(const char* port) {
-
-      cerr << "Opening port " << port << "..\n";
-      SerialPort m_port;
-      if (m_port.openPort(port) < 0) {
-        throw InitSerialPortException();
-      }
+    string str() {
+      return ss.str();
     }
 
     void doPinMode(int pin, bool type) {
@@ -27,29 +20,28 @@ class SerialWriter : public Writer {
       return 0.0;
     }
     void doPrint(const char* val) {
-      //if (!m_port) {throw NullPortException();}
-      m_port.writePort(val);
+      ss << val;
     }
     void doPrint(char val) {
-      m_port.writePort(to_string(val));
+      ss << val;
     }
     void doPrint(double val) {
-      m_port.writePort(to_string(val));
+      ss << val;
     }
     void doPrint(long val) {
-      m_port.writePort(to_string(val));
+      ss << val;
     }
     void doPrint(unsigned long val) {
-      m_port.writePort(to_string(val));
+      ss << val;
     }
     void doPrint(bool val) {
-      m_port.writePort(to_string(val));
+      ss << val;
     }
     void doPrint(int val) {
-      m_port.writePort(to_string(val));
+      ss << val;
     }
 
-    SerialPort& m_port;
+    stringstream ss;
 };
 
 #endif

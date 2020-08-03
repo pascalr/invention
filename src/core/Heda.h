@@ -66,9 +66,9 @@ class Heda {
     }
 
     void reference() {
-      cerr << "Doing reference...";
-      m_port.executeUntil("H", MESSAGE_DONE);
-      m_position = HOME_POSITION;
+      cerr << "Doing reference...\n";
+      m_writer << "H";
+      m_position << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
     }
 
     void detectOneCode() {
@@ -108,7 +108,7 @@ class Heda {
     void move(Movement mvt) {
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
-      m_port.executeUntil(mvt.str(), MESSAGE_DONE);
+      m_writer << mvt.str().c_str();
 
       if (mvt.axis == 'x' || mvt.axis == 'X') {
         m_position(0) = mvt.destination;
@@ -162,27 +162,26 @@ class Heda {
     }
 
     void grab(double strength) {
-      m_port.executeUntil("G" + to_string(strength), MESSAGE_DONE);
+      m_writer << "G" << strength;
     }
 
     void sweep() {
     }
 
     void stop() {
-      m_port.executeUntil("s", MESSAGE_DONE);
+      m_writer << "s";
     }
 
     void release() {
-      m_port.executeUntil("h", MESSAGE_DONE);
+      m_writer << "r";
     }
 
-  protected:
+//  protected:
 
     Writer& m_writer;
     bool m_working;
 
     PolarCoord m_position;
-    SerialPort m_port;
     VideoCapture m_cap;
     std::unordered_map<string, std::function<void(vector<Token>)>> m_commands;
     bool m_video_working = false;

@@ -125,7 +125,7 @@ void tokenize(vector<Token> &tokens, const vector<string> &words) {
   }
 }
 
-void parse(string commandName, vector<Token> &tokenList, const string cmd1) {
+void parse(string &commandName, vector<Token> &tokenList, const string cmd1) {
  
   string cmd = cmd1; 
   transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower); 

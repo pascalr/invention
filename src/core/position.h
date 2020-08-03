@@ -18,9 +18,6 @@
 using namespace Eigen;
 using namespace std;
 
-#define HOME_POSITION PolarCoord::Constant(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z)
-
-
 using PolarCoord = Vector3d; // (x,y,t)
 using CartesianCoord = Vector3d; // (x,y,z)
 

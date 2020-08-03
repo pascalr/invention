@@ -116,6 +116,10 @@ add_executable( test_parser ${MyCpp} src/test/parser.cpp )
 target_include_directories(test_parser PRIVATE ${MyDirs})
 target_link_libraries(test_parser ${MyLibs})
 
+add_executable( test_heda ${MyCpp} src/test/heda.cpp )
+target_include_directories(test_heda PRIVATE ${MyDirs})
+target_link_libraries(test_heda ${MyLibs})
+
 add_executable( simulation src/simulation.cpp )
 target_include_directories(simulation PRIVATE ${MyDirs})
 target_link_libraries( simulation ${MyLibs} )
