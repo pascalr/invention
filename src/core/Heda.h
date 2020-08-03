@@ -6,10 +6,9 @@
 #include "../lib/opencv.h"
 #include "sweep.h" // because it is sweep that detects HRCodes
 
-#include "command_parser.h"
+#include "parser.h"
 
-class HedaException : public exception {
-};
+class HedaException : public exception {};
 
 class InitVideoException : public HedaException {};
 class InitArduinoException : public HedaException {};
@@ -34,8 +33,36 @@ class Heda {
       if (!initVideo(m_cap)) {
         throw InitVideoException();
       }
-      
+
       reference();
+
+      setupCommands();
+    }
+
+
+    void setupCommands() {
+      
+    
+      // All lowercase
+      m_commands["grab"] = [](vector<Token> tokens) {
+      };
+    
+      /*Parser parser;
+      parser.keywords["t."] = Volume(1);
+      parser.keywords[""] = ...
+      Quantity("");
+      sscanf
+      sscanf (sentence,"%s %*s %d",str,&i);
+    
+      Command("grab", "^%d$");
+      Command("release");
+      Command("move", "^%d %d %d$");*/
+    
+      // moveX
+      // moveT
+      // moveZ?
+      // moveY
+    
     }
 
     void reference() {
@@ -58,7 +85,8 @@ class Heda {
 
     void execute(string cmd) {
       cerr << "Executing cmd = " << cmd << "\n";
-      if (cmd == "grab") {
+      parse(cmd);
+      /*if (cmd == "grab") {
         grab(50);
       } else if (cmd == "release") {
         release();
@@ -66,7 +94,7 @@ class Heda {
       //  move();
       } else if (cmd == "s" || cmd == "stop") {
         stop();
-      }
+      }*/
     }
 
     void captureFrame(Mat& frame) {
@@ -121,6 +149,7 @@ class Heda {
     PolarCoord m_position;
     SerialPort m_port;
     VideoCapture m_cap;
+    std::unordered_map<string, std::function<void(vector<Token>)>> m_commands;
 };
 
 #endif

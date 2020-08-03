@@ -1,9 +1,23 @@
 #ifndef _TEST_H
 #define _TEST_H
 
+#include "../utils/io_common.h"
 #include <iostream>
+#include <functional>
 
 using namespace std;
+  
+void assertException(const char* exceptionClassName, std::function<void()> toCall) {
+  try {
+    toCall();
+    cout << "\033[31mFAILED\033[0m";
+  } catch (exception e) {
+    // TODO: Check the exception class name
+    cout << "\033[32mPASSED\033[0m";
+  }
+  //cout << " (" << info << ")";
+  cout << " - Expected an exception to occur of type " << exceptionClassName << endl;
+}
 
 template <class P1, class P2>
 void assertNearby(const char* info, P1 t1, P2 t2) {

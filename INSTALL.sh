@@ -63,3 +63,5 @@ git submodule update
 
 sudo apt install libsqlite3-dev sqlite3
 
+
+pkg-config --cflags --libs ruby-2.5

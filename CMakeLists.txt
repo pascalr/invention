@@ -26,7 +26,8 @@ find_package(Boost COMPONENTS program_options log log_setup system filesystem RE
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
 
-include_directories( ${OpenCV_INCLUDE_DIRS} "/usr/local/include/eigen3/")
+#include_directories( "/usr/include/ruby-2.5.0/" "/usr/include/x86_64-linux-gnu/ruby-2.5.0" )
+include_directories( ${OpenCV_INCLUDE_DIRS} "/usr/local/include/eigen3/" )
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -61,7 +62,8 @@ ADD_LIBRARY(MyLibsModule
   src/lib/ArduinoMock.cpp
 )
 
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule SQLiteCpp sqlite3 dl pthread)
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule SQLiteCpp sqlite3 dl pthread )
+# ruby-2.5 gmp crypt m
 set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 
 #message(STATUS "HERE!!!")
@@ -109,6 +111,10 @@ target_link_libraries(test_jar_position_analyzer ${MyLibs})
 add_executable( test_axis ${MyCpp} src/test/axis.cpp )
 target_include_directories(test_axis PRIVATE ${MyDirs})
 target_link_libraries(test_axis ${MyLibs})
+
+add_executable( test_parser ${MyCpp} src/test/parser.cpp )
+target_include_directories(test_parser PRIVATE ${MyDirs})
+target_link_libraries(test_parser ${MyLibs})
 
 add_executable( simulation src/simulation.cpp )
 target_include_directories(simulation PRIVATE ${MyDirs})
