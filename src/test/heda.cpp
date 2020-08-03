@@ -14,8 +14,10 @@ void testHomeCommand() {
   StreamWriter ss;
   Heda heda(ss);
   heda.execute("home");
-
   assertEqual("home", "H", ss.str());
+
+  heda.execute("grab 50");
+  assertEqual("grab 50", "G50", ss.str());
 }
 
 int main (int argc, char *argv[]) {

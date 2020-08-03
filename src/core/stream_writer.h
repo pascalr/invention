@@ -9,7 +9,10 @@ class StreamWriter : public Writer {
   public:
 
     string str() {
-      return ss.str();
+      string str = ss.str();
+      ss.str("");
+      ss.clear();
+      return str;
     }
 
     void doPinMode(int pin, bool type) {

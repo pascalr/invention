@@ -33,17 +33,18 @@ class Heda {
       // at throws a out of range exception 
     
       // All lowercase
-      m_commands["grab"] = [&](vector<Token> tokens) {
-        cout << "Executing grab with strength = " << tokens.at(0).toScalaire() << endl;
-        grab(tokens.at(0).toScalaire());
+      m_commands["grab"] = [&](ParseResult tokens) {
+        double strength = tokens.popScalaire();
+        cout << "Executing grab with strength = " << strength << endl;
+        grab(strength);
       };
       
-      m_commands["stop"] = [&](vector<Token> tokens) {
+      m_commands["stop"] = [&](ParseResult tokens) {
         cout << "Executing stop" << endl;
         stop();
       };
     
-      m_commands["home"] = [&](vector<Token> tokens) {
+      m_commands["home"] = [&](ParseResult tokens) {
         reference();
       };
     
@@ -87,10 +88,11 @@ class Heda {
       cerr << "Executing cmd = " << cmd << "\n";
 
       string cmdName;
-      vector<Token> tokens;
-      parse(cmdName, tokens, cmd);
+      Parser parser;
+      ParseResult result;
+      parser.parse(result, cmd);
       try {
-        m_commands.at(cmdName)(tokens);
+        m_commands.at(result.getCommand())(result);
       } catch (const out_of_range &e) {
         // If the command does not exist, it throws an out of range exception.
       }
@@ -183,7 +185,7 @@ class Heda {
 
     PolarCoord m_position;
     VideoCapture m_cap;
-    std::unordered_map<string, std::function<void(vector<Token>)>> m_commands;
+    std::unordered_map<string, std::function<void(ParseResult)>> m_commands;
     bool m_video_working = false;
 };
 
