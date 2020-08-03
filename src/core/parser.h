@@ -8,7 +8,8 @@
 using namespace std;
 
 class WrongTokenTypeException : public exception {};
-class ExpectedScalaireException : public exception {};
+class MissingExpectedScalaireException : public exception {};
+class WrongTypeExpectedScalaireException : public exception {};
 class EmptyCommandException : public exception {};
 
 enum TokenType {
@@ -21,66 +22,27 @@ enum TokenType {
   UNKOWN
 };
 
-class TokenValue {
+class Token {
   public:
-    virtual ~TokenValue() {}
+    virtual ~Token() {}
     virtual TokenType getType() = 0;
 };
 
-class Unit : public TokenValue {
+class Unit : public Token {
   public:
     TokenType getType() {return UNIT;}
 };
 
-class Quantity : public TokenValue {
+class Quantity : public Token {
   public:
     TokenType getType() {return QUANTITY;}
 };
 
-class Scalaire : public TokenValue {
+class Scalaire : public Token {
   public:
     Scalaire(double val) : value(val) {}
     double value;
     TokenType getType() {return SCALAIRE;}
-};
-
-// A token must be dynamically allocated. This class encapsulates that.
-class Token {
-
-  public:
-
-    Token() {
-    }
-
-    ~Token() {
-      if (val) {
-        delete val;
-      }
-    }
-
-    double toScalaire() {
-    
-      if (getType() != SCALAIRE) {
-        throw ExpectedScalaireException();
-      }
-    
-      return ((Scalaire*) val)->value;
-    }
-
-    void setVal(TokenValue* v) {
-      val = v;
-    }
-
-    TokenType getType() const {
-      if (!val) {return UNKOWN;}
-      return val->getType();
-    }
-
-    virtual explicit operator bool() const {
-      return getType() != UNKOWN;
-    }
-
-    TokenValue* val;
 };
 
 
@@ -99,48 +61,91 @@ void splitWords(vector<string> &words, const string &str) {
   }
 }
 
+class ParseResult {
+  public:
 
-TokenValue* parseNumber(const string &word) {
-  
-  char* pEnd;
-  double val = strtod (word.c_str(), &pEnd);
-  if (strlen(pEnd) == 0) {
-    return new Scalaire(val);
-  }
-  return NULL;
-}
+    double popScalaire() {
 
-Token tokenize(const string &word) {
+      if (m_tokens.empty()) {
+        throw MissingExpectedScalaireException();
+      }
+   
+      shared_ptr<Token> token = *m_tokens.begin();
+      if (token->getType() != SCALAIRE) {
+        throw WrongTypeExpectedScalaireException();
+      }
+      
+      double val = (dynamic_pointer_cast<Scalaire> (token))->value;
+      m_tokens.erase(m_tokens.begin());
+    
+      return val;
+    }
 
-  Token token;
-  if ((token.val = parseNumber(word))) {return token;}
-  //if (token.val = parseUnit(word)) {return token;}
+    void addToken(shared_ptr<Token> tok) {
+      m_tokens.push_back(tok);
+    }
 
-  return token;
-}
+    void setCommand(const string &str) {
+      m_command = str;
+    }
 
-void tokenize(vector<Token> &tokens, const vector<string> &words) {
-  for (auto it = words.begin(); it != words.end(); it++) {
-    tokens.push_back(tokenize(*it));
-  }
-}
+    string getCommand() const {
+      return m_command;
+    }
 
-void parse(string &commandName, vector<Token> &tokenList, const string cmd1) {
- 
-  string cmd = cmd1; 
-  transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower); 
+    /*vector<Token> getTokens() const {
+      return m_tokens;
+    }*/
 
-  vector<string> words;
-  splitWords(words, cmd);
+  protected:
 
-  if (words.size() < 1) {
-    throw EmptyCommandException();
-  }
+    string m_command;
+    vector<shared_ptr<Token>> m_tokens;
+};
 
-  commandName = *words.begin();
-  words.erase(words.begin());
+class Parser {
+  public:
 
-  tokenize(tokenList, words);
-}
+    bool parseNumber(ParseResult &result, const string &word) {
+      
+      char* pEnd;
+      double val = strtod (word.c_str(), &pEnd);
+      if (strlen(pEnd) == 0) {
+
+        shared_ptr<Token> tok = make_shared<Scalaire>(val);
+        result.addToken(tok);
+
+        return true;
+      }
+      return false;
+    }
+
+    void tokenize(ParseResult &result, const string &word) {
+    
+      parseNumber(result, word); // || parseUnit(word) || parse...
+    }
+    
+    
+    void parse(ParseResult &result, const string cmd1) {
+     
+      string cmd = cmd1; 
+      transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower); 
+    
+      vector<string> words;
+      splitWords(words, cmd);
+    
+      if (words.size() < 1) {
+        throw EmptyCommandException();
+      }
+    
+      result.setCommand(*words.begin());
+      words.erase(words.begin());
+    
+      for (auto it = words.begin(); it != words.end(); it++) {
+        tokenize(result, *it);
+      }
+    }
+
+};
 
 #endif
