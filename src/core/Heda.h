@@ -34,8 +34,6 @@ class Heda {
         throw InitVideoException();
       }
 
-      reference();
-
       setupCommands();
     }
 
@@ -53,6 +51,10 @@ class Heda {
       m_commands["stop"] = [&](vector<Token> tokens) {
         cout << "Executing stop" << endl;
         stop();
+      };
+    
+      m_commands["home"] = [&](vector<Token> tokens) {
+        reference();
       };
     
       /*Parser parser;
