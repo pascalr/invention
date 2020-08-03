@@ -9,6 +9,7 @@ using namespace std;
 
 class WrongTokenTypeException : public exception {};
 class ExpectedScalaireException : public exception {};
+class EmptyCommandException : public exception {};
 
 enum TokenType {
 // A unit can be a volume, a mass or a weight.
@@ -54,17 +55,6 @@ class Token {
     ~Token() {
       if (val) {
         delete val;
-        /*switch(val->getType()) {
-          case UNIT:
-            delete (Unit*)val;
-            break;
-          case SCALAIRE:
-            delete (Scalaire*)val;
-            break;
-          case QUANTITY:
-            delete (Quantity*)val;
-            break;
-        }*/
       }
     }
 
@@ -135,24 +125,22 @@ void tokenize(vector<Token> &tokens, const vector<string> &words) {
   }
 }
 
-void parse(string cmd) {
-  
+void parse(string commandName, vector<Token> &tokenList, const string cmd1) {
+ 
+  string cmd = cmd1; 
   transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower); 
-  /*int state;
-  VALUE result;
-  result = rb_eval_string_protect(cmd, &state);
 
-  if (TYPE(result) == T_STRING) {
-    char* str = StringValueCStr(result);
-    cout << "Got a string! String = " << str << "\n";
-  } else {
-    cerr << "Error expected a string.\n";
+  vector<string> words;
+  splitWords(words, cmd);
+
+  if (words.size() < 1) {
+    throw EmptyCommandException();
   }
 
-  if (state) {
-    cerr << "There was an exception in ruby: state = " << state << "\n";
-  	// handle exception
-  }*/
+  commandName = *words.begin();
+  words.erase(words.begin());
+
+  tokenize(tokenList, words);
 }
 
 #endif

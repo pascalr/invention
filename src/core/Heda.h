@@ -41,10 +41,18 @@ class Heda {
 
 
     void setupCommands() {
-      
+     
+      // at throws a out of range exception 
     
       // All lowercase
-      m_commands["grab"] = [](vector<Token> tokens) {
+      m_commands["grab"] = [&](vector<Token> tokens) {
+        cout << "Executing grab with strength = " << tokens.at(0).toScalaire() << endl;
+        grab(tokens.at(0).toScalaire());
+      };
+      
+      m_commands["stop"] = [&](vector<Token> tokens) {
+        cout << "Executing stop" << endl;
+        stop();
       };
     
       /*Parser parser;
@@ -85,16 +93,15 @@ class Heda {
 
     void execute(string cmd) {
       cerr << "Executing cmd = " << cmd << "\n";
-      parse(cmd);
-      /*if (cmd == "grab") {
-        grab(50);
-      } else if (cmd == "release") {
-        release();
-      //} else if (cmd == "move") {
-      //  move();
-      } else if (cmd == "s" || cmd == "stop") {
-        stop();
-      }*/
+
+      string cmdName;
+      vector<Token> tokens;
+      parse(cmdName, tokens, cmd);
+      try {
+        m_commands.at(cmdName)(tokens);
+      } catch (out_of_range e) {
+        // If the command does not exist, it throws an out of range exception.
+      }
     }
 
     void captureFrame(Mat& frame) {
