@@ -16,27 +16,17 @@ class MissingHRCodeException : public HedaException {};
 class TooManyHRCodeException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 
+
 class Heda {
   public:
 
-    // Init flags instead. INIT_ARDUINO | INIT_VIDEO, or INIT_ALL
-    // INIT_ARDUINO = 00000001, INIT_VIDEO = 000000010, INIT_ALL = 111111111
-    // Always init all for now.
-    void init(bool initArduinoFlag = true, bool initVideoFlag = true) {
-      
-      cerr << "Opening arduino port...";
-      SerialPort m_port;
-      if (m_port.openPort("/dev/ttyACM0") < 0) {
-        throw InitArduinoException();
-      }
-
-      if (!initVideo(m_cap)) {
-        throw InitVideoException();
-      }
+    Heda(Writer& writer) : m_writer(writer) {
+    
+      cerr << "Initializing video...\n";
+      m_video_working = initVideo(m_cap);
 
       setupCommands();
     }
-
 
     void setupCommands() {
      
@@ -138,6 +128,39 @@ class Heda {
       }
     }
 
+    void poll() {
+      /*server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+        if (p.isOpen()) {
+          thread work_thread([&p,response] {
+            while (true) {
+              p.lock(SERIAL_KEY_POLL);
+              if (p.inputAvailable()) {
+                string s;
+                p.getInput(s);
+                p.unlock();
+                cout << "Arduino: " << s;
+                                                                                 
+                ptree pt;
+                stringstream ss;
+                pt.put("log", s);
+                json_parser::write_json(ss, pt);
+                                                                                 
+                string str = ss.str();
+                SimpleWeb::CaseInsensitiveMultimap header;
+                header.emplace("Content-Length", to_string(str.length()));
+                header.emplace("Content-Type", "application/json");
+                response->write(SimpleWeb::StatusCode::success_ok, str, header);
+                return;
+              }
+              p.unlock();
+              this_thread::sleep_for(chrono::milliseconds(10));
+            }
+          });
+          work_thread.detach();
+        }
+      };*/
+    }
+
     void grab(double strength) {
       m_port.executeUntil("G" + to_string(strength), MESSAGE_DONE);
     }
@@ -154,11 +177,15 @@ class Heda {
     }
 
   protected:
-    
+
+    Writer& m_writer;
+    bool m_working;
+
     PolarCoord m_position;
     SerialPort m_port;
     VideoCapture m_cap;
     std::unordered_map<string, std::function<void(vector<Token>)>> m_commands;
+    bool m_video_working = false;
 };
 
 #endif

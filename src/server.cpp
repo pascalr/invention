@@ -166,9 +166,9 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
- 
-  Heda heda; 
-  heda.init();
+
+  SerialWriter writer("/dev/ttyACM0"); 
+  Heda heda(writer); 
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;

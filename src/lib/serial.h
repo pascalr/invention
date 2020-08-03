@@ -22,6 +22,8 @@
 #include <thread>
 #include <chrono>
 
+class InitSerialPortException : public exception {};
+
 // FIXME: Write error messages to a string instead of printf to stdout...
 
 using namespace std;
@@ -98,7 +100,9 @@ class SerialPort {
         return -1;
       }
 
-      waitUntilMessageReceived(MESSAGE_READY); // TODO: timeout
+      // This definitely does not belongs here.
+      //cerr << "Waiting until receiveing message ready.\n";
+      //waitUntilMessageReceived(MESSAGE_READY); // TODO: timeout
       m_is_opened = true;
 
       return m_serial_port;
