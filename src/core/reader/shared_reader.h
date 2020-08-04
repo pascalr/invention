@@ -6,11 +6,25 @@
 using namespace std;
 
 class GetByteOnEmptyStreamException : public exception {};
+class UnregisteredClientException : public exception {};
 
 class SharedReader {
   public:
     
     SharedReader(Reader& reader) : m_reader(reader) {
+    }
+
+    string &getStreamForClient(int clientId) {
+
+      if (streams.count(clientId) != 1) {
+        throw UnregisteredClientException();
+      }
+
+      return streams.at(clientId);
+    }
+
+    void registerClient(int clientId) {
+      streams[clientId] = "";
     }
 
     bool inputAvailable(int clientId) {
@@ -23,13 +37,13 @@ class SharedReader {
         }
       }
       
-      string &stream = streams[clientId];
+      string &stream = getStreamForClient(clientId);
       return !stream.empty();
     }
 
     int getByte(int clientId) {
 
-      string &stream = streams[clientId];
+      string &stream = getStreamForClient(clientId);
 
       if (stream.empty()) {throw GetByteOnEmptyStreamException();}
 
@@ -48,6 +62,7 @@ class SharedReader {
 class SharedReaderClient : public Reader {
   public:
     SharedReaderClient(SharedReader &sharedReader, int id) : m_shared_reader(sharedReader), m_id(id) {
+      sharedReader.registerClient(id);
     }
     
     bool inputAvailable() {
