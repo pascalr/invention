@@ -42,9 +42,9 @@
 
 #include "core/Heda.h"
 #include "core/writer/serial_writer.h"
-#include "core/writer/command_writer.h"
+//#include "core/writer/command_writer.h"
 #include "core/reader/serial_reader.h"
-#include "core/reader/shared_reader.h"
+//#include "core/reader/shared_reader.h"
 
 using namespace NL::Template;
 
@@ -177,13 +177,13 @@ int main(int argc, char** argv) {
   }
   
   SerialReader serialReader(serialPort);
-  SharedReader sharedReader(serialReader);
+  //SharedReader sharedReader(serialReader);
   SerialWriter serialWriter(serialPort);
 
-  CommandWriter writer(sharedReader, serialWriter); 
-  SharedReaderClient reader(sharedReader, READER_CLIENT_ID_HEDA);
+  //CommandWriter writer(sharedReader, serialWriter); 
+  //SharedReaderClient reader(sharedReader, READER_CLIENT_ID_HEDA);
 
-  Heda heda(writer, reader); 
+  Heda heda(serialWriter, serialReader); 
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;

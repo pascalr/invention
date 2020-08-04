@@ -8,6 +8,8 @@
 
 #include "parser.h"
 
+#include "writer/command_writer.h"
+
 class HedaException : public exception {};
 
 class InitVideoException : public HedaException {};
@@ -16,6 +18,9 @@ class MissingHRCodeException : public HedaException {};
 class TooManyHRCodeException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 
+// Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
+// It has a stack of commands to execute.
+// It keeps a copy of the serial it has read if it required at some point.
 
 class Heda {
   public:
@@ -167,6 +172,7 @@ class Heda {
 
     void stop() {
       m_writer << "s";
+      // TODO: Clear the stack
     }
 
     void info() {
@@ -183,7 +189,7 @@ class Heda {
     Writer& m_writer;
     bool m_working;
 
-    //std::list<std::function<void()>> m_command_stack;
+    std::list<string> m_command_stack;
 
     PolarCoord m_position;
     VideoCapture m_cap;

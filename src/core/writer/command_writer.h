@@ -24,21 +24,45 @@ class CommandWriter : public StdWriter {
       thread command_thread([&] {
         while (true) {
 
-          // Wait for a new command
-          while (!commandAvailable()) {
-            this_thread::sleep_for(chrono::milliseconds(10));
-          }
+          if (m_is_working) {
 
-          string command = popCommand();
-          m_writer << command.c_str();
+            // Check if the message MESSAGE_DONE has been received.
+            if (doneMessageReceived()) {
+              setIsWorking(false);
+            }  else {
+              this_thread::sleep_for(chrono::milliseconds(10));
+            }
 
-          // Wait for the message MESSAGE_DONE to be received.
-          while (!doneMessageReceived()) {
-            this_thread::sleep_for(chrono::milliseconds(10));
+          } else {
+
+            // Wait for is a new command is available
+            if (commandAvailable()) {
+
+              string command = popCommand();
+              m_writer << command.c_str();
+              setIsWorking(true);
+            } else {
+              this_thread::sleep_for(chrono::milliseconds(100));
+            }
           }
         }
       });
       command_thread.detach();
+    }
+
+    void setIsWorking(bool val) {
+      std::lock_guard<std::mutex> guard(commandsMutex);
+      m_is_working = val;
+    }
+
+    bool stopAll() {
+      std::lock_guard<std::mutex> guard(commandsMutex);
+      m_commands.clear();
+      m_is_working = false;
+    }
+
+    bool isWorking() {
+      return m_is_working;
     }
 
     bool doneMessageReceived() {
@@ -76,6 +100,7 @@ class CommandWriter : public StdWriter {
 
     SharedReaderClient m_reader;
     Writer& m_writer;
+    bool m_is_working;
 };
 
 #endif
