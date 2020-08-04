@@ -51,6 +51,13 @@ class Heda {
       m_commands["info"] = [&](ParseResult tokens) {
         info();
       };
+      
+      m_commands["move"] = [&](ParseResult tokens) {
+        char axis = tokens.popAxis();
+        double dest = tokens.popScalaire();
+        stringstream ss; ss << "m" << axis << dest;
+        m_writer << ss.str().c_str();
+      };
     
       /*Parser parser;
       parser.keywords["t."] = Volume(1);

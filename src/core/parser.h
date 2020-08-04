@@ -7,11 +7,6 @@
 
 using namespace std;
 
-class WrongTokenTypeException : public exception {};
-class MissingExpectedScalaireException : public exception {};
-class WrongTypeExpectedScalaireException : public exception {};
-class EmptyCommandException : public exception {};
-
 enum TokenType {
 // A unit can be a volume, a mass or a weight.
 // cups, t., ...
@@ -19,8 +14,50 @@ enum TokenType {
 // A quantity is the combination of both a scalar and a unit.
   QUANTITY,
   SCALAIRE,
+  AXIS,
   UNKOWN
 };
+
+enum MyEnum {VAL1, VAL2,VAL3};
+
+const char* tokenTypeName(TokenType e) {
+  switch (e) {
+    case UNIT: return "UNIT";
+    case QUANTITY: return "QUANTITY";
+    case SCALAIRE: return "SCALAIRE";
+    case AXIS: return "AXIS";
+    case UNKOWN: return "UNKOWN";
+    default: throw "Bad TokenType";
+  }
+}
+
+class MissingArgumentException : public exception {
+  public:
+};
+class WrongTypeArgumentException : public exception {
+  public:
+    WrongTypeArgumentException(TokenType expected, TokenType actual) {
+      stringstream ss; ss << "WrongTypeArgumentException happened. Expected "
+                          << tokenTypeName(expected) << ", but got " 
+                          << tokenTypeName(actual) << ".\n";
+      error = ss.str();
+    }
+
+    const char* what() const throw() {
+      return error.c_str();
+    }
+
+    string error;
+};
+
+class WrongTokenTypeException : public exception {};
+class MissingExpectedScalaireException : public exception {};
+class WrongTypeExpectedScalaireException : public exception {};
+class MissingExpectedAxisException : public exception {};
+class WrongTypeExpectedAxisException : public exception {};
+class EmptyCommandException : public exception {};
+
+// TODO: namespace Token. Token::Unit
 
 class Token {
   public:
@@ -33,6 +70,13 @@ class Unit : public Token {
     TokenType getType() {return UNIT;}
 };
 
+class AxisToken : public Token {
+  public:
+    AxisToken(char name) : name(name) {}
+    TokenType getType() {return AXIS;}
+    char name;
+};
+
 class Quantity : public Token {
   public:
     TokenType getType() {return QUANTITY;}
@@ -43,6 +87,13 @@ class Scalaire : public Token {
     Scalaire(double val) : value(val) {}
     double value;
     TokenType getType() {return SCALAIRE;}
+};
+
+class Unkown : public Token {
+  public:
+    Unkown(const string &val) : value(val) {}
+    string value;
+    TokenType getType() {return UNKOWN;}
 };
 
 
@@ -64,18 +115,33 @@ void splitWords(vector<string> &words, const string &str) {
 class ParseResult {
   public:
 
-    double popScalaire() {
+    void expectArgument(TokenType type) {
 
       if (m_tokens.empty()) {
-        throw MissingExpectedScalaireException();
+        throw MissingArgumentException();
       }
-   
-      shared_ptr<Token> token = *m_tokens.begin();
-      if (token->getType() != SCALAIRE) {
-        throw WrongTypeExpectedScalaireException();
+  
+      TokenType actual = (*m_tokens.begin())->getType();
+      if (actual != type) {
+        throw WrongTypeArgumentException(type, actual);
       }
+    }
+
+    char popAxis() {
+
+      expectArgument(AXIS);
       
-      double val = (dynamic_pointer_cast<Scalaire> (token))->value;
+      double val = (dynamic_pointer_cast<AxisToken> (*m_tokens.begin()))->name;
+      m_tokens.erase(m_tokens.begin());
+    
+      return val;
+    }
+
+    double popScalaire() {
+      
+      expectArgument(SCALAIRE);
+
+      double val = (dynamic_pointer_cast<Scalaire> (*m_tokens.begin()))->value;
       m_tokens.erase(m_tokens.begin());
     
       return val;
@@ -120,9 +186,29 @@ class Parser {
       return false;
     }
 
+    bool parseAxis(ParseResult &result, const string &word) {
+
+      if (word == "x" || word == "y" || word == "z" || word == "t") {
+
+        shared_ptr<Token> tok = make_shared<AxisToken>(word[0]);
+        result.addToken(tok);
+        return true;
+      }
+      
+      return false;
+    }
+
+    bool parseUnkown(ParseResult &result, const string &word) {
+
+      shared_ptr<Token> tok = make_shared<Unkown>(word);
+      result.addToken(tok);
+      
+      return true;
+    }
+
     void tokenize(ParseResult &result, const string &word) {
     
-      parseNumber(result, word); // || parseUnit(word) || parse...
+      parseNumber(result, word) || parseAxis(result, word) || parseUnkown(result, word);
     }
     
     

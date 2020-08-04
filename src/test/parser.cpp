@@ -36,6 +36,13 @@ void testParse() {
   assertEqual("Command name", "test", result.getCommand());
   assertEqual("1234", 1234, result.popScalaire());
   //assertEqual("test", UNKOWN, tokens[1].getType());
+ 
+  
+  ParseResult result1;
+  parser.parse(result1, "Move X 1234");
+  assertEqual("Command name", "move", result1.getCommand());
+  assertEqual("x", 'x', result1.popAxis());
+  assertEqual("1234", 1234, result1.popScalaire());
 
 }
 
