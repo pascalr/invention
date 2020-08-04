@@ -52,11 +52,19 @@ class Heda {
         info();
       };
       
+      m_commands["help"] = [&](ParseResult tokens) {
+        // TODO
+      };
+      
       m_commands["move"] = [&](ParseResult tokens) {
         char axis = tokens.popAxis();
         double dest = tokens.popScalaire();
         stringstream ss; ss << "m" << axis << dest;
         m_writer << ss.str().c_str();
+      };
+
+      m_commands["open"] = [&](ParseResult tokens) {
+        openJaw();
       };
     
       /*Parser parser;
@@ -164,7 +172,7 @@ class Heda {
       m_writer << "?";
     }
 
-    void release() {
+    void openJaw() {
       m_writer << "r";
     }
 

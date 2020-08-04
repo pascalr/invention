@@ -30,10 +30,12 @@ class DCMotor : public Motor {
     void grab(int dutyCycle) {
       setMotorDirection(REVERSE);
       setDutyCycle(dutyCycle);
+      setDestination(-9999999999);
     }
 
     void release() {
-      // TODO
+      setMotorDirection(REVERSE);
+      setDestination(90 * 8 * 0.75);
     }
         
     void rotate(bool direction) {
@@ -82,11 +84,16 @@ class DCMotor : public Motor {
       if (m_duty_cycle == 0) {return false;}
 
       m_encoder.checkPosition(currentTime, isForward);
+
+      if (isDestinationReached()) {
+        setDutyCycle(0);
+      }
+
       if (m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01) {
         if (isReferencing) {
           referenceReached();
         }
-	return false;
+	      return false;
       }
         
       // TODO: Handle acceleration and deceleration

@@ -61,6 +61,11 @@ class Motor : public Axis {
       return isWorking;
     }
 
+    bool isDestinationReached() {
+      return (isForward && getPosition() >= getDestination()) ||
+             (!isForward && getPosition() <= getDestination());
+    }
+
     void prepareWorking(unsigned long time) {
       isWorking = true;
       prepare(time);

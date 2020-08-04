@@ -123,14 +123,6 @@ class StepperMotor : public Motor {
     }
 
 
-    virtual bool isDestinationReached() {
-      //double destSteps = getDestinationSteps();
-      //double posSteps = getPositionSteps();
-      //return (isForward && posSteps >= destSteps) ||
-      //       (!isForward && posSteps <= destSteps);
-      return (isForward && getPosition() >= getDestination()) ||
-             (!isForward && getPosition() <= getDestination());
-    }
 
     // Only the vertical axis moves in order to do a reference
     virtual bool moveToReference() {
