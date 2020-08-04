@@ -34,7 +34,7 @@ class DCMotor : public Motor {
     }
 
     void release() {
-      setMotorDirection(REVERSE);
+      setMotorDirection(FORWARD);
       setDutyCycle(25);
       setDestination(90 * 8 * 0.75);
     }
@@ -83,22 +83,24 @@ class DCMotor : public Motor {
 
     bool handleAxis(unsigned long currentTime) {
       if (m_duty_cycle == 0) {return false;}
-
+      
       m_encoder.checkPosition(currentTime, isForward);
+      bool isNotMoving = m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01;
+
+      if (isReferencing) {
+        if (isNotMoving) {
+          referenceReached();
+	  return false;
+	}
+	return true;
+      }
+
 
       if (isDestinationReached()) {
         setDutyCycle(0);
       }
-
-      if (m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01) {
-        if (isReferencing) {
-          referenceReached();
-        }
-	      return false;
-      }
-        
-      // TODO: Handle acceleration and deceleration
-      return true;
+      
+      return isNotMoving ? false : true;
     }
 
     Encoder m_encoder;

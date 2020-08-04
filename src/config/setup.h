@@ -4,14 +4,15 @@
 #include "../core/program.h"
 #include "../core/axis.h"
 #include "constants.h"
+#include <float.h>
 
 void setupAxes(Program& p) {
 
   p.axisR.setupPins(8,9,5);
   p.axisR.setReverseMotorDirection(true);
   // min and max positions depends on the tool, sometimes no limits (mixer), sometimes yes (gripper)
-  //p.axisR.setMinPosition(MINUS_INFINITY);
-  //p.axisR.setMaxPosition(INFINITY);
+  p.axisR.setMinPosition(-DBL_MAX);
+  p.axisR.setMaxPosition(DBL_MAX);
 
   p.axisT.setStepsPerUnit(200 * 2 * 16 / (360*12/61));
   p.axisT.setStepsPerTurn(200 * 2 * 16);
