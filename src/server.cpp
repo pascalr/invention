@@ -41,7 +41,7 @@
 #include "controllers/3d_controller.h"
 
 #include "core/Heda.h"
-#include "core/serial_writer.h"
+#include "core/writer/serial_writer.h"
 #include "core/reader/serial_reader.h"
 
 using namespace NL::Template;

@@ -2,7 +2,7 @@
 #define FAKE_PROGRAM_H
 
 #include "program.h"
-#include "console_writer.h"
+#include "writer/console_writer.h"
 #include "reader/fake_reader.h"
 
 class FakeProgram : public Program {

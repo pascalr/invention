@@ -19,15 +19,6 @@ class ArduinoReader : public Reader {
 
 class ArduinoWriter : public Writer {
   public:
-    void doPinMode(int pin, bool type) {
-      pinMode(pin, type);
-    }
-    void doDigitalWrite(int pin, bool value) {
-      digitalWrite(pin, value);
-    }
-    double doDigitalRead(int pin) {
-      return digitalRead(pin);
-    }
 
     void doPrint(const char* theString) {
       Serial.print(theString);

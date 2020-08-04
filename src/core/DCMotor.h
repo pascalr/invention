@@ -3,7 +3,7 @@
 
 #include "Motor.h"
 
-#include "writer.h"
+#include "writer/writer.h"
 #include "../config/constants.h"
 #include "../utils/utils.h"
 #include <math.h>

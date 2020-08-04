@@ -31,6 +31,6 @@ Writer& operator<<(Writer& writer, bool val) {
 }
 
 Writer& operator<<(Writer& writer, int val) {
-  writer.doPrint(val);
+  writer.doPrint((long)val);
   return writer;
 }

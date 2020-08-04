@@ -1,7 +1,7 @@
 #ifndef AXIS_H
 #define AXIS_H
 
-#include "writer.h"
+#include "writer/writer.h"
 #include "../config/constants.h"
 #include "../utils/utils.h"
 #include <math.h>

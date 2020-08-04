@@ -6,7 +6,7 @@
 
 #include "program.h"
 #include "axis.h"
-#include "writer.h"
+#include "writer/writer.h"
 #include "../config/constants.h"
 
 template <typename T>

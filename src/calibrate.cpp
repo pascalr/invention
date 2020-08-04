@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "core/Heda.h"
-#include "core/serial_writer.h"
+#include "core/writer/serial_writer.h"
 
 using namespace std;
 

@@ -117,7 +117,7 @@ class StepperMotor : public Motor {
     }
     
     void setMotorEnabled(bool value) {
-      m_writer.doDigitalWrite(m_enabled_pin, LOW); // FIXME: ALWAYS ENABLED
+      digitalWrite(m_enabled_pin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(m_enabled_pin, value ? LOW : HIGH);
       isMotorEnabled = value;
     }
@@ -270,7 +270,7 @@ class StepperMotor : public Motor {
     }
 
     void turnOneStep(unsigned long currentTime) {
-      m_writer.doDigitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
+      digitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 

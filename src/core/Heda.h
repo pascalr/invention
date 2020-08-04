@@ -46,6 +46,7 @@ class Heda {
     
       m_commands["home"] = [&](ParseResult tokens) {
         reference();
+        //m_command_stack.push_back([&](){reference();});
       };
 
       m_commands["info"] = [&](ParseResult tokens) {
@@ -54,6 +55,15 @@ class Heda {
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
+      };
+
+      m_commands["cherche"] = [&](ParseResult tokens) { // fetch
+      };
+      
+      m_commands["trouve"] = [&](ParseResult tokens) {
+      };
+      
+      m_commands["rapporte"] = [&](ParseResult tokens) {
       };
       
       m_commands["move"] = [&](ParseResult tokens) {
@@ -161,6 +171,13 @@ class Heda {
       m_writer << cmd.c_str();
     }
 
+    void find(string ingredientName) {
+    }
+
+    // bring back to the working area
+    void retreive() {
+    }
+
     void sweep() {
     }
 
@@ -181,6 +198,8 @@ class Heda {
     Reader& m_reader;
     Writer& m_writer;
     bool m_working;
+
+    //std::list<std::function<void()>> m_command_stack;
 
     PolarCoord m_position;
     VideoCapture m_cap;
