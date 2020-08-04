@@ -35,6 +35,7 @@ class DCMotor : public Motor {
 
     void release() {
       setMotorDirection(REVERSE);
+      setDutyCycle(25);
       setDestination(90 * 8 * 0.75);
     }
         
