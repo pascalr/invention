@@ -23,10 +23,6 @@ void setupAxes(Program& p) {
   p.axisT.setDefaultMaxSpeed(0.2);
   p.axisT.setAcceleration(0.2);
 
-  p.axisZ.setMinPosition(-100);
-  p.axisZ.setMaxPosition(RAYON);
-  p.axisZ.setDestination(0.0);
-
   p.baseAxisX.setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
   p.baseAxisX.setStepsPerTurn(200 * 2 * 8);
   //p.baseAxisX.limitSwitchPin = 12;
@@ -34,19 +30,6 @@ void setupAxes(Program& p) {
   p.baseAxisX.setMaxPosition(AXIS_X_MAX_POS);
   p.baseAxisX.setDefaultMaxSpeed(1.5);
   p.baseAxisX.setAcceleration(1.5);
-
-  p.axisX.setMaxPosition(AXIS_X_MAX_POS);
-  p.axisX.setDestination(RAYON);
-
-  p.axisA.setStepsPerUnit(200 * 2 * 16 / (360*20/69));
-  p.axisA.setStepsPerTurn(200 * 2 * 16);
-  //p.axisA.limitSwitchPin = 12;
-  p.axisA.setupPins(8,7,6);
-
-  p.axisB.setStepsPerUnit(200 * 2 * 16 / (360*20/69));
-  p.axisB.setStepsPerTurn(200 * 2 * 16);
-  //p.axisB.limitSwitchPin = 12;
-  p.axisB.setupPins(8,7,6);
 
   p.axisY.setStepsPerUnit(200 * 2 * 16 / (2.625*25.4*3.1416) * (51/13));
   p.axisY.setStepsPerTurn(200 * 2 * 16);

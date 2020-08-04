@@ -13,9 +13,8 @@
 class Program {
   public:
     Program(Writer& writer, Reader& reader) :
-        axisT(writer, 'T'), axisZ(writer, 'Z', axisT),
-        baseAxisX(writer, 'Q', axisT), axisX(writer, 'X', baseAxisX, axisT),
-        axisA(writer, 'A'), axisY(writer, 'Y'), axisB(writer, 'B'), axisR(writer, 'R') {
+        axisT(writer, 'T'), baseAxisX(writer, 'X', axisT),
+        axisY(writer, 'Y'), axisR(writer, 'R') {
     }
 
     virtual Writer& getWriter() = 0;
@@ -40,23 +39,16 @@ class Program {
     }
     
     MotorT axisT; // Real one
-    ZAxis axisZ; // Virtual one
 
     BaseXAxis baseAxisX; // Real one
-    XAxis axisX; // Virtual one
 
-    StepperMotor axisA;
     StepperMotor axisY;
-    StepperMotor axisB;
 
     DCMotor axisR;
      
     // These axes actually moves the motors. 
-    Motor* motors[NUMBER_OF_MOTORS+1] = {&baseAxisX, &axisY, &axisT, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    Motor* motors[NUMBER_OF_MOTORS+1] = {&baseAxisX, &axisY, &axisT, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
 
-    // These axes are the ones you can move. mx100, mz100, etc...
-    Axis* movingAxes[NUMBER_OF_AXES+1] = {&axisX, &axisY, &axisT, &axisZ, &axisA, &axisB, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
-    
     bool isWorking = false;
     
     virtual unsigned long getCurrentTime() = 0;

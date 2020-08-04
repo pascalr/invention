@@ -16,7 +16,6 @@
 #include "../helper/logging.h"
 #include "../config/setup.h"
 #include "../config/constants.h"
-#include "deserialize.h"
 #include "fake_program.h"
 
 #include <chrono>

@@ -53,12 +53,6 @@ Motor* parseInputMotorAxis(Program& p, Motor* &axis) {
   return 0;
 }
 
-Axis* parseInputMovingAxis(Program& p, Axis* &axis) {
-  char name = p.getChar();
-  axis = axisByLetter(p.movingAxes, name);
-  return axis;
-}
-
 // Do I need a Zaxis or not? The idea is that I have to check for flips too.
 // But the nice thing about Zaxis is simply to behave the same way as the others.
 
@@ -222,7 +216,6 @@ void doReferencingAll(Program& p) {
 
 int parseActionCommand(char cmd, Program& p) {
 
-  Axis* axis;
   Motor* motorAxis;
   double number;
   int status;
@@ -232,8 +225,6 @@ int parseActionCommand(char cmd, Program& p) {
   for (int i = 0; p.motors[i] != 0; i++) {
     p.motors[i]->prepareWorking(time);
   }
-  p.axisX.prepare(time);
-  p.axisZ.prepare(time);
 
   // Move
   if (cmd == 'M' || cmd == 'm') {
@@ -247,9 +238,9 @@ int parseActionCommand(char cmd, Program& p) {
     //if (parseNumber(p,number) < 0) {p.stopMoving(); return ERROR_EXPECTED_NUMBER;}
     //if ((status = axis->setDestination(number)) < 0) {p.stopMoving(); return status;}
     //if ((status = processMoveCommand(p)) < 0) {p.stopMoving(); return status;}
-    if (!parseInputMovingAxis(p, axis)) {return ERROR_EXPECTED_AXIS;}
+    if (!parseInputMotorAxis(p, motorAxis)) {return ERROR_EXPECTED_AXIS;}
     if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
-    if ((status = axis->setDestination(number)) < 0) {return status;}
+    if ((status = motorAxis->setDestination(number)) < 0) {return status;}
     //if ((status = processMoveCommand(p)) < 0) {return status;}
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
