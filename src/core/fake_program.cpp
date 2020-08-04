@@ -8,36 +8,11 @@
 
 using namespace std;
 
-void FakeProgram::sleepMs(int time) {
-  this_thread::sleep_for(chrono::milliseconds(time));
-}
-    
-int FakeProgram::getByte() {
-  if (fake_input.empty()) {
-    return -1;
-  }
-  int val = fake_input[0];
-  fake_input.erase(fake_input.begin());
-  return val;
-}
-
-void FakeProgram::setFakeInput(const char* str) {
-  fake_input.assign(str);
-}
-
-void FakeProgram::setFakeInput(std::string& str) {
-  fake_input.assign(str);
-}
-
-bool FakeProgram::inputAvailable() {
-  return !fake_input.empty();
-}
-
 void FakeProgram::execute(const char* dest) {
 
   string str = dest;
   str += '\n';
-  setFakeInput(str);
+  m_reader.setFakeInput(str);
 
   setCurrentTime(0);
   myLoop(*this);
@@ -46,6 +21,10 @@ void FakeProgram::execute(const char* dest) {
     myLoop(*this);
   }
 
+}
+
+void FakeProgram::sleepMs(int time) {
+  this_thread::sleep_for(chrono::milliseconds(time));
 }
 
 void FakeProgram::move(char axis, double destination) {

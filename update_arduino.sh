@@ -1,6 +1,7 @@
 #!/bin/bash
 rm -R ../Arduino/libraries/* || true
 mkdir ../Arduino/libraries/core
+mkdir ../Arduino/libraries/core/reader
 mkdir ../Arduino/libraries/utils
 mkdir ../Arduino/libraries/config
 mkdir ../Arduino/libraries/lib
@@ -24,3 +25,4 @@ cp src/core/StepperMotor.h ../Arduino/libraries/core/StepperMotor.h
 cp src/core/DCMotor.h ../Arduino/libraries/core/DCMotor.h
 cp src/core/Encoder.h ../Arduino/libraries/core/Encoder.h
 cp src/lib/ArduinoMock.h ../Arduino/libraries/lib/ArduinoMock.h
+cp src/core/reader/reader.h ../Arduino/libraries/core/reader/reader.h

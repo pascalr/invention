@@ -7,33 +7,28 @@
 #include <thread>
 #include <chrono>
 #include "console_writer.h"
+#include "reader/io_reader.h"
 
 using namespace std;
 
 class IOProgram : public Program {
   public:
-    IOProgram() : Program(m_writer) {
+    IOProgram() : Program(m_writer, m_reader) {
     }
 
     Writer& getWriter() {
       return m_writer;
     }
-    void setCurrentTime(unsigned long time) {
-      currentTime = time;
+
+    Reader& getReader() {
+      return m_reader;
     }
 
     void sleepMs(int time) {
       this_thread::sleep_for(chrono::milliseconds(time));
     }
-    
-    int getByte() {
-      char c;
-      cin.get(c);
-      return c;
-    }
-
-    bool inputAvailable() {
-      return linuxInputAvailable();
+    void setCurrentTime(unsigned long time) {
+      currentTime = time;
     }
 
     unsigned long getCurrentTime() {
@@ -42,6 +37,7 @@ class IOProgram : public Program {
 
   protected:
     ConsoleWriter m_writer;
+    IOReader m_reader;
     unsigned long currentTime = 0;
     
 };
