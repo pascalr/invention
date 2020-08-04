@@ -20,8 +20,6 @@ class FakeProgram : public Program {
 
     int getByte();
 
-    bool getInput(char* buf, int size);
-
     void setFakeInput(const char* str);
 
     void setFakeInput(std::string& str);

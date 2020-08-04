@@ -64,14 +64,6 @@ class ArduinoProgram : public Program {
     int getByte() {
       return Serial.read();
     }
-    bool getInput(char* buf, int size) {
-      size_t inputSize = Serial.readBytes(buf, size);
-      if (inputSize == 0) return false;
-      
-      buf[inputSize] = 0;
-      rtrim(buf);
-      return true;
-    }
 
     unsigned long getCurrentTime() {
       return micros();

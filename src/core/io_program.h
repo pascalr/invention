@@ -32,20 +32,6 @@ class IOProgram : public Program {
       return c;
     }
 
-    bool getInput(char* buf, int size) {
-      string str;
-      cin >> str;
-
-      if (((int) str.length()) >= size-1) {
-        cerr << "Message is too long. Maximum: " << size << ". Was: " << str.length() << ".\n";
-        return false;
-      }
-
-      strcpy(buf, str.c_str());
-      rtrim(buf);
-      return true;
-    }
-
     bool inputAvailable() {
       return linuxInputAvailable();
     }

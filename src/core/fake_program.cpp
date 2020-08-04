@@ -21,15 +21,6 @@ int FakeProgram::getByte() {
   return val;
 }
 
-bool FakeProgram::getInput(char* buf, int size) {
-  if (fake_input.empty()) {
-    return false;
-  }
-  strcpy(buf, fake_input.c_str());
-  fake_input.clear();
-  return true;
-}
-
 void FakeProgram::setFakeInput(const char* str) {
   fake_input.assign(str);
 }
