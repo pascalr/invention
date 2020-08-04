@@ -164,7 +164,9 @@ class Heda {
     }
 
     void grab(double strength) {
-      m_writer << "G" << strength;
+      string cmd = "G";
+      cmd += to_string(strength);
+      m_writer << cmd.c_str();
     }
 
     void sweep() {

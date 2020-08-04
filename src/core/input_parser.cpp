@@ -262,11 +262,11 @@ int parseActionCommand(char cmd, Program& p) {
     p.sleepMs(number);
 
   // Release
-  } else if (cmd == 'r') {
+  } else if (cmd == 'r' || cmd == "R") {
     p.axisR.release();
 
   // Grab
-  } else if (cmd == 'g') {
+  } else if (cmd == 'g' || cmd == "G") {
     if (parseNumber(p,number) < 0) {return ERROR_EXPECTED_NUMBER;}
     p.axisR.grab(number);
 
