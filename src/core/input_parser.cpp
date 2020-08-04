@@ -288,8 +288,8 @@ int parseActionCommand(char cmd, Program& p) {
 }
 
 void myLoop(Program& p) {
-  if (p.inputAvailable()) {
-    int incomingByte = p.getByte();
+  if (p.getReader().inputAvailable()) {
+    int incomingByte = p.getReader().getByte();
     if (incomingByte < 0) {
       return;
     }

@@ -3,30 +3,34 @@
 
 #include "program.h"
 #include "console_writer.h"
+#include "reader/fake_reader.h"
 
 class FakeProgram : public Program {
   public:
-    FakeProgram() : Program(m_writer) {
+    FakeProgram() : Program(m_writer, m_reader) {
     }
 
     Writer& getWriter() {
       return m_writer;
     }
-    void setCurrentTime(unsigned long time) {
-      currentTime = time;
+
+    Reader& getReader() {
+      return m_reader;
+    } 
+
+    void setFakeInput(const char* str) {
+      m_reader.setFakeInput(str);
+    }
+    
+    void setFakeInput(std::string& str) {
+      m_reader.setFakeInput(str);
     }
 
     void sleepMs(int time);
 
-    int getByte();
-
-    bool getInput(char* buf, int size);
-
-    void setFakeInput(const char* str);
-
-    void setFakeInput(std::string& str);
-
-    bool inputAvailable();
+    void setCurrentTime(unsigned long time) {
+      currentTime = time;
+    }
 
     void execute(const char* dest);
 
@@ -40,8 +44,8 @@ class FakeProgram : public Program {
 
   protected:
 
+    FakeReader m_reader;
     ConsoleWriter m_writer;
-    std::string fake_input;
 };
 
 

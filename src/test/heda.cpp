@@ -2,6 +2,7 @@
 
 #include "../core/Heda.h"
 #include "../core/stream_writer.h"
+#include "../core/reader/fake_reader.h"
 
 using namespace std;
 
@@ -11,8 +12,9 @@ void setup() {
 void testHomeCommand() {
   title("Testing home command");
 
+  FakeReader reader;
   StreamWriter ss;
-  Heda heda(ss);
+  Heda heda(ss, reader);
   heda.execute("home");
   assertEqual("home", "H", ss.str());
 

@@ -32,16 +32,6 @@ void drawArmCenterAxis(Program& p) {
   drawLines(x,z);
 }
 
-/*void drawArmBoundingBox(HorizontalAxis* axisX, ZAxis* axisZ) {
-  double angle = axisZ->getPositionAngle();
-
-  double a[4][2] = {{0,0},
-                   {ARM_WIDTH, 0},
-                   {ARM_WIDTH, ARM_LENGTH},
-                   {0, ARM_LENGTH}};
-
-} */
-
 void drawPossibleXPosition(double maxX) {
   vector<double> x(2);
   vector<double> z(2);

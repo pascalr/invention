@@ -5,28 +5,27 @@
 #include "axis.h"
 #include "StepperMotor.h"
 #include "DCMotor.h"
+#include "reader/reader.h"
 
 #define NUMBER_OF_MOTORS 6
 #define NUMBER_OF_AXES 7
 
 class Program {
   public:
-    Program(Writer& writer) :
+    Program(Writer& writer, Reader& reader) :
         axisT(writer, 'T'), axisZ(writer, 'Z', axisT),
         baseAxisX(writer, 'Q', axisT), axisX(writer, 'X', baseAxisX, axisT),
         axisA(writer, 'A'), axisY(writer, 'Y'), axisB(writer, 'B'), axisR(writer, 'R') {
     }
 
     virtual Writer& getWriter() = 0;
-
-    virtual void sleepMs(int time) = 0;
-    virtual bool inputAvailable() = 0;
-    virtual bool getInput(char* buf, int size) = 0;
-    virtual int getByte() = 0;
+    virtual Reader& getReader() = 0;
     
+    virtual void sleepMs(int time) = 0;
+
     char getChar() {
       int receivedByte;
-      while ((receivedByte = getByte()) < 0) {
+      while ((receivedByte = getReader().getByte()) < 0) {
         sleepMs(1);
       }
       return (char) receivedByte;

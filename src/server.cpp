@@ -42,6 +42,7 @@
 
 #include "core/Heda.h"
 #include "core/serial_writer.h"
+#include "core/reader/serial_reader.h"
 
 using namespace NL::Template;
 
@@ -168,8 +169,15 @@ int main(int argc, char** argv) {
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
 
-  SerialWriter writer("/dev/ttyACM0"); 
-  Heda heda(writer); 
+  SerialPort serialPort;
+  if (serialPort.openPort("/dev/ttyACM0") < 0) {
+    throw InitSerialPortException();
+  }
+
+  SerialWriter writer(serialPort); 
+  SerialReader reader(serialPort);
+
+  Heda heda(writer, reader); 
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;
@@ -268,36 +276,32 @@ int main(int argc, char** argv) {
     response->write("Port closed.");
   };*/
  
-  /*server.resource["^/poll$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    if (p.isOpen()) {
-      thread work_thread([&p,response] {
-        while (true) {
-          p.lock(SERIAL_KEY_POLL);
-          if (p.inputAvailable()) {
-            string s;
-            p.getInput(s);
-            p.unlock();
-            cout << "Arduino: " << s;
-                                                                             
-            ptree pt;
-            stringstream ss;
-            pt.put("log", s);
-            json_parser::write_json(ss, pt);
-                                                                             
-            string str = ss.str();
-            SimpleWeb::CaseInsensitiveMultimap header;
-            header.emplace("Content-Length", to_string(str.length()));
-            header.emplace("Content-Type", "application/json");
-            response->write(SimpleWeb::StatusCode::success_ok, str, header);
-            return;
-          }
-          p.unlock();
-          this_thread::sleep_for(chrono::milliseconds(10));
+  server.resource["^/poll$"]["GET"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    thread work_thread([&heda,response] {
+      string s;
+      while (true) {
+
+        heda.poll(s);
+        if (!s.empty()) {
+                                                                           
+          cout << "Arduino: " << s;
+          ptree pt;
+          stringstream ss;
+          pt.put("log", s);
+          json_parser::write_json(ss, pt);
+                                                                           
+          string str = ss.str();
+          SimpleWeb::CaseInsensitiveMultimap header;
+          header.emplace("Content-Length", to_string(str.length()));
+          header.emplace("Content-Type", "application/json");
+          response->write(SimpleWeb::StatusCode::success_ok, str, header);
+          return;
         }
-      });
-      work_thread.detach();
-    }
-  };*/
+        this_thread::sleep_for(chrono::milliseconds(10));
+      }
+    });
+    work_thread.detach();
+  };
 
   // Default GET-example. If no other matches, this anonymous function will be called.
   // Will respond with content in the web/-directory, and its subdirectories.

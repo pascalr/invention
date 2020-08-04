@@ -89,11 +89,11 @@ void calibrateCamWithJarRef(Heda& heda) {
 int main(int argc, char** argv)
 { // 21 mm and 31 mm
 
-  SerialWriter writer("/dev/ttyACM0"); 
-  Heda heda(writer);
+  //SerialWriter writer("/dev/ttyACM0"); 
+  //Heda heda(writer);
 
   //calibrateShelvesHeight(workingShelfHeight);
-  calibrateCamWithJarRef(heda);
+  //calibrateCamWithJarRef(heda);
 
   /*Mat frame;
   heda.captureFrame(frame);

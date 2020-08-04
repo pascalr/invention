@@ -3,6 +3,19 @@
 #include "setup.h"
 #include "program.h"
 #include "input_parser.h"
+#include "reader/reader.h"
+
+class ArduinoReader : public Reader {
+
+  public:
+    
+    bool inputAvailable() {
+      return Serial.available() > 0;
+    }
+    int getByte() {
+      return Serial.read();
+    }
+};
 
 class ArduinoWriter : public Writer {
   public:
@@ -48,7 +61,7 @@ class ArduinoWriter : public Writer {
 
 class ArduinoProgram : public Program {
   public:
-    ArduinoProgram() : Program(m_writer) {
+    ArduinoProgram() : Program(m_writer, m_reader) {
     }
 
     Writer& getWriter() {
@@ -57,20 +70,6 @@ class ArduinoProgram : public Program {
     
     void sleepMs(int time) {
       delay(time); // FIXME: Should be sleep, not busy wait..
-    }
-    bool inputAvailable() {
-      return Serial.available() > 0;
-    }
-    int getByte() {
-      return Serial.read();
-    }
-    bool getInput(char* buf, int size) {
-      size_t inputSize = Serial.readBytes(buf, size);
-      if (inputSize == 0) return false;
-      
-      buf[inputSize] = 0;
-      rtrim(buf);
-      return true;
     }
 
     unsigned long getCurrentTime() {
