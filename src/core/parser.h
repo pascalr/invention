@@ -15,6 +15,7 @@ enum TokenType {
   QUANTITY,
   SCALAIRE,
   AXIS,
+  POSITIVE_INTEGER,
   UNKOWN
 };
 
@@ -27,6 +28,7 @@ const char* tokenTypeName(TokenType e) {
     case SCALAIRE: return "SCALAIRE";
     case AXIS: return "AXIS";
     case UNKOWN: return "UNKOWN";
+    case POSITIVE_INTEGER: return "POSITIVE_INTEGER";
     default: throw "Bad TokenType";
   }
 }
@@ -51,10 +53,6 @@ class WrongTypeArgumentException : public exception {
 };
 
 class WrongTokenTypeException : public exception {};
-class MissingExpectedScalaireException : public exception {};
-class WrongTypeExpectedScalaireException : public exception {};
-class MissingExpectedAxisException : public exception {};
-class WrongTypeExpectedAxisException : public exception {};
 class EmptyCommandException : public exception {};
 
 // TODO: namespace Token. Token::Unit
@@ -87,6 +85,13 @@ class Scalaire : public Token {
     Scalaire(double val) : value(val) {}
     double value;
     TokenType getType() {return SCALAIRE;}
+};
+
+class PositiveInteger : public Token {
+  public:
+    PositiveInteger(unsigned long val) : value(val) {}
+    unsigned long value;
+    TokenType getType() {return POSITIVE_INTEGER;}
 };
 
 class Unkown : public Token {
@@ -137,11 +142,24 @@ class ParseResult {
       return val;
     }
 
-    double popScalaire() {
+    unsigned long popPositiveInteger() {
+
+      expectArgument(POSITIVE_INTEGER);
       
+      unsigned long val = (dynamic_pointer_cast<PositiveInteger> (*m_tokens.begin()))->value;
+      m_tokens.erase(m_tokens.begin());
+    
+      return val;
+    }
+
+    double popScalaire() {
+     
+      shared_ptr<Token> token = *m_tokens.begin();
+      if (token->getType() == POSITIVE_INTEGER) {return popPositiveInteger();}
+
       expectArgument(SCALAIRE);
 
-      double val = (dynamic_pointer_cast<Scalaire> (*m_tokens.begin()))->value;
+      double val = (dynamic_pointer_cast<Scalaire> (token))->value;
       m_tokens.erase(m_tokens.begin());
     
       return val;
@@ -172,18 +190,27 @@ class ParseResult {
 class Parser {
   public:
 
-    bool parseNumber(ParseResult &result, const string &word) {
+
+    bool parseScalaire(ParseResult &result, const string &word) {
       
       char* pEnd;
       double val = strtod (word.c_str(), &pEnd);
-      if (strlen(pEnd) == 0) {
+      if (strlen(pEnd) != 0) { return false;}
 
-        shared_ptr<Token> tok = make_shared<Scalaire>(val);
-        result.addToken(tok);
+      shared_ptr<Token> tok = make_shared<Scalaire>(val);
+      result.addToken(tok);
+      return true;
+    }
 
-        return true;
-      }
-      return false;
+    bool parsePositiveInteger(ParseResult &result, const string &word) {
+      
+      char* pEnd;
+      unsigned long val = strtoul (word.c_str(), &pEnd, 10);
+      if (strlen(pEnd) != 0) { return false; }
+
+      shared_ptr<Token> tok = make_shared<PositiveInteger>(val);
+      result.addToken(tok);
+      return true;
     }
 
     bool parseAxis(ParseResult &result, const string &word) {
@@ -208,7 +235,7 @@ class Parser {
 
     void tokenize(ParseResult &result, const string &word) {
     
-      parseNumber(result, word) || parseAxis(result, word) || parseUnkown(result, word);
+      parsePositiveInteger(result, word) || parseScalaire(result, word) || parseAxis(result, word) || parseUnkown(result, word);
     }
     
     
