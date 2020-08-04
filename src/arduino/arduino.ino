@@ -67,6 +67,10 @@ class ArduinoProgram : public Program {
     Writer& getWriter() {
       return m_writer;
     }
+
+    Reader& getReader() {
+      return m_reader;
+    }
     
     void sleepMs(int time) {
       delay(time); // FIXME: Should be sleep, not busy wait..
@@ -79,6 +83,7 @@ class ArduinoProgram : public Program {
   protected:
 
     ArduinoWriter m_writer;
+    ArduinoReader m_reader;
 };
 
 ArduinoProgram p;
