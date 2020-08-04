@@ -105,4 +105,6 @@
 
 #define HR_CODE_WIDTH 31 // mm
 
+#define READER_CLIENT_ID_HEDA 1
+
 #endif

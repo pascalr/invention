@@ -77,22 +77,6 @@ class Heda {
         openJaw();
       };
     
-      /*Parser parser;
-      parser.keywords["t."] = Volume(1);
-      parser.keywords[""] = ...
-      Quantity("");
-      sscanf
-      sscanf (sentence,"%s %*s %d",str,&i);
-    
-      Command("grab", "^%d$");
-      Command("release");
-      Command("move", "^%d %d %d$");*/
-    
-      // moveX
-      // moveT
-      // moveZ?
-      // moveY
-    
     }
 
     void reference() {
