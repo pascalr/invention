@@ -93,7 +93,7 @@ class Heda {
       parser.parse(result, cmd);
       try {
         m_commands.at(result.getCommand())(result);
-      } catch (out_of_range e) {
+      } catch (const out_of_range &e) {
         // If the command does not exist, it throws an out of range exception.
       }
     }
