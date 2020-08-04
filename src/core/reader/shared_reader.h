@@ -32,8 +32,8 @@ class SharedReader {
       while (m_reader.inputAvailable()) {
 
         char ch = (char)m_reader.getByte();
-        for (auto it : streams) {
-          it.second += ch;
+        for (std::unordered_map<int, string>::iterator it = streams.begin(); it != streams.end(); it++) {
+          it->second = it->second + ch;
         }
       }
       

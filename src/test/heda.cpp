@@ -11,7 +11,7 @@ void setup() {
 }
 
 void testHomeCommand() {
-  title("Testing home command");
+  title("testHomeCommand");
 
   FakeReader reader;
   StreamWriter ss;
@@ -24,11 +24,21 @@ void testHomeCommand() {
 }
 
 void testSharedReader() {
+  title("testSharedReader");
+
   FakeReader src;
   SharedReader shared(src);
   SharedReaderClient dest1(shared, 1);
   SharedReaderClient dest2(shared, 2);
+
+  assertEqual("No input at first.", false, dest1.inputAvailable());
+
   src.setFakeInput("hello");
+  
+  assertEqual("Now there should be an input.", true, dest1.inputAvailable());
+  assertEqual("h", 'h', (char) dest1.getByte());
+  assertEqual("e", 'e', (char) dest1.getByte());
+  assertEqual("h", 'h', (char) dest2.getByte());
 }
 
 int main (int argc, char *argv[]) {
@@ -36,4 +46,5 @@ int main (int argc, char *argv[]) {
   signal(SIGINT, signalHandler);
 
   testHomeCommand();
+  testSharedReader();
 }
