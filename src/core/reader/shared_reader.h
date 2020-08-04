@@ -3,6 +3,9 @@
 
 #include "reader.h"
 
+#define READER_CLIENT_ID_HEDA 1
+#define READER_CLIENT_ID_COMMAND_WRITER 2
+
 using namespace std;
 
 class GetByteOnEmptyStreamException : public exception {};

@@ -42,6 +42,7 @@
 
 #include "core/Heda.h"
 #include "core/writer/serial_writer.h"
+#include "core/writer/command_writer.h"
 #include "core/reader/serial_reader.h"
 #include "core/reader/shared_reader.h"
 
@@ -174,10 +175,12 @@ int main(int argc, char** argv) {
   if (serialPort.openPort("/dev/ttyACM0") < 0) {
     throw InitSerialPortException();
   }
-
-  SerialWriter writer(serialPort); 
+  
   SerialReader serialReader(serialPort);
   SharedReader sharedReader(serialReader);
+
+  CommandWriter writer(sharedReader, serialPort); 
+  writer.start();
   SharedReaderClient reader(sharedReader, READER_CLIENT_ID_HEDA);
 
   Heda heda(writer, reader); 

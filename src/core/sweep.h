@@ -78,7 +78,7 @@ class Sweep {
     }
 
     void moveThanDetect(const char* txt, double pos, vector<DetectedHRCode> &detected) {
-      string str = txt;
+      /*string str = txt;
       str += to_string(pos);
       //str += to_string((int)pos);
       BOOST_LOG_TRIVIAL(debug) << "About to move to: " << str;
@@ -89,7 +89,7 @@ class Sweep {
       m_port.unlock();
       simulation.execute(str.c_str());
       
-      captureAndDetect(detected);
+      captureAndDetect(detected);*/
     }
 
     

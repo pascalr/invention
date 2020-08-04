@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   cerr << "Doing reference...";
   p.writePort("H");
   cerr << "Waiting until receives message done...";
-  p.waitUntilMessageReceived(MESSAGE_DONE);
+  //p.waitUntilMessageReceived(MESSAGE_DONE);
 
   cerr << "Reference done. Sweeping...";
   Sweep sweep(p);
