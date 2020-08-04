@@ -6,9 +6,9 @@
 #include "../lib/opencv.h"
 #include "sweep.h" // because it is sweep that detects HRCodes
 
-#include "parser.h"
+#include "command_stack.h"
 
-#include "writer/command_writer.h"
+#include "parser.h"
 
 class HedaException : public exception {};
 
@@ -21,6 +21,12 @@ class FrameCaptureException : public HedaException {};
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
 // It keeps a copy of the serial it has read if it required at some point.
+//
+// TODO: Put everything I just put inside a class CommandStack.
+
+
+class CommandStack {
+};
 
 class Heda {
   public:
@@ -155,9 +161,7 @@ class Heda {
     }
 
     void grab(double strength) {
-      string cmd = "G";
-      cmd += to_string(strength);
-      m_writer << cmd.c_str();
+      pushCommand("g"+to_string(strength));
     }
 
     void find(string ingredientName) {
@@ -172,7 +176,8 @@ class Heda {
 
     void stop() {
       m_writer << "s";
-      // TODO: Clear the stack
+      clearStack();
+      setIsWorking(false);
     }
 
     void info() {
@@ -180,14 +185,13 @@ class Heda {
     }
 
     void openJaw() {
-      m_writer << "r";
+      pushCommand("r");
     }
 
 //  protected:
 
     Reader& m_reader;
     Writer& m_writer;
-    bool m_working;
 
     std::list<string> m_command_stack;
 
@@ -195,6 +199,8 @@ class Heda {
     VideoCapture m_cap;
     std::unordered_map<string, std::function<void(ParseResult)>> m_commands;
     bool m_video_working = false;
+
+    bool m_is_working = false;
 };
 
 #endif
