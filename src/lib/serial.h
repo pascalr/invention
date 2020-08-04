@@ -22,6 +22,10 @@
 #include <thread>
 #include <chrono>
 
+#include <mutex>
+
+std::mutex serialPortMutex;
+
 class InitSerialPortException : public exception {};
 
 // FIXME: Write error messages to a string instead of printf to stdout...
@@ -38,6 +42,9 @@ class SerialPort {
 
 
     void closePort() {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       if (m_is_opened) {
         close(m_serial_port);
         m_is_opened = false;
@@ -45,12 +52,18 @@ class SerialPort {
     }
 
     bool isOpen() {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       return m_is_opened;
     }
 
     // Device: "/dev/ttyACM0"
     // opens or repoens the given device
     int openPort(const char* device) {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       // If already open, close first
       if (m_is_opened) {
         closePort();
@@ -109,6 +122,9 @@ class SerialPort {
     }
 
     void getInput(string& str) {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       if (separatorFound) {
         size_t i = input.find(m_separator);
         str.assign(input, 0, i+1);
@@ -122,6 +138,9 @@ class SerialPort {
     }
 
     bool inputAvailable() {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       if (separatorFound) {
         return true;
       } else {
@@ -139,6 +158,7 @@ class SerialPort {
     }
 
     bool messageReceived(const char* msg) {
+
       if (!inputAvailable()) {
         return false;
       }
@@ -151,12 +171,14 @@ class SerialPort {
     }
 
     void waitUntilMessageReceived(const char* msg) {
+
       while (!messageReceived(msg)) {
         this_thread::sleep_for(chrono::milliseconds(10));
       }
     }
 
     void waitUntilMessageReceived(string& str) {
+
       while (!inputAvailable()) {
         this_thread::sleep_for(chrono::milliseconds(10));
       }
@@ -175,6 +197,9 @@ class SerialPort {
     }
 
     void writePort(const char* str) {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       write(m_serial_port, str, strlen(str));
       write(m_serial_port, &m_separator, 1);
       cout << "Serial: Writing: " << str << endl;
@@ -193,6 +218,9 @@ class SerialPort {
   
   private:
     int readBytes(char* buf, int length) {
+
+      std::lock_guard<std::mutex> guard(serialPortMutex);
+
       // Read bytes. The behaviour of read() (e.g. does it block?,
       // how long does it block for?) depends on the configuration
       // settings above, specifically VMIN and VTIME
