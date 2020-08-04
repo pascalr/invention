@@ -16,7 +16,8 @@ std::mutex commandsMutex;
 class CommandWriter : public StdWriter {
   public:
 
-    CommandWriter(SharedReader shared, SerialPort& p) : m_reader(shared, READER_CLIENT_ID_COMMAND_WRITER), m_port(p) {
+    CommandWriter(SharedReader& shared, Writer& writer) : m_reader(shared, READER_CLIENT_ID_COMMAND_WRITER), m_writer(writer) {
+      start();
     }
 
     void start() {
@@ -29,7 +30,7 @@ class CommandWriter : public StdWriter {
           }
 
           string command = popCommand();
-          m_port.writePort(command);
+          m_writer << command.c_str();
 
           // Wait for the message MESSAGE_DONE to be received.
           while (!doneMessageReceived()) {
@@ -74,7 +75,7 @@ class CommandWriter : public StdWriter {
     std::list<string> m_commands;
 
     SharedReaderClient m_reader;
-    SerialPort& m_port;
+    Writer& m_writer;
 };
 
 #endif

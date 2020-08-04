@@ -19,11 +19,16 @@ class SharedReader {
 
     string &getStreamForClient(int clientId) {
 
-      if (streams.count(clientId) != 1) {
+      if (streams.empty()) {
         throw UnregisteredClientException();
       }
 
-      return streams.at(clientId);
+      auto stream = streams.find(clientId);
+      if (stream == streams.end()) {
+        throw UnregisteredClientException();
+      }
+
+      return stream->second;
     }
 
     void registerClient(int clientId) {

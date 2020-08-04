@@ -2,6 +2,7 @@
 
 #include "../core/Heda.h"
 #include "../core/writer/stream_writer.h"
+#include "../core/writer/command_writer.h"
 #include "../core/reader/fake_reader.h"
 #include "../core/reader/shared_reader.h"
 
@@ -41,10 +42,34 @@ void testSharedReader() {
   assertEqual("h", 'h', (char) dest2.getByte());
 }
 
+void testCommandWriter() {
+  title("testCommandWriter");
+
+  StreamWriter ss;
+  FakeReader src;
+  SharedReader shared(src);
+  CommandWriter writer(shared, ss);
+
+  assertEqual("Empty output at first", "", ss.str());
+  writer << "h";
+  this_thread::sleep_for(chrono::milliseconds(100));
+  assertEqual("Should have written the first command", "h", ss.str());
+  
+  writer << "e";
+  assertEqual("It should not have written the second command (waiting for DONE)", "", ss.str());
+  
+  src.setFakeInput(MESSAGE_DONE);
+
+  this_thread::sleep_for(chrono::milliseconds(100));
+  assertEqual("Now it should have written the second output.", "e", ss.str());
+
+}
+
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
   testHomeCommand();
   testSharedReader();
+  testCommandWriter();
 }

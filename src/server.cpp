@@ -178,9 +178,9 @@ int main(int argc, char** argv) {
   
   SerialReader serialReader(serialPort);
   SharedReader sharedReader(serialReader);
+  SerialWriter serialWriter(serialPort);
 
-  CommandWriter writer(sharedReader, serialPort); 
-  writer.start();
+  CommandWriter writer(sharedReader, serialWriter); 
   SharedReaderClient reader(sharedReader, READER_CLIENT_ID_HEDA);
 
   Heda heda(writer, reader); 
