@@ -4,6 +4,7 @@
 #include "program.h"
 #include "input_parser.h"
 #include "reader/reader.h"
+#include "writer/writer.h"
 
 class ArduinoReader : public Reader {
 

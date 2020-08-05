@@ -1,7 +1,6 @@
 #ifndef WRITER_H
 #define WRITER_H
 
-// FIXME: Make the writer class simply a child of ostream
 class Writer {
   public:
     virtual void doPrint(const char* val) = 0;
