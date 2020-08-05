@@ -7,11 +7,12 @@ class FakeReader : public Reader {
   public:
 
     void setFakeInput(const char* str) {
-      fake_input.assign(str);
+      fake_input = str;
+      fake_input += "\n";
     }
     
-    void setFakeInput(std::string& str) {
-      fake_input.assign(str);
+    void setFakeInput(const std::string& str) {
+      fake_input.assign(str + "\n");
     }
 
         

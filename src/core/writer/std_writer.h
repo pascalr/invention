@@ -1,6 +1,8 @@
 #ifndef _STD_WRITER_H
 #define _STD_WRITER_H
 
+#include "writer.h"
+
 class StdWriter : public Writer {
   public:
     virtual void doPrint(string str) = 0;
