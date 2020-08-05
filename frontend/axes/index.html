@@ -4,7 +4,6 @@
     let log = document.getElementById("log")
     log.value += data.log;
     log.scrollTop = log.scrollHeight;
-    document.getElementById("current_cmd").value = data.current_cmd;
 
     const info = data.info
     if (info) {
@@ -28,7 +27,8 @@
 setInterval(
   (function pollHeda() {
     $.get( "/pollHeda", function( data ) {
-      document.getElementById("current_cmd").value = data.current_cmd;
+      window.data = data;
+      document.getElementById("current_cmd").value = data.cmd || "";
     });
   }), 500);
 
