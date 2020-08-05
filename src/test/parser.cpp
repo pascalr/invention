@@ -25,24 +25,18 @@ void testSplitWords() {
 void testParse() {
   title("Testing parse");
 
-  vector<string> words;
-  words.push_back("1234");
-  words.push_back("test");
-
   Parser parser;
-  ParseResult result;
+  /*ParseResult result;
   parser.parse(result, "test 1234 foo");
 
   assertEqual("Command name", "test", result.getCommand());
-  assertEqual("1234", 1234, result.popScalaire());
-  //assertEqual("test", UNKOWN, tokens[1].getType());
- 
+  assertEqual("1234", 1234, result.popScalaire());*/
   
   ParseResult result1;
-  parser.parse(result1, "Move X 1234");
+  parser.parse(result1, "move t -8");
   assertEqual("Command name", "move", result1.getCommand());
-  assertEqual("x", 'x', result1.popAxis());
-  assertEqual("1234", 1234, result1.popScalaire());
+  assertEqual("t", 't', result1.popAxis());
+  assertEqual("-8", -8, result1.popScalaire());
 
 }
 
@@ -75,9 +69,9 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  testSplitWords();
-  testParseNumber();
+  //testSplitWords();
+  //testParseNumber();
   testParse();
-  testParseQuantity();
+  //testParseQuantity();
 
 }

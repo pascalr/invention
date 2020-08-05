@@ -214,12 +214,12 @@ class Parser {
     }
 
     bool parsePositiveInteger(ParseResult &result, const string &word) {
-      
-      char* pEnd;
-      unsigned long val = strtoul (word.c_str(), &pEnd, 10);
-      if (strlen(pEnd) != 0) { return false; }
 
-      shared_ptr<Token> tok = make_shared<PositiveInteger>(val);
+      for (auto it = word.begin(); it != word.end(); it++) {
+        if (*it < '0' || *it > '9') {return false;}
+      }
+
+      shared_ptr<Token> tok = make_shared<PositiveInteger>(atoi(word.c_str()));
       result.addToken(tok);
       return true;
     }
