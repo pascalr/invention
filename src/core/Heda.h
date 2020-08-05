@@ -88,13 +88,16 @@ class Heda {
         char axis = tokens.popAxis();
         double dest = tokens.popScalaire();
         stringstream ss; ss << "m" << axis << dest;
-        m_writer << ss.str().c_str();
+        pushCommand(ss.str());
       };
 
       m_commands["open"] = [&](ParseResult tokens) {
         openJaw();
       };
     
+    }
+
+    void waitUntilNotWorking() {
     }
 
     void reference() {
