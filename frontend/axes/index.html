@@ -20,10 +20,18 @@
         }
       })
     }
-
-    poll(); // FIXME: Possible deep stack error can I do a forever loop or it will jam? It's single threaded I think.
+    poll(); // FIXME: Infinite stack exception at some point?
   });
 })()
+
+
+setInterval(
+  (function pollHeda() {
+    $.get( "/pollHeda", function( data ) {
+      document.getElementById("current_cmd").value = data.current_cmd;
+    });
+  }), 500);
+
 </script>
 
 <div id="statusBar">

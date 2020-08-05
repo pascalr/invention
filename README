@@ -212,3 +212,14 @@ Toutefois, ce n'est pas en vaint, j'ai une bonne idée je crois. Le potentiel es
 Speach de vente: Je vais vous compter une histoire. Dire quelque chose de dramatique. Et là c'est là que j'ai su que je devais fabriquer ma machine. Un allier dans la salle dit: Est-ce que c'est vrai cette histoire: Moi de rétortorquer, non, mais ça aurait pu l'être. hahahaha
 
 Fuck l'obscellescence programmé. Fuck les machines à pain qui ne dure pas.
+
+.vimrc
+
+filetype plugin indent on
+" On pressing tab, insert 2 spaces
+set expandtab
+" show existing tab with 2 spaces width
+set tabstop=2
+set softtabstop=2
+" when indenting with '>', use 2 spaces width
+set shiftwidth=2

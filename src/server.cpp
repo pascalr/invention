@@ -285,6 +285,24 @@ int main(int argc, char** argv) {
     response->write("Port closed.");
   };*/
  
+
+  server.resource["^/pollHeda$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+      string cmd = heda.getCurrentCommand();
+      cout << "PollHeda: CurrentCommand: " << cmd << endl;
+
+      ptree pt;
+      stringstream ss;
+      pt.put("cmd", cmd);
+      json_parser::write_json(ss, pt);
+                                                                       
+      string str = ss.str();
+      SimpleWeb::CaseInsensitiveMultimap header;
+      header.emplace("Content-Length", to_string(str.length()));
+      header.emplace("Content-Type", "application/json");
+      response->write(SimpleWeb::StatusCode::success_ok, str, header);
+  };
+
   server.resource["^/poll$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     thread work_thread([&heda,response,&serverReader] {
       string s;
@@ -299,7 +317,6 @@ int main(int argc, char** argv) {
           ptree pt;
           stringstream ss;
           pt.put("log", s);
-          pt.put("cmd", heda.getCurrentCommand());
           json_parser::write_json(ss, pt);
                                                                            
           string str = ss.str();
