@@ -203,6 +203,8 @@ class Heda {
     Reader& m_reader;
     Writer& m_writer;
 
+    // This is the stack of raw commands sent to the arduino.
+    // It is NOT the stack of commands sent to Heda.
     std::list<string> m_stack;
     
     std::thread m_commands_thread;

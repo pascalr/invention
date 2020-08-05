@@ -299,6 +299,7 @@ int main(int argc, char** argv) {
           ptree pt;
           stringstream ss;
           pt.put("log", s);
+          pt.put("cmd", heda.getCurrentCommand());
           json_parser::write_json(ss, pt);
                                                                            
           string str = ss.str();
