@@ -287,7 +287,6 @@ int main(int argc, char** argv) {
   server.resource["^/pollHeda$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
       string cmd = heda.getCurrentCommand();
-      cout << "PollHeda: CurrentCommand: " << cmd << endl;
 
       ptree pt;
       stringstream ss;

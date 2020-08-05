@@ -253,7 +253,10 @@ class Heda {
           str += (char) m_reader.getByte();
         } while (m_reader.inputAvailable());
 
+        cout << "Message received is: " << str << endl;
+
         if (str == MESSAGE_DONE) {
+          cout << "Which means it is done!!!" << endl;
           m_current_command = "";
           return 0;
         }
