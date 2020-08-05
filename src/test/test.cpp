@@ -4,7 +4,7 @@
 
 #include "../lib/lib.h"
 #include "../lib/matplotlibcpp.h"
-#include "../core/console_writer.h"
+#include "../core/writer/console_writer.h"
 #include "../core/axis.h"
 #include "../core/input_parser.h"
 #include "../config/setup.h"
@@ -15,7 +15,7 @@
 #include <signal.h>
 
 #include "../core/serialize.h"
-#include "../core/deserialize.h"
+//#include "../core/deserialize.h"
 #include "../core/fake_program.h"
 
 #include "test.h"
@@ -45,7 +45,7 @@ void referenceAll(Program& p) {
   }
 }
 
-void testStop() {
+/*void testStop() {
   title("Testing stop");
 
   FakeProgram p;
@@ -71,10 +71,10 @@ void testParseInput() {
   p.axisA.setPositionSteps(100);
   p.axisY.setPositionSteps(100);
 
-  /*cursor = parseInput("HX", p, 0);
+  *//*cursor = parseInput("HX", p, 0);
   assertTest("HX should reference X", 0, axisX.getPositionSteps());
   assertTest("HX should not refence Y", 100, axisY->getPositionSteps());
-  assertTest("Should increase the cursor by 2", 2, cursor);*/
+  assertTest("Should increase the cursor by 2", 2, cursor);*//*
 
   p.setFakeInput("H");
   myLoop(p);
@@ -244,6 +244,29 @@ void testSerialize() {
   //assertTest("forward", true, result.axisY.isForward);
   //assertNearby("dest_angle", 90.0, result.axisY.getDestinationAngle());
   //assertNearby("angle", 0.0, result.axisY.getPositionAngle());
+}*/
+
+void assertParseNumber(const char* str, double expected) {
+
+  double val;
+
+  char tmp[256];
+  strncpy(tmp,str,256);
+  char *ptr = tmp;
+
+  parseNumber(&ptr, val);
+  assertNearby(str, expected, val);
+}
+
+void assertInvalidNumber(const char* str) {
+  
+  double val;
+
+  char tmp[256];
+  strncpy(tmp,str,256);
+  char *ptr = tmp;
+
+  assertTest(str, -1, parseNumber(&ptr,val));
 }
 
 void testInputParserParseNumber() {
@@ -251,35 +274,19 @@ void testInputParserParseNumber() {
   FakeProgram p;
   double val;
 
-  p.setFakeInput("m123\n");
-  assertTest("invalid number (m123)", -1, parseNumber(p,val));
+  assertInvalidNumber("");
+  assertInvalidNumber("m123");
+  assertParseNumber("123", 123.0);
+  assertParseNumber("-123", -123.0);
+  assertParseNumber("+123", +123.0);
+  assertParseNumber("12+3", 12.0);
+  assertParseNumber("12-3", 12.0);
+  assertParseNumber("123.45", 123.45);
+  assertParseNumber("123.45e2", 12345.0);
+  assertParseNumber("123.45E2", 12345.0);
+  assertParseNumber("123.45e+2", 12345.0);
+  assertParseNumber("0.1e-1", 0.01);
 
-  p.setFakeInput("123\n");
-  parseNumber(p, val);
-  assertNearby("123", 123.0, val);
-
-  p.setFakeInput("-123\n");
-  parseNumber(p, val);
-  assertNearby("-123", -123.0, val);
-  
-  p.setFakeInput("+123\n");
-  parseNumber(p, val);
-  assertNearby("+123", 123.0, val);
-
-  p.setFakeInput("12+3\n");
-  parseNumber(p, val);
-  assertNearby("12+3", 12.0, val);
-
-  p.setFakeInput("12-3\n");
-  parseNumber(p, val);
-  assertNearby("12-3", 12.0, val);
-  
-  p.setFakeInput("123.45\n");
-  parseNumber(p, val);
-  assertNearby("123.45", 123.45, val);
-
-  p.setFakeInput("\n");
-  assertTest("invalid number (empty)", -1, parseNumber(p,val));
 }
 
 /*void testBaseXAxisSpeed() {
@@ -317,13 +324,13 @@ int main (int argc, char *argv[]) {
 
   //testSerialize();
   testTimeDifference();
-  testMoveZMovesX();
-  testMoveXFlipsZ();
-  testStop();
-  testMoveZ();
-  testParseInput();
+  //testMoveZMovesX();
+  //testMoveXFlipsZ();
+  //testStop();
+  //testMoveZ();
+  //testParseInput();
   testInputParserParseNumber();
-  testMoveSquare();
+  //testMoveSquare();
   //testBaseXAxisSpeed();
 
 }

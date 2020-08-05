@@ -9,7 +9,6 @@
 #include <boost/property_tree/ptree.hpp>
 
 // Added for the default_resource example
-#include <algorithm>
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <vector>
@@ -19,7 +18,6 @@
 
 #include "lib/serial.h"
 #include "lib/linux.h"
-#include "core/sweep.h"
 //#include "core/fake_serial.h"
 
 #include <unistd.h> // To parse arguments

@@ -5,9 +5,11 @@
 #include "axis.h"
 #include "serialize.h"
 
-int parseNumber(Program& p, double& n);
+int parseNumber(char** input, double& n);
+//int parseNumber(Program& p, double& n);
 
-Axis* parseInputAxis(Program& p, Axis* &axis);
+Motor* parseInputMotorAxis(Program& p, char** input, Motor* &axis);
+//Axis* parseInputAxis(Program& p, Axis* &axis);
 
 int parseActionCommand(char cmd, Program& p);
 

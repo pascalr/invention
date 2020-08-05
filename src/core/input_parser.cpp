@@ -3,7 +3,30 @@
 
 #include <stdlib.h>
 
-int parseNumber(Program& p, double& n) {
+int parseNumber(char** input, double& n) {
+  char* pEnd;
+  n = strtod(*input, &pEnd);
+  // If no number was found
+  if (pEnd == *input) {return -1;}
+  *input = pEnd;
+  return 0;
+}
+
+Motor* parseInputMotorAxis(Program& p, char** input, Motor* &axis) {
+  char name = **input;
+
+  for (int i = 0; p.motors[i] != 0; i++) {
+    if (toupper(name) == p.motors[i]->getName()) {
+      axis = p.motors[i];
+      (*input)++;
+      return axis;
+    }
+  }
+
+  return 0;
+}
+
+/*int parseNumber(Program& p, double& n) {
 
   char number[MAX_NUMBER_CHAR + 1];
   bool periodFound = false;
@@ -63,7 +86,7 @@ Motor* parseInputMotorAxis(Program& p, Motor* &axis) {
 // This will check if a flip is required, but this will NOT check if it must
 // hide the arm to change level to go higher or lower, this should have
 // been done before. It should not be done on the arduino.
-/*int parseMoveCommand(Program& p) {
+int parseMoveCommand(Program& p) {
 
   bool zDestinationSet = false;
   double zDestination;
@@ -214,7 +237,8 @@ void doReferencingAll(Program& p) {
   //}
 }
 
-int parseActionCommand(char cmd, Program& p) {
+
+/*int oldParseActionCommand(char cmd, Program& p) {
 
   Motor* motorAxis;
   double number;
@@ -270,6 +294,60 @@ int parseActionCommand(char cmd, Program& p) {
   // Move backward
   } else if (cmd == '-') {
     if (!parseInputMotorAxis(p, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    motorAxis->rotate(REVERSE);
+  }
+
+  p.getWriter() << "Cmd: " << cmd << "\n";
+
+  return 0;
+}*/
+
+int parseActionCommand(char cmd, Program& p) {
+
+  Motor* motorAxis;
+  double number;
+  int status;
+
+  // Prepare
+  unsigned long time = p.getCurrentTime();
+  for (int i = 0; p.motors[i] != 0; i++) {
+    p.motors[i]->prepareWorking(time);
+  }
+
+  char* input = p.getInputLine();
+
+  // Move
+  if (cmd == 'M' || cmd == 'm') {
+    if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    if ((status = motorAxis->setDestination(number)) < 0) {return status;}
+
+  // Home (referencing) (currently only supports referencing all (not HX or HY)
+  } else if (cmd == 'H' || cmd == 'h') {
+    doReferencingAll(p);
+
+  // Wait or sleep for some time
+  } else if (cmd == 'w' || cmd == 'W') {
+    if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    p.sleepMs(number);
+
+  // Release
+  } else if (cmd == 'r' || cmd == 'R') {
+    p.axisR.release();
+
+  // Grab
+  } else if (cmd == 'g' || cmd == 'G') {
+    if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    p.axisR.grab(number);
+
+  // Move forward
+  } else if (cmd == '+') {
+    if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    motorAxis->rotate(FORWARD);
+
+  // Move backward
+  } else if (cmd == '-') {
+    if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
     motorAxis->rotate(REVERSE);
   }
 

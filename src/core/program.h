@@ -10,6 +10,11 @@
 #define NUMBER_OF_MOTORS 6
 #define NUMBER_OF_AXES 7
 
+// Way too big but at least I wont have to worry about that.
+// If I run out of space some time bring this down.
+// Could be as low as 52.
+#define MAX_INPUT_LENGTH 256
+
 class Program {
   public:
     Program(Writer& writer, Reader& reader) :
@@ -28,6 +33,17 @@ class Program {
         sleepMs(1);
       }
       return (char) receivedByte;
+    }
+
+    char* getInputLine() {
+      int i = 0;
+      char ch;
+      while ((ch = getChar()) != '\n') {
+        input[i] = ch;
+        i++;
+      }
+      input[i] = '\0';
+      return input;
     }
 
     void stopMoving() {
@@ -52,6 +68,7 @@ class Program {
     bool isWorking = false;
     
     virtual unsigned long getCurrentTime() = 0;
+    char input[MAX_INPUT_LENGTH];
 };
 
 
