@@ -113,38 +113,6 @@ class SerialPort {
       return m_serial_port;
     }
 
-    void getInput(string& str) {
-
-      if (separatorFound) {
-        size_t i = input.find(m_separator);
-        str.assign(input, 0, i+1);
-        input.erase(0, i+1);
-        if (input.find(m_separator) == string::npos) {
-          separatorFound = false;
-        }
-      } else {
-        cerr << "Error trying to getInput, but none was available." << endl;
-      }
-    }
-
-    bool inputAvailable() {
-
-      if (separatorFound) {
-        return true;
-      } else {
-        char msg[256]; 
-        memset(&msg, '\0', sizeof(msg));
-        int num_bytes = readBytes(msg, sizeof(msg));
-        if (num_bytes > 0) {
-          input += msg;
-          if (input.find(m_separator) != string::npos) {
-            separatorFound = true;
-          }
-        }
-      }
-      return separatorFound;
-    }
-
     void writePort(string str) {
       writePort(str.c_str());
     }
@@ -152,11 +120,11 @@ class SerialPort {
     void writePort(const char* str) {
 
       write(m_serial_port, str, strlen(str));
-      write(m_serial_port, &m_separator, 1);
+      char newline = '\n';
+      write(m_serial_port, &newline, 1);
       cout << "Serial: Writing: " << str << endl;
     }
 
-  private:
     int readBytes(char* buf, int length) {
 
       // Read bytes. The behaviour of read() (e.g. does it block?,
@@ -172,9 +140,6 @@ class SerialPort {
     }
 
     int m_serial_port;
-    char m_separator = '\n';
-    string input;
-    bool separatorFound = false;
     bool m_is_opened = false;
 };
 

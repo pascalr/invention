@@ -85,8 +85,8 @@ target_link_libraries( capture ${MyLibs} )
 add_executable( main src/main.cpp )
 target_link_libraries( main ${MyLibs} )
 
-add_executable( communicate src/communicate.cpp )
-target_link_libraries( communicate ${MyLibs} )
+#add_executable( communicate src/communicate.cpp )
+#target_link_libraries( communicate ${MyLibs} )
 
 #add_executable( test_captures src/test/test_captures.cpp )
 #target_link_libraries( test_captures ${MyLibs} )

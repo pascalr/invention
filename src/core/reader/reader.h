@@ -3,6 +3,10 @@
 
 class GetByteOnEmptyStreamException : public exception {};
 
+// TODO: The Reader should encapsulate to logic of detecting
+// if a getByte has been called without a inputAvailable call.
+// This would throw a GetByteBeforeInputAvailableException
+
 class Reader {
   public:
 
