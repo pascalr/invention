@@ -40,10 +40,7 @@ class SerialPort {
       closePort();
     }
 
-
     void closePort() {
-
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
 
       if (m_is_opened) {
         close(m_serial_port);
@@ -52,17 +49,12 @@ class SerialPort {
     }
 
     bool isOpen() {
-
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
-
       return m_is_opened;
     }
 
     // Device: "/dev/ttyACM0"
     // opens or repoens the given device
     int openPort(const char* device) {
-
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
 
       // If already open, close first
       if (m_is_opened) {
@@ -123,8 +115,6 @@ class SerialPort {
 
     void getInput(string& str) {
 
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
-
       if (separatorFound) {
         size_t i = input.find(m_separator);
         str.assign(input, 0, i+1);
@@ -138,8 +128,6 @@ class SerialPort {
     }
 
     bool inputAvailable() {
-
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
 
       if (separatorFound) {
         return true;
@@ -157,69 +145,19 @@ class SerialPort {
       return separatorFound;
     }
 
-    /*bool messageReceived(const char* msg) {
-
-      if (!inputAvailable()) {
-        return false;
-      }
-
-      string str;
-      getInput(str);
-      trim(str);
-      cout << "Serial: Received: " << str << endl;
-      return str == msg;
-    }
-
-    void waitUntilMessageReceived(const char* msg) {
-
-      while (!messageReceived(msg)) {
-        this_thread::sleep_for(chrono::milliseconds(10));
-      }
-    }
-
-    void waitUntilMessageReceived(string& str) {
-
-      while (!inputAvailable()) {
-        this_thread::sleep_for(chrono::milliseconds(10));
-      }
-      
-      getInput(str);
-      trim(str);
-    }
-
-    void executeUntil(string str, string msg) {
-      writePort(str);
-      waitUntilMessageReceived(msg);
-    }*/
-
     void writePort(string str) {
       writePort(str.c_str());
     }
 
     void writePort(const char* str) {
 
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
-
       write(m_serial_port, str, strlen(str));
       write(m_serial_port, &m_separator, 1);
       cout << "Serial: Writing: " << str << endl;
     }
 
-    void lock(int key) {
-      while (m_key) {
-        this_thread::sleep_for(chrono::milliseconds(10));
-      }
-      m_key = key;
-    }
-
-    void unlock() {
-      m_key = 0;
-    }
-  
   private:
     int readBytes(char* buf, int length) {
-
-      //std::lock_guard<std::mutex> guard(serialPortMutex);
 
       // Read bytes. The behaviour of read() (e.g. does it block?,
       // how long does it block for?) depends on the configuration
@@ -238,7 +176,6 @@ class SerialPort {
     string input;
     bool separatorFound = false;
     bool m_is_opened = false;
-    int m_key = 0;
 };
 
 #endif

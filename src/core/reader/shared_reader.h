@@ -8,7 +8,6 @@
 
 using namespace std;
 
-class GetByteOnEmptyStreamException : public exception {};
 class UnregisteredClientException : public exception {};
 
 class SharedReader {

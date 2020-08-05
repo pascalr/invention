@@ -3,6 +3,8 @@
 
 #include "reader.h"
 
+class EmptyInputInvalidException : public exception {};
+
 class SerialReader : public Reader {
   public:
     
@@ -10,18 +12,19 @@ class SerialReader : public Reader {
     }
 
     bool inputAvailable() {
-      return m_port.inputAvailable();
+      return !m_input.empty() || m_port.inputAvailable();
     }
 
     int getByte() {
 
       if (m_input.empty()) {
-        m_port.lock(SERIAL_KEY_READER);
+        if (!m_port.inputAvailable()) {
+          throw GetByteOnEmptyStreamException();
+        }
         m_port.getInput(m_input);
-        m_port.unlock();
       }
 
-      if (m_input.empty()) {return -1;}
+      if (m_input.empty()) {throw EmptyInputInvalidException();} // Should never happen but to be safe..
 
       char c = m_input[0];
       m_input.erase(m_input.begin());
