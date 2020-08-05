@@ -24,6 +24,29 @@ class FrameCaptureException : public HedaException {};
 
 std::mutex commandsMutex;
 
+// Low level command, sent to the arduino. "mx..." not "move x ..."
+class RawCommand {
+  public:
+    RawCommand() {}
+    RawCommand(std::string cmd) : cmd(cmd) {}
+    RawCommand(std::string cmd, std::function<void()> callback) : cmd(cmd), callback(callback) {}
+
+    bool isDone() {
+      return cmd.empty();
+    }
+    void clear() {
+      cmd = "";
+    }
+    void finish() {
+      cmd = "";
+      if (callback) {
+        callback();
+      }
+    }
+    std::string cmd;
+    std::function<void()> callback;
+};
+
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
 // It keeps a copy of the serial it has read if it required at some point.
@@ -154,17 +177,15 @@ class Heda {
     void move(Movement mvt) {
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
-      pushCommand(mvt.str());
-
-      // FIXME: This should be done as a callback.
-      // TODO: The command stack must be a list of callbacks, not a list of strings...
-      if (mvt.axis == 'x' || mvt.axis == 'X') {
-        m_position(0) = mvt.destination;
-      } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
-        m_position(1) = mvt.destination;
-      } else if (mvt.axis == 't' || mvt.axis == 'T') {
-        m_position(2) = mvt.destination;
-      }
+      pushCommand(mvt.str(), [&,mvt]() {
+        if (mvt.axis == 'x' || mvt.axis == 'X') {
+          m_position(0) = mvt.destination;
+        } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
+          m_position(1) = mvt.destination;
+        } else if (mvt.axis == 't' || mvt.axis == 'T') {
+          m_position(2) = mvt.destination;
+        }
+      });
     }
 
     void moveTo(PolarCoord destination) {
@@ -190,16 +211,23 @@ class Heda {
     void sweep() {
     }
 
+    void pushCommand(string str, std::function<void()> callback) {
+      std::lock_guard<std::mutex> guard(commandsMutex);
+      RawCommand cmd(str, callback);
+      m_stack.push_back(cmd);
+    }
+
     void pushCommand(string str) {
       std::lock_guard<std::mutex> guard(commandsMutex);
-      m_stack.push_back(str);
+      RawCommand cmd(str);
+      m_stack.push_back(cmd);
     }
 
     void stop() {
       std::lock_guard<std::mutex> guard(commandsMutex);
       m_writer << "s";
       m_stack.clear();
-      m_current_command = "";
+      m_current_command.clear();
       // TODO: BIIIIGGGG TODO: When stopping, ask for the position!!!
     }
 
@@ -212,7 +240,7 @@ class Heda {
     }
 
     string getCurrentCommand() {
-      return m_current_command;
+      return m_current_command.cmd;
     }
 
 //  protected:
@@ -222,7 +250,7 @@ class Heda {
 
     // This is the stack of raw commands sent to the arduino.
     // It is NOT the stack of commands sent to Heda.
-    std::list<string> m_stack;
+    std::list<RawCommand> m_stack;
     
     std::thread m_commands_thread;
     std::atomic<bool> m_commands_thread_run;
@@ -232,7 +260,7 @@ class Heda {
     std::unordered_map<string, std::function<void(ParseResult)>> m_commands;
     bool m_video_working = false;
 
-    string m_current_command;
+    RawCommand m_current_command;
 
   protected:
 
@@ -248,13 +276,13 @@ class Heda {
       std::lock_guard<std::mutex> guard(commandsMutex);
 
       // Check if there is a command being executed right now
-      if (m_current_command.empty()) {
+      if (m_current_command.isDone()) {
 
         // Check if a new command is available
         if (m_stack.empty()) {return 100;}
 
         m_current_command = *m_stack.begin();
-        m_writer << m_current_command.c_str();
+        m_writer << m_current_command.cmd.c_str();
         m_stack.pop_front();
         return 0;
 
@@ -264,7 +292,7 @@ class Heda {
         string str = getInputLine(m_reader);
 
         if (str == MESSAGE_DONE) {
-          m_current_command = "";
+          m_current_command.finish();
           return 0;
         }
       }
