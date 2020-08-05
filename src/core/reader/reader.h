@@ -6,7 +6,6 @@ class Reader {
 
     virtual bool inputAvailable() = 0;
     virtual int getByte() = 0;
-
     
 };
 

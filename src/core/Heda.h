@@ -18,15 +18,13 @@ class MissingHRCodeException : public HedaException {};
 class TooManyHRCodeException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 
+#include <mutex>
+
+std::mutex commandsMutex;
+
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
 // It keeps a copy of the serial it has read if it required at some point.
-//
-// TODO: Put everything I just put inside a class CommandStack.
-
-
-class CommandStack {
-};
 
 class Heda {
   public:
@@ -37,7 +35,17 @@ class Heda {
       m_video_working = initVideo(m_cap);
 
       setupCommands();
+
+      m_commands_thread_run = true;
+      m_commands_thread = std::thread(&Heda::loopCommandStack, this);
+      //m_commands_thread.detach(); Do I need to detach?
     }
+
+    ~Heda() {
+      m_commands_thread_run = false;
+      m_commands_thread.join();
+    }
+
 
     void setupCommands() {
      
@@ -57,7 +65,6 @@ class Heda {
     
       m_commands["home"] = [&](ParseResult tokens) {
         reference();
-        //m_command_stack.push_back([&](){reference();});
       };
 
       m_commands["info"] = [&](ParseResult tokens) {
@@ -92,7 +99,7 @@ class Heda {
 
     void reference() {
       cerr << "Doing reference...\n";
-      m_writer << "H";
+      pushCommand("H");
       m_position << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
     }
 
@@ -134,7 +141,7 @@ class Heda {
     void move(Movement mvt) {
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
-      m_writer << mvt.str().c_str();
+      pushCommand(mvt.str());
 
       if (mvt.axis == 'x' || mvt.axis == 'X') {
         m_position(0) = mvt.destination;
@@ -154,12 +161,6 @@ class Heda {
       }
     }
 
-    void poll(string& s) {
-      while (m_reader.inputAvailable()) {
-        s += (char) m_reader.getByte();
-      }
-    }
-
     void grab(double strength) {
       pushCommand("g"+to_string(strength));
     }
@@ -174,10 +175,15 @@ class Heda {
     void sweep() {
     }
 
+    void pushCommand(string str) {
+      std::lock_guard<std::mutex> guard(commandsMutex);
+      m_stack.push_back(str);
+    }
+
     void stop() {
+      std::lock_guard<std::mutex> guard(commandsMutex);
       m_writer << "s";
-      clearStack();
-      setIsWorking(false);
+      m_stack.clear();
     }
 
     void info() {
@@ -188,19 +194,69 @@ class Heda {
       pushCommand("r");
     }
 
+    string getCurrentCommand() {
+      return m_current_command;
+    }
+
 //  protected:
 
     Reader& m_reader;
     Writer& m_writer;
 
-    std::list<string> m_command_stack;
+    std::list<string> m_stack;
+    
+    std::thread m_commands_thread;
+    std::atomic<bool> m_commands_thread_run;
 
     PolarCoord m_position;
     VideoCapture m_cap;
     std::unordered_map<string, std::function<void(ParseResult)>> m_commands;
     bool m_video_working = false;
 
-    bool m_is_working = false;
+    string m_current_command;
+
+  protected:
+
+    void loopCommandStack() {
+      while (m_commands_thread_run) {
+        this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
+      }
+    }
+    
+    // returns the time to sleep
+    int handleCommandStack() {
+
+      std::lock_guard<std::mutex> guard(commandsMutex);
+
+      // Check if there is a command being executed right now
+      if (m_current_command.empty()) {
+
+        // Check if a new command is available
+        if (m_stack.empty()) {return 100;}
+
+        m_current_command = *m_stack.begin();
+        m_writer << m_current_command.c_str();
+        m_stack.pop_front();
+        return 0;
+
+      // Check if the message MESSAGE_DONE has been received.
+      } else if (m_reader.inputAvailable()) {
+
+        // TODO: This should only be one call to a reader function.
+        string str;
+        do {
+          str += (char) m_reader.getByte();
+        } while (m_reader.inputAvailable());
+
+        if (str == MESSAGE_DONE) {
+          m_current_command = "";
+          return 0;
+        }
+      }
+
+      return 10;
+    }
+
 };
 
 #endif

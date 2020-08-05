@@ -17,9 +17,16 @@ void testHomeCommand() {
   Heda heda(ss, reader);
 
   heda.execute("home");
+  this_thread::sleep_for(chrono::milliseconds(200));
   assertEqual("home", "H", ss.str());
 
+  assertEqual("current command", "H", heda.getCurrentCommand());
+  reader.setFakeInput(MESSAGE_DONE);
+  this_thread::sleep_for(chrono::milliseconds(200));
+  assertEqual("current command", "", heda.getCurrentCommand());
+
   heda.execute("grab 50");
+  this_thread::sleep_for(chrono::milliseconds(200));
   assertEqual("grab 50", "G50", ss.str());
 }
 

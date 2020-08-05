@@ -44,7 +44,7 @@
 #include "core/writer/serial_writer.h"
 //#include "core/writer/command_writer.h"
 #include "core/reader/serial_reader.h"
-//#include "core/reader/shared_reader.h"
+#include "core/reader/shared_reader.h"
 
 using namespace NL::Template;
 
@@ -177,13 +177,16 @@ int main(int argc, char** argv) {
   }
   
   SerialReader serialReader(serialPort);
-  //SharedReader sharedReader(serialReader);
   SerialWriter serialWriter(serialPort);
+  
+  SharedReader sharedReader(serialReader);
+  SharedReaderClient hedaReader(sharedReader, READER_CLIENT_ID_HEDA);
+  SharedReaderClient serverReader(sharedReader, READER_CLIENT_ID_SERVER);
 
   //CommandWriter writer(sharedReader, serialWriter); 
   //SharedReaderClient reader(sharedReader, READER_CLIENT_ID_HEDA);
 
-  Heda heda(serialWriter, serialReader); 
+  Heda heda(serialWriter, hedaReader); 
   vector<Jar> jars;
   FakeProgram fake;
   WebProgram wp;
@@ -282,12 +285,14 @@ int main(int argc, char** argv) {
     response->write("Port closed.");
   };*/
  
-  server.resource["^/poll$"]["GET"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    thread work_thread([&heda,response] {
+  server.resource["^/poll$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    thread work_thread([&heda,response,&serverReader] {
       string s;
       while (true) {
 
-        heda.poll(s);
+        while (serverReader.inputAvailable()) {
+          s += (char) serverReader.getByte();
+        }
         if (!s.empty()) {
                                                                            
           cout << "Arduino: " << s;
@@ -303,6 +308,7 @@ int main(int argc, char** argv) {
           response->write(SimpleWeb::StatusCode::success_ok, str, header);
           return;
         }
+        s = "";
         this_thread::sleep_for(chrono::milliseconds(10));
       }
     });
