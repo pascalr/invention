@@ -187,6 +187,7 @@ class Heda {
       std::lock_guard<std::mutex> guard(commandsMutex);
       m_writer << "s";
       m_stack.clear();
+      m_current_command = "";
     }
 
     void info() {

@@ -14,7 +14,7 @@ class SerialReader : public Reader {
 
     bool inputAvailable() {
 
-      if (m_separator_found) {
+      if (m_separator_found && !m_input.empty()) {
         return true;
       } else {
         char msg[256]; 
