@@ -120,16 +120,28 @@ void splitWords(vector<string> &words, const string &str) {
 class ParseResult {
   public:
 
-    void expectArgument(TokenType type) {
-
+    void expectArgument() {
       if (m_tokens.empty()) {
         throw MissingArgumentException();
       }
-  
+    }
+
+    void expectArgument(TokenType type) {
+
+      expectArgument();
+
       TokenType actual = (*m_tokens.begin())->getType();
       if (actual != type) {
         throw WrongTypeArgumentException(type, actual);
       }
+    }
+
+    bool checkArgument(TokenType type) {
+
+      expectArgument();
+
+      shared_ptr<Token> token = *m_tokens.begin();
+      return token->getType() == type;
     }
 
     char popAxis() {
@@ -153,13 +165,12 @@ class ParseResult {
     }
 
     double popScalaire() {
-     
-      shared_ptr<Token> token = *m_tokens.begin();
-      if (token->getType() == POSITIVE_INTEGER) {return popPositiveInteger();}
 
+      if (checkArgument(POSITIVE_INTEGER)) {return popPositiveInteger();}
+     
       expectArgument(SCALAIRE);
 
-      double val = (dynamic_pointer_cast<Scalaire> (token))->value;
+      double val = (dynamic_pointer_cast<Scalaire> (*m_tokens.begin()))->value;
       m_tokens.erase(m_tokens.begin());
     
       return val;

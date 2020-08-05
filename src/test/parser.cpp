@@ -46,30 +46,37 @@ void testParse() {
 
 }
 
-/*void assertNumber(double val, const char* str) {
+void assertParseScalaire(const char* str, double val) {
 
-  Token tok = tokenize(str);
-  assertEqual(str, SCALAIRE, tok.getType());
-  if (tok.getType() == SCALAIRE) {
-    assertEqual(str, val, tok.toScalaire());
-  }
+  Parser parser;
+  ParseResult result;
+  parser.parseScalaire(result, str);
+  assertEqual(str, val, result.popScalaire());
 }
 
 void testParseNumber() {
   title("Testing parse number");
   
-  assertNumber(1234, "1234");
-  assertNumber(12.34, "12.34");
-  assertException("ExpectedScalaireException", []() {tokenize("12.34.").toScalaire();});
-  assertException("ExpectedScalaireException", []() {tokenize("1a2").toScalaire();});
-}*/
+  assertParseScalaire("1234", 1234.0);
+  assertParseScalaire("12.34", 12.34);
+  assertParseScalaire("123", 123.0);
+  assertParseScalaire("-123", -123.0);
+  assertParseScalaire("+123", +123.0);
+  assertParseScalaire("123.45", 123.45);
+  assertParseScalaire("123.45e2", 12345.0);
+  assertParseScalaire("123.45E2", 12345.0);
+  assertParseScalaire("123.45e+2", 12345.0);
+  assertParseScalaire("0.1e-1", 0.01);
+  assertException("ExpectedScalaireException 12.34.", []() {assertParseScalaire("12.34.", 0.0);});
+  assertException("ExpectedScalaireException 1a2", []() {assertParseScalaire("1a2", 0.0);});
+}
 
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
   testSplitWords();
-  //testParseNumber();
+  testParseNumber();
   testParse();
   testParseQuantity();
 
