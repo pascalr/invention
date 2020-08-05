@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include "std_writer.h"
+#include <string>
 
 class ConsoleWriter : public StdWriter {
   public:
-    void doPrint(string val) {
+    void doPrint(std::string val) {
       std::cout << val;
     }
 };

@@ -96,8 +96,8 @@ target_link_libraries( main ${MyLibs} )
 add_executable( sweep src/sweep.cpp )
 target_link_libraries( sweep ${MyLibs} )
 
-add_executable( video_capture src/video_capture.cpp )
-target_link_libraries( video_capture ${MyLibs} )
+#add_executable( video_capture src/video_capture.cpp )
+#target_link_libraries( video_capture ${MyLibs} )
 
 add_executable( usbreset src/usbreset.c )
 target_link_libraries( usbreset ${MyLibs} )

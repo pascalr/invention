@@ -4,6 +4,7 @@
 #include "position.h"
 #include "sweep.h"
 #include <vector>
+#include "jar.h"
  
 using namespace std;
 using namespace Eigen;
@@ -25,10 +26,6 @@ double calculateJarHeight(double perceivedWidth) {
   double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
   return DISTANCE_CAMERA_SHELF - distanceFromCam;
 }
-
-class Jar {
-  Vector3d position;
-};
 
 // This is separate from sweep because this does not require the sweep action.
 // This is done afterward.

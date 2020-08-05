@@ -11,6 +11,12 @@ TODO business:
 - Calculer le coût de la machine, calculer le temps de fabrication.
 - Écrire un speech de vente.
 
+Un front end rails. Tout est correct. Sauf la partie avec les ingredients et recettes
+quand j'avais commencer à coder. Ça mettre ça dans rails.
+
+Je vais avoir un serveur pour Heda (recevoir des commandes, etc). Et un serveur pour le frontend (voir des trucs)
+Attendre le plus longtemps possible avant de faire le front end.
+Attendre le plus longtemps possible avant de toucher à rails. Idéalement même pas.
 
 Use interupts to read rotary encoder.
 https://playground.arduino.cc/Main/RotaryEncoders/

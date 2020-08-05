@@ -10,6 +10,10 @@ using namespace std;
 // HUUUUUUUUGEEEE FIXME: I do not validate the user input. It could insert sql...
 // I should probably use ruby on rails which does all this already...
 
+#include <mutex>
+
+std::mutex dbMutex;
+
 class Database {
   public:
 
@@ -17,6 +21,7 @@ class Database {
     }
 
     void load(vector<Ingredient>& ingredients) {
+      std::lock_guard<std::mutex> guard(dbMutex);
 
       SQLite::Statement query(db, "SELECT rowid,* FROM ingredient");
       
@@ -31,18 +36,20 @@ class Database {
     }
 
     void save(Ingredient ingredient) {
+      std::lock_guard<std::mutex> guard(dbMutex);
       db.exec("INSERT INTO ingredient VALUES (\""+ingredient.name+"\", "+to_string(ingredient.aliment_id)+")");
     }
 
     void loadRecette(SQLite::Statement& query, Recette& recette) {
+      std::lock_guard<std::mutex> guard(dbMutex);
 
-        recette.rowid = query.getColumn(0);
-        recette.name = (const char*)query.getColumn(1);
-        recette.instructions = (const char*)query.getColumn(2);
-
+      recette.rowid = query.getColumn(0);
+      recette.name = (const char*)query.getColumn(1);
+      recette.instructions = (const char*)query.getColumn(2);
     }
 
     void load(vector<Recette>& recettes) {
+      std::lock_guard<std::mutex> guard(dbMutex);
 
       SQLite::Statement query(db, "SELECT rowid,* FROM recette");
       
@@ -55,10 +62,12 @@ class Database {
     }
 
     void remove(Recette& recette, string name) {
+      std::lock_guard<std::mutex> guard(dbMutex);
       db.exec("DELETE FROM recette WHERE name =  \""+name+"\"");
     }
 
     void get(Recette& recette, string name) {
+      std::lock_guard<std::mutex> guard(dbMutex);
 
       SQLite::Statement query(db, "SELECT rowid,* FROM recette WHERE NAME = \"" + name + "\"");
       query.executeStep();
@@ -66,6 +75,7 @@ class Database {
     }
 
     void save(Recette recette) {
+      std::lock_guard<std::mutex> guard(dbMutex);
       if (recette.rowid) {
         cout << "Updating recipee\n";
         db.exec("UPDATE recette SET name = \""+recette.name+"\", instructions = \""+recette.instructions+"\" WHERE rowid = " + to_string(recette.rowid));

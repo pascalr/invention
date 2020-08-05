@@ -184,10 +184,10 @@ int main(int argc, char** argv) {
   //CommandWriter writer(sharedReader, serialWriter); 
   //SharedReaderClient reader(sharedReader, READER_CLIENT_ID_HEDA);
 
-  Heda heda(serialWriter, hedaReader); 
-  vector<Jar> jars;
   FakeProgram fake;
-  WebProgram wp;
+  Database db("data/test.db");
+  WebProgram wp(db);
+  Heda heda(serialWriter, hedaReader, db); 
 
   // WARNING: The routes are not in order...
   // So my urls will be longer, but I think I will do it this way:
@@ -233,7 +233,7 @@ int main(int argc, char** argv) {
     response->write("Ok command given to arduino");
   };
 
-  /*server.resource["^/cam_capture.jpg$"]["GET"] = [&p, &jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  /*server.resource["^/cam_capture.jpg$"]["GET"] = [&p](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
     Mat frame;
     captureVideoImage(frame);
@@ -250,7 +250,7 @@ int main(int argc, char** argv) {
     response->write(buf, ss);
   };*/
 
-  server.resource["^/listeIngredients$"]["GET"] = [&jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/listeIngredients$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /listeIngredients" << endl;
    
     ptree pt;
@@ -258,7 +258,7 @@ int main(int argc, char** argv) {
     sendJson(response, pt);
   };
 
-  server.resource["^/listeRecettes$"]["GET"] = [&jars](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/listeRecettes$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /listeRecettes" << endl;
    
     ptree pt;

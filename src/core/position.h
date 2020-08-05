@@ -48,13 +48,39 @@ class Movement {
 };
 
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
-// Maybe asking arduino: @ => (120, 23.12, 123.00)
-// Will often do many moves like this: "MZ0\nMY500\nMX200Z200"
-void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
+void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination) {
 
   // TODO: Collision detection
 
   int currentLevel = calculateLevel(position);
+  int destinationLevel = calculateLevel(destination);
+
+  // must change level
+  if (currentLevel != destinationLevel) {
+
+    double angleDest = ((position(0)) > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    movements.push_back(Movement('t', angleDest));
+  }
+
+  // If moving theta would colide, move x first
+  double deltaX = cosd(destination(2)) * CLAW_RADIUS;
+  double xIfTurnsFirst = position(0) + deltaX;
+
+  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
+    movements.push_back(Movement('x', destination(0)));
+    movements.push_back(Movement('t', destination(2)));
+  } else {
+    movements.push_back(Movement('t', destination(2)));
+    movements.push_back(Movement('x', destination(0)));
+  }
+}
+
+void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
+
+  // TODO: Transform the CartesianCoord destination into a PolarCoord
+  // then call calculateGoto()
+
+  /*int currentLevel = calculateLevel(position);
   int destinationLevel = calculateLevel(destination);
 
   // must change level
@@ -73,7 +99,7 @@ void calculateMoveCommands(vector<Movement> &movements, const PolarCoord positio
   
   double xDest = destination(0) - CLAW_RADIUS * cosd(angleDest);
 
-  //bool xMovingForward = xDest -
+  //bool xMovingForward = xDest -*/
   
 }
 

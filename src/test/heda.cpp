@@ -14,7 +14,8 @@ void testHomeCommand() {
 
   StreamWriter ss;
   FakeReader reader;
-  Heda heda(ss, reader);
+  Database db("data/test.db");
+  Heda heda(ss, reader, db);
 
   heda.execute("home");
   this_thread::sleep_for(chrono::milliseconds(200));

@@ -10,6 +10,8 @@
 
 #include "parser.h"
 
+#include "Database.h"
+
 class HedaException : public exception {};
 
 class InitVideoException : public HedaException {};
@@ -29,7 +31,7 @@ std::mutex commandsMutex;
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader) : m_reader(reader), m_writer(writer) {
+    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), m_db(db) {
     
       cerr << "Initializing video...\n";
       m_video_working = initVideo(m_cap);
@@ -82,6 +84,14 @@ class Heda {
       };
       
       m_commands["rapporte"] = [&](ParseResult tokens) {
+      };
+
+      m_commands["goto"] = [&](ParseResult tokens) {
+        double x = tokens.popScalaire();
+        double y = tokens.popScalaire();
+        double t = tokens.popScalaire();
+        PolarCoord dest; dest << x, y, t;
+        moveTo(dest);
       };
       
       m_commands["move"] = [&](ParseResult tokens) {
@@ -146,6 +156,8 @@ class Heda {
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
       pushCommand(mvt.str());
 
+      // FIXME: This should be done as a callback.
+      // TODO: The command stack must be a list of callbacks, not a list of strings...
       if (mvt.axis == 'x' || mvt.axis == 'X') {
         m_position(0) = mvt.destination;
       } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
@@ -155,10 +167,10 @@ class Heda {
       }
     }
 
-    void moveTo(Vector3d destination) {
+    void moveTo(PolarCoord destination) {
 
       vector<Movement> mvts;
-      calculateMoveCommands(mvts, m_position, destination);
+      calculateGoto(mvts, m_position, destination);
       for (auto it = mvts.begin(); it != mvts.end(); it++) {
         move(*it);
       }
@@ -188,6 +200,7 @@ class Heda {
       m_writer << "s";
       m_stack.clear();
       m_current_command = "";
+      // TODO: BIIIIGGGG TODO: When stopping, ask for the position!!!
     }
 
     void info() {
@@ -259,6 +272,7 @@ class Heda {
       return 10;
     }
 
+    Database &m_db;
 };
 
 #endif

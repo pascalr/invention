@@ -2,6 +2,9 @@
 #define _STD_WRITER_H
 
 #include "writer.h"
+#include <string>
+
+using namespace std;
 
 class StdWriter : public Writer {
   public:

@@ -15,13 +15,13 @@ using namespace std;
 // This is passed to every controller function
 class WebProgram {
   public:
-    WebProgram() : db("data/test.db") {
+    WebProgram(Database &db) : db(db) {
     }
 
     //vector<Aliment> aliments;
     //vector<Ingredient> ingredients;
     //vector<Recette> recettes;
-    Database db;
+    Database &db;
 
     shared_ptr<HttpServer::Request> request;
 };
