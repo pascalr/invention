@@ -2,6 +2,7 @@
 #define _SHARED_READER_H
 
 #include "reader.h"
+#include "serial_reader.h" // FIXME: Included for class GetByteOnEmptyStreamException 
 
 #define READER_CLIENT_ID_HEDA 1
 #define READER_CLIENT_ID_SERVER 2

@@ -3,6 +3,7 @@
 
 #include "reader.h"
 
+class GetByteOnEmptyStreamException : public exception {};
 class EmptyInputInvalidException : public exception {};
 
 class SerialReader : public Reader {
@@ -48,9 +49,7 @@ class SerialReader : public Reader {
   protected:
 
     void searchForSeparator() {
-      if (m_input.find(m_separator) != string::npos) {
-        m_separator_found = true;
-      }
+      m_separator_found = m_input.find(m_separator) != string::npos;
     }
 
     bool m_separator_found = false;

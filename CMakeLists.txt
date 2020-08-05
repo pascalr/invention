@@ -57,7 +57,9 @@ ADD_LIBRARY(MyLibsModule
   src/utils/utils.cpp
   src/core/fake_program.cpp
   src/core/writer/writer.cpp
+  src/core/reader/reader.cpp
   src/core/axis.cpp
+  src/lib/lib.cpp
   src/core/input_parser.cpp
   src/lib/ArduinoMock.cpp
 )

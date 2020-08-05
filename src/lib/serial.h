@@ -26,7 +26,7 @@
 
 //std::mutex serialPortMutex;
 
-class InitSerialPortException : public exception {};
+class InitSerialPortException {};
 
 // FIXME: Write error messages to a string instead of printf to stdout...
 

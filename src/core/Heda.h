@@ -247,16 +247,9 @@ class Heda {
       // Check if the message MESSAGE_DONE has been received.
       } else if (m_reader.inputAvailable()) {
 
-        // TODO: This should only be one call to a reader function.
-        string str;
-        do {
-          str += (char) m_reader.getByte();
-        } while (m_reader.inputAvailable());
-
-        cout << "Message received is: " << str << endl;
+        string str = getInputLine(m_reader);
 
         if (str == MESSAGE_DONE) {
-          cout << "Which means it is done!!!" << endl;
           m_current_command = "";
           return 0;
         }

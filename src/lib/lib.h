@@ -1,45 +1,23 @@
 #ifndef LIB_H 
 #define LIB_H
 
-#include <algorithm>
-#include <cctype>
-#include <locale>
+#include <algorithm> // ?
+#include <cctype> // ?
+#include <locale> // ?
+#include <fstream> // ?
 
-#include <fstream>
-
-#include "../utils/utils.h"
-#include "../utils/io_common.h"
-
-using namespace std;
+#include <string>
 
 // trim from start (in place)
-static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-        return !std::isspace(ch);
-    }));
-}
+void ltrim(std::string &s);
 
 // trim from end (in place)
-static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
-}
+void rtrim(std::string &s);
 
 // trim from both ends (in place)
-static inline void trim(std::string &s) {
-    ltrim(s);
-    rtrim(s);
-}
+void trim(std::string &s);
 
 // https://stackoverflow.com/questions/2896600/how-to-replace-all-occurrences-of-a-character-in-string
-string replaceAll(string str, const string& from, const string& to) {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
-    }
-    return str;
-}
+std::string replaceAll(std::string str, const std::string& from, const std::string& to);
 
 #endif // COMMON_H
