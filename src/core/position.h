@@ -48,14 +48,15 @@ class Movement {
     double destination;
 };
 
-const PolarCoord toPolar(const PolarCoord c) {
+PolarCoord toolCartesianToPolar(const CartesianCoord c) {
 
   double t = (asin(c(2) / CLAW_RADIUS) * 180.0 / PI);
   if (c(0) > X_MIDDLE) {
     t = 180 - t;
   }
+  double deltaX = cosd(t) * CLAW_RADIUS;
   PolarCoord r;
-  r << c(0), c(1), t;
+  r << c(0)-deltaX, c(1), t;
   return r;
 } 
 

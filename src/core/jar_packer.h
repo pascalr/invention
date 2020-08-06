@@ -42,7 +42,7 @@ class NaiveJarPacker : public JarPacker {
             double x = i*148.0 + (148.0 / 2);
             double z = j*148.0 + (148.0 / 2);
             c << x, shelf.height, z;
-            PolarCoord r = toPolar(c);
+            PolarCoord r = toolCartesianToPolar(c);
             cout << "Calculated possible jar location at " << r << endl;
             possible_locations.push_back(r);
           }
