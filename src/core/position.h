@@ -41,7 +41,8 @@ class Movement {
   public:
     Movement(char axis, double destination) : axis(axis), destination(destination) {}
     string str() {
-      return "M" + axis + to_string(destination);
+      stringstream ss; ss << "m" << axis << destination;
+      return ss.str();
     }
     char axis;
     double destination;
