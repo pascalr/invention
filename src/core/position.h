@@ -51,7 +51,7 @@ class Movement {
 PolarCoord toolCartesianToPolar(const CartesianCoord c) {
 
   double t = (asin(c(2) / CLAW_RADIUS) * 180.0 / PI);
-  if (c(0) > X_MIDDLE) {
+  if (c(0) < X_MIDDLE) {
     t = 180 - t;
   }
   double deltaX = cosd(t) * CLAW_RADIUS;

@@ -40,8 +40,9 @@ class NaiveJarPacker : public JarPacker {
           for (int j = 0; j < nbRows; j++) {
             CartesianCoord c;
             double x = i*148.0 + (148.0 / 2);
-            double z = j*148.0 + (148.0 / 2);
+            double z = CLAW_RADIUS - (j*148.0 + (148.0 / 2));
             c << x, shelf.height, z;
+            cout << "Calculated possible jar cartesian at " << c << endl;
             PolarCoord r = toolCartesianToPolar(c);
             cout << "Calculated possible jar location at " << r << endl;
             possible_locations.push_back(r);
