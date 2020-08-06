@@ -62,6 +62,8 @@ void calculateGoto(vector<Movement> &movements, const PolarCoord position, const
     double angleDest = ((position(0)) > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     movements.push_back(Movement('t', angleDest));
   }
+  
+  movements.push_back(Movement('y', destination(1)));
 
   // If moving theta would colide, move x first
   double deltaX = cosd(destination(2)) * CLAW_RADIUS;

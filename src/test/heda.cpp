@@ -9,6 +9,13 @@ using namespace std;
 void setup() {
 }
 
+string popResult(Heda& heda, StreamWriter& ss, FakeReader& reader) {
+  this_thread::sleep_for(chrono::milliseconds(200));
+  string result = ss.str();
+  reader.setFakeInput(MESSAGE_DONE);
+  return result;
+}
+
 void testHomeCommand() {
   title("testHomeCommand");
 
@@ -17,7 +24,7 @@ void testHomeCommand() {
   Database db("data/test.db");
   Heda heda(ss, reader, db);
 
-  heda.execute("home");
+  heda.reference();
   this_thread::sleep_for(chrono::milliseconds(200));
   assertEqual("home", "H", ss.str());
 
@@ -26,9 +33,12 @@ void testHomeCommand() {
   this_thread::sleep_for(chrono::milliseconds(200));
   assertEqual("current command", "", heda.getCurrentCommand());
 
-  heda.execute("grab 50");
-  this_thread::sleep_for(chrono::milliseconds(200));
-  assertEqual("grab 50", "G50", ss.str());
+  heda.stop(); ss.str();
+  heda.execute("goto 200 700 90");
+  assertEqual("goto 200 700 90", "mt-6", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 90", "my700", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 90", "mt90", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 90", "mx200", popResult(heda, ss, reader));
 }
 
 /*void testSharedReader() {

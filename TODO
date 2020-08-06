@@ -20,6 +20,8 @@ Je vais avoir un serveur pour Heda (recevoir des commandes, etc). Et un serveur 
 Attendre le plus longtemps possible avant de faire le front end.
 Attendre le plus longtemps possible avant de toucher à rails. Idéalement même pas.
 
+HTTPReader c'est ça qui va lire les commandes de Heda.
+
 Use interupts to read rotary encoder.
 https://playground.arduino.cc/Main/RotaryEncoders/
 
