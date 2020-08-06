@@ -228,7 +228,8 @@ class Heda {
       m_writer << "s";
       m_stack.clear();
       m_current_command.clear();
-      // TODO: BIIIIGGGG TODO: When stopping, ask for the position!!!
+      // m_position <<  TODO
+      cout << "BIIIIGGGG TODO: When stopping, ask for the position!!!"; // TODO
     }
 
     void info() {
