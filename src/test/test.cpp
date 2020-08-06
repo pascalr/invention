@@ -272,7 +272,6 @@ void assertInvalidNumber(const char* str) {
 void testInputParserParseNumber() {
   title("Testing input_parser parseNumber");
   FakeProgram p;
-  double val;
 
   assertInvalidNumber("");
   assertInvalidNumber("m123");

@@ -33,13 +33,13 @@ void testDatabase() {
   clearJars();
 
   JarTable jars = loadJars();
-  assertEqual("empty jars first", 0, jars.items.size());
+  assertEqual("empty jars first", (unsigned)0, jars.items.size());
 
   insertOneJar(jars);
-  assertEqual("one jar added", 1, jars.items.size());
+  assertEqual("one jar added", (unsigned)1, jars.items.size());
   
   jars = loadJars();
-  assertEqual("one jar added (after reloading)", 1, jars.items.size());
+  assertEqual("one jar added (after reloading)", (unsigned)1, jars.items.size());
 }
 
 int main (int argc, char *argv[]) {

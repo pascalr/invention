@@ -55,7 +55,7 @@ class RawCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), m_db(db) {
+    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), m_db(db), m_packer(db) {
     
       cerr << "Initializing video...\n";
       m_video_working = initVideo(m_cap);

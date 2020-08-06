@@ -35,7 +35,7 @@ class JarTable : public Table<Jar> {
     const char* TABLE_NAME = "jar";
     string getTableName() { return TABLE_NAME; };
     
-    virtual string getValues(const Jar& item) {
+    string getValues(const Jar& item) {
       stringstream ss; ss << item.position(0) << ", " << item.position(1) << ", " << item.position(2);
       return ss.str();
     }
@@ -51,10 +51,39 @@ class JarTable : public Table<Jar> {
 
 };
 
-class Shelf {
+
+class Shelf : public Model {
   public:
+    double height;
+    double width;
+    double depth;
+    int is_working_shelf;
 };
 
+class ShelfTable : public Table<Shelf> {
+  public:
+    const char* TABLE_NAME = "shelf";
+    string getTableName() { return TABLE_NAME; };
+    
+    string getValues(const Shelf& item) {
+      stringstream ss; ss << item.height << ", " << item.width << ", " << item.depth << ", " << item.is_working_shelf;
+      return ss.str();
+    }
+    
+    Shelf parseItem(SQLite::Statement& query) {
+      Shelf i;
+      i.height = query.getColumn(1);
+      i.width = query.getColumn(2);
+      i.depth = query.getColumn(3);
+      i.is_working_shelf = query.getColumn(4);
+      return i;
+    }
+
+};
+
+/*class Machine {
+  vector<Shelf> shelves;
+};*/
 
 // A unique aliment. I provide the list of aliment.
 // They have all the information, nutrional value, etc...

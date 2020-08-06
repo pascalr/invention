@@ -21,3 +21,12 @@ CREATE TABLE jar(
       POS_X          REAL        NOT NULL,
       POS_Y          REAL        NOT NULL,
       POS_T          REAL        NOT NULL);
+
+CREATE TABLE shelf(
+      HEIGHT           REAL      NOT NULL,
+      WIDTH            REAL      NOT NULL,
+      DEPTH            REAL      NOT NULL,
+      IS_WORKING_SHELF INTEGER   NOT NULL);
+
+INSERT INTO shelf VALUES( 0.0, 640.0, 300.0, 0 );
+INSERT INTO shelf VALUES( 675.0, 640.0, 300.0, 1 );

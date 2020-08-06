@@ -48,6 +48,21 @@ class Movement {
     double destination;
 };
 
+const PolarCoord toPolar(const PolarCoord c) {
+
+  double t = (asin(c(2) / CLAW_RADIUS) * 180.0 / PI);
+  if (c(0) > X_MIDDLE) {
+    t = 180 - t;
+  }
+  PolarCoord r;
+  r << c(0), c(1), t;
+  return r;
+} 
+
+std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
+  return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
+}
+
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination) {
 
