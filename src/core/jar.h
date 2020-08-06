@@ -3,8 +3,4 @@
 
 #include "Model.h"
 
-class Jar {
-  Vector3d position;
-};
-
 #endif

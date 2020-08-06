@@ -9,6 +9,7 @@
 #include "command_stack.h"
 
 #include "parser.h"
+#include "jar_packer.h"
 
 #include "Database.h"
 
@@ -64,6 +65,8 @@ class Heda {
       m_commands_thread_run = true;
       m_commands_thread = std::thread(&Heda::loopCommandStack, this);
       //m_commands_thread.detach(); Do I need to detach?
+      
+      m_packer.setup();
     }
 
     ~Heda() {
@@ -83,18 +86,10 @@ class Heda {
         grab(strength);
       };
       
-      m_commands["stop"] = [&](ParseResult tokens) {
-        cout << "Executing stop" << endl;
-        stop();
-      };
-    
-      m_commands["home"] = [&](ParseResult tokens) {
-        reference();
-      };
-
-      m_commands["info"] = [&](ParseResult tokens) {
-        info();
-      };
+      m_commands["stop"] = [&](ParseResult tokens) {stop();};
+      m_commands["home"] = [&](ParseResult tokens) {reference();};
+      m_commands["info"] = [&](ParseResult tokens) {info();};
+      m_commands["store"] = [&](ParseResult tokens) {store();};
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -108,6 +103,7 @@ class Heda {
       
       m_commands["rapporte"] = [&](ParseResult tokens) {
       };
+
 
       m_commands["goto"] = [&](ParseResult tokens) {
         double x = tokens.popScalaire();
@@ -211,6 +207,16 @@ class Heda {
     void sweep() {
     }
 
+    // goto an empty place and drop the jar
+    void store() {
+      
+      vector<Movement> mvts;
+      m_packer.calculateStoreMovements();
+      for (auto it = mvts.begin(); it != mvts.end(); it++) {
+        move(*it);
+      }
+    }
+
     void pushCommand(string str, std::function<void()> callback) {
       std::lock_guard<std::mutex> guard(commandsMutex);
       RawCommand cmd(str, callback);
@@ -225,6 +231,7 @@ class Heda {
 
     void stop() {
       std::lock_guard<std::mutex> guard(commandsMutex);
+      cout << "Executing stop" << endl;
       m_writer << "s";
       m_stack.clear();
       m_current_command.clear();
@@ -302,6 +309,7 @@ class Heda {
     }
 
     Database &m_db;
+    NaiveJarPacker m_packer;
 };
 
 #endif

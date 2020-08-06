@@ -106,6 +106,10 @@ add_executable( run_tests ${MyCpp} src/test/test.cpp )
 target_include_directories(run_tests PRIVATE ${MyDirs})
 target_link_libraries( run_tests ${MyLibs})
 
+add_executable( test_db ${MyCpp} src/test/db.cpp )
+target_include_directories(test_db PRIVATE ${MyDirs})
+target_link_libraries( test_db ${MyLibs})
+
 add_executable( test_jar_position_analyzer ${MyCpp} src/test/jar_position_analyzer.cpp )
 target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
 target_link_libraries(test_jar_position_analyzer ${MyLibs})

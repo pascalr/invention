@@ -4,6 +4,8 @@ Une page d'acceuil du projet avec une feature list. Faire une feature list.
 
 DCMotor avec un encodeur pour l'axe vertical. Comme ça je vais pouvoir à côté les pots sur les tablettes?
 
+run should definitely be a POST, no resend
+
 TODO business:
 - En parler, parler et parler.
 - Trouver des investisseurs.
