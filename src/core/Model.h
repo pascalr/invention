@@ -25,6 +25,13 @@ class Model {
     long rowid = -1;
 };
 
+class JarFormat : public Model {
+  public:
+    double empty_weight;
+    double height;
+    double width;
+};
+
 class Jar : public Model {
   public:
     PolarCoord position;
