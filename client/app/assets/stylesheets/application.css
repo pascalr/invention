@@ -13,3 +13,26 @@
  *= require_tree .
  *= require_self
  */
+
+body {
+  margin-top: 0px;
+}
+
+#menu {
+  background-color: black;
+  color: white;
+}
+#menu .item:hover {
+  background-color: orange;
+}
+#menu .item {
+  padding-left: 6px;
+  padding-right: 10px;
+  border-right: solid 1px white;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+}
+#menu a:visited{
+  color:white;
+}

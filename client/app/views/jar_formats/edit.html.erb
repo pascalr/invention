@@ -1,0 +1,52 @@
+<h1>Edit Jar Format</h1>
+
+<%= form_with(model: @jar_format, local: true) do |form| %>
+
+  <% if @jar_format.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@jar_format.errors.count, "error") %> prohibited
+        this article from being saved:
+      </h2>
+      <ul>
+        <% @jar_format.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p>
+    <%= form.label :name %><br>
+    <%= form.text_field :name %>
+  </p>
+
+  <p>
+    <%= form.label :empty_weight %> (kg)<br>
+    <%= form.number_field :empty_weight, step: 0.001 %>
+  </p>
+
+  <p>
+    <%= form.label :height %> (mm)<br>
+    <%= form.number_field :height %>
+  </p>
+
+  <p>
+    <%= form.label :diameter %> (mm)<br>
+    <%= form.number_field :diameter %>
+  </p>
+
+  <p>
+    <%= form.label :lid_diameter %> (mm)<br>
+    <%= form.number_field :lid_diameter %>
+  </p>
+
+  <p>
+    <%= form.label :lid_weight %> (kg)<br>
+    <%= form.number_field :lid_weight, step: 0.001 %>
+  </p>
+
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>

@@ -1,0 +1,37 @@
+<h1>New Jar Format</h1>
+
+<%= form_with scope: :jar_format, url: jar_formats_path, local: true do |form| %>
+  <p>
+    <%= form.label :name %><br>
+    <%= form.text_field :name %>
+  </p>
+
+  <p>
+    <%= form.label :empty_weight %> (kg)<br>
+    <%= form.number_field :empty_weight, step: 0.001 %>
+  </p>
+
+  <p>
+    <%= form.label :height %> (mm)<br>
+    <%= form.number_field :height %>
+  </p>
+
+  <p>
+    <%= form.label :diameter %> (mm)<br>
+    <%= form.number_field :diameter %>
+  </p>
+
+  <p>
+    <%= form.label :lid_diameter %> (mm)<br>
+    <%= form.number_field :lid_diameter %>
+  </p>
+
+  <p>
+    <%= form.label :lid_weight %> (kg)<br>
+    <%= form.number_field :lid_weight, step: 0.001 %>
+  </p>
+
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>

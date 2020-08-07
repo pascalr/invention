@@ -30,6 +30,7 @@ class JarFormat : public Model {
     double empty_weight;
     double height;
     double width;
+    string name;
 };
 
 class Jar : public Model {

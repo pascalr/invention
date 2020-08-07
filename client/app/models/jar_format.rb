@@ -1,0 +1,2 @@
+class JarFormat < ApplicationRecord
+end

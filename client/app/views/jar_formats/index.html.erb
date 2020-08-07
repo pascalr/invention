@@ -1,0 +1,36 @@
+<h1>Listing Jar Formats</h1>
+ 
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Empty weight</th>
+    <th>Height</th>
+    <th>Diameter</th>
+    <th>Lid diameter</th>
+    <th>Lid weight</th>
+    <th></th>
+  </tr>
+ 
+  <tr>
+    <td></td>
+    <td>(kg)</td>
+    <td>(mm)</td>
+    <td>(mm)</td>
+    <td>(mm)</td>
+    <td>(kg)</td>
+    <td></td>
+  </tr>
+  <% @jar_formats.each do |jar_format| %>
+    <tr>
+      <td><%= jar_format.name %></td>
+      <td><%= jar_format.empty_weight %></td>
+      <td><%= jar_format.height %></td>
+      <td><%= jar_format.diameter %></td>
+      <td><%= jar_format.lid_diameter %></td>
+      <td><%= jar_format.lid_weight %></td>
+      <td><%= link_to 'edit', edit_jar_format_path(jar_format) %></td>
+    </tr>
+  <% end %>
+</table>
+
+<%= link_to 'Add jar format', new_jar_format_path %>
