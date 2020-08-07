@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_07_151746) do
+ActiveRecord::Schema.define(version: 2020_08_07_155108) do
 
   create_table "jar_formats", force: :cascade do |t|
     t.float "empty_weight"
@@ -21,6 +21,16 @@ ActiveRecord::Schema.define(version: 2020_08_07_151746) do
     t.string "name"
     t.float "lid_diameter"
     t.float "lid_weight"
+  end
+
+  create_table "shelves", force: :cascade do |t|
+    t.float "height"
+    t.float "width"
+    t.float "depth"
+    t.float "offset_x"
+    t.float "offset_z"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
 end

@@ -1,3 +1,14 @@
+Les coordonées polaires et les coordonées cartésiennes sont vraiment différentes.
+
+Les coordonées polaire:
+X: X0 est à la droite du point de vue de l'utilisateur. C'est le maximum que le bras peut se déplacer.
+Y: Y0 est le plus bas que la machine peut se déplacer
+T: Theta0 est le bras orienté vers la gauche du point de vue de l'utilisateur.
+
+Les coordonnées cartésiennes:
+X: X0 est à partir de la paroie gauche.
+Y: Y0 est la tablette la plus basse.
+Z: Z0 est à partir du devant.
 
 // TO print all exceptions
     } catch(...) {

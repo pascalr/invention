@@ -1,0 +1,32 @@
+<h1>New shelf</h1>
+
+<%= form_with scope: :shelf, url: shelves_path, local: true do |form| %>
+  <p>
+    <%= form.label :height %> (mm)<br>
+    <%= form.number_field :height %>
+  </p>
+
+  <p>
+    <%= form.label :width %> (mm)<br>
+    <%= form.number_field :width %>
+  </p>
+
+  <p>
+    <%= form.label :depth %> (mm)<br>
+    <%= form.number_field :depth %>
+  </p>
+
+  <p>
+    <%= form.label :offset_x %> (mm)<br>
+    <%= form.number_field :offset_x %>
+  </p>
+
+  <p>
+    <%= form.label :offset_z %> (mm)<br>
+    <%= form.number_field :offset_z %>
+  </p>
+
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>

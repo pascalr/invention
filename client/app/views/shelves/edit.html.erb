@@ -1,0 +1,47 @@
+<h1>Edit shelf</h1>
+
+<%= form_with(model: @shelf, local: true) do |form| %>
+
+  <% if @shelf.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@shelf.errors.count, "error") %> prohibited
+        this article from being saved:
+      </h2>
+      <ul>
+        <% @shelf.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p>
+    <%= form.label :height %> (mm)<br>
+    <%= form.number_field :height %>
+  </p>
+
+  <p>
+    <%= form.label :width %> (mm)<br>
+    <%= form.number_field :width %>
+  </p>
+
+  <p>
+    <%= form.label :depth %> (mm)<br>
+    <%= form.number_field :depth %>
+  </p>
+
+  <p>
+    <%= form.label :offset_x %> (mm)<br>
+    <%= form.number_field :offset_x %>
+  </p>
+
+  <p>
+    <%= form.label :offset_z %> (mm)<br>
+    <%= form.number_field :offset_z %>
+  </p>
+
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>

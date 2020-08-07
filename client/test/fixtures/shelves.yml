@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  height: 1.5
+  width: 1.5
+  depth: 1.5
+  offset_x: 1.5
+  offset_z: 1.5
+
+two:
+  height: 1.5
+  width: 1.5
+  depth: 1.5
+  offset_x: 1.5
+  offset_z: 1.5

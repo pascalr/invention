@@ -1,4 +1,4 @@
-<h1>Listing Jar Formats</h1>
+<h2>Listing Jar Formats</h2>
  
 <table>
   <tr>
@@ -20,7 +20,7 @@
     <td>(kg)</td>
     <td></td>
   </tr>
-  <% @jar_formats.each do |jar_format| %>
+  <% (@jar_formats || []).each do |jar_format| %>
     <tr>
       <td><%= jar_format.name %></td>
       <td><%= jar_format.empty_weight %></td>
