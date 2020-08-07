@@ -18,8 +18,28 @@
 using namespace Eigen;
 using namespace std;
 
-using PolarCoord = Vector3d; // (x,y,t)
-using CartesianCoord = Vector3d; // (x,y,z)
+//using PolarCoord = Vector3d; // (x,y,t)
+//using CartesianCoord = Vector3d; // (x,y,z)
+
+/*
+Les coordonées polaires et les coordonées cartésiennes sont vraiment différentes.
+
+Les coordonées polaire:
+X: X0 est à la droite du point de vue de l'utilisateur. C'est le maximum que le bras peut se déplacer.
+Y: Y0 est le plus bas que la machine peut se déplacer
+T: Theta0 est le bras orienté vers la gauche du point de vue de l'utilisateur.
+
+Les coordonnées cartésiennes:
+X: X0 est à partir de la paroie gauche.
+Y: Y0 est la tablette la plus basse.
+Z: Z0 est à partir du devant.
+*/
+
+class PolarCoord : public Vector3d {
+};
+
+class CartesianCoord : public Vector3d {
+};
 
 
 // Above which shelf is the arm on?
