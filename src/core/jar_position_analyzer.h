@@ -1,7 +1,7 @@
 #ifndef JAR_POSITION_DETECTOR
 #define JAR_POSITION_DETECTOR
 
-#include "position.h"
+/*#include "position.h"
 #include "sweep.h"
 #include <vector>
 #include "jar.h"
@@ -56,6 +56,6 @@ public:
       result.push_back(p);
     }
   }
-};
+};*/
 
 #endif

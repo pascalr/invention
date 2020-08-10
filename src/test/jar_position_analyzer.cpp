@@ -5,7 +5,7 @@
 #include "../core/sweep.h"
 #include "../config/constants.h"
 
-#include "../lib/hr_code.hpp"
+#include "../lib/hr_code.h"
 #include "../lib/opencv.h"
 
 using namespace std;
@@ -84,7 +84,7 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  Mat mat = imread("data/test/pot_01.png", IMREAD_GRAYSCALE);
+  /*Mat mat = imread("data/test/pot_01.png", IMREAD_GRAYSCALE);
 
   HRCode code1(mat, 285.669, 198.225, 2.78717);
   HRCode code2(mat, 361.880, 233.758, 2.7581);
@@ -122,6 +122,6 @@ int main (int argc, char *argv[]) {
   testCameraPosition();
   testConvertToAbsolutePosition();
   testJarOffset();
-  testImageDelta();
+  testImageDelta();*/
 
 }

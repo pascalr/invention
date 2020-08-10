@@ -39,10 +39,10 @@ class RawCommand {
       cmd = "";
     }
     void finish() {
-      cmd = "";
       if (callback) {
         callback();
       }
+      cmd = "";
     }
     std::string cmd;
     std::function<void()> callback;
@@ -55,7 +55,7 @@ class RawCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), m_db(db), m_packer(db) {
+    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db), m_packer(db) {
     
       cerr << "Initializing video...\n";
       m_video_working = initVideo(m_cap);
@@ -135,17 +135,6 @@ class Heda {
       m_position << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
     }
 
-    void detectOneCode() {
-      
-      Mat frame;
-      vector<DetectedHRCode> detected;
-      detect(frame, detected, RAYON, 0.0, 0.0, 0.0);
-      if (detected.size() < 1) {
-        throw MissingHRCodeException();
-      } else {
-        throw TooManyHRCodeException();
-      }
-    }
 
     void execute(string cmd) {
       cerr << "Executing cmd = " << cmd << "\n";
@@ -181,6 +170,7 @@ class Heda {
         } else if (mvt.axis == 't' || mvt.axis == 'T') {
           m_position(2) = mvt.destination;
         }
+        if (mvt.callback) {mvt.callback();}
       });
     }
 
@@ -205,6 +195,7 @@ class Heda {
     }
 
     void sweep() {
+      db.clear(codes);
     }
 
     // goto an empty place and drop the jar
@@ -250,6 +241,10 @@ class Heda {
     string getCurrentCommand() {
       return m_current_command.cmd;
     }
+    
+    PolarCoord getPosition() {
+      return m_position;
+    }
 
 //  protected:
 
@@ -269,6 +264,9 @@ class Heda {
     bool m_video_working = false;
 
     RawCommand m_current_command;
+    
+    DetectedHRCodeTable codes;
+    Database& db;
 
   protected:
 
@@ -308,7 +306,6 @@ class Heda {
       return 10;
     }
 
-    Database &m_db;
     NaiveJarPacker m_packer;
 };
 

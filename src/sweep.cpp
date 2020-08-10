@@ -1,6 +1,6 @@
 #include "utils/io_common.h"
 #include "lib/lib.h"
-#include "lib/hr_code.hpp"
+#include "lib/hr_code.h"
 #include "lib/serial.h"
 #include "config/setup.h"
 #include "helper/logging.h"

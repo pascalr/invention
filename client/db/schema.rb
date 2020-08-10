@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_07_155108) do
+ActiveRecord::Schema.define(version: 2020_08_10_134142) do
+
+  create_table "detected_codes", force: :cascade do |t|
+    t.float "x"
+    t.float "y"
+    t.float "t"
+    t.float "centerX"
+    t.float "centerY"
+    t.float "scale"
+    t.binary "img"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "jar_formats", force: :cascade do |t|
     t.float "empty_weight"

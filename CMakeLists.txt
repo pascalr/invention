@@ -59,6 +59,7 @@ ADD_LIBRARY(MyLibsModule
   src/core/writer/writer.cpp
   src/core/reader/reader.cpp
   src/core/axis.cpp
+  src/core/sweep.cpp
   src/lib/lib.cpp
   src/core/input_parser.cpp
   src/lib/ArduinoMock.cpp
@@ -93,8 +94,8 @@ target_link_libraries( main ${MyLibs} )
 #add_executable( test_captures src/test/test_captures.cpp )
 #target_link_libraries( test_captures ${MyLibs} )
 
-add_executable( sweep src/sweep.cpp )
-target_link_libraries( sweep ${MyLibs} )
+#add_executable( sweep src/sweep.cpp )
+#target_link_libraries( sweep ${MyLibs} )
 
 #add_executable( video_capture src/video_capture.cpp )
 #target_link_libraries( video_capture ${MyLibs} )

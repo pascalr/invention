@@ -4,6 +4,10 @@
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "position.h"
 #include <vector>
+#include <iostream>
+
+#include "../lib/opencv.h"
+#include "../lib/hr_code.h"
 
 class WrongModelTypeException : public exception {};
 
@@ -14,6 +18,8 @@ class Table {
     virtual string getTableName() = 0;
     virtual T parseItem(SQLite::Statement& query) = 0;
     virtual string getValues(const T& item) = 0;
+    virtual void bindBlob(SQLite::Statement& query, const T& item) {
+    }
 
     bool exists = false;
 
@@ -23,6 +29,53 @@ class Table {
 class Model {
   public:
     long rowid = -1;
+};
+
+
+class DetectedHRCode : public Model {
+  public:
+    DetectedHRCode() {}
+    DetectedHRCode(const HRCode& code, PolarCoord coord) : coord(coord), centerX(code.x), centerY(code.y), scale(code.scale), img(code.img) {
+    }
+    PolarCoord coord;
+    double centerX;
+    double centerY;
+    double scale;
+    Mat img;
+};
+//ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
+//  return os << c.code << " at " << c.coord;
+//}
+
+class DetectedHRCodeTable : public Table<DetectedHRCode> {
+  public:
+    const char* TABLE_NAME = "detected_code";
+    string getTableName() { return TABLE_NAME; };
+    
+    string getValues(const DetectedHRCode& item) {
+      stringstream ss; ss << item.coord(0) << ", " << item.coord(1) << ", " << item.coord(2) << ", ";
+      ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", " << "?";
+      return ss.str();
+    }
+    
+    virtual void bindBlob(SQLite::Statement& query, const DetectedHRCode& item) {
+      std::vector<uchar> buf;
+      imencode(".jpeg", item.img, buf);
+      char* blob = reinterpret_cast<char*>(buf.data());
+      query.bind(1, blob, buf.size());
+    }
+    
+    DetectedHRCode parseItem(SQLite::Statement& query) {
+      DetectedHRCode code;
+      /*code.x = query.getColumn(1);
+      code.y = query.getColumn(2);
+      code.t = query.getColumn(3);
+      code.centerX = query.getColumn(4);
+      code.centerY = query.getColumn(5);
+      code.img = query.getColumn(6);*/
+      return code;
+    }
+
 };
 
 class JarFormat : public Model {

@@ -5,6 +5,19 @@
 
 using namespace std;
 
+
+    /*void detectOneCode() {
+      
+      Mat frame;
+      vector<DetectedHRCode> detected;
+      detect(frame, detected, RAYON, 0.0, 0.0, 0.0);
+      if (detected.size() < 1) {
+        throw MissingHRCodeException();
+      } else {
+        throw TooManyHRCodeException();
+      }
+    }*/
+
 //FOUND (127.335, 142.398)[640, 480]{1.16312} at (320, 0, 85)
 //FOUND (363.636, 238.243)[640, 480]{1.19391} at (320, 0, 255)
 //FOUND (366.351, 238.047)[640, 480]{1.18762} at (160, 0, 425)

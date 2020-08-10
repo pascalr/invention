@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "lib/lib.h"
-#include "lib/hr_code.hpp"
+#include "lib/hr_code.h"
 
 #include "helper/logging.h"
 

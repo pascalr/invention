@@ -59,6 +59,7 @@ int calculateLevel(PolarCoord position) {
 
 class Movement {
   public:
+    Movement(char axis, double destination, std::function<void()> callback) : axis(axis), destination(destination), callback(callback) {}
     Movement(char axis, double destination) : axis(axis), destination(destination) {}
     string str() {
       stringstream ss; ss << "m" << axis << destination;
@@ -66,6 +67,7 @@ class Movement {
     }
     char axis;
     double destination;
+    std::function<void()> callback;
 };
 
 PolarCoord toolCartesianToPolar(const CartesianCoord c) {
@@ -84,33 +86,52 @@ std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
   return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
 }
 
+/*void calculateGoto(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
+  PolarCoord p = toolCartesianToPolar(destination);
+  calculateGoto(movements, position, p);
+}*/
+
+void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition) {
+  if (abs(mvt.destination - currentPosition) > 0.001) {
+    movements.push_back(mvt);
+  }
+}
+
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
-void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination) {
+void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback = 0) {
 
   // TODO: Collision detection
+  
+  unsigned int size = movements.size();
 
   int currentLevel = calculateLevel(position);
   int destinationLevel = calculateLevel(destination);
+    
+  double positionT = position(2);
 
   // must change level
   if (currentLevel != destinationLevel) {
 
-    double angleDest = ((position(0)) > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
-    movements.push_back(Movement('t', angleDest));
+    positionT = ((position(0)) > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    movements.push_back(Movement('t', positionT));
   }
-  
-  movements.push_back(Movement('y', destination(1)));
+ 
+  addMovementIfDifferent(movements, Movement('y', destination(1)), position(1)); 
 
   // If moving theta would colide, move x first
   double deltaX = cosd(destination(2)) * CLAW_RADIUS;
   double xIfTurnsFirst = position(0) + deltaX;
 
   if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
-    movements.push_back(Movement('x', destination(0)));
-    movements.push_back(Movement('t', destination(2)));
+    addMovementIfDifferent(movements, Movement('x', destination(0)), position(0)); 
+    addMovementIfDifferent(movements, Movement('t', destination(2)), positionT); 
   } else {
-    movements.push_back(Movement('t', destination(2)));
-    movements.push_back(Movement('x', destination(0)));
+    addMovementIfDifferent(movements, Movement('t', destination(2)), positionT); 
+    addMovementIfDifferent(movements, Movement('x', destination(0)), position(0)); 
+  }
+
+  if (movements.size() != size) {
+    movements.end()->callback = callback;
   }
 }
 

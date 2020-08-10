@@ -1,0 +1,2 @@
+class DetectedCode < ApplicationRecord
+end

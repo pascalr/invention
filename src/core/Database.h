@@ -49,13 +49,15 @@ class Database {
 
       stringstream ss; ss << "INSERT INTO " << table.getTableName() << " VALUES(";
       ss << table.getValues(item) << ")";
+      SQLite::Statement insertQuery(db, ss.str());
+      table.bindBlob(insertQuery, item);
+      insertQuery.exec();
 
       SQLite::Statement query(db, "SELECT last_insert_rowid()");
       query.executeStep();
       item.rowid = query.getColumn(0);
 
       table.items.push_back(item);
-      db.exec(ss.str());
     }
 
     void load(vector<Ingredient>& ingredients) {

@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  x: 1.5
+  'y': 1.5
+  t: 1.5
+  centerX: 1.5
+  centerY: 1.5
+  scale: 1.5
+  img: 
+
+two:
+  x: 1.5
+  'y': 1.5
+  t: 1.5
+  centerX: 1.5
+  centerY: 1.5
+  scale: 1.5
+  img: 
