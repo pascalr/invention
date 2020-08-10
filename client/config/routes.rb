@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
-  get 'manual/index'
+  get 'heda/index'
+  post 'heda/run'
   get 'configure/index'
   resources :jar_formats
   resources :shelves
-  root to: 'manual#index'
+  root to: 'heda#index'
 end

@@ -239,16 +239,17 @@ int main(int argc, char** argv) {
 
   // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
   server.resource["^/run$"]["POST"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    cout << "GET /run" << endl;
+    cout << "POST /run" << endl;
 
-    auto query_fields = request->parse_query_string();
-    for(auto &field : query_fields) {
+    SimpleWeb::CaseInsensitiveMultimap vals;
+    vals = SimpleWeb::QueryString::parse(request->content.string());
+
+    for(auto &field : vals) {
       if (field.first == "cmd") {
-
         heda.execute(field.second);
       }
     }
-    response->write("Ok command given to arduino");
+    response->write("ok");
   };
 
   server.resource["^/run$"]["GET"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {

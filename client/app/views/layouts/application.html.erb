@@ -11,15 +11,16 @@
 
   <body>
     <div id='menu'>
+      <%= link_to 'Heda', heda_index_path, class: 'item' %>
+      <%= link_to 'Jar formats', jar_formats_path, class: 'item' %>
+      <%= link_to 'Shelves', shelves_path, class: 'item' %>
+      <%= link_to 'Config', '/configure/index', class: 'item' %>
       <a class='item' href='/inventaire.html'>Inventaire</a>
       <a class='item' href='/recettes/'>Recettes</a>
       <a class='item' href='/ingredients/index'>Ingredients</a>
       <a class='item' href='/axes/index.html'>Manuel</a>
       <a class='item' href='/visuel.html'>Visuel</a>
       <a class='item' href='/3d/index.html'>3d</a>
-      <%= link_to 'Jar formats', jar_formats_path, class: 'item' %>
-      <%= link_to 'Shelves', shelves_path, class: 'item' %>
-      <%= link_to 'Config', '/configure/index', class: 'item' %>
     </div>
     <%= yield %>
   </body>

@@ -1,0 +1,2 @@
+module HedaHelper
+end

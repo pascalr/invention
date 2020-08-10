@@ -3,9 +3,8 @@
 <button style="font-size: 28px; margin-bottom: 10px;" <%= onclick_heda_cmd('H') %>>🏠</button><br/>
 <button <%= onclick_heda_cmd('s') %> style="color: red;">Stop</button>
 
-<div>
-  <form action="#" onsubmit="<%= post_heda_cmd('${encodeURI(this[0].value)}') %>">
-    Command: <input name="name" type="text">
-    <input type="submit" value="Execute"/>
-  </form>
-</div>
+<%= form_with(url: heda_run_path, method: "post") do %>
+  <%= label_tag(:cmd, "Command:") %>
+  <%= text_field_tag(:cmd) %>
+  <%= submit_tag("Execute") %>
+<% end %>
