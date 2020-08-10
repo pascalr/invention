@@ -43,6 +43,7 @@
 //#include "core/writer/command_writer.h"
 #include "core/reader/serial_reader.h"
 #include "core/reader/shared_reader.h"
+#include "core/reader/io_reader.h"
 
 
 #include <boost/log/core.hpp>
@@ -179,6 +180,10 @@ int main(int argc, char** argv) {
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
 
+#ifdef SIMULATION
+  ConsoleWriter serialWriter;
+  IOReader serialReader;
+#else
   SerialPort serialPort;
   if (serialPort.openPort("/dev/ttyACM0") < 0) {
     throw InitSerialPortException();
@@ -186,6 +191,8 @@ int main(int argc, char** argv) {
   
   SerialReader serialReader(serialPort);
   SerialWriter serialWriter(serialPort);
+#endif
+
   
   SharedReader sharedReader(serialReader);
   SharedReaderClient hedaReader(sharedReader, READER_CLIENT_ID_HEDA);

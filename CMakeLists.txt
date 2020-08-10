@@ -106,6 +106,11 @@ add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )
 target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
 
+add_executable( simulation src/server.cpp )
+target_link_libraries( simulation ${MyLibs}  )
+target_include_directories( simulation PRIVATE "/usr/local/include/simple-web-server/" )
+target_compile_definitions(simulation PUBLIC SIMULATION)
+
 add_executable( calibrate src/calibrate.cpp )
 target_link_libraries( calibrate ${MyLibs}  )
 
