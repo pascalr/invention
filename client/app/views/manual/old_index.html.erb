@@ -1,0 +1,157 @@
+<script>
+(function poll() {
+  $.get( <%= heda_path("poll") %>, function( data ) {
+    let log = document.getElementById("log")
+    log.value += data.log;
+    log.scrollTop = log.scrollHeight;
+
+    const info = data.info
+    if (info) {
+      window.info = info
+      Object.keys(info).forEach((key) => {
+        const input = document.getElementById(key)
+        if (input) {
+          if (input.type == "checkbox") {
+            input.checked = info[key] === "1"
+          } else {
+            input.value = info[key]
+          }
+        }
+      })
+    }
+    poll(); // FIXME: Infinite stack exception at some point?
+  });
+})()
+
+setInterval(
+  (function pollHeda() {
+    $.get( <%= heda_path("pollHeda") %>, function( data ) {
+      window.data = data;
+      document.getElementById("current_cmd").value = data.cmd || "";
+    });
+  }), 500);
+
+</script>
+
+<div><%=post_heda_cmd('H')%></div>
+<div id="statusBar">
+  Cmd: <input id="current_cmd" type="text" readonly />
+</div>
+<div id="Manuel" style="display: flex;">
+<div style="display: flex;">
+  <div>
+    <div>
+      <img src="cam_capture.jpg" id="captureImg" width="640" height="480">
+	    <!--<img src="capture.jpg" id="captureImg" width="640" height="480">-->
+<!--	    <video src="http://127.0.0.1:8082/go.ogg" autoplay></video>-->
+<!--<video width="700" src="http://127.0.0.1:8082/go.ogv" autoplay type="video/ogg; codecs=theora"></video>-->
+      <!--<video poster="poster.jpg" controls>
+	<source src="theora.ogv" type='video/ogg; codecs="theora, vorbis"'>
+	<p>This is fallback content to display for user agents that do not support the video tag.</p>
+      </video>-->
+    </div>
+    <div>
+      <form action="#" onsubmit="sendMessage(); return false;" autocomplete="off">
+        Message: <input id="message" type="text" size="51">
+        <input type="submit" value="Send"/>
+      </form>
+    </div>
+    <div>
+      <textarea id="log" cols=68 rows=14 readonly></textarea> 
+    </div>
+  </div>
+  <div>
+    <button style="font-size: 28px; margin-bottom: 10px;" <%= onclick_heda_cmd('H') %>>🏠</button><br/>
+    <button>🏠 X</button><br/>
+    <button>🏠 Y</button><br/>
+    <button>🏠 Z</button><br/>
+    <button>🏠 W</button><br/>
+  </div>
+  <div>
+    <div>
+      <button>Connect</button>
+      <button>Close</button>
+      <button>Info</button>
+      <button <%= onclick_heda_cmd('s') %> style="color: red;">Stop</button>
+      <button>Picture</button>
+    </div>
+    <div>
+      <form action="#" onsubmit="$.get(`/run?cmd=${encodeURI(this[0].value)}`);return false">
+        Command: <input name="name" type="text">
+        <input type="submit" value="Execute"/>
+      </form>
+    </div>
+    <div style="display: flex;">
+      
+      <div class="manuel_columns">
+        <h2>Position</h2>
+        Position X: <input id="Pos X" type="number" readonly>
+        <button onclick="$.get('/run?cmd=%2DX')">-</button>
+        <button onclick="$.get('/run?cmd=%2BX')">+</button>
+        <br/>
+        Position Y: <input id="Pos Y" type="number" readonly>
+        <button onmousedown="$.get('/run?cmd=%2DY')"
+        onclick="$.get('/run?cmd=s')">-</button>
+        <button onmousedown="$.get('/run?cmd=%2BY')"
+        onclick="$.get('/run?cmd=s')">+</button>
+        <br/>
+        Position Z: <input id="Pos Z" type="number" readonly>
+        <button onclick="$.get('/run?cmd=%2DZ')">-</button>
+        <button onclick="$.get('/run?cmd=%2BZ')">+</button>
+        <br/>
+        Position W: <input id="Pos W" type="number" readonly>
+        <button onclick="$.get('/run?cmd=%2DW')">-</button>
+        <button onclick="$.get('/run?cmd=%2BW')">+</button>
+        <br/>
+      </div>
+      <div class="manuel_columns">
+        <h2>Destination</h2>
+        <form action="#" onsubmit="$.get(`/run?cmd=MX${this[0].value}Y${this[1].value}Z${this[2].value}W${this[3].value}`);return false">
+        Position X: <input id="Dest X" type="number" readonly><br/>
+        Position Y: <input id="Dest Y" type="number" readonly><br/>
+        Position Z: <input id="Dest Z" type="number" readonly><br/>
+        Position W: <input id="Dest W" type="number" readonly><br/>
+        </form>
+      </div>
+      <div class="manuel_columns">
+        <h2>Outputs</h2> Axis
+        <select id="axis" name="axis">
+          <option value="X">X</option>
+          <option value="Y">Y</option>
+          <option value="Z">Z</option>
+          <option value="W">W</option>
+        </select>
+        <br/>
+        <input id="PIN enabled Y" type="checkbox">Enabled
+        <br/>
+        <input id="PIN dir Y" type="checkbox" readonly>Direction<br/>
+        <input id="PIN step Y" type="checkbox" readonly>Step<br/>
+        <input id="PIN limit switch Y" type="checkbox" readonly>Limit switch<br/>
+        <input id="Force Y" type="checkbox" readonly>Force rotation<br/>
+      </div>
+      <div class="manuel_columns">
+        <h2>Inputs</h2> Axis
+        <select id="axis" name="axis">
+          <option value="X">X</option>
+          <option value="Y">Y</option>
+          <option value="Z">Z</option>
+          <option value="W">W</option>
+        </select>
+        <br/>
+        Speed: <input type="range" min="500" max="3000" value="500" style ="direction: rtl;" onchange="$.get('/run?cmd=v' + this.value)">
+        <br/>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function sendMessage() {
+  let v = document.getElementById('message');
+  $.get('/run?cmd=' + encodeURI(v.value));
+  v.value = "";
+}
+</script>
+
+</div>

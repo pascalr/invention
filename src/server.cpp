@@ -230,6 +230,20 @@ int main(int argc, char** argv) {
   //addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html"); // deprecated
   addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html"); // deprecated*/
 
+  // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
+  server.resource["^/run$"]["POST"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    cout << "GET /run" << endl;
+
+    auto query_fields = request->parse_query_string();
+    for(auto &field : query_fields) {
+      if (field.first == "cmd") {
+
+        heda.execute(field.second);
+      }
+    }
+    response->write("Ok command given to arduino");
+  };
+
   server.resource["^/run$"]["GET"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /run" << endl;
 
