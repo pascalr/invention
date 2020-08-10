@@ -1,11 +1,14 @@
-#ifndef PROGRAM_H
-#define PROGRAM_H
+#ifndef _PROGRAM_H
+#define _PROGRAM_H
+
 
 #include <ctype.h>
 #include "axis.h"
 #include "StepperMotor.h"
 #include "DCMotor.h"
 #include "reader/reader.h"
+#include "../config/constants.h"
+#include <float.h>
 
 #define NUMBER_OF_MOTORS 6
 #define NUMBER_OF_AXES 7
@@ -27,32 +30,11 @@ class Program {
     
     virtual void sleepMs(int time) = 0;
 
-    char getChar() {
-      int receivedByte;
-      while ((receivedByte = getReader().getByte()) < 0) {
-        sleepMs(1);
-      }
-      return (char) receivedByte;
-    }
+    char getChar();
 
-    char* getInputLine() {
-      int i = 0;
-      char ch;
-      while ((ch = getChar()) != '\n') {
-        input[i] = ch;
-        i++;
-      }
-      input[i] = '\0';
-      return input;
-    }
+    char* getInputLine();
 
-    void stopMoving() {
-      for (int i = 0; motors[i] != 0; i++) {
-        motors[i]->stop();
-      }
-      getWriter() << "Stopped\n";
-      isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
-    }
+    void stopMoving();
     
     MotorT axisT; // Real one
 
@@ -71,6 +53,6 @@ class Program {
     char input[MAX_INPUT_LENGTH];
 };
 
-
+void setupAxes(Program& p);
 
 #endif

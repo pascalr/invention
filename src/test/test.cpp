@@ -7,7 +7,6 @@
 #include "../core/writer/console_writer.h"
 #include "../core/axis.h"
 #include "../core/input_parser.h"
-#include "../config/setup.h"
       
 #include <chrono> // for sleep
 #include <thread> // for sleep

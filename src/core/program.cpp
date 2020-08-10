@@ -1,10 +1,47 @@
-#ifndef SETUP_H
-#define SETUP_H
+#include "program.h"
 
-#include "../core/program.h"
-#include "../core/axis.h"
-#include "constants.h"
+#include <ctype.h>
+#include "axis.h"
+#include "StepperMotor.h"
+#include "DCMotor.h"
+#include "reader/reader.h"
+#include "../config/constants.h"
 #include <float.h>
+
+#define NUMBER_OF_MOTORS 6
+#define NUMBER_OF_AXES 7
+
+// Way too big but at least I wont have to worry about that.
+// If I run out of space some time bring this down.
+// Could be as low as 52.
+#define MAX_INPUT_LENGTH 256
+
+char Program::getChar() {
+  int receivedByte;
+  while ((receivedByte = getReader().getByte()) < 0) {
+    sleepMs(1);
+  }
+  return (char) receivedByte;
+}
+
+char* Program::getInputLine() {
+  int i = 0;
+  char ch;
+  while ((ch = getChar()) != '\n') {
+    input[i] = ch;
+    i++;
+  }
+  input[i] = '\0';
+  return input;
+}
+
+void Program::stopMoving() {
+  for (int i = 0; motors[i] != 0; i++) {
+    motors[i]->stop();
+  }
+  getWriter() << "Stopped\n";
+  isWorking = false; // Maybe not necessary because already told the axes to stop. Anyway it does not hurt..
+}
 
 void setupAxes(Program& p) {
 
@@ -43,5 +80,3 @@ void setupAxes(Program& p) {
   p.axisY.setReverseMotorDirection(true);
 
 }
-
-#endif

@@ -13,7 +13,6 @@
 #include "../lib/serial.h"
 #include "../lib/opencv.h"
 #include "../helper/logging.h"
-#include "../config/setup.h"
 #include "../config/constants.h"
 #include "fake_program.h"
 
@@ -31,6 +30,6 @@ void detect(Heda& heda, Mat& frame, PolarCoord c);
 
 std::function<void()> sweepCallback(Heda& heda);
 
-void calculateMovements(Heda& heda, std::vector<Movement>& movements);
+void calculateSweepMovements(Heda& heda, std::vector<Movement>& movements);
 
 #endif

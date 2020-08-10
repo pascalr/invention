@@ -31,18 +31,28 @@
 
 #include "core/WebProgram.h"
 
-#include "controllers/controllers.h"
+/*#include "controllers/controllers.h"
 #include "controllers/recettes_controller.h"
 #include "controllers/ingredients_controller.h"
 #include "controllers/axes_controller.h"
 #include "controllers/layout_controller.h"
-#include "controllers/3d_controller.h"
+#include "controllers/3d_controller.h"*/
 
 #include "core/Heda.h"
 #include "core/writer/serial_writer.h"
 //#include "core/writer/command_writer.h"
 #include "core/reader/serial_reader.h"
 #include "core/reader/shared_reader.h"
+
+
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
 
 using namespace NL::Template;
 
@@ -52,7 +62,7 @@ using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
-void addPostRoute(HttpServer& server, WebProgram& wp, const char* path, const std::function<void(WebProgram&, PostRequest&)>& func) {
+/*void addPostRoute(HttpServer& server, WebProgram& wp, const char* path, const std::function<void(WebProgram&, PostRequest&)>& func) {
   server.resource[path]["POST"] = [func, &wp](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
     try {
@@ -104,7 +114,7 @@ void addRoute(HttpServer& server, WebProgram& wp, const char* path, const char* 
 
     response->write(withLayout.str()); // OPTIMIZE: Write the stream directly
   };
-}
+}*/
 
 void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
 
@@ -193,7 +203,7 @@ int main(int argc, char** argv) {
   // So my urls will be longer, but I think I will do it this way:
   // /:model/:action/:id?
  
-  auto axesIndex = [&fake](WebProgram& wp, Template& t) {Axes::index(wp, t, fake);};
+  /*auto axesIndex = [&fake](WebProgram& wp, Template& t) {Axes::index(wp, t, fake);};
   addRoute(server, wp, "^/?$", "GET", axesIndex, "frontend/axes/layout.html");
   addRoute(server, wp, "^/axes/index/?$", "GET", axesIndex, "frontend/axes/layout.html");
 
@@ -218,7 +228,7 @@ int main(int argc, char** argv) {
   addRoute(server, wp, "^/recettes/index.html$", "GET", Recettes::index, "frontend/recettes/layout.html"); // deprecated
   addRoute(server, wp, "^/recettes/new.html$", "GET", Recettes::create, "frontend/recettes/layout.html"); // deprecated
   //addRoute(server, wp, "^/ingredients/show.html$", "GET", Ingredients::show, "frontend/ingredients/layout.html"); // deprecated
-  addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html"); // deprecated
+  addRoute(server, wp, "^/ingredients/new.html$", "GET", Ingredients::create, "frontend/ingredients/layout.html"); // deprecated*/
 
   server.resource["^/run$"]["GET"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "GET /run" << endl;

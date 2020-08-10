@@ -12,7 +12,6 @@
 #include "../lib/serial.h"
 #include "../lib/opencv.h"
 #include "../helper/logging.h"
-#include "../config/setup.h"
 #include "../config/constants.h"
 #include "fake_program.h"
 
@@ -59,7 +58,7 @@ std::function<void()> sweepCallback(Heda& heda) {
   };
 }
 
-void calculateMovements(Heda& heda, vector<Movement>& movements) {
+void calculateSweepMovements(Heda& heda, vector<Movement>& movements) {
 
   double heights[] = {0.0};
   double zStep = MAX_Z / 4;

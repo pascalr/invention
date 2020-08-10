@@ -21,17 +21,7 @@ enum TokenType {
 
 enum MyEnum {VAL1, VAL2,VAL3};
 
-const char* tokenTypeName(TokenType e) {
-  switch (e) {
-    case UNIT: return "UNIT";
-    case QUANTITY: return "QUANTITY";
-    case SCALAIRE: return "SCALAIRE";
-    case AXIS: return "AXIS";
-    case UNKOWN: return "UNKOWN";
-    case POSITIVE_INTEGER: return "POSITIVE_INTEGER";
-    default: throw "Bad TokenType";
-  }
-}
+const char* tokenTypeName(TokenType e);
 
 class MissingArgumentException : public exception {
   public:
@@ -103,90 +93,28 @@ class Unkown : public Token {
 
 
 
-void splitWords(vector<string> &words, const string &str) {
-
-  istringstream ss(str);
-  do {
-    string word;
-    ss >> word;
-    words.push_back(word);
-  } while (ss);
-
-  if (!words.empty()) {
-    words.pop_back();
-  }
-}
+void splitWords(vector<string> &words, const string &str);
 
 class ParseResult {
   public:
 
-    void expectArgument() {
-      if (m_tokens.empty()) {
-        throw MissingArgumentException();
-      }
-    }
+    void expectArgument();
 
-    void expectArgument(TokenType type) {
+    void expectArgument(TokenType type);
 
-      expectArgument();
+    bool checkArgument(TokenType type);
 
-      TokenType actual = (*m_tokens.begin())->getType();
-      if (actual != type) {
-        throw WrongTypeArgumentException(type, actual);
-      }
-    }
+    char popAxis();
 
-    bool checkArgument(TokenType type) {
+    unsigned long popPositiveInteger();
 
-      expectArgument();
+    double popScalaire();
 
-      shared_ptr<Token> token = *m_tokens.begin();
-      return token->getType() == type;
-    }
+    void addToken(shared_ptr<Token> tok);
 
-    char popAxis() {
+    void setCommand(const string &str);
 
-      expectArgument(AXIS);
-      
-      double val = (dynamic_pointer_cast<AxisToken> (*m_tokens.begin()))->name;
-      m_tokens.erase(m_tokens.begin());
-    
-      return val;
-    }
-
-    unsigned long popPositiveInteger() {
-
-      expectArgument(POSITIVE_INTEGER);
-      
-      unsigned long val = (dynamic_pointer_cast<PositiveInteger> (*m_tokens.begin()))->value;
-      m_tokens.erase(m_tokens.begin());
-    
-      return val;
-    }
-
-    double popScalaire() {
-
-      if (checkArgument(POSITIVE_INTEGER)) {return popPositiveInteger();}
-     
-      expectArgument(SCALAIRE);
-
-      double val = (dynamic_pointer_cast<Scalaire> (*m_tokens.begin()))->value;
-      m_tokens.erase(m_tokens.begin());
-    
-      return val;
-    }
-
-    void addToken(shared_ptr<Token> tok) {
-      m_tokens.push_back(tok);
-    }
-
-    void setCommand(const string &str) {
-      m_command = str;
-    }
-
-    string getCommand() const {
-      return m_command;
-    }
+    string getCommand() const;
 
     /*vector<Token> getTokens() const {
       return m_tokens;
@@ -202,74 +130,18 @@ class Parser {
   public:
 
 
-    bool parseScalaire(ParseResult &result, const string &word) {
+    bool parseScalaire(ParseResult &result, const string &word);
       
-      char* pEnd;
-      double val = strtod (word.c_str(), &pEnd);
-      if (strlen(pEnd) != 0) { return false;}
+    bool parsePositiveInteger(ParseResult &result, const string &word);
 
-      shared_ptr<Token> tok = make_shared<Scalaire>(val);
-      result.addToken(tok);
-      return true;
-    }
+    bool parseAxis(ParseResult &result, const string &word);
 
-    bool parsePositiveInteger(ParseResult &result, const string &word) {
+    bool parseUnkown(ParseResult &result, const string &word);
 
-      for (auto it = word.begin(); it != word.end(); it++) {
-        if (*it < '0' || *it > '9') {return false;}
-      }
-
-      shared_ptr<Token> tok = make_shared<PositiveInteger>(atoi(word.c_str()));
-      result.addToken(tok);
-      return true;
-    }
-
-    bool parseAxis(ParseResult &result, const string &word) {
-
-      if (word == "x" || word == "y" || word == "z" || word == "t") {
-
-        shared_ptr<Token> tok = make_shared<AxisToken>(word[0]);
-        result.addToken(tok);
-        return true;
-      }
-      
-      return false;
-    }
-
-    bool parseUnkown(ParseResult &result, const string &word) {
-
-      shared_ptr<Token> tok = make_shared<Unkown>(word);
-      result.addToken(tok);
-      
-      return true;
-    }
-
-    void tokenize(ParseResult &result, const string &word) {
+    void tokenize(ParseResult &result, const string &word);
     
-      parsePositiveInteger(result, word) || parseScalaire(result, word) || parseAxis(result, word) || parseUnkown(result, word);
-    }
-    
-    
-    void parse(ParseResult &result, const string cmd1) {
+    void parse(ParseResult &result, const string cmd1);
      
-      string cmd = cmd1; 
-      transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower); 
-    
-      vector<string> words;
-      splitWords(words, cmd);
-    
-      if (words.size() < 1) {
-        throw EmptyCommandException();
-      }
-    
-      result.setCommand(*words.begin());
-      words.erase(words.begin());
-    
-      for (auto it = words.begin(); it != words.end(); it++) {
-        tokenize(result, *it);
-      }
-    }
-
 };
 
 #endif

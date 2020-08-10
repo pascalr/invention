@@ -4,7 +4,7 @@
 #include "position.h"
 #include "../lib/serial.h"
 #include "../lib/opencv.h"
-#include "sweep.h" // because it is sweep that detects HRCodes
+#include "sweep.h"
 
 #include "command_stack.h"
 
@@ -22,8 +22,6 @@ class TooManyHRCodeException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 
 #include <mutex>
-
-std::mutex commandsMutex;
 
 // Low level command, sent to the arduino. "mx..." not "move x ..."
 class RawCommand {
@@ -104,6 +102,9 @@ class Heda {
       m_commands["rapporte"] = [&](ParseResult tokens) {
       };
 
+      m_commands["balaye"] = [&](ParseResult tokens) {
+        sweep();
+      };
 
       m_commands["goto"] = [&](ParseResult tokens) {
         double x = tokens.popScalaire();
@@ -159,7 +160,13 @@ class Heda {
       throw FrameCaptureException();
     }
 
-    void move(Movement mvt) {
+    void move(const std::vector<Movement>& mvts) {
+      for (auto it = mvts.begin(); it != mvts.end(); it++) {
+        move(*it);
+      }
+    }
+
+    void move(const Movement& mvt) {
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
       pushCommand(mvt.str(), [&,mvt]() {
@@ -178,9 +185,7 @@ class Heda {
 
       vector<Movement> mvts;
       calculateGoto(mvts, m_position, destination);
-      for (auto it = mvts.begin(); it != mvts.end(); it++) {
-        move(*it);
-      }
+      move(mvts);
     }
 
     void grab(double strength) {
@@ -194,18 +199,14 @@ class Heda {
     void retreive() {
     }
 
-    void sweep() {
-      db.clear(codes);
-    }
+    void sweep();
 
     // goto an empty place and drop the jar
     void store() {
       
       vector<Movement> mvts;
       m_packer.calculateStoreMovements();
-      for (auto it = mvts.begin(); it != mvts.end(); it++) {
-        move(*it);
-      }
+      move(mvts);
     }
 
     void pushCommand(string str, std::function<void()> callback) {
@@ -307,6 +308,8 @@ class Heda {
     }
 
     NaiveJarPacker m_packer;
+
+    std::mutex commandsMutex;
 };
 
 #endif

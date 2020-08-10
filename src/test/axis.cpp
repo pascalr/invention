@@ -3,7 +3,6 @@
 
 #include "../core/axis.h"
 #include "../core/fake_program.h"
-#include "../config/setup.h"
 
 using namespace std;
 
