@@ -128,52 +128,13 @@ int main(int argc, char** argv) {
     response->write(buf, ss);
   };*/
 
-  server.resource["^/pollHeda$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-
-      string cmd = heda.getCurrentCommand();
-
-      ptree pt;
-      stringstream ss;
-      pt.put("cmd", cmd);
-      pt.put("pending", cmd);
-      pt.put("output", "TODO OUTPUT");
-      json_parser::write_json(ss, pt);
-                                                                       
-      string str = ss.str();
-      SimpleWeb::CaseInsensitiveMultimap header;
-      header.emplace("Content-Length", to_string(str.length()));
-      header.emplace("Content-Type", "application/json");
-      response->write(SimpleWeb::StatusCode::success_ok, str, header);
-  };
-
   server.resource["^/poll$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    thread work_thread([&heda,response,&serverReader] {
-      string s;
-      while (true) {
 
-        while (serverReader.inputAvailable()) {
-          s += (char) serverReader.getByte();
-        }
-        if (!s.empty()) {
-                                                                           
-          cout << "Arduino: " << s;
-          ptree pt;
-          stringstream ss;
-          pt.put("log", s);
-          json_parser::write_json(ss, pt);
-                                                                           
-          string str = ss.str();
-          SimpleWeb::CaseInsensitiveMultimap header;
-          header.emplace("Content-Length", to_string(str.length()));
-          header.emplace("Content-Type", "application/json");
-          response->write(SimpleWeb::StatusCode::success_ok, str, header);
-          return;
-        }
-        s = "";
-        this_thread::sleep_for(chrono::milliseconds(10));
-      }
-    });
-    work_thread.detach();
+    ptree pt;
+    pt.put("cmd", heda.getCurrentCommand());
+    pt.put("pending", heda.getPendingCommands());
+    pt.put("output", getAllAvailable(serverReader));
+    sendJson(response, pt);
   };
 
   server.default_resource["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {

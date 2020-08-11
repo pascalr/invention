@@ -14,3 +14,14 @@ std::string getInputLine(Reader& r) {
   trim(str);
   return str;
 }
+
+std::string getAllAvailable(Reader& r) {
+
+  std::string str;
+  while (r.inputAvailable()) {
+    char c = r.getByte();
+    str += c;
+  }
+  trim(str);
+  return str;
+}

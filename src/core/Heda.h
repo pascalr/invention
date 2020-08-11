@@ -213,12 +213,14 @@ class Heda {
       std::lock_guard<std::mutex> guard(commandsMutex);
       RawCommand cmd(str, callback);
       m_stack.push_back(cmd);
+      calculatePendingCommands();
     }
 
     void pushCommand(string str) {
       std::lock_guard<std::mutex> guard(commandsMutex);
       RawCommand cmd(str);
       m_stack.push_back(cmd);
+      calculatePendingCommands();
     }
 
     void stop() {
@@ -226,6 +228,7 @@ class Heda {
       cout << "Executing stop" << endl;
       m_writer << "s";
       m_stack.clear();
+      m_pending_commands.clear();
       m_current_command.clear();
       // m_position <<  TODO
       cout << "BIIIIGGGG TODO: When stopping, ask for the position!!!"; // TODO
@@ -237,6 +240,18 @@ class Heda {
 
     void openJaw() {
       pushCommand("r");
+    }
+
+    void calculatePendingCommands() {
+      m_pending_commands = m_current_command.cmd + "\n";
+      for (const RawCommand& cmd : m_stack) {
+        m_pending_commands += cmd.cmd;
+        m_pending_commands += "\n";
+      }
+    }
+
+    string getPendingCommands() {
+      return m_pending_commands;
     }
 
     string getCurrentCommand() {
@@ -291,6 +306,7 @@ class Heda {
         m_current_command = *m_stack.begin();
         m_writer << m_current_command.cmd.c_str();
         m_stack.pop_front();
+        calculatePendingCommands();
         return 0;
 
       // Check if the message MESSAGE_DONE has been received.
@@ -310,6 +326,8 @@ class Heda {
     NaiveJarPacker m_packer;
 
     std::mutex commandsMutex;
+
+    string m_pending_commands;
 };
 
 #endif

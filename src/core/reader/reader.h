@@ -18,6 +18,7 @@ class Reader {
 
 #include <string>
 std::string getInputLine(Reader& r);
+std::string getAllAvailable(Reader& r);
 
 #endif
 
