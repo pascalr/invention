@@ -7,7 +7,7 @@ class HedaController < ApplicationController
   end
   def run
 
-    uri = URI('http://127.0.0.1:8083/run')
+    uri = URI('http://192.168.0.19:8083/run')
     req = Net::HTTP::Post.new(uri)
     req.set_form_data('cmd' => params[:cmd])
     
