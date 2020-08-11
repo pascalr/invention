@@ -6,14 +6,33 @@
 
 using namespace std;
 
-void setup() {
-}
-
 string popResult(Heda& heda, StreamWriter& ss, FakeReader& reader) {
   this_thread::sleep_for(chrono::milliseconds(200));
   string result = ss.str();
   reader.setFakeInput(MESSAGE_DONE);
   return result;
+}
+
+void testPosition() {
+  title("testPosition");
+
+  StreamWriter ss;
+  FakeReader reader;
+  Database db("data/test.db");
+  Heda heda(ss, reader, db);
+
+  heda.reference();
+  reader.setFakeInput(MESSAGE_DONE);
+  this_thread::sleep_for(chrono::milliseconds(100));
+  PolarCoord pos; pos << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
+  assertEqual("home position", pos, heda.getPosition());
+
+  heda.move(Movement('x', 100.0));
+  reader.setFakeInput(MESSAGE_DONE);
+  this_thread::sleep_for(chrono::milliseconds(100));
+  pos << 100, HOME_POSITION_Y, HOME_POSITION_Z;
+  assertEqual("x 100", pos, heda.getPosition());
+
 }
 
 void testHomeCommand() {
@@ -25,12 +44,12 @@ void testHomeCommand() {
   Heda heda(ss, reader, db);
 
   heda.reference();
-  this_thread::sleep_for(chrono::milliseconds(200));
+  this_thread::sleep_for(chrono::milliseconds(100));
   assertEqual("home", "H", ss.str());
 
   assertEqual("current command", "H", heda.getCurrentCommand());
   reader.setFakeInput(MESSAGE_DONE);
-  this_thread::sleep_for(chrono::milliseconds(200));
+  this_thread::sleep_for(chrono::milliseconds(100));
   assertEqual("current command", "", heda.getCurrentCommand());
 
   heda.stop(); ss.str();
@@ -88,6 +107,7 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
+  testPosition();
   testHomeCommand();
   //testSharedReader();
   //testCommandWriter();
