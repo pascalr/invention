@@ -5,6 +5,20 @@ require 'open-uri'
 class HedaController < ApplicationController
   def index
   end
+
+  def status
+    @output = 'some output'
+    @pending = 'some pending'
+
+    url = URI('http://192.168.0.19:8083/pollHeda')
+    response = Net::HTTP.get(url)
+    vals = JSON.parse(response)
+    @output = vals.output
+    @pending = vals.pending
+
+    render partial: "status"
+  end
+
   def run
 
     uri = URI('http://192.168.0.19:8083/run')

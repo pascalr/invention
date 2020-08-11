@@ -323,6 +323,8 @@ int main(int argc, char** argv) {
       ptree pt;
       stringstream ss;
       pt.put("cmd", cmd);
+      pt.put("pending", cmd);
+      pt.put("output", "TODO OUTPUT");
       json_parser::write_json(ss, pt);
                                                                        
       string str = ss.str();
