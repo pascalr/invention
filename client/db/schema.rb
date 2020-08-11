@@ -10,7 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_10_134142) do
+ActiveRecord::Schema.define(version: 2020_08_11_133019) do
+
+  create_table "aliments", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "detected_codes", force: :cascade do |t|
     t.float "x"
@@ -22,6 +28,14 @@ ActiveRecord::Schema.define(version: 2020_08_10_134142) do
     t.binary "img"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "ingredients", force: :cascade do |t|
+    t.string "name"
+    t.integer "aliment_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["aliment_id"], name: "index_ingredients_on_aliment_id"
   end
 
   create_table "jar_formats", force: :cascade do |t|
@@ -45,4 +59,5 @@ ActiveRecord::Schema.define(version: 2020_08_10_134142) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "ingredients", "aliments"
 end
