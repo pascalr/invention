@@ -13,6 +13,7 @@ class HedaController < ApplicationController
     vals = JSON.parse(response)
     @output = vals["output"]
     @pending = vals["pending"]
+    @position = vals["pos"]
 
     render partial: "status"
   end
