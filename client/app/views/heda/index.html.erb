@@ -1,9 +1,7 @@
 <h1>Mode manuel</h1>
 
-<%= link_to "🏠", heda_run_path(cmd: "h"), method: "post", remote: true %>
-<%= link_to "stop", heda_run_path(cmd: "s"), method: "post", remote: true %>
-<button <%= onclick_heda_cmd('H') %>>🏠</button>
-<button <%= onclick_heda_cmd('s') %> style="color: red;">Stop</button>
+<%= link_to "🏠", heda_run_path(cmd: "home"), method: "post", remote: true %>
+<%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
 
 <%= form_with(url: heda_run_path, method: "post", id: 'inputcommandform') do %>
   <%= label_tag(:cmd, "Commande:") %>
