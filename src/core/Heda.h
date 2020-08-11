@@ -230,8 +230,7 @@ class Heda {
       m_stack.clear();
       m_pending_commands.clear();
       m_current_command.clear();
-      // m_position <<  TODO
-      cout << "BIIIIGGGG TODO: When stopping, ask for the position!!!"; // TODO
+      m_writer << "@";
     }
 
     void info() {
@@ -291,7 +290,7 @@ class Heda {
         this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
       }
     }
-    
+
     // returns the time to sleep
     int handleCommandStack() {
 
@@ -318,6 +317,17 @@ class Heda {
           m_current_command.finish();
           calculatePendingCommands();
           return 0;
+        } else if (str == MESSAGE_POSITION) {
+          while (true) {
+            if (m_reader.inputAvailable()) {
+              string pos = getInputLine(m_reader);
+              Parser parser;
+              ParseResult result;
+              parser.parse(result, pos);
+              m_position << result.popScalaire(), result.popScalaire(), result.popScalaire();
+            }
+            this_thread::sleep_for(chrono::milliseconds(5));
+          }
         }
       }
 
