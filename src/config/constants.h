@@ -65,6 +65,7 @@
 
 #define MESSAGE_RECEIVED "ok"
 #define MESSAGE_DONE "done"
+#define MESSAGE_POSITION "@"
 // invalid_pending means that it should only process one command at once
 // it is still listening if told to stop or query position
 // anything else is an invalid_pending.
