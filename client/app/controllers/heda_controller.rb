@@ -7,14 +7,12 @@ class HedaController < ApplicationController
   end
 
   def status
-    @output = 'some output'
-    @pending = 'some pending'
 
     url = URI('http://192.168.0.19:8083/pollHeda')
     response = Net::HTTP.get(url)
     vals = JSON.parse(response)
-    @output = vals.output
-    @pending = vals.pending
+    @output = vals["output"]
+    @pending = vals["pending"]
 
     render partial: "status"
   end
