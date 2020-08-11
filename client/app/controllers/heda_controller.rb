@@ -8,7 +8,7 @@ class HedaController < ApplicationController
 
   def status
 
-    url = URI('http://192.168.0.19:8083/pollHeda')
+    url = URI('http://192.168.0.19:8083/poll')
     response = Net::HTTP.get(url)
     vals = JSON.parse(response)
     @output = vals["output"]

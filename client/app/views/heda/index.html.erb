@@ -1,12 +1,19 @@
 <h1>Mode manuel</h1>
 
+<%= link_to "🏠", heda_run_path(cmd: "h"), method: "post", remote: true %>
+<%= link_to "stop", heda_run_path(cmd: "s"), method: "post", remote: true %>
 <button <%= onclick_heda_cmd('H') %>>🏠</button>
 <button <%= onclick_heda_cmd('s') %> style="color: red;">Stop</button>
 
-<%= form_with(url: heda_run_path, method: "post") do %>
+<%= form_with(url: heda_run_path, method: "post", id: 'inputcommandform') do %>
   <%= label_tag(:cmd, "Commande:") %>
-  <%= text_field_tag(:cmd) %>
+  <%= text_field_tag(:cmd, nil, id: 'inputcommand') %>
   <%= submit_tag("Executer") %>
 <% end %>
 
-<%= render_async heda_status_path, interval: 2000 %>
+<%= render_async heda_status_path, interval: 1000, event_name: "logoutput-loaded" %>
+
+<%= label_tag(:output)  %>
+<%= text_area_tag :output, nil, :size =>"100x10", :id => "logoutput" %>
+
+<%= javascript_pack_tag 'heda_index' %>

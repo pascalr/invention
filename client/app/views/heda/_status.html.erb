@@ -1,5 +1,4 @@
 <%= label_tag(:pending)  %>
 <%= text_area_tag :pending, @pending || 'aucun', :size =>"100x10" %><br/>
 
-<%= label_tag(:output)  %>
-<%= text_area_tag :output, @output, :size =>"100x10" %>
+<span id="logoutputdata" hidden><%= @output %></span>

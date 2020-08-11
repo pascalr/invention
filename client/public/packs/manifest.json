@@ -9,6 +9,16 @@
       "js.map": [
         "/packs/js/application-434aa2e1fa1e74ccf6ec.js.map"
       ]
+    },
+    "heda_index": {
+      "js": [
+        "/packs/js/heda_index-a43291781fd61dee25b5.js"
+      ],
+      "js.map": [
+        "/packs/js/heda_index-a43291781fd61dee25b5.js.map"
+      ]
     }
-  }
+  },
+  "heda_index.js": "/packs/js/heda_index-a43291781fd61dee25b5.js",
+  "heda_index.js.map": "/packs/js/heda_index-a43291781fd61dee25b5.js.map"
 }
