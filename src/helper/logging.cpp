@@ -16,7 +16,7 @@ void setupInterrupt() {
 }
 
 void setupLogging() {
-  boost::log::add_file_log("log/main.log");
+  //boost::log::add_file_log("log/main.log");
 
   boost::log::core::get()->set_filter(
     boost::log::trivial::severity >= boost::log::trivial::trace // SHOW ALL in log file
