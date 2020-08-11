@@ -180,10 +180,10 @@ int main(int argc, char** argv) {
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
 
-//#ifdef SIMULATION
-//  ConsoleWriter serialWriter;
-//  IOReader serialReader;
-//#else
+#ifdef SIMULATION
+  ConsoleWriter serialWriter;
+  IOReader serialReader;
+#else
   SerialPort serialPort;
   if (serialPort.openPort("/dev/ttyACM0") < 0) {
     throw InitSerialPortException();
@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
   
   SerialReader serialReader(serialPort);
   SerialWriter serialWriter(serialPort);
-//#endif
+#endif
 
   
   SharedReader sharedReader(serialReader);
