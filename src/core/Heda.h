@@ -301,7 +301,7 @@ class Heda {
       if (m_current_command.isDone()) {
 
         // Check if a new command is available
-        if (m_stack.empty()) {return 100;}
+        if (m_stack.empty()) { return 100;}
 
         m_current_command = *m_stack.begin();
         m_writer << m_current_command.cmd.c_str();
@@ -316,6 +316,7 @@ class Heda {
 
         if (str == MESSAGE_DONE) {
           m_current_command.finish();
+          calculatePendingCommands();
           return 0;
         }
       }
