@@ -131,6 +131,7 @@ int main(int argc, char** argv) {
   server.resource["^/poll$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
     ptree pt;
+    pt.put("pos", heda.getPosition());
     pt.put("cmd", heda.getCurrentCommand());
     pt.put("pending", heda.getPendingCommands());
     pt.put("output", getAllAvailable(serverReader));
