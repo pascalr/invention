@@ -1,6 +1,5 @@
 #include "utils.h"
 #include "axis.h"
-#include "setup.h"
 #include "program.h"
 #include "input_parser.h"
 #include "reader/reader.h"
