@@ -22,6 +22,5 @@ std::string getAllAvailable(Reader& r) {
     char c = r.getByte();
     str += c;
   }
-  trim(str);
   return str;
 }
