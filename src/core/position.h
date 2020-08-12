@@ -61,8 +61,10 @@ std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
 
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);
 
+void doNothing();
+
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
-void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback = 0);
+void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
 
 void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination);
 

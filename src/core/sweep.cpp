@@ -47,15 +47,14 @@ void detect(Heda& heda, Mat& frame, PolarCoord c) {
   }
 }
 
-std::function<void()> sweepCallback(Heda& heda) {
-  return [&heda]() {
-    BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
-    Mat frame;
-    heda.captureFrame(frame);
+void sweepCallback(Heda& heda) {
+  cout << "HEERRREEEE!!!!!\n";
+  BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
+  Mat frame;
+  heda.captureFrame(frame);
 
-    BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
-    detect(heda, frame, heda.getPosition()); 
-  };
+  BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
+  detect(heda, frame, heda.getPosition()); 
 }
 
 void calculateSweepMovements(Heda& heda, vector<Movement>& movements) {
@@ -82,7 +81,17 @@ void calculateSweepMovements(Heda& heda, vector<Movement>& movements) {
       for (z = zUp ? 0.0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0.0; z += zStep * (zUp ? 1 : -1)) {
         CartesianCoord c; c << x, heights[i], z;
         PolarCoord p = toolCartesianToPolar(c);
-        calculateGoto(movements, oldP, p, sweepCallback(heda));
+        calculateGoto(movements, oldP, p, [&heda](){sweepCallback(heda);});
+        //calculateGoto(movements, oldP, p);
+        /*calculateGoto(movements, oldP, p, [&heda]() {
+          debug();
+          BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
+          Mat frame;
+          heda.captureFrame(frame);
+
+          BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
+          detect(heda, frame, heda.getPosition()); 
+        });*/
         oldP = p;
       }
       zUp = !zUp;

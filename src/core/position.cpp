@@ -1,4 +1,5 @@
 #include "position.h"
+#include "Heda.h"
 
 #include "../config/constants.h"
 
@@ -70,18 +71,14 @@ std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
   return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
 }
 
-/*void calculateGoto(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
-  PolarCoord p = toolCartesianToPolar(destination);
-  calculateGoto(movements, position, p);
-}*/
-
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition) {
   if (abs(mvt.destination - currentPosition) > 0.001) {
     movements.push_back(mvt);
   }
 }
 
-void doNothing() {}  
+void doNothing() {}
+
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 //void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback = doNothing) {
 void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
@@ -116,7 +113,12 @@ void calculateGoto(vector<Movement> &movements, const PolarCoord position, const
   }
 
   if (callback && movements.size() != size) {
-    movements.end()->callback = callback;
+    movements[movements.size()-1].callback = callback;
+    //const Movement& oldLast = *movements.end();
+    //const Movement& oldLast = movements[movements.size()-1];
+    //Movement last = Movement(oldLast.axis, oldLast.destination, callback);
+    //movements.pop_back();
+    //movements.push_back(last);
   }
 }
 

@@ -14,6 +14,12 @@ class JarPacker {
     virtual void calculateStoreMovements() = 0;
 };
 
+// TODO: Save the things into possible locations. Only run this once.
+// A Location has:
+// A position x, y, z
+// A list of other locations which must be empty to be able to move to there?
+// A path on how to get it in and out.
+
 // Puts the jars 150 mm (6 inches) appart. (The biggest jar possible.)
 class NaiveJarPacker : public JarPacker {
   public:
@@ -24,7 +30,6 @@ class NaiveJarPacker : public JarPacker {
     }
 
     void setup() {
-      db.load(jars);
       db.load(shelves);
 
       calculatePossibleLocations();
@@ -42,9 +47,9 @@ class NaiveJarPacker : public JarPacker {
             double x = i*148.0 + (148.0 / 2);
             double z = CLAW_RADIUS - (j*148.0 + (148.0 / 2));
             c << x, shelf.height, z;
-            cout << "Calculated possible jar cartesian at " << c << endl;
+            //cout << "Calculated possible jar cartesian at " << c << endl;
             PolarCoord r = toolCartesianToPolar(c);
-            cout << "Calculated possible jar location at " << r << endl;
+            //cout << "Calculated possible jar location at " << r << endl;
             possible_locations.push_back(r);
           }
         }
@@ -59,7 +64,6 @@ class NaiveJarPacker : public JarPacker {
     std::vector<PolarCoord> possible_locations;
     Database& db;
     ShelfTable shelves;
-    JarTable jars;
 
 };
 

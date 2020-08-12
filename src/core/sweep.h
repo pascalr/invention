@@ -28,8 +28,6 @@ class Heda;
 
 void detect(Heda& heda, Mat& frame, PolarCoord c);
 
-std::function<void()> sweepCallback(Heda& heda);
-
 void calculateSweepMovements(Heda& heda, std::vector<Movement>& movements);
 
 #endif

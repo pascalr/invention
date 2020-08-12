@@ -49,7 +49,7 @@ class DetectedHRCode : public Model {
 
 class DetectedHRCodeTable : public Table<DetectedHRCode> {
   public:
-    const char* TABLE_NAME = "detected_code";
+    const char* TABLE_NAME = "detected_codes";
     string getTableName() { return TABLE_NAME; };
     
     string getValues(const DetectedHRCode& item) {
@@ -93,7 +93,7 @@ class Jar : public Model {
 
 class JarTable : public Table<Jar> {
   public:
-    const char* TABLE_NAME = "jar";
+    const char* TABLE_NAME = "jars";
     string getTableName() { return TABLE_NAME; };
     
     string getValues(const Jar& item) {
@@ -123,7 +123,7 @@ class Shelf : public Model {
 
 class ShelfTable : public Table<Shelf> {
   public:
-    const char* TABLE_NAME = "shelf";
+    const char* TABLE_NAME = "shelves";
     string getTableName() { return TABLE_NAME; };
     
     string getValues(const Shelf& item) {

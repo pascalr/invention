@@ -10,7 +10,7 @@
 #include "command_stack.h"
 
 #include "parser.h"
-#include "jar_packer.h"
+//#include "jar_packer.h"
 
 #include "Database.h"
 
@@ -54,7 +54,7 @@ class RawCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db), m_packer(db) {
+    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db)/*, m_packer(db)*/ {
     
       cerr << "Initializing video...\n";
       m_video_working = initVideo(m_cap);
@@ -65,7 +65,7 @@ class Heda {
       m_commands_thread = std::thread(&Heda::loopCommandStack, this);
       //m_commands_thread.detach(); Do I need to detach?
       
-      m_packer.setup();
+      //m_packer.setup();
     }
 
     ~Heda() {
@@ -89,6 +89,8 @@ class Heda {
       m_commands["home"] = [&](ParseResult tokens) {reference();};
       m_commands["info"] = [&](ParseResult tokens) {info();};
       m_commands["store"] = [&](ParseResult tokens) {store();};
+      m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
+      m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -103,16 +105,11 @@ class Heda {
       m_commands["rapporte"] = [&](ParseResult tokens) {
       };
 
-      m_commands["balaye"] = [&](ParseResult tokens) {
-        sweep();
-      };
-
       m_commands["goto"] = [&](ParseResult tokens) {
         double x = tokens.popScalaire();
         double y = tokens.popScalaire();
         double t = tokens.popScalaire();
         PolarCoord dest; dest << x, y, t;
-        cout << "In goto\n";
         moveTo(dest);
       };
       
@@ -191,11 +188,8 @@ class Heda {
 
     void moveTo(PolarCoord destination) {
 
-      cout << "WTF!\n";
       vector<Movement> mvts;
-      cout << "Before!\n";
-      calculateGoto(mvts, m_position, destination);
-      cout << "Here!\n";
+      calculateGoto(mvts, m_position, destination, doNothing);
       move(mvts);
     }
 
@@ -216,7 +210,7 @@ class Heda {
     void store() {
       
       vector<Movement> mvts;
-      m_packer.calculateStoreMovements();
+      //m_packer.calculateStoreMovements();
       move(mvts);
     }
 
@@ -294,6 +288,10 @@ class Heda {
     DetectedHRCodeTable codes;
     Database& db;
 
+    bool isDoneWorking() {
+      return m_current_command.isDone() && m_stack.empty();
+    }
+
   protected:
 
     void loopCommandStack() {
@@ -345,7 +343,7 @@ class Heda {
       return 10;
     }
 
-    NaiveJarPacker m_packer;
+    //NaiveJarPacker m_packer;
 
     std::mutex commandsMutex;
 

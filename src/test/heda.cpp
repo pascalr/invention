@@ -6,11 +6,37 @@
 
 using namespace std;
 
+void executeAllPending(Heda& heda, FakeReader& reader) {
+  while(!heda.isDoneWorking()) {
+    reader.setFakeInput(MESSAGE_DONE);
+    this_thread::sleep_for(chrono::milliseconds(10));
+  }
+  reader.setFakeInput("");
+}
+
 string popResult(Heda& heda, StreamWriter& ss, FakeReader& reader) {
   this_thread::sleep_for(chrono::milliseconds(200));
   string result = ss.str();
   reader.setFakeInput(MESSAGE_DONE);
   return result;
+}
+
+void doReference(Heda& heda, FakeReader& reader) {
+  heda.reference();
+  executeAllPending(heda, reader);
+}
+
+void testSweep() {
+  title("testSweep");
+
+  StreamWriter ss;
+  FakeReader reader;
+  Database db("client/db/development.sqlite3");
+  Heda heda(ss, reader, db);
+  doReference(heda, reader);
+
+  heda.execute("sweep");
+  //cout << "Sweep pending commands :" << endl << heda.getPendingCommands() << endl;
 }
 
 void testPosition() {
@@ -21,15 +47,12 @@ void testPosition() {
   Database db("data/test.db");
   Heda heda(ss, reader, db);
 
-  heda.reference();
-  reader.setFakeInput(MESSAGE_DONE);
-  this_thread::sleep_for(chrono::milliseconds(100));
+  doReference(heda, reader);
   PolarCoord pos; pos << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
   assertEqual("home position", pos, heda.getPosition());
 
   heda.move(Movement('x', 100.0));
-  reader.setFakeInput(MESSAGE_DONE);
-  this_thread::sleep_for(chrono::milliseconds(100));
+  executeAllPending(heda, reader);
   pos << 100, HOME_POSITION_Y, HOME_POSITION_Z;
   assertEqual("x 100", pos, heda.getPosition());
 
@@ -111,6 +134,7 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
+  testSweep();
   testPosition();
   testHomeCommand();
   //testSharedReader();
