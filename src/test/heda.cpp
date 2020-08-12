@@ -53,11 +53,15 @@ void testHomeCommand() {
   assertEqual("current command", "", heda.getCurrentCommand());
 
   heda.stop(); ss.str();
-  heda.execute("goto 200 700 90");
+  heda.execute("goto 200 700 90\ngoto 200 700 88");
   assertEqual("goto 200 700 90", "mt-6", popResult(heda, ss, reader));
   assertEqual("goto 200 700 90", "my700", popResult(heda, ss, reader));
   assertEqual("goto 200 700 90", "mt90", popResult(heda, ss, reader));
   assertEqual("goto 200 700 90", "mx200", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 88", "mt-6", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 88", "my700", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 88", "mt88", popResult(heda, ss, reader));
+  assertEqual("goto 200 700 88", "mx200", popResult(heda, ss, reader));
 }
 
 /*void testSharedReader() {

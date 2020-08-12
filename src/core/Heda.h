@@ -111,6 +111,7 @@ class Heda {
         double y = tokens.popScalaire();
         double t = tokens.popScalaire();
         PolarCoord dest; dest << x, y, t;
+        cout << "In goto\n";
         moveTo(dest);
       };
       
@@ -154,7 +155,7 @@ class Heda {
         // If the command does not exist, it throws an out of range exception.
       }
 
-      if (pos != string::npos) {execute(str.substr(pos));}
+      if (pos != string::npos) {execute(str.substr(pos+1));}
     }
 
     void captureFrame(Mat& frame) {
@@ -189,8 +190,11 @@ class Heda {
 
     void moveTo(PolarCoord destination) {
 
+      cout << "WTF!\n";
       vector<Movement> mvts;
+      cout << "Before!\n";
       calculateGoto(mvts, m_position, destination);
+      cout << "Here!\n";
       move(mvts);
     }
 

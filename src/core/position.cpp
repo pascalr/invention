@@ -81,18 +81,12 @@ void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double cu
   }
 }
 
-void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
-  
-  unsigned int size = movements.size();
-  calculateGoto(movements, position, destination);
-  if (movements.size() != size) {
-    movements.end()->callback = callback;
-  }
-}
-
+void doNothing() {}  
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
-void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination) {
+//void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback = doNothing) {
+void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
 
+  unsigned int size = movements.size();
   // TODO: Collision detection
 
   int currentLevel = calculateLevel(position);
@@ -121,6 +115,9 @@ void calculateGoto(vector<Movement> &movements, const PolarCoord position, const
     addMovementIfDifferent(movements, Movement('x', destination(0)), position(0)); 
   }
 
+  if (callback && movements.size() != size) {
+    movements.end()->callback = callback;
+  }
 }
 
 void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {

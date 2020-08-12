@@ -59,11 +59,6 @@ PolarCoord toolCartesianToPolar(const CartesianCoord c);
 
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
 
-/*void calculateGoto(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
-  PolarCoord p = toolCartesianToPolar(destination);
-  calculateGoto(movements, position, p);
-}*/
-
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);
 
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
