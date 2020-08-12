@@ -36,6 +36,7 @@ void testSweep() {
   doReference(heda, reader);
 
   heda.execute("sweep");
+  //executeAllPending(heda, reader);
   //cout << "Sweep pending commands :" << endl << heda.getPendingCommands() << endl;
 }
 

@@ -23,6 +23,8 @@
 #include "core/reader/shared_reader.h"
 #include "core/reader/io_reader.h"
 #include "core/writer/console_writer.h"
+#include "core/fake_program.h"
+#include "core/two_way_stream.h"
 
 using namespace std;
 using namespace boost::property_tree; // json
@@ -77,8 +79,9 @@ int main(int argc, char** argv) {
   server.config.port = serverPort ? serverPort : 8083;
 
 #ifdef SIMULATION
-  ConsoleWriter serialWriter;
-  IOReader serialReader;
+  TwoWayStream serialWriter;
+  TwoWayStream serialReader;
+  FakeProgram fake(serialWriter, serialReader); // reader, writer
 #else
   SerialPort serialPort;
   if (serialPort.openPort("/dev/ttyACM0") < 0) {

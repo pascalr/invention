@@ -14,7 +14,7 @@ class HedaController < ApplicationController
 
     puts "before"
 
-    url = URI('http://192.168.0.19:8083/poll')
+    url = URI(heda_uri('poll'))
     response = Net::HTTP.get(url)
     vals = JSON.parse(response)
     @output = vals["output"]
@@ -42,8 +42,13 @@ class HedaController < ApplicationController
 
   private
 
+  def heda_uri(command)
+    'http://127.0.0.1:8083/' + command
+    #'http://192.168.0.19:8083/run'
+  end
+
   def execute(cmd)
-    uri = URI('http://192.168.0.19:8083/run')
+    uri = URI(heda_uri('run'))
     req = Net::HTTP::Post.new(uri)
     req.set_form_data('cmd' => cmd)
     

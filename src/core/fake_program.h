@@ -2,12 +2,12 @@
 #define FAKE_PROGRAM_H
 
 #include "program.h"
-#include "writer/console_writer.h"
-#include "reader/fake_reader.h"
+#include "reader/reader.h"
+#include "writer/writer.h"
 
 class FakeProgram : public Program {
   public:
-    FakeProgram() : Program(m_writer, m_reader) {
+    FakeProgram(Reader& reader, Writer& writer) : Program(writer, reader), m_reader(reader), m_writer(writer) {
     }
 
     Writer& getWriter() {
@@ -18,13 +18,13 @@ class FakeProgram : public Program {
       return m_reader;
     } 
 
-    void setFakeInput(const char* str) {
+    /*void setFakeInput(const char* str) {
       m_reader.setFakeInput(str);
     }
     
     void setFakeInput(std::string& str) {
       m_reader.setFakeInput(str);
-    }
+    }*/
 
     void sleepMs(int time);
 
@@ -32,9 +32,9 @@ class FakeProgram : public Program {
       currentTime = time;
     }
 
-    void execute(const char* dest);
+    //void execute(const char* dest);
 
-    void move(char axis, double destination);
+    //void move(char axis, double destination);
 
     unsigned long currentTime = 0;
 
@@ -44,8 +44,8 @@ class FakeProgram : public Program {
 
   protected:
 
-    FakeReader m_reader;
-    ConsoleWriter m_writer;
+    Reader& m_reader;
+    Writer& m_writer;
 };
 
 

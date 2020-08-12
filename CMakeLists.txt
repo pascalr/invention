@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 2.8)
 project( DisplayImage )
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -DBOOST_LOG_DYN_LINK -DDEBUG -DWITHOUT_NUMPY -Wno-psabi -Wall -g")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -DBOOST_LOG_DYN_LINK -DDEBUG -DWITHOUT_NUMPY -Wno-psabi -Wall")
 
 find_package(PythonLibs 2.7)
 set(Python2_INCLUDE_DIRS "/usr/include/python2.7" )
