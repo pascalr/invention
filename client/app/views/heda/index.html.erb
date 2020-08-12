@@ -3,6 +3,9 @@
 <%= link_to "🏠", heda_run_path(cmd: "home"), method: "post", remote: true %>
 <%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
 
+<%= label_tag(:recette)  %>
+<%= text_field_tag :recette, if @recette then @recette.name end %>
+
 <%= form_with(url: heda_run_path, method: "post", id: 'inputcommandform') do %>
   <%= label_tag(:cmd, "Commande:") %>
   <%= text_field_tag(:cmd, nil, id: 'inputcommand') %>

@@ -7,7 +7,7 @@
     <tr>
       <th>Name</th>
       <th>Rating</th>
-      <th colspan="2"></th>
+      <th colspan="3"></th>
     </tr>
   </thead>
 
@@ -16,8 +16,9 @@
       <tr>
         <td><%= link_to recette.name, recette %></td>
         <td><%= recette.rating %></td>
-        <td><%= link_to 'Edit', edit_recette_path(recette) %></td>
-        <td><%= link_to 'Destroy', recette, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Cuisiner', heda_run_recette_path(recette_id: recette.id), method: :post %></td>
+        <td><%= link_to 'Éditer', edit_recette_path(recette) %></td>
+        <td><%= link_to 'Supprimer', recette, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

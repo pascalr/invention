@@ -3,7 +3,11 @@ require 'open-uri'
 
 
 class HedaController < ApplicationController
+
   def index
+    if params[:recette_id]
+      @recette = Recette.find(params[:recette_id])
+    end
   end
 
   def status
@@ -18,11 +22,25 @@ class HedaController < ApplicationController
     render partial: "status"
   end
 
-  def run
+  def run_recette
+    recette = Recette.find(params[:recette_id])
+    execute(recette.instructions)
 
+    redirect_to action: 'index', recette_id: params[:recette_id]
+  end
+
+  def run
+    execute(params[:cmd])
+    
+    redirect_to action: 'index'
+  end
+
+  private
+
+  def execute(cmd)
     uri = URI('http://192.168.0.19:8083/run')
     req = Net::HTTP::Post.new(uri)
-    req.set_form_data('cmd' => params[:cmd])
+    req.set_form_data('cmd' => cmd)
     
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
@@ -35,16 +53,6 @@ class HedaController < ApplicationController
       # error
       # res.value
     end
-    
-    render 'index'
-
-    #url = URI.parse('http://127.0.0.1:8083/')
-    #req = Net::HTTP::Post.new(url.path)
-    #req.cmd = params[:cmd]
-    #req.basic_auth url.user, url.password if url.user
-    #con = Net::HTTP.new(url.host, url.port)
-    #con.use_ssl = true
-    #con.start {|http| http.request(req)}    
-    #redirect_to(:back)
   end
+
 end

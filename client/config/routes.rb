@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get 'heda/index'
   get 'heda/status'
   post 'heda/run'
+  post 'heda/run_recette'
   get 'configure/index'
   resources :jar_formats
   resources :shelves
