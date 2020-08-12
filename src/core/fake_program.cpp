@@ -8,7 +8,7 @@
 
 using namespace std;
 
-/*void FakeProgram::execute(const char* dest) {
+void FakeProgram::execute(const char* dest) {
 
   string str = dest;
   str += '\n';
@@ -21,15 +21,15 @@ using namespace std;
     myLoop(*this);
   }
 
-}*/
+}
 
 void FakeProgram::sleepMs(int time) {
   this_thread::sleep_for(chrono::milliseconds(time));
 }
 
-/*void FakeProgram::move(char axis, double destination) {
+void FakeProgram::move(char axis, double destination) {
   string str0 = "M";
   str0 += axis;
   str0 += to_string(destination);
   execute(str0.c_str());
-}*/
+}

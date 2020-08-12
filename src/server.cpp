@@ -23,7 +23,7 @@
 #include "core/reader/shared_reader.h"
 #include "core/reader/io_reader.h"
 #include "core/writer/console_writer.h"
-#include "core/fake_program.h"
+#include "core/simulation.h"
 #include "core/two_way_stream.h"
 
 using namespace std;
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 #ifdef SIMULATION
   TwoWayStream serialWriter;
   TwoWayStream serialReader;
-  FakeProgram fake(serialWriter, serialReader); // reader, writer
+  Simulation simu(serialWriter, serialReader); // reader, writer
 #else
   SerialPort serialPort;
   if (serialPort.openPort("/dev/ttyACM0") < 0) {
