@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :jars
   resources :recettes
   get 'aliment/index'
   get 'heda/index'

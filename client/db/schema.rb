@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_11_134959) do
+ActiveRecord::Schema.define(version: 2020_08_12_140316) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -49,6 +49,25 @@ ActiveRecord::Schema.define(version: 2020_08_11_134959) do
     t.float "lid_weight"
   end
 
+  create_table "jars", force: :cascade do |t|
+    t.integer "jar_format_id", null: false
+    t.integer "ingredient_id", null: false
+    t.integer "position_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["ingredient_id"], name: "index_jars_on_ingredient_id"
+    t.index ["jar_format_id"], name: "index_jars_on_jar_format_id"
+    t.index ["position_id"], name: "index_jars_on_position_id"
+  end
+
+  create_table "positions", force: :cascade do |t|
+    t.float "x"
+    t.float "y"
+    t.float "t"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "recettes", force: :cascade do |t|
     t.string "name"
     t.text "instructions"
@@ -68,4 +87,7 @@ ActiveRecord::Schema.define(version: 2020_08_11_134959) do
   end
 
   add_foreign_key "ingredients", "aliments"
+  add_foreign_key "jars", "ingredients"
+  add_foreign_key "jars", "jar_formats"
+  add_foreign_key "jars", "positions"
 end
