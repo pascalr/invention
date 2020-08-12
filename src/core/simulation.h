@@ -5,6 +5,8 @@
 #include "reader/reader.h"
 #include "writer/writer.h"
 #include "input_parser.h"
+#include <thread>
+#include <chrono>
 
 class Simulation : public Program {
   public:

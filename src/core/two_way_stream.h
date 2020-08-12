@@ -3,6 +3,7 @@
 
 #include "writer/std_writer.h"
 #include "reader/reader.h"
+#include <sstream>
 
 using namespace std;
 

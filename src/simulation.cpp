@@ -7,12 +7,12 @@
 #include "utils/utils.h"
 #include "lib/lib.h"
 #include "core/axis.h"
-#include "core/console_writer.h"
-//#include "core/serial_program.h"
-#include "core/io_program.h"
+#include "core/two_way_stream.h"
+#include "core/reader/io_reader.h"
 #include "core/input_parser.h"
-#include "config/setup.h"
+#include "core/simulation.h"
 #include "lib/draw_matplotlib.h"
+#include "core/Heda.h"
       
 using namespace std;
 
@@ -21,16 +21,16 @@ void drawToolPosition(double x, double z) {
   drawPoint(x, z);
 }
 
-void drawArmCenterAxis(Program& p) {
+/*void drawArmCenterAxis(Program& p) {
   vector<double> x(2);
   vector<double> z(2);
 
-  x[0] = p.axisX.getPosition();
+  x[0] = p.baseAxisX.getPosition();
   x[1] = p.baseAxisX.getPosition();
   z[0] = p.axisZ.getPosition();
   z[1] = 0.0;
   drawLines(x,z);
-}
+}*/
 
 void drawPossibleXPosition(double maxX) {
   vector<double> x(2);
@@ -46,9 +46,9 @@ void draw(Program& p) {
  
   beforeRenderScene(); 
   
-  drawPossibleXPosition(p.axisX.getMaxPosition());
-  drawArmCenterAxis(p);
-  drawToolPosition(p.axisX.getPosition(),p.axisZ.getPosition());
+  drawPossibleXPosition(p.baseAxisX.getMaxPosition());
+  //drawArmCenterAxis(p);
+  //drawToolPosition(p.baseAxisX.getPosition(),p.axisZ.getPosition());
 
   renderScene(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X, -OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z, "Position du bras");
 }
@@ -57,30 +57,35 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  cout << "Setup...\n";
+  Database db("data/test.db");
 
-  IOProgram p;
-  setupAxes(p);
+  TwoWayStream hedaInput;
+  TwoWayStream hedaOutput;
 
-  cout << MESSAGE_READY;
+  Simulation simulation(hedaOutput, hedaInput); // reader, writer
+  Heda heda(hedaOutput, hedaInput, db); 
+  IOReader userInput;
 
   cerr << ">> ";
-  draw(p);
+  draw(simulation);
 
   while (true) {
-    bool wasWorking = p.isWorking;
+    bool wasWorking = simulation.isWorking;
 
-    p.setCurrentTime((p.isWorking) ? p.getCurrentTime() + 5 : 0);
-
-    myLoop(p);
-    
-    if (p.isWorking && p.getCurrentTime() % 200000 == 0) {
-      draw(p);
+    if (userInput.inputAvailable()) {
+      string cmd = getInputLine(userInput);
+      heda.execute(cmd);
     }
-    if (wasWorking && !p.isWorking) {
+
+    if (simulation.isWorking && simulation.getCurrentTime() % 200000 == 0) {
+      draw(simulation);
+    }
+    if (wasWorking && !simulation.isWorking) {
       cerr << ">> ";
-      draw(p);
+      draw(simulation);
     }
+    
+    this_thread::sleep_for(chrono::milliseconds(10));
   }
 
   return 0;

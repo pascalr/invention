@@ -23,7 +23,6 @@
 #include "core/reader/shared_reader.h"
 #include "core/reader/io_reader.h"
 #include "core/writer/console_writer.h"
-#include "core/simulation.h"
 #include "core/two_way_stream.h"
 
 using namespace std;
@@ -78,11 +77,6 @@ int main(int argc, char** argv) {
   server.config.address = serverAddress;
   server.config.port = serverPort ? serverPort : 8083;
 
-#ifdef SIMULATION
-  TwoWayStream serialWriter;
-  TwoWayStream serialReader;
-  Simulation simu(serialWriter, serialReader); // reader, writer
-#else
   SerialPort serialPort;
   if (serialPort.openPort("/dev/ttyACM0") < 0) {
     throw InitSerialPortException();
@@ -90,8 +84,6 @@ int main(int argc, char** argv) {
   
   SerialReader serialReader(serialPort);
   SerialWriter serialWriter(serialPort);
-#endif
-
   
   SharedReader sharedReader(serialReader);
   SharedReaderClient hedaReader(sharedReader, READER_CLIENT_ID_HEDA);
