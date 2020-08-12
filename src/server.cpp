@@ -22,6 +22,7 @@
 #include "core/reader/serial_reader.h"
 #include "core/reader/shared_reader.h"
 #include "core/reader/io_reader.h"
+#include "core/writer/console_writer.h"
 
 using namespace std;
 using namespace boost::property_tree; // json

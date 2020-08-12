@@ -2,6 +2,7 @@
 #define _IO_READER_H
 
 #include "reader.h"
+#include "../../utils/io_common.h"
 
 class IOReader : public Reader {
   public:

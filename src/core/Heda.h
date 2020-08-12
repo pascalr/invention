@@ -4,7 +4,8 @@
 #include "position.h"
 #include "../lib/serial.h"
 #include "../lib/opencv.h"
-#include "sweep.h"
+#include "reader/reader.h"
+#include "writer/writer.h"
 
 #include "command_stack.h"
 
