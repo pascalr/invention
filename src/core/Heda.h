@@ -137,8 +137,11 @@ class Heda {
       });
     }
 
+    void execute(string str) {
 
-    void execute(string cmd) {
+      string::size_type pos = str.find('\n');
+      string cmd = (pos == string::npos) ? str : str.substr(0, pos);
+
       cerr << "Executing cmd = " << cmd << "\n";
 
       string cmdName;
@@ -150,6 +153,8 @@ class Heda {
       } catch (const out_of_range &e) {
         // If the command does not exist, it throws an out of range exception.
       }
+
+      if (pos != string::npos) {execute(str.substr(pos));}
     }
 
     void captureFrame(Mat& frame) {
