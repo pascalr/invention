@@ -48,7 +48,7 @@ void detect(Heda& heda, Mat& frame, PolarCoord c) {
 }
 
 void sweepCallback(Heda& heda) {
-  cout << "HEERRREEEE!!!!!\n";
+  cout << "sweepCallback(Heda& heda)\n";
   BOOST_LOG_TRIVIAL(debug) << "Capturing frame.";
   Mat frame;
   heda.captureFrame(frame);
@@ -58,6 +58,8 @@ void sweepCallback(Heda& heda) {
 }
 
 void calculateSweepMovements(Heda& heda, vector<Movement>& movements) {
+  
+  cout << "calculateSweepMovements\n";
 
   double heights[] = {0.0};
   double zStep = MAX_Z / 4;

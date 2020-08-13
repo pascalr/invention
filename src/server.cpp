@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
   SharedReaderClient hedaReader(sharedReader, READER_CLIENT_ID_HEDA);
   SharedReaderClient serverReader(sharedReader, READER_CLIENT_ID_SERVER);
 
-  Database db("data/test.db");
+  Database db(DB_PROD);
   Heda heda(serialWriter, hedaReader, db); 
 
   // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
@@ -101,7 +101,11 @@ int main(int argc, char** argv) {
 
     for(auto &field : vals) {
       if (field.first == "cmd") {
-        heda.execute(field.second);
+        try {
+          heda.execute(field.second);
+        } catch (const exception& e) {
+          cout << "Caught an exception: " << e.what() << endl;
+        }
       }
     }
     response->write("ok");

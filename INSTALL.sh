@@ -65,9 +65,12 @@ sudo apt install libsqlite3-dev sqlite3
 
 pkg-config --cflags --libs ruby-2.5
 
-sudo gem install rails
+sudo apt install ruby ruby-dev zlib1g-dev liblzma-dev
 
 install yarn for rails
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt update && sudo apt install yarn
+
+
+sudo gem install rails

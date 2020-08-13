@@ -31,7 +31,7 @@ void testSweep() {
 
   StreamWriter ss;
   FakeReader reader;
-  Database db("client/db/development.sqlite3");
+  Database db(DB_TEST);
   Heda heda(ss, reader, db);
   doReference(heda, reader);
 

@@ -101,6 +101,10 @@
 #define ERROR_OUT_OF_BOUNDS_MAX_X -6
 #define ERROR_AXIS_NOT_REFERENCED -7
 
+#define DB_TEST "client/db/development.sqlite3"
+#define DB_DEV "client/db/development.sqlite3"
+#define DB_PROD "client/db/development.sqlite3"
+
 // Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12
 
