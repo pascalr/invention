@@ -58,7 +58,7 @@ int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  Database db("data/test.db");
+  Database db(DB_TEST);
 
   TwoWayStream hedaInput;
   TwoWayStream hedaOutput;

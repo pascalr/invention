@@ -1,1 +1,1 @@
-#define CLAW_RADIUS 340.0
+#define CLAW_RADIUS 338.0

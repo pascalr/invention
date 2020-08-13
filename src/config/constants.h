@@ -32,7 +32,7 @@
 #define TOOL_Z_MIDDLE ((TOOL_Z_MAX + TOOL_Z_MIN)/2)
 
 #define BASE_X_MIN 0.0 // mm
-#define BASE_X_MAX 640.0 // mm
+#define BASE_X_MAX 680.0 // mm
 #define BASE_X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
 
 #define CHANGE_LEVEL_ANGLE_LOW -6
