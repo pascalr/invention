@@ -107,6 +107,10 @@ add_executable( server src/server.cpp )
 target_link_libraries( server ${MyLibs}  )
 target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
 
+add_executable( jar_parser src/jar_parser.cpp )
+target_include_directories(jar_parser PRIVATE ${MyDirs})
+target_link_libraries( jar_parser ${MyLibs}  )
+
 #add_executable( simulation src/server.cpp )
 #target_link_libraries( simulation ${MyLibs}  )
 #target_include_directories( simulation PRIVATE "/usr/local/include/simple-web-server/" )

@@ -14,7 +14,8 @@ int main(int argc, char** argv)
   DetectedHRCodeTable codes;
   db.load(codes);
 
-  for (const DetectedHRCode& code : codes.items) {
+  for (size_t i = 0; i < codes.items.size(); i++) {
+    DetectedHRCode& code = codes.items[i];
     parseJarCode(code);
     db.saveItem(codes, code);
   }

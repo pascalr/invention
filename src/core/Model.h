@@ -38,7 +38,6 @@ class Model {
     time_t updated_at;
 };
 
-
 class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}
@@ -49,6 +48,10 @@ class DetectedHRCode : public Model {
     double centerY;
     double scale;
     string imgFilename;
+    string jar_id;
+    string weight;
+    string content_name;
+    string content_id;
 };
 //ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
 //  return os << c.code << " at " << c.coord;
@@ -62,7 +65,8 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     string getValues(const DetectedHRCode& item) {
       stringstream ss; ss << item.coord(0) << ", " << item.coord(1) << ", " << item.coord(2) << ", ";
       ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", '" << item.imgFilename << "', ";
-      ss << item.created_at << ", " << item.updated_at;
+      ss << item.created_at << ", " << item.updated_at << ", '" << item.jar_id << "', '" << item.weight << "', '";
+      ss << item.content_name << "', '" << item.content_id << "'";
       return ss.str();
     }
     
@@ -73,6 +77,25 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
       query.bind(1, blob, buf.size());
       */
     }
+
+    /*
+    0|id|integer|1||1
+    1|x|float|0|NULL|0
+    2|y|float|0|NULL|0
+    3|t|float|0|NULL|0
+    4|centerX|float|0|NULL|0
+    5|centerY|float|0|NULL|0
+    6|scale|float|0|NULL|0
+    7|img|varchar|0||0
+    8|created_at|datetime|0||0
+    9|updated_at|datetime|0||0
+    10|jar_id|varchar|0||0
+    11|weight|varchar|0||0
+    12|content_name|varchar|0||0
+    13|content_id|varchar|0||0
+    */
+
+    // Maybe one day generate this all automatically from ruby?
     
     DetectedHRCode parseItem(SQLite::Statement& query) {
       DetectedHRCode code;
@@ -80,7 +103,14 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
       code.coord << query.getColumn(1), query.getColumn(2), query.getColumn(3);
       code.centerX = query.getColumn(4);
       code.centerY = query.getColumn(5);
-      code.imgFilename = (const char*)query.getColumn(6);
+      code.scale = query.getColumn(6);
+      code.imgFilename = (const char*)query.getColumn(7);
+      code.created_at = query.getColumn(8);
+      code.updated_at = query.getColumn(9);
+      code.jar_id = (const char*)query.getColumn(10);
+      code.weight = (const char*)query.getColumn(11);
+      code.content_name = (const char*)query.getColumn(12);
+      code.content_id = (const char*)query.getColumn(13);
       return code;
     }
 

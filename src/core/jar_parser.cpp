@@ -1,6 +1,7 @@
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 
+#include "../lib/opencv.h"
 #include "Model.h"
 #include "../lib/hr_code.h"
 #include <string>
@@ -153,8 +154,9 @@ string parseLineTesseract(Mat& im) {
   return outText;
 }
 
-void parseJarCode(DetectedHRCode& p) {
-  Mat gray = imread(p.imgFilename, IMREAD_GRAYSCALE);
+void parseJarCode(DetectedHRCode& code) {
+  cout << "Loading image: " << code.imgFilename << endl;
+  Mat gray = imread(code.imgFilename, IMREAD_GRAYSCALE);
   BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
   double scale = gray.cols/110.0;
   BOOST_LOG_TRIVIAL(debug) << "scale: " << scale;
@@ -185,12 +187,8 @@ void parseJarCode(DetectedHRCode& p) {
     rawHRCode[i] = parseLineTesseract(lineMat);
   }
 
-  /*HRCode code;
-  code.setJarId(rawHRCode[0]);
-  code.setWeight(rawHRCode[1]);
-  code.setName(rawHRCode[2]);
-  code.setContentId(rawHRCode[3]);
-  if (code.isValid()) {
-    BOOST_LOG_TRIVIAL(info) << "Detected code: " << code;
-  }*/
+  code.jar_id = rawHRCode[0];
+  code.weight = rawHRCode[1];
+  code.content_name = rawHRCode[2];
+  code.content_id = rawHRCode[3];
 }
