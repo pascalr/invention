@@ -28,7 +28,14 @@ class Table {
 
 class Model {
   public:
-    long rowid = -1;
+    Model() {
+      time_t time; localtime(&time);
+      created_at = time;
+      updated_at = time;
+    }
+    long id = -1;
+    time_t created_at;
+    time_t updated_at;
 };
 
 
@@ -54,7 +61,8 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     
     string getValues(const DetectedHRCode& item) {
       stringstream ss; ss << item.coord(0) << ", " << item.coord(1) << ", " << item.coord(2) << ", ";
-      ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", '" << item.imgFilename << "'";
+      ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", '" << item.imgFilename << "', ";
+      ss << item.created_at << ", " << item.updated_at;
       return ss.str();
     }
     
@@ -68,12 +76,11 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     
     DetectedHRCode parseItem(SQLite::Statement& query) {
       DetectedHRCode code;
-      /*code.x = query.getColumn(1);
-      code.y = query.getColumn(2);
-      code.t = query.getColumn(3);
+      code.id = query.getColumn(0);
+      code.coord << query.getColumn(1), query.getColumn(2), query.getColumn(3);
       code.centerX = query.getColumn(4);
       code.centerY = query.getColumn(5);
-      code.img = query.getColumn(6);*/
+      code.imgFilename = (const char*)query.getColumn(6);
       return code;
     }
 
@@ -167,7 +174,6 @@ class Ingredient {
 
     string name;
     int aliment_id = 0;
-    long rowid = 0;
 };
 
 /*
@@ -203,7 +209,6 @@ class Recette {
 
     string name;
     string instructions;
-    long rowid = 0;
 };
 
 #endif

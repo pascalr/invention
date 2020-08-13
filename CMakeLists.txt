@@ -50,6 +50,7 @@ ADD_LIBRARY(MyLibsModule
   src/core/fake_program.cpp
   src/core/writer/writer.cpp
   src/core/reader/reader.cpp
+  src/core/jar_parser.cpp
   src/core/axis.cpp
   src/core/Heda.cpp
   src/core/sweep.cpp

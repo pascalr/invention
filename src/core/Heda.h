@@ -10,6 +10,8 @@
 #include "command_stack.h"
 
 #include "parser.h"
+
+#include "jar_parser.h"
 //#include "jar_packer.h"
 
 #include "Database.h"
