@@ -6,7 +6,7 @@ CMakeCache.txt
 Makefile
 cmake_install.cmake
 CTestTestfile.cmake
-bin
+/bin
 output
 Testing
 node_modules
