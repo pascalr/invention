@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Detected Codes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>X</th>
+      <th>Y</th>
+      <th>T</th>
+      <th>Centerx</th>
+      <th>Centery</th>
+      <th>Scale</th>
+      <th>Img</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @detected_codes.each do |detected_code| %>
+      <tr>
+        <td><%= detected_code.x %></td>
+        <td><%= detected_code.y %></td>
+        <td><%= detected_code.t %></td>
+        <td><%= detected_code.centerX %></td>
+        <td><%= detected_code.centerY %></td>
+        <td><%= detected_code.scale %></td>
+        <td><%= detected_code.img %></td>
+        <td><%= link_to 'Show', detected_code %></td>
+        <td><%= link_to 'Edit', edit_detected_code_path(detected_code) %></td>
+        <td><%= link_to 'Destroy', detected_code, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Detected Code', new_detected_code_path %>

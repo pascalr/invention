@@ -28,7 +28,7 @@ using namespace cv;
 
 class HRCode {
   public:
-    HRCode(Mat mat, double x1, double y1, double s1) : img(mat), x(x1), y(y1), scale(s1) {
+    HRCode(Mat mat, std::string imgFilename, double x1, double y1, double s1) : img(mat), imgFilename(imgFilename), x(x1), y(y1), scale(s1) {
     }
     HRCode(const HRCode& code) : img(code.img.clone()), x(code.x), y(code.y), scale(code.scale) {
     }
@@ -36,6 +36,7 @@ class HRCode {
     friend ostream &operator<<(std::ostream &os, const HRCode &c);
 
     Mat img;
+    string imgFilename;
     double x;
     double y;
     double scale;

@@ -17,6 +17,7 @@
 
 #include "../lib/lib.h"
 #include "../lib/opencv.h"
+#include "../utils/io_common.h"
 
 #include "../config/constants.h"
 
@@ -149,7 +150,9 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     double pixelsPerMm = radius[i]*2 / HR_CODE_WIDTH;
-    HRCode codePos(rotatedHRCode, centers[i].x, centers[i].y, pixelsPerMm); 
+    string imgFilename = nextFilename("client/storage/detected_codes/detected", ".jpg");
+    imwrite(imgFilename, rotatedHRCode);
+    HRCode codePos(rotatedHRCode, imgFilename, centers[i].x, centers[i].y, pixelsPerMm); 
     detectedCodes.push_back(codePos);
   }
   //imshow( "Contours", drawing );

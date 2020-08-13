@@ -35,13 +35,13 @@ class Model {
 class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}
-    DetectedHRCode(const HRCode& code, PolarCoord coord) : coord(coord), centerX(code.x), centerY(code.y), scale(code.scale), img(code.img) {
+    DetectedHRCode(const HRCode& code, PolarCoord coord) : coord(coord), centerX(code.x), centerY(code.y), scale(code.scale), imgFilename(code.imgFilename) {
     }
     PolarCoord coord;
     double centerX;
     double centerY;
     double scale;
-    Mat img;
+    string imgFilename;
 };
 //ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
 //  return os << c.code << " at " << c.coord;
@@ -54,15 +54,16 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     
     string getValues(const DetectedHRCode& item) {
       stringstream ss; ss << item.coord(0) << ", " << item.coord(1) << ", " << item.coord(2) << ", ";
-      ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", " << "?";
+      ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", '" << item.imgFilename << "'";
       return ss.str();
     }
     
     virtual void bindBlob(SQLite::Statement& query, const DetectedHRCode& item) {
-      std::vector<uchar> buf;
+      /*std::vector<uchar> buf;
       imencode(".jpeg", item.img, buf);
       char* blob = reinterpret_cast<char*>(buf.data());
       query.bind(1, blob, buf.size());
+      */
     }
     
     DetectedHRCode parseItem(SQLite::Statement& query) {

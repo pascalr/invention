@@ -16,6 +16,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+  // Use utils/io_common nextFilename
   string outfile_name;
   if ( argc == 2 ) {
     outfile_name = "output/";

@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>X:</strong>
+  <%= @detected_code.x %>
+</p>
+
+<p>
+  <strong>Y:</strong>
+  <%= @detected_code.y %>
+</p>
+
+<p>
+  <strong>T:</strong>
+  <%= @detected_code.t %>
+</p>
+
+<p>
+  <strong>Centerx:</strong>
+  <%= @detected_code.centerX %>
+</p>
+
+<p>
+  <strong>Centery:</strong>
+  <%= @detected_code.centerY %>
+</p>
+
+<p>
+  <strong>Scale:</strong>
+  <%= @detected_code.scale %>
+</p>
+
+<p>
+  <strong>Img:</strong>
+  <%= @detected_code.img %>
+</p>
+
+<%= link_to 'Edit', edit_detected_code_path(@detected_code) %> |
+<%= link_to 'Back', detected_codes_path %>

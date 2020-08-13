@@ -1,0 +1,52 @@
+<%= form_with(model: detected_code, local: true) do |form| %>
+  <% if detected_code.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(detected_code.errors.count, "error") %> prohibited this detected_code from being saved:</h2>
+
+      <ul>
+        <% detected_code.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :x %>
+    <%= form.text_field :x %>
+  </div>
+
+  <div class="field">
+    <%= form.label :y %>
+    <%= form.text_field :y %>
+  </div>
+
+  <div class="field">
+    <%= form.label :t %>
+    <%= form.text_field :t %>
+  </div>
+
+  <div class="field">
+    <%= form.label :centerX %>
+    <%= form.text_field :centerX %>
+  </div>
+
+  <div class="field">
+    <%= form.label :centerY %>
+    <%= form.text_field :centerY %>
+  </div>
+
+  <div class="field">
+    <%= form.label :scale %>
+    <%= form.text_field :scale %>
+  </div>
+
+  <div class="field">
+    <%= form.label :img %>
+    <%= form.text_field :img %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

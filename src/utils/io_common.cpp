@@ -3,7 +3,10 @@
 #include <sys/select.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <string.h>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <boost/filesystem.hpp>
 
 void signalHandler( int signum ) {
   std::cout << "Interrupt signal (" << signum << ") received.\n";
@@ -36,4 +39,15 @@ bool linuxInputAvailable() {
     }
   }
   return false;
+}
+
+std::string nextFilename(std::string base, std::string ext) {
+  std::string outfile_name = base;
+  for (int i = 1; i < 1000; i++) {
+    std::stringstream ss;
+    ss << base << "_" << std::setw(3) << std::setfill('0') << i << ext;
+
+    if (!boost::filesystem::exists(ss.str())) {return ss.str();}
+  }
+  return base + "_moreThan1000" + ext;
 }

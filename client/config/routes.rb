@@ -10,5 +10,6 @@ Rails.application.routes.draw do
   resources :jar_formats
   resources :shelves
   resources :ingredients
+  resources :detected_codes
   root to: 'heda#index'
 end
