@@ -74,3 +74,4 @@ sudo apt update && sudo apt install yarn
 
 
 sudo gem install rails
+(cd client && bundle install)
