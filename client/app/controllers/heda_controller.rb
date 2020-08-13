@@ -43,8 +43,8 @@ class HedaController < ApplicationController
   private
 
   def heda_uri(command)
-    'http://127.0.0.1:8083/' + command
-    #'http://192.168.0.19:8083/run'
+    #'http://127.0.0.1:8083/' + command
+    'http://192.168.0.19:8083/' + command
   end
 
   def execute(cmd)
