@@ -105,6 +105,10 @@ int main(int argc, char** argv) {
           heda.execute(field.second);
         } catch (const exception& e) {
           cout << "Caught an exception: " << e.what() << endl;
+        } catch (...) {
+          cout << "Caught an exception which does not inherit exception class." << endl;
+          std::exception_ptr p = std::current_exception();
+          std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
         }
       }
     }

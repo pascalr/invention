@@ -1,5 +1,7 @@
 $("#inputcommandform").bind('ajax:success', function(data, status, xhr) {
-  document.getElementById('inputcommand').value = '';
+  let inputCmd = document.getElementById('inputcommand');
+  inputCmd.value = '';
+  inputCmd.focus();
 })
 
 document.addEventListener("logoutput-loaded", function(event) {
@@ -7,4 +9,5 @@ document.addEventListener("logoutput-loaded", function(event) {
   let log = document.getElementById("logoutput");
   log.value += data.textContent;
   log.scrollTop = log.scrollHeight;
+  document.getElementById('inputcommand').focus();
 });

@@ -13,6 +13,7 @@
 #include "core/simulation.h"
 #include "lib/draw_matplotlib.h"
 #include "core/Heda.h"
+#include "core/writer/echo_writer.h"
       
 using namespace std;
 
@@ -53,6 +54,8 @@ void draw(Program& p) {
   renderScene(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X, -OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z, "Position du bras");
 }
 
+void debug() {}
+
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
@@ -62,17 +65,28 @@ int main (int argc, char *argv[]) {
   TwoWayStream hedaInput;
   TwoWayStream hedaOutput;
 
-  Simulation simulation(hedaOutput, hedaInput); // reader, writer
-  Heda heda(hedaOutput, hedaInput, db); 
-  IOReader userInput;
+  EchoWriter simulationOut = EchoWriter("Simulation output", hedaInput);
+  EchoWriter hedaOut = EchoWriter("Heda output", hedaOutput);
 
+  Simulation simulation(hedaOutput, simulationOut); // reader, writer
+  Heda heda(hedaOut, hedaInput, db); 
+
+  while (true) {
+    string input;
+    cout << ">> ";
+    cin >> input;
+    heda.execute(input);
+  }
+
+  /*
+  IOReader userInput;
   cerr << ">> ";
   draw(simulation);
-
   while (true) {
     bool wasWorking = simulation.isWorking;
 
     if (userInput.inputAvailable()) {
+      debug();
       string cmd = getInputLine(userInput);
       heda.execute(cmd);
     }
@@ -86,7 +100,7 @@ int main (int argc, char *argv[]) {
     }
     
     this_thread::sleep_for(chrono::milliseconds(10));
-  }
+  }*/
 
   return 0;
 }

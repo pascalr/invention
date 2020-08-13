@@ -23,9 +23,9 @@ class Simulation : public Program {
     }
 
     void runSimulation() {
+      cout << "Running simulation...\n";
       setCurrentTime(0);
-      myLoop(*this);
-      while (isWorking) {
+      while (m_simulation_thread_run) {
         setCurrentTime(currentTime + 5);
         myLoop(*this);
       }

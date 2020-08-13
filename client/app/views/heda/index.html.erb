@@ -4,7 +4,7 @@
 <%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
 
 <%= label_tag(:recette)  %>
-<%= text_field_tag :recette, if @recette then @recette.name end %>
+<%= text_field_tag :recette, if @recette then @recette.name end, readonly: true %>
 
 <%= form_with(url: heda_run_path, method: "post", id: 'inputcommandform') do %>
   <%= label_tag(:cmd, "Commande:") %>
@@ -17,6 +17,6 @@
 <%= render_async heda_status_path, interval: 1000, event_name: "logoutput-loaded", container_id: 'async-container'  %>
 
 <%= label_tag(:output)  %>
-<%= text_area_tag :output, nil, :size =>"100x10", :id => "logoutput" %>
+<%= text_area_tag :output, nil, :size =>"100x10", :id => "logoutput", :readonly => true %>
 
 <%= javascript_pack_tag 'heda_index' %>
