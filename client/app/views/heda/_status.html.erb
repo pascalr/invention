@@ -1,8 +1,8 @@
 
 <%= label_tag(:position)  %>
-<%= text_field_tag :position, @position %><br/>
+<%= text_field_tag :position, @position, readonly: true %><br/>
 
 <%= label_tag(:pending)  %>
-<%= text_area_tag :pending, @pending || 'aucun', :size =>"100x10" %><br/>
+<%= text_area_tag :pending, @pending || 'aucun', size: "100x10", readonly: true %><br/>
 
 <span id="logoutputdata" hidden><%= @output %></span>
