@@ -45,9 +45,11 @@ class Database {
     template<class T> 
     void addItem(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
-    
+   
       stringstream ss; ss << "INSERT INTO " << table.getTableName() << " VALUES(";
-      ss << table.getValues(item) << ")";
+      ss << "NULL" << ", " << table.getValues(item) << ", ";
+      time_t time; localtime(&time);
+      ss << time << ", " << time << ")";
       SQLite::Statement insertQuery(db, ss.str());
       table.bindBlob(insertQuery, item);
       insertQuery.exec();
