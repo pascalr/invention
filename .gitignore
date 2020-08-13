@@ -45,6 +45,8 @@ client/tmp/pids/*
 # Ignore uploaded files in development.
 client/storage/*
 !client/storage/.keep
+!client/storage/detected_codes/
+!client/storage/detected_codes/*
 
 client/public/assets
 client/.byebug_history
