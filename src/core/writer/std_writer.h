@@ -15,7 +15,8 @@ class StdWriter : public Writer {
     }
 
     void doPrint(char val) {
-      doPrint(to_string(val));
+      string s = ""; s += val;
+      doPrint(s);
     }
 
     void doPrint(double val) {

@@ -54,8 +54,6 @@ void draw(Program& p) {
   renderScene(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X, -OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z, "Position du bras");
 }
 
-void debug() {}
-
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
@@ -86,7 +84,6 @@ int main (int argc, char *argv[]) {
     bool wasWorking = simulation.isWorking;
 
     if (userInput.inputAvailable()) {
-      debug();
       string cmd = getInputLine(userInput);
       heda.execute(cmd);
     }

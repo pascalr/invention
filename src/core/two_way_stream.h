@@ -18,7 +18,7 @@ class TwoWayStream : public StdWriter, public Reader {
     }
     
     void doPrint(string str) {
-      ss << str;
+      ss << str << "\n";
     }
     
     bool inputAvailable() {
