@@ -26,6 +26,8 @@ log
 # Ignore bundler config.
 client/.bundle
 
+client/Gemfile.lock
+
 # Ignore the default SQLite database.
 client/db/*.sqlite3
 client/db/*.sqlite3-journal
