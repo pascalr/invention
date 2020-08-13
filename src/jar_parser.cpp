@@ -14,11 +14,11 @@ int main(int argc, char** argv)
   DetectedHRCodeTable codes;
   db.load(codes);
 
-  for (size_t i = 0; i < codes.items.size(); i++) {
+  /*for (size_t i = 0; i < codes.items.size(); i++) {
     DetectedHRCode& code = codes.items[i];
     parseJarCode(code);
     db.saveItem(codes, code);
-  }
+  }*/
 
   return 0;
 }

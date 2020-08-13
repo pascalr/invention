@@ -10,16 +10,6 @@ using namespace std;
 // HUUUUUUUUGEEEE FIXME: I do not validate the user input. It could insert sql...
 // I should probably use ruby on rails which does all this already...
 
-look at .schema peut-être, je veux juste avoir à bind les trucs et que ça marche pour tout ça serait magique!!!
-Travailler là dessus!
-
-https://github.com/SRombauts/SQLiteCpp/blob/master/src/Column.cpp
-// Return the named assigned to this result column (potentially aliased)
-onst char* Column::getName() const noexcept
-{
-    return sqlite3_column_name(mStmtPtr, mIndex);
-}
-
 #include <mutex>
 
 class Database {
@@ -35,10 +25,18 @@ class Database {
     
       string queryStr = "SELECT * FROM ";
 
-      todo read all columns and get all the table name to be able to prepare a sql query for the update!
-
       queryStr += table.getTableName();
       SQLite::Statement query(db, queryStr);
+      cout << "There are " << query.getColumnCount() << " columns for table " << table.getTableName() << endl;
+      table.updateQuery = "UPDATE " + table.getTableName() + " SET ";
+      for (int i = 1; i < query.getColumnCount(); i++) {
+        table.updateQuery += query.getColumnName(i); table.updateQuery += " = (?)";
+        if (i != query.getColumnCount() - 1) {
+          table.updateQuery += ", ";
+        }
+      }
+      table.updateQuery += " WHERE id = ";
+      cout << "Update query: " << table.updateQuery << endl;
       
       while (query.executeStep()) {
         T item = table.parseItem(query);

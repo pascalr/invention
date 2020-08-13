@@ -20,9 +20,12 @@ class Table {
     virtual string getValues(const T& item) = 0;
     virtual void bindBlob(SQLite::Statement& query, const T& item) {
     }
+    virtual void bindQuery(SQLite::Statement& query, const T& item) {}
 
     bool exists = false;
 
+    std::string selectQuery;
+    std::string updateQuery;
     std::vector<T> items;
 };
 
@@ -94,6 +97,22 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     12|content_name|varchar|0||0
     13|content_id|varchar|0||0
     */
+
+    void bindQuery(SQLite::Statement& query, const DetectedHRCode& item) {
+      query.bind(1, item.x);
+      query.bind(2, item.y);
+      query.bind(3, item.t);
+      query.bind(4, item.centerX);
+      query.bind(5, item.centerY);
+      query.bind(6, item.scale);
+      query.bind(7, item.imgFilename);
+      query.bind(8, item.create_at);
+      query.bind(9, item.updated_at);
+      query.bind(10, item.jar_id);
+      query.bind(11, item.weight);
+      query.bind(12, item.content_name);
+      query.bind(13, item.content_id);
+    }
 
     // Maybe one day generate this all automatically from ruby?
     
