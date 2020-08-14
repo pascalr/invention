@@ -10,26 +10,9 @@ using namespace std;
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
   
-HttpServer server;
-bool exiting = false;
-pid_t socatPid;
-
-void raspServerSignalHandler( int signum ) {
-  std::cout << "Rasp server interrupt signal (" << signum << ") received.\n";
-
-  exiting = true;
-  cout << "Stopping server.\n";
-  server.stop();
-  cout << "Killing socat.\n";
-  kill(-socatPid, SIGKILL);
-
-  exit(signum);
-}
-
 int main(int argc, char** argv) {
 
-  // TODO: Also handle socat the usb
-
+  HttpServer server;
   server.config.address = "192.168.0.19";
   server.config.port = 8889;
 
@@ -61,29 +44,10 @@ int main(int argc, char** argv) {
 
   // Start server and receive assigned port when server is listening for requests
   promise<unsigned short> server_port;
-
-  //thread server_thread([&server_port]() {
-    // Start server
-  //});
-
-  pid_t socatPid = fork();
-
-  if(socatPid == 0) { // child process
-
-    signal(SIGINT, raspServerSignalHandler);
-    while(!exiting) {
-      cout << "Executing socat.\n";
-      system("socat /dev/ttyACM0,raw,echo=0,b115200 tcp-listen:8888,reuseaddr");
-    }
-
-  } else {   // parent process
-    
-    signal(SIGINT, raspServerSignalHandler);
-    cout << "Server listening on " << server.config.address << " port " << server_port.get_future().get() << endl << endl;
-    server.start([&server_port](unsigned short port) {
-      server_port.set_value(port);
-    });
-  }
+  cout << "Server listening on " << server.config.address << " port " << server_port.get_future().get() << endl << endl;
+  server.start([&server_port](unsigned short port) {
+    server_port.set_value(port);
+  });
 
   return 0;
 
