@@ -2,6 +2,7 @@
 
 #include "core/Heda.h"
 #include "core/writer/serial_writer.h"
+#include "core/reader/serial_reader.h"
 
 using namespace std;
 
@@ -87,8 +88,8 @@ int main(int argc, char** argv)
 
   cerr << "Moving to center of working shelf, at height=(" << height << "+4) mm.\n";
 
-  //Vector3d destination;
-  //destination << 0.0, workingShelfHeight + height + 4, 45.0;
+  Vector3d destination;
+  //destination << 0.0, heda.config.working_shelf_idworkingShelfHeight + height + 4, 45.0;
 
   heda.reference(); // Make sure it is referenced.
   //heda.move(Movement('T', CHANGE_LEVEL_ANGLE_LOW));

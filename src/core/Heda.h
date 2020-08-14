@@ -24,6 +24,9 @@ class MissingHRCodeException : public HedaException {};
 class TooManyHRCodeException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 
+class MissingConfigException : public exception {};
+class NoWorkingShelfException : public exception {};
+
 #include <mutex>
 
 // RawCommand is bad. We should not be able to execute "mx..." this is too low level.
@@ -74,6 +77,8 @@ class Heda {
       //m_commands_thread.detach(); Do I need to detach?
       
       //m_packer.setup();
+
+      loadConfig();
     }
 
     ~Heda() {
@@ -81,6 +86,13 @@ class Heda {
       m_commands_thread.join();
     }
 
+    void loadConfig() {
+      HedaConfigTable table;
+      db.load(table);
+      db.load(shelves);
+      if (table.items.empty()) {throw MissingConfigException();}
+      config = *table.items.begin();
+    }
 
     void setupCommands() {
      
@@ -298,6 +310,7 @@ class Heda {
     RawCommand m_current_command;
     
     DetectedHRCodeTable codes;
+    ShelfTable shelves;
     Database& db;
 
     bool isDoneWorking() {
@@ -355,11 +368,22 @@ class Heda {
       return 10;
     }
 
+    Shelf getWorkingShelf() {
+      for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
+        if (it->id == config.working_shelf_id) {
+          return *it;
+        }
+      }
+      throw NoWorkingShelfException();
+    }
+
     //NaiveJarPacker m_packer;
 
     std::mutex commandsMutex;
 
     string m_pending_commands;
+
+    HedaConfig config;
 };
 
 #endif

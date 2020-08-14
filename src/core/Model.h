@@ -18,7 +18,7 @@ class Table {
     virtual string getTableName() = 0;
     virtual T parseItem(SQLite::Statement& query) = 0;
     //virtual string getValues(const T& item) = 0;
-    virtual void bindQuery(SQLite::Statement& query, const T& item) {};
+    virtual void bindQuery(SQLite::Statement& query, const T& item) = 0;
     //virtual void bindQuery(SQLite::Statement& query, const T& item, int i) = 0;
 
     //bool exists = false;
@@ -41,6 +41,64 @@ class Model {
     time_t updated_at;
 };
 
+/*
+0|id|integer|1||1
+1|shelf_id|integer|0|NULL|0
+2|created_at|datetime(6)|1||0
+3|updated_at|datetime(6)|1||0
+4|user_coord_offset_x|float|0|NULL|0
+5|user_coord_offset_y|float|0|NULL|0
+6|user_coord_offset_z|float|0|NULL|0
+7|camera_radius|float|0|NULL|0
+8|gripper_radius|float|0|NULL|0
+9|camera_focal_point|float|0|NULL|0
+*/
+
+class HedaConfig : public Model {
+  public:
+    HedaConfig() {}
+
+    long working_shelf_id;
+    double user_coord_offset_x;
+    double user_coord_offset_y;
+    double user_coord_offset_z;
+    double camera_radius;
+    double gripper_radius;
+    double camera_focal_point;
+};
+
+class HedaConfigTable : public Table<HedaConfig> {
+  public:
+    const char* TABLE_NAME = "hedas";
+    string getTableName() { return TABLE_NAME; };
+
+    HedaConfig parseItem(SQLite::Statement& query) {
+      HedaConfig config;
+      config.working_shelf_id = query.getColumn(0);
+      config.created_at = query.getColumn(1);
+      config.updated_at = query.getColumn(2);
+      config.user_coord_offset_x = query.getColumn(3);
+      config.user_coord_offset_y = query.getColumn(4);
+      config.user_coord_offset_z = query.getColumn(5);
+      config.camera_radius = query.getColumn(6);
+      config.gripper_radius = query.getColumn(7);
+      config.camera_focal_point = query.getColumn(8);
+      return config;
+    }
+
+    void bindQuery(SQLite::Statement& query, const HedaConfig& item) {
+      query.bind(1, item.working_shelf_id);
+      query.bind(2, item.created_at);
+      query.bind(3, item.updated_at);
+      query.bind(4, item.user_coord_offset_x);
+      query.bind(5, item.user_coord_offset_y);
+      query.bind(6, item.user_coord_offset_z);
+      query.bind(7, item.camera_radius);
+      query.bind(8, item.gripper_radius);
+      query.bind(9, item.camera_focal_point);
+    }
+};
+
 class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}
@@ -57,48 +115,12 @@ class DetectedHRCode : public Model {
     string content_id;
     CartesianCoord lid_coord;
 };
-//ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
-//  return os << c.code << " at " << c.coord;
-//}
 
 class DetectedHRCodeTable : public Table<DetectedHRCode> {
   public:
     const char* TABLE_NAME = "detected_codes";
     string getTableName() { return TABLE_NAME; };
     
-    /*string getValues(const DetectedHRCode& item) {
-      stringstream ss; ss << item.coord(0) << ", " << item.coord(1) << ", " << item.coord(2) << ", ";
-      ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", '" << item.imgFilename << "', ";
-      ss << item.created_at << ", " << item.updated_at << ", '" << item.jar_id << "', '" << item.weight << "', '";
-      ss << item.content_name << "', '" << item.content_id << "'";
-      return ss.str();
-    }*/
-    
-    //virtual void bindBlob(SQLite::Statement& query, const DetectedHRCode& item) {
-      /*std::vector<uchar> buf;
-      imencode(".jpeg", item.img, buf);
-      char* blob = reinterpret_cast<char*>(buf.data());
-      query.bind(1, blob, buf.size());
-      */
-    //}
-
-    /*
-    0|id|integer|1||1
-    1|x|float|0|NULL|0
-    2|y|float|0|NULL|0
-    3|t|float|0|NULL|0
-    4|centerX|float|0|NULL|0
-    5|centerY|float|0|NULL|0
-    6|scale|float|0|NULL|0
-    7|img|varchar|0||0
-    8|created_at|datetime|0||0
-    9|updated_at|datetime|0||0
-    10|jar_id|varchar|0||0
-    11|weight|varchar|0||0
-    12|content_name|varchar|0||0
-    13|content_id|varchar|0||0
-    */
-
     void bindQuery(SQLite::Statement& query, const DetectedHRCode& item) {
       query.bind(1, item.coord(0));
       query.bind(2, item.coord(1));
@@ -158,11 +180,12 @@ class JarTable : public Table<Jar> {
     const char* TABLE_NAME = "jars";
     string getTableName() { return TABLE_NAME; };
     
-    /*string getValues(const Jar& item) {
-      stringstream ss; ss << item.position(0) << ", " << item.position(1) << ", " << item.position(2);
-      return ss.str();
-    }*/
-    
+    void bindQuery(SQLite::Statement& query, const Jar& item) {
+      query.bind(1, item.position(0));
+      query.bind(2, item.position(1));
+      query.bind(3, item.position(2));
+    }
+
     Jar parseItem(SQLite::Statement& query) {
       Jar jar;
       double x = query.getColumn(1);
@@ -174,13 +197,12 @@ class JarTable : public Table<Jar> {
 
 };
 
-
 class Shelf : public Model {
   public:
     double height;
     double width;
     double depth;
-    int is_working_shelf;
+    int is_working_shelf; // deprecated, see HedaConfig.working_shelf_id
 };
 
 class ShelfTable : public Table<Shelf> {
@@ -188,10 +210,12 @@ class ShelfTable : public Table<Shelf> {
     const char* TABLE_NAME = "shelves";
     string getTableName() { return TABLE_NAME; };
     
-    /*string getValues(const Shelf& item) {
-      stringstream ss; ss << item.height << ", " << item.width << ", " << item.depth << ", " << item.is_working_shelf;
-      return ss.str();
-    }*/
+    void bindQuery(SQLite::Statement& query, const Shelf& item) {
+      query.bind(1, item.height);
+      query.bind(2, item.width);
+      query.bind(3, item.depth);
+      query.bind(4, item.is_working_shelf);
+    }
     
     Shelf parseItem(SQLite::Statement& query) {
       Shelf i;
@@ -202,67 +226,6 @@ class ShelfTable : public Table<Shelf> {
       return i;
     }
 
-};
-
-/*class Machine {
-  vector<Shelf> shelves;
-};*/
-
-// A unique aliment. I provide the list of aliment.
-// They have all the information, nutrional value, etc...
-class Aliment {
-  // sugar
-  // protein
-  // fat
-  // volum mass
-  // ...
-};
-
-// Ingredients in recipees are referred to by name.
-// You have your list of ingredients, you put anything in any language.
-// You can search and map your ingredient to a unique id with a search tool.
-class Ingredient {
-  public:
-    Ingredient(string name) : name(name) {}
-    Ingredient(string name, int aliment_id) : name(name), aliment_id(aliment_id) {}
-
-    string name;
-    int aliment_id = 0;
-};
-
-/*
-// Liquid is in ml, solid is in g
-enum IngredientType { LIQUID, SOLID };
-
-class Ingredient {
-  public:
-    int id;
-    string name;
-    IngredientType type;
-    double volumic_mass;
-
-    void saveAsHtml() {
-    }
-
-    void saveAsJson() {
-    }
-};
-*/
-
-class Recette {
-  public:
-
-    Recette() {
-    }
-
-    Recette(string name) : name(name) {
-    }
-
-    Recette(string name, string instructions) : name(name), instructions(instructions) {
-    }
-
-    string name;
-    string instructions;
 };
 
 #endif

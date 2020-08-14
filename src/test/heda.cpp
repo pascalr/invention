@@ -49,12 +49,12 @@ void testPosition() {
   Heda heda(ss, reader, db);
 
   doReference(heda, reader);
-  PolarCoord pos; pos << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
+  PolarCoord pos; pos << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T;
   assertEqual("home position", pos, heda.getPosition());
 
   heda.move(Movement('x', 100.0));
   executeAllPending(heda, reader);
-  pos << 100, HOME_POSITION_Y, HOME_POSITION_Z;
+  pos << 100, HOME_POSITION_Y, HOME_POSITION_T;
   assertEqual("x 100", pos, heda.getPosition());
 
   stringstream stream; stream << heda.getToolPosition();
