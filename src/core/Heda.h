@@ -140,7 +140,7 @@ class Heda {
     void reference() {
       cerr << "Doing reference...\n";
       pushCommand("H", [&]() {
-        m_position << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_Z;
+        m_position << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T;
       });
     }
 
