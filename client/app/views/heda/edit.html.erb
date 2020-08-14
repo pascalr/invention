@@ -1,0 +1,65 @@
+<h1>Configuration Heda</h1>
+
+<%= form_with(model: @heda, local: true) do |form| %>
+  <% if @heda.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@heda.errors.count, "error") %> prohibited this heda from being saved:</h2>
+
+      <ul>
+        <% @heda.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p>
+    La tablette principale est celle où les mélanges se passent et où tu déposes tes pots.<br/>
+    Veuillez inscrire le numéro de le tablette désignée pour être principale.<br/>
+    Voici la liste des tablettes:
+  </p>
+
+  <%= render :file => 'shelves/index' %>
+
+  <div class="field">
+    <%= form.label :shelf_id %>
+    <%= form.text_field :shelf_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :user_coord_offset_x %>
+    <%= form.number_field :user_coord_offset_x, step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :user_coord_offset_y %>
+    <%= form.number_field :user_coord_offset_y, step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :user_coord_offset_z %>
+    <%= form.number_field :user_coord_offset_z, step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :camera_radius %>
+    <%= form.number_field :camera_radius, readonly: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :gripper_radius %>
+    <%= form.number_field :gripper_radius, readonly: true  %>
+  </div>
+
+  <div class="field">
+    <%= form.label :camera_focal_point %>
+    <%= form.text_field :camera_focal_point, readonly: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+
+<%= render :file => 'jar_formats/index' %>

@@ -2,6 +2,7 @@
 
 <%= link_to "🏠", heda_run_path(cmd: "home"), method: "post", remote: true %>
 <%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
+<%= link_to "Configure", edit_heda_path(@heda) %>
 
 <%= label_tag(:recette)  %>
 <%= text_field_tag :recette, if @recette then @recette.name end, readonly: true %>

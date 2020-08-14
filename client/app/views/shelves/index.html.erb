@@ -2,6 +2,7 @@
  
 <table>
   <tr>
+    <th>Id</th>
     <th>Height</th>
     <th>Width</th>
     <th>Depth</th>
@@ -22,6 +23,7 @@
   </tr>
   <% (@shelves || []).each do |shelf| %>
     <tr>
+      <td><%= shelf.id %></td>
       <td><%= shelf.height %></td>
       <td><%= shelf.width %></td>
       <td><%= shelf.depth %></td>

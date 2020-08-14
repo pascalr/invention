@@ -3,8 +3,8 @@
 
 #include "calibration_constants.h"
 
-#define USER_COORD_OFFSET_X 865.0
-#define USER_COORD_OFFSET_Z 350.0
+#define USER_COORD_OFFSET_X 860.0
+#define USER_COORD_OFFSET_Z 355.0
 #define USER_COORD_OFFSET_Y 38.0
 
 #define HOME_POSITION_X 0.0 // mm

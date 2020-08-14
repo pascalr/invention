@@ -5,9 +5,27 @@ require 'open-uri'
 class HedaController < ApplicationController
 
   def index
+    redirect_to heda_path(get_heda), params: request.query_parameters
+  end
+
+  def show
+    @heda = get_heda
     if params[:recette_id]
       @recette = Recette.find(params[:recette_id])
     end
+    @heda = get_heda
+  end
+
+  def edit
+    @shelves = Shelf.all
+    @jar_formats = JarFormat.all
+    @heda = get_heda
+  end
+
+  def update
+    @heda ||= Heda.find(params[:id])
+    #render 'edit', status: if @heda.update(heda_params) then :ok else :unprocessable_entity end
+    redirect_to action: 'edit', status: if @heda.update(heda_params) then :ok else :unprocessable_entity end
   end
 
   def status
@@ -43,6 +61,17 @@ class HedaController < ApplicationController
 
   private
 
+  def get_heda
+    heda = Heda.first
+    if not heda
+      heda = Heda.new
+      if not heda.save
+        throw "Empty Heda wont save!!!" + heda.errors.full_messages.to_s
+      end
+    end
+    heda
+  end
+
   def heda_uri(command)
     #'http://127.0.0.1:8083/' + command
     'http://192.168.0.19:8083/' + command
@@ -64,6 +93,10 @@ class HedaController < ApplicationController
       # error
       # res.value
     end
+  end
+
+  def heda_params
+    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point)
   end
 
 end

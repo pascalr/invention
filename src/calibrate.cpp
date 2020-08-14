@@ -54,6 +54,22 @@ void writeConfig(string name, string value) {
 
 void calibrateCamWithJarRef(Heda& heda) {
   
+}
+
+int main(int argc, char** argv)
+{ // 21 mm and 31 mm
+
+  SerialPort serialPort;
+  if (serialPort.openPort("/dev/ttyACM0") < 0) {
+    throw InitSerialPortException();
+  }
+  
+  SerialReader serialReader(serialPort);
+  SerialWriter serialWriter(serialPort);
+  
+  Database db(DB_DEV);
+  Heda heda(serialWriter, serialReader, db); 
+
   char key;
 
   cerr << "Please clear the working shelf. Press any key when done..";
@@ -72,12 +88,12 @@ void calibrateCamWithJarRef(Heda& heda) {
   cerr << "Moving to center of working shelf, at height=(" << height << "+4) mm.\n";
 
   //Vector3d destination;
-  //destination << TOOL_X_MIDDLE, workingShelfHeight + height + 4, TOOL_Z_MIDDLE;
+  //destination << 0.0, workingShelfHeight + height + 4, 45.0;
 
   heda.reference(); // Make sure it is referenced.
-  heda.move(Movement('T', CHANGE_LEVEL_ANGLE_LOW));
-  heda.move(Movement('Y', WORKING_SHELF_HEIGHT+height+4));
-  heda.move(Movement('T', 30.0));
+  //heda.move(Movement('T', CHANGE_LEVEL_ANGLE_LOW));
+  //heda.move(Movement('Y', WORKING_SHELF_HEIGHT+height+4));
+  //heda.move(Movement('T', 30.0));
 
   // Find the position
 
@@ -97,10 +113,6 @@ void calibrateCamWithJarRef(Heda& heda) {
   heda.moveTo(destination);
 
   DetectedHRCode code = heda.detectOneCode();*/
-}
-
-int main(int argc, char** argv)
-{ // 21 mm and 31 mm
 
   //SerialWriter writer("/dev/ttyACM0"); 
   //Heda heda(writer);

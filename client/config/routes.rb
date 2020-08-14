@@ -4,9 +4,9 @@ Rails.application.routes.draw do
   get 'aliment/index'
   get 'heda/index'
   get 'heda/status'
+  resources :heda, only: [:update, :show, :edit]
   post 'heda/run'
   post 'heda/run_recette'
-  get 'configure/index'
   resources :jar_formats
   resources :shelves
   resources :ingredients

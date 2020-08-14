@@ -1,2 +1,2 @@
 #!/bin/bash
-cp data/test.db data/backup.db
+cp client/db/development.sqlite3 client/db/development.sqlite3.backup

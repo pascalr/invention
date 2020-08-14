@@ -1,0 +1,2 @@
+class Heda < ApplicationRecord
+end

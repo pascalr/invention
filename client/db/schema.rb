@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_14_143116) do
+ActiveRecord::Schema.define(version: 2020_08_14_164029) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -35,6 +35,19 @@ ActiveRecord::Schema.define(version: 2020_08_14_143116) do
     t.float "lid_x"
     t.float "lid_y"
     t.float "lid_z"
+  end
+
+  create_table "hedas", force: :cascade do |t|
+    t.integer "shelf_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.float "user_coord_offset_x"
+    t.float "user_coord_offset_y"
+    t.float "user_coord_offset_z"
+    t.float "camera_radius"
+    t.float "gripper_radius"
+    t.float "camera_focal_point"
+    t.index ["shelf_id"], name: "index_hedas_on_shelf_id"
   end
 
   create_table "ingredients", force: :cascade do |t|
@@ -93,6 +106,7 @@ ActiveRecord::Schema.define(version: 2020_08_14_143116) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "hedas", "shelves"
   add_foreign_key "ingredients", "aliments"
   add_foreign_key "jars", "ingredients"
   add_foreign_key "jars", "jar_formats"
