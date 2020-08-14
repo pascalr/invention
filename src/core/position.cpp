@@ -81,6 +81,14 @@ std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
   return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
 }
 
+std::ostream& operator<<(std::ostream &os, const UserCoord& c) {
+  return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
+}
+
+std::ostream& operator<<(std::ostream &os, const CartesianCoord& c) {
+  return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
+}
+
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition) {
   if (abs(mvt.destination - currentPosition) > 0.001) {
     movements.push_back(mvt);

@@ -20,6 +20,7 @@ class HedaController < ApplicationController
     @output = vals["output"]
     @pending = vals["pending"]
     @position = vals["pos"]
+    @tool_position = vals["toolPos"]
 
     puts "vals = "
     puts vals
