@@ -18,31 +18,46 @@ class Database {
     Database(const char* dbName) : db(dbName, SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE) {
     }
 
+    void execute(const char* cmd) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+      db.exec(cmd);
+    }
 
     template<class T> 
     void load(Table<T>& table) {
       std::lock_guard<std::mutex> guard(dbMutex);
     
       string queryStr = "SELECT * FROM ";
-
       queryStr += table.getTableName();
       SQLite::Statement query(db, queryStr);
-      cout << "There are " << query.getColumnCount() << " columns for table " << table.getTableName() << endl;
-      table.updateQuery = "UPDATE " + table.getTableName() + " SET ";
+      table.column_count = query.getColumnCount();
+      table.update_query = "UPDATE " + table.getTableName() + " SET ";
+      table.insert_query = "INSERT INTO " + table.getTableName() + " VALUES(NULL, ";
       for (int i = 1; i < query.getColumnCount(); i++) {
-        table.updateQuery += query.getColumnName(i); table.updateQuery += " = (?)";
+        table.update_query += query.getColumnName(i); table.update_query += " = ?";
+        table.insert_query += "?";
         if (i != query.getColumnCount() - 1) {
-          table.updateQuery += ", ";
+          table.update_query += ", ";
+          table.insert_query += ", ";
         }
       }
-      table.updateQuery += " WHERE id = ";
-      cout << "Update query: " << table.updateQuery << endl;
+      table.update_query += " WHERE id = ?";
+      table.insert_query += ")";
       
       while (query.executeStep()) {
         T item = table.parseItem(query);
         table.items.push_back(item);
       }
     }
+   
+    // Get should only query database if not inside table. 
+    /*template<class T> 
+    T get(Table<T>& table, long id) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+      stringstream ss; ss << "SELECT * FROM " << table.getTableName() << " WHERE ID = " << id;
+      SQLite::Statement query(db, ss.str());
+
+    }*/
     
     template<class T> 
     void clear(Table<T>& table) {
@@ -53,13 +68,11 @@ class Database {
     }
     
     template<class T> 
-    void addItem(Table<T>& table, T& item) {
+    void insert(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
-   
-      stringstream ss; ss << "INSERT INTO " << table.getTableName() << " VALUES(";
-      ss << "NULL" << ", " << table.getValues(item) << ")";
-      SQLite::Statement insertQuery(db, ss.str());
-      table.bindBlob(insertQuery, item);
+  
+      SQLite::Statement insertQuery(db, table.insert_query);
+      table.bindQuery(insertQuery, item);
       insertQuery.exec();
       item.id = getLastInsertedId(table);
     
@@ -84,9 +97,14 @@ class Database {
     // TODO: Add a table: __updates to handle this with table_name:string, to_remove_id:int, to_add_id:int, so no record is lost
     // in the odd chance that the system crashes between a add item and a removeItem.
     template<class T> 
-    void saveItem(Table<T>& table, T& item) {
-      //removeItem(table, item);
-      //addItem(table, item);
+    void update(Table<T>& table, T& item) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+   
+      SQLite::Statement updateQuery(db, table.update_query);
+      table.bindQuery(updateQuery, item);
+      updateQuery.bind(table.column_count, item.id);
+
+      updateQuery.exec();
     }
 
     SQLite::Database db;
@@ -97,6 +115,7 @@ class Database {
 
     template<class T> 
     long getLastInsertedId(Table<T>& table) {
+      // Probably more efficient to get the last rowid inserted, than get the id of that rowid, but I dont care for now.
       stringstream ss; ss << "SELECT MAX(id) FROM " << table.getTableName();
       SQLite::Statement query(db, ss.str());
       query.executeStep();

@@ -17,15 +17,15 @@ class Table {
 
     virtual string getTableName() = 0;
     virtual T parseItem(SQLite::Statement& query) = 0;
-    virtual string getValues(const T& item) = 0;
-    virtual void bindBlob(SQLite::Statement& query, const T& item) {
-    }
-    virtual void bindQuery(SQLite::Statement& query, const T& item) {}
+    //virtual string getValues(const T& item) = 0;
+    virtual void bindQuery(SQLite::Statement& query, const T& item) {};
+    //virtual void bindQuery(SQLite::Statement& query, const T& item, int i) = 0;
 
-    bool exists = false;
+    //bool exists = false;
 
-    std::string selectQuery;
-    std::string updateQuery;
+    int column_count;
+    std::string update_query;
+    std::string insert_query;
     std::vector<T> items;
 };
 
@@ -65,21 +65,21 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     const char* TABLE_NAME = "detected_codes";
     string getTableName() { return TABLE_NAME; };
     
-    string getValues(const DetectedHRCode& item) {
+    /*string getValues(const DetectedHRCode& item) {
       stringstream ss; ss << item.coord(0) << ", " << item.coord(1) << ", " << item.coord(2) << ", ";
       ss << item.centerX << ", " << item.centerY << ", " << item.scale << ", '" << item.imgFilename << "', ";
       ss << item.created_at << ", " << item.updated_at << ", '" << item.jar_id << "', '" << item.weight << "', '";
       ss << item.content_name << "', '" << item.content_id << "'";
       return ss.str();
-    }
+    }*/
     
-    virtual void bindBlob(SQLite::Statement& query, const DetectedHRCode& item) {
+    //virtual void bindBlob(SQLite::Statement& query, const DetectedHRCode& item) {
       /*std::vector<uchar> buf;
       imencode(".jpeg", item.img, buf);
       char* blob = reinterpret_cast<char*>(buf.data());
       query.bind(1, blob, buf.size());
       */
-    }
+    //}
 
     /*
     0|id|integer|1||1
@@ -99,14 +99,14 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     */
 
     void bindQuery(SQLite::Statement& query, const DetectedHRCode& item) {
-      query.bind(1, item.x);
-      query.bind(2, item.y);
-      query.bind(3, item.t);
+      query.bind(1, item.coord(0));
+      query.bind(2, item.coord(1));
+      query.bind(3, item.coord(2));
       query.bind(4, item.centerX);
       query.bind(5, item.centerY);
       query.bind(6, item.scale);
       query.bind(7, item.imgFilename);
-      query.bind(8, item.create_at);
+      query.bind(8, item.created_at);
       query.bind(9, item.updated_at);
       query.bind(10, item.jar_id);
       query.bind(11, item.weight);
@@ -153,10 +153,10 @@ class JarTable : public Table<Jar> {
     const char* TABLE_NAME = "jars";
     string getTableName() { return TABLE_NAME; };
     
-    string getValues(const Jar& item) {
+    /*string getValues(const Jar& item) {
       stringstream ss; ss << item.position(0) << ", " << item.position(1) << ", " << item.position(2);
       return ss.str();
-    }
+    }*/
     
     Jar parseItem(SQLite::Statement& query) {
       Jar jar;
@@ -183,10 +183,10 @@ class ShelfTable : public Table<Shelf> {
     const char* TABLE_NAME = "shelves";
     string getTableName() { return TABLE_NAME; };
     
-    string getValues(const Shelf& item) {
+    /*string getValues(const Shelf& item) {
       stringstream ss; ss << item.height << ", " << item.width << ", " << item.depth << ", " << item.is_working_shelf;
       return ss.str();
-    }
+    }*/
     
     Shelf parseItem(SQLite::Statement& query) {
       Shelf i;

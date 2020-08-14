@@ -42,7 +42,7 @@ void detect(Heda& heda, Mat& frame, PolarCoord c) {
   if (!positions.empty()) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {
       DetectedHRCode d(*it, c);
-      heda.db.addItem(heda.codes, d);
+      heda.db.insert(heda.codes, d);
     }
   }
 }
