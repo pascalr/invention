@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
   server.config.port = serverPort ? serverPort : 8083;
 
   SerialPort serialPort;
-  if (serialPort.openPort("/dev/ttyACM0") < 0) {
+  if (serialPort.openPort("/tmp/heda0") < 0) {
     throw InitSerialPortException();
   }
   
