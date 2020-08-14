@@ -62,6 +62,8 @@ PolarCoord toolCartesianToPolar(const CartesianCoord c);
 UserCoord toUserCoord(const PolarCoord p, double reference);
 
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
+std::ostream& operator<<(std::ostream &os, const CartesianCoord& c);
+std::ostream& operator<<(std::ostream &os, const UserCoord& c);
 
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);
 

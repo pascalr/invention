@@ -57,6 +57,9 @@ void testPosition() {
   pos << 100, HOME_POSITION_Y, HOME_POSITION_Z;
   assertEqual("x 100", pos, heda.getPosition());
 
+  stringstream stream; stream << heda.getToolPosition();
+  assertEqual("wrong", "wrong", stream.str());
+
 }
 
 void testHomeCommand() {
