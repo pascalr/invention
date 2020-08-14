@@ -136,6 +136,7 @@ int main(int argc, char** argv) {
 
     ptree pt;
     pt.put("pos", heda.getPosition());
+    pt.put("toolPos", heda.getToolPosition());
     pt.put("cmd", heda.getCurrentCommand());
     pt.put("pending", heda.getPendingCommands());
     pt.put("output", getAllAvailable(serverReader));

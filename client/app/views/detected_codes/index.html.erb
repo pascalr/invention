@@ -12,6 +12,13 @@
       <th>Centery</th>
       <th>Scale</th>
       <th>Img</th>
+      <th>Jar id</th>
+      <th>Weight</th>
+      <th>ContentName</th>
+      <th>ContentId</th>
+      <th>Lid x</th>
+      <th>Lid y</th>
+      <th>Lid z</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -26,6 +33,13 @@
         <td><%= detected_code.centerY %></td>
         <td><%= detected_code.scale %></td>
         <td><%= image_tag(detected_code.img) %></td>
+        <td><%= detected_code.jar_id %></td>
+        <td><%= detected_code.weight %></td>
+        <td><%= detected_code.content_name %></td>
+        <td><%= detected_code.content_id %></td>
+        <td><%= detected_code.lid_x %></td>
+        <td><%= detected_code.lid_y %></td>
+        <td><%= detected_code.lid_z %></td>
         <td><%= link_to 'Show', detected_code %></td>
         <td><%= link_to 'Edit', edit_detected_code_path(detected_code) %></td>
         <td><%= link_to 'Destroy', detected_code, method: :delete, data: { confirm: 'Are you sure?' } %></td>

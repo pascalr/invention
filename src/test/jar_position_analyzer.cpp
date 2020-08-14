@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void testCameraPosition() {
+/*void testCameraPosition() {
   title("Testing camera position");
 
   Vector2d toolPosition;
@@ -64,7 +64,7 @@ void testJarOffset() {
   assertNearby("0 degree, x", -offsetMm, result(0));
   assertNearby("0 degree, z", 0.0, result(1));
 
-}
+}*/
 
 void testConvertToAbsolutePosition() {
   title("Testing convert to absolute position");

@@ -29,7 +29,7 @@ X: X0 est à la droite du point de vue de l'utilisateur. C'est le maximum que le
 Y: Y0 est le plus bas que la machine peut se déplacer
 T: Theta0 est le bras orienté vers la gauche du point de vue de l'utilisateur.
 
-Les coordonnées cartésiennes:
+Les coordonnées cartésiennes de l'utilisateur:
 X: X0 est à partir de la paroie gauche.
 Y: Y0 est la tablette la plus basse.
 Z: Z0 est à partir du devant.
@@ -39,6 +39,9 @@ class PolarCoord : public Vector3d {
 };
 
 class CartesianCoord : public Vector3d {
+};
+
+class UserCoord : public CartesianCoord {
 };
 
 
@@ -56,6 +59,7 @@ class Movement {
 };
 
 PolarCoord toolCartesianToPolar(const CartesianCoord c);
+UserCoord toUserCoord(const PolarCoord p, double reference);
 
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
 
@@ -66,12 +70,4 @@ void doNothing();
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
 
-void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination);
-
-Vector2d cameraPosition(Vector2d toolPosition, double angle);
-
-Vector2d jarOffset(Vector2d imgCenter, double angle, double scale);
-
-Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d imgCenter, double scale);
-  
 #endif

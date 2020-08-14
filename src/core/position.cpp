@@ -55,6 +55,16 @@ string Movement::str() const {
   return ss.str();
 }
 
+// reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
+UserCoord toUserCoord(const PolarCoord p, double reference) {
+  UserCoord c; 
+  // The x axis and the z axis are reverse (hence * -1)
+  c << ((p(0) + cosd(p(2)) * reference)*-1)+USER_COORD_OFFSET_X,
+       p(1),
+       ((sind(p(2)) * reference)*-1)+USER_COORD_OFFSET_Z;
+  return c;
+}
+
 PolarCoord toolCartesianToPolar(const CartesianCoord c) {
 
   double t = (asin(c(2) / CLAW_RADIUS) * 180.0 / PI);
@@ -122,7 +132,7 @@ void calculateGoto(vector<Movement> &movements, const PolarCoord position, const
   }
 }
 
-void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
+//void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
 
   // TODO: Transform the CartesianCoord destination into a PolarCoord
   // then call calculateGoto()
@@ -148,38 +158,5 @@ void calculateMoveCommands(vector<Movement> &movements, const PolarCoord positio
 
   //bool xMovingForward = xDest -*/
   
-}
+//}
 
-
-Vector2d cameraPosition(Vector2d toolPosition, double angle) {
-
-  double offset = CAMERA_TOOL_DISTANCE;
-  Vector2d cameraOffset(offset*cosd(angle),offset*sind(angle));
-  return toolPosition - cameraOffset;
-}
-
-Vector2d jarOffset(Vector2d imgCenter, double angle, double scale) {
-
-  Vector2d imgCenterOffset = imgCenter - Vector2d(CAMERA_WIDTH/2, CAMERA_HEIGHT/2) ;
-
-  // Gauche droite sur l'image (donc jarCenter.x) c'est les z quand l'angle est à 0.
-  // jarCenter.x positif c'est z négatif.
-  // jarCenter.y positif c'est x négatif.
-  Vector2d jarCenter;
-  jarCenter << -imgCenterOffset(1), -imgCenterOffset(0);
-
-  jarCenter /= scale; // Translate pixels dimensions into mm.
-
-  // I must rotate the offset value because the camera is rotated.
-  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(angle / 180.0 * PI));
-  jarCenter = t * jarCenter;
-
-  return jarCenter;
-}
-
-Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d imgCenter, double scale) {
-  
-  Vector2d cameraPos = cameraPosition(toolPosition, angle);
-
-  return cameraPos + jarOffset(imgCenter, angle, scale);
-}

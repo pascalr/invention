@@ -3,6 +3,9 @@
 
 #include "calibration_constants.h"
 
+#define USER_COORD_OFFSET_X 865.0
+#define USER_COORD_OFFSET_Z 350.0
+
 #ifndef PI
 #define PI 3.1415926535897932384626433832795
 #endif

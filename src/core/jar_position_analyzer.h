@@ -1,7 +1,7 @@
 #ifndef JAR_POSITION_DETECTOR
 #define JAR_POSITION_DETECTOR
 
-/*#include "position.h"
+#include "position.h"
 #include "sweep.h"
 #include <vector>
 #include "jar.h"
@@ -9,53 +9,63 @@
 using namespace std;
 using namespace Eigen;
 
-class PositionedHRCode {
-  public:
-    PositionedHRCode(HRCode cod, double x0, double y0, double z0) : code(cod), x(x0), y(y0), z(z0) {
-    }
-    HRCode code;
-    double x;
-    double y;
-    double z;
-};
-ostream &operator<<(std::ostream &os, const PositionedHRCode &c) {
-  return os << c.code << " at (" << c.x << ", " << c.y << ", " << c.z << ")";
-}
-
-double calculateJarHeight(double perceivedWidth) {
+/*double calculateJarHeight(double perceivedWidth) {
   double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
   return DISTANCE_CAMERA_SHELF - distanceFromCam;
 }
 
-// This is separate from sweep because this does not require the sweep action.
-// This is done afterward.
-// Step1: detect the position of the jar
-// Step2: remove near duplicates
-// Step3: parse the text
-// Step4: if the text is not readable, store into data/negatives
-// and later ask the user to translate
-class JarPositionAnalyzer {
-public:
-  PositionedHRCode convert(DetectedHRCode& input) {
+Vector2d cameraPosition(Vector2d toolPosition, double angle) {
 
-    Vector2d toolPosition;
-    toolPosition << input.x, input.z;
+  double offset = CAMERA_TOOL_DISTANCE;
+  Vector2d cameraOffset(offset*cosd(angle),offset*sind(angle));
+  return toolPosition - cameraOffset;
+}
 
-    Vector2d jarCenter;
-    jarCenter << input.code.x, input.code.y;
+Vector2d jarOffset(Vector2d imgCenter, double angle, double scale) {
 
-    Vector2d jarPosition = convertToAbsolutePosition(toolPosition, input.angle, jarCenter, input.code.scale);
+  Vector2d imgCenterOffset = imgCenter - Vector2d(CAMERA_WIDTH/2, CAMERA_HEIGHT/2) ;
 
-    PositionedHRCode result(input.code, jarPosition(0), 0, jarPosition(1));
-    return result;
+  // Gauche droite sur l'image (donc jarCenter.x) c'est les z quand l'angle est à 0.
+  // jarCenter.x positif c'est z négatif.
+  // jarCenter.y positif c'est x négatif.
+  Vector2d jarCenter;
+  jarCenter << -imgCenterOffset(1), -imgCenterOffset(0);
+
+  jarCenter /= scale; // Translate pixels dimensions into mm.
+
+  // I must rotate the offset value because the camera is rotated.
+  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(angle / 180.0 * PI));
+  jarCenter = t * jarCenter;
+
+  return jarCenter;
+}
+
+
+Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d imgCenter, double scale) {
+  
+  Vector2d cameraPos = cameraPosition(toolPosition, angle);
+
+  return cameraPos + jarOffset(imgCenter, angle, scale);
+}*/
+
+void analyzePosition(DetectedHRCode& input) {
+
+  /*Vector2d toolPosition;
+  toolPosition << input.x, input.z;
+
+  Vector2d jarCenter;
+  jarCenter << input.code.x, input.code.y;
+
+  Vector2d jarPosition = convertToAbsolutePosition(toolPosition, input.angle, jarCenter, input.code.scale);
+
+  PositionedHRCode result(input.code, jarPosition(0), 0, jarPosition(1));
+  return result;*/
+}
+
+void analyzePosition(vector<DetectedHRCode>& input) {
+  for (auto it = input.begin(); it != input.end(); ++it) {
+    analyzePosition(*it);
   }
-
-  void run(vector<DetectedHRCode> input, vector<PositionedHRCode>& result) {
-    for (auto it = input.begin(); it != input.end(); ++it) {
-      PositionedHRCode p = convert(*it);
-      result.push_back(p);
-    }
-  }
-};*/
+}
 
 #endif

@@ -55,6 +55,7 @@ class DetectedHRCode : public Model {
     string weight;
     string content_name;
     string content_id;
+    CartesianCoord lid_coord;
 };
 //ostream &operator<<(std::ostream &os, const DetectedHRCode &c) {
 //  return os << c.code << " at " << c.coord;
@@ -112,6 +113,9 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
       query.bind(11, item.weight);
       query.bind(12, item.content_name);
       query.bind(13, item.content_id);
+      query.bind(14, item.lid_coord(0));
+      query.bind(15, item.lid_coord(1));
+      query.bind(16, item.lid_coord(2));
     }
 
     // Maybe one day generate this all automatically from ruby?
@@ -130,6 +134,7 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
       code.weight = (const char*)query.getColumn(11);
       code.content_name = (const char*)query.getColumn(12);
       code.content_id = (const char*)query.getColumn(13);
+      code.lid_coord << query.getColumn(14), query.getColumn(15), query.getColumn(16);
       return code;
     }
 

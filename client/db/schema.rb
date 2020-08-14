@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_13_190353) do
+ActiveRecord::Schema.define(version: 2020_08_14_143116) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -32,6 +32,9 @@ ActiveRecord::Schema.define(version: 2020_08_13_190353) do
     t.string "weight"
     t.string "content_name"
     t.string "content_id"
+    t.float "lid_x"
+    t.float "lid_y"
+    t.float "lid_z"
   end
 
   create_table "ingredients", force: :cascade do |t|

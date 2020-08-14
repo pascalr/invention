@@ -26,6 +26,12 @@ class FrameCaptureException : public HedaException {};
 
 #include <mutex>
 
+// RawCommand is bad. We should not be able to execute "mx..." this is too low level.
+// The stack should be HedaCommand, which are object and not strings.
+// A HedaCommand can be a Movement, a Detect, a Capture, etc...
+// Utilies like sweep generates other HedaCommands
+// Or they are done directrly by reading Heda source code.
+
 // Low level command, sent to the arduino. "mx..." not "move x ..."
 class RawCommand {
   public:
@@ -262,6 +268,10 @@ class Heda {
 
     string getCurrentCommand() {
       return m_current_command.cmd;
+    }
+
+    UserCoord getToolPosition() {
+      return toUserCoord(m_position, CLAW_RADIUS);
     }
     
     PolarCoord getPosition() {
