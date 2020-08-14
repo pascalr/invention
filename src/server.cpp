@@ -43,6 +43,8 @@ void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
 }
 
 int main(int argc, char** argv) {
+  
+  signal(SIGINT, signalHandler);
 
   setupLogging();
 

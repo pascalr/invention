@@ -11,7 +11,7 @@ void assertException(const char* exceptionClassName, std::function<void()> toCal
   try {
     toCall();
     cout << "\033[31mFAILED\033[0m";
-  } catch (exception e) {
+  } catch (const exception& e) {
     // TODO: Check the exception class name
     cout << "\033[32mPASSED\033[0m";
   }
