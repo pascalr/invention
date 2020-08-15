@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   resources :jars
   resources :recettes
+  get 'image/show'
   get 'aliment/index'
   get 'heda/index'
   get 'heda/status'
