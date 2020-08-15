@@ -26,20 +26,20 @@
   <tbody>
     <% @detected_codes.each do |detected_code| %>
       <tr>
-        <td><%= detected_code.x %></td>
-        <td><%= detected_code.y %></td>
-        <td><%= detected_code.t %></td>
-        <td><%= detected_code.centerX %></td>
-        <td><%= detected_code.centerY %></td>
-        <td><%= detected_code.scale %></td>
+        <td><%= '%.2f' % detected_code.x %></td>
+        <td><%= '%.2f' % detected_code.y %></td>
+        <td><%= '%.2f' % detected_code.t %></td>
+        <td><%= '%.2f' % detected_code.centerX %></td>
+        <td><%= '%.2f' % detected_code.centerY %></td>
+        <td><%= '%.2f' % detected_code.scale %></td>
         <td><%= image_tag(image_show_path(name: "detected_code_001.jpg")) %></td>
         <td><%= detected_code.jar_id %></td>
         <td><%= detected_code.weight %></td>
         <td><%= detected_code.content_name %></td>
         <td><%= detected_code.content_id %></td>
-        <td><%= detected_code.lid_x %></td>
-        <td><%= detected_code.lid_y %></td>
-        <td><%= detected_code.lid_z %></td>
+        <td><%= '%.2f' % detected_code.lid_x %></td>
+        <td><%= '%.2f' % detected_code.lid_y %></td>
+        <td><%= '%.2f' % detected_code.lid_z %></td>
         <td><%= link_to 'Show', detected_code %></td>
         <td><%= link_to 'Edit', edit_detected_code_path(detected_code) %></td>
         <td><%= link_to 'Destroy', detected_code, method: :delete, data: { confirm: 'Are you sure?' } %></td>

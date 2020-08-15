@@ -285,7 +285,7 @@ class Heda {
     }
 
     UserCoord getToolPosition() {
-      return toUserCoord(m_position, CLAW_RADIUS);
+      return toUserCoord(m_position, CLAW_RADIUS, config.user_coord_offset_x, config.user_coord_offset_z);
     }
     
     PolarCoord getPosition() {

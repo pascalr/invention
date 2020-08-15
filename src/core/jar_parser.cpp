@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "../lib/hr_code.h"
 #include <string>
+#include "../config/constants.h"
 
 /*class JarLabel {
   public:
@@ -156,7 +157,7 @@ string parseLineTesseract(Mat& im) {
 
 void parseJarCode(DetectedHRCode& code) {
   cout << "Loading image: " << code.imgFilename << endl;
-  Mat gray = imread(code.imgFilename, IMREAD_GRAYSCALE);
+  Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
   BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
   double scale = gray.cols/110.0;
   BOOST_LOG_TRIVIAL(debug) << "scale: " << scale;

@@ -56,12 +56,12 @@ string Movement::str() const {
 }
 
 // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
-UserCoord toUserCoord(const PolarCoord p, double reference) {
+UserCoord toUserCoord(const PolarCoord p, double reference, double offsetX, double offsetZ) {
   UserCoord c; 
   // The x axis and the z axis are reverse (hence * -1)
-  c << ((p(0) + cosd(p(2)) * reference)*-1)+USER_COORD_OFFSET_X,
+  c << ((p(0) + cosd(p(2)) * reference)*-1)+offsetX,
        p(1),
-       ((sind(p(2)) * reference)*-1)+USER_COORD_OFFSET_Z;
+       ((sind(p(2)) * reference)*-1)+offsetZ;
   return c;
 }
 

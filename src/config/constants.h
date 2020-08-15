@@ -3,13 +3,11 @@
 
 #include "calibration_constants.h"
 
-#define USER_COORD_OFFSET_X 860.0
-#define USER_COORD_OFFSET_Z 355.0
-#define USER_COORD_OFFSET_Y 38.0
-
 #define HOME_POSITION_X 0.0 // mm
 #define HOME_POSITION_Y 0.0 // mm
 #define HOME_POSITION_T 90.0 // mm
+
+#define DETECTED_CODES_BASE_PATH "client/storage/detected_codes/"
 
 #ifndef PI
 #define PI 3.1415926535897932384626433832795

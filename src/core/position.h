@@ -59,7 +59,7 @@ class Movement {
 };
 
 PolarCoord toolCartesianToPolar(const CartesianCoord c);
-UserCoord toUserCoord(const PolarCoord p, double reference);
+UserCoord toUserCoord(const PolarCoord p, double reference, double offsetX, double offsetZ);
 
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
 std::ostream& operator<<(std::ostream &os, const CartesianCoord& c);
