@@ -67,8 +67,8 @@ class Heda {
 
     Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db)/*, m_packer(db)*/ {
     
-      cerr << "Initializing video...\n";
-      m_video_working = initVideo(m_cap);
+      //cerr << "Initializing video...\n";
+      //m_video_working = initVideo(m_cap);
 
       setupCommands();
 
@@ -78,7 +78,7 @@ class Heda {
       
       //m_packer.setup();
 
-      loadConfig();
+      loadDb();
     }
 
     ~Heda() {
@@ -86,10 +86,11 @@ class Heda {
       m_commands_thread.join();
     }
 
-    void loadConfig() {
+    void loadDb() {
       HedaConfigTable table;
       db.load(table);
       db.load(shelves);
+      db.load(codes);
       if (table.items.empty()) {throw MissingConfigException();}
       config = *table.items.begin();
     }
@@ -111,6 +112,7 @@ class Heda {
       m_commands["store"] = [&](ParseResult tokens) {store();};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
       m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
+      m_commands["detect"] = [&](ParseResult tokens) {detect();};
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -123,6 +125,11 @@ class Heda {
       };
       
       m_commands["rapporte"] = [&](ParseResult tokens) {
+      };
+
+      m_commands["photo"] = [&](ParseResult tokens) {
+        Mat mat;
+        captureFrame(mat);
       };
 
       m_commands["goto"] = [&](ParseResult tokens) {
@@ -176,14 +183,7 @@ class Heda {
       if (pos != string::npos) {execute(str.substr(pos+1));}
     }
 
-    void captureFrame(Mat& frame) {
-
-      for (int i = 0; i < 10; i++) {
-        m_cap.read(frame);
-        if (!frame.empty()) {return;}
-      }
-      throw FrameCaptureException();
-    }
+    void captureFrame(Mat& frame);
 
     void move(const std::vector<Movement>& mvts) {
       for (auto it = mvts.begin(); it != mvts.end(); it++) {
@@ -225,6 +225,8 @@ class Heda {
     }
 
     void sweep();
+
+    void detect();
 
     // goto an empty place and drop the jar
     void store() {
@@ -303,9 +305,9 @@ class Heda {
     std::atomic<bool> m_commands_thread_run;
 
     PolarCoord m_position;
-    VideoCapture m_cap;
+    //VideoCapture m_cap;
     std::unordered_map<string, std::function<void(ParseResult)>> m_commands;
-    bool m_video_working = false;
+    //bool m_video_working = false;
 
     RawCommand m_current_command;
     

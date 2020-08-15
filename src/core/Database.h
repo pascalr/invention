@@ -20,6 +20,7 @@ class Database {
 
     void execute(const char* cmd) {
       std::lock_guard<std::mutex> guard(dbMutex);
+      cout << "DB EXEC: " << cmd << endl;
       db.exec(cmd);
     }
 
@@ -44,6 +45,7 @@ class Database {
       table.update_query += " WHERE id = ?";
       table.insert_query += ")";
       
+      cout << "DB LOAD: " << queryStr << endl;
       while (query.executeStep()) {
         T item = table.parseItem(query);
         table.items.push_back(item);
@@ -64,6 +66,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
     
       stringstream ss; ss << "DELETE FROM " << table.getTableName();
+      cout << "DB CLEAR: " << ss.str() << endl;
       db.exec(ss.str());
     }
     
@@ -71,6 +74,7 @@ class Database {
     void insert(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
   
+      cout << "DB INSERT: " << table.insert_query << endl;
       SQLite::Statement insertQuery(db, table.insert_query);
       table.bindQuery(insertQuery, item);
       insertQuery.exec();
@@ -100,6 +104,7 @@ class Database {
     void update(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
    
+      cout << "DB UPDATE: " << table.update_query << endl;
       SQLite::Statement updateQuery(db, table.update_query);
       table.bindQuery(updateQuery, item);
       updateQuery.bind(table.column_count, item.id);

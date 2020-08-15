@@ -49,8 +49,8 @@ bool HRCodeParser::contourIsMarker(int i, int center, vector<Point2f> centers, v
   if (!correctSize) return false;
 
   float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2));
-  BOOST_LOG_TRIVIAL(debug) << "expectedMarkerDistance: " << expected;
-  BOOST_LOG_TRIVIAL(debug) << "actualMarkerDistance: " << distFromCenter;
+  //BOOST_LOG_TRIVIAL(debug) << "expectedMarkerDistance: " << expected;
+  //BOOST_LOG_TRIVIAL(debug) << "actualMarkerDistance: " << distFromCenter;
   return abs(distFromCenter - expected)/expected < 0.2;
 }
 
@@ -96,12 +96,13 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
 
     if (!contourIsCircle[i]) continue;
     
-    BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
+    // TODO: Return an error message with the reason why it did not detect instead of logging stuff like this.
+    //BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
 
     int child = hierarchy[i][2];
     if (child < 0) continue;
     
-    BOOST_LOG_TRIVIAL(debug) << "Child found.";
+    //BOOST_LOG_TRIVIAL(debug) << "Child found.";
    
     float scale = radius[i] / 36.0; // mm
     float insideDiameter = 30 * scale; // mm
@@ -109,17 +110,17 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     bool correctSize = abs(radius[child] - insideDiameter)/insideDiameter < 0.2;
     if (!correctSize) continue;
     
-    BOOST_LOG_TRIVIAL(debug) << "Child correct size.";
+    //BOOST_LOG_TRIVIAL(debug) << "Child correct size.";
 
     int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (firstMarker < 0) continue;
     
-    BOOST_LOG_TRIVIAL(debug) << "First inner circle found.";
+    //BOOST_LOG_TRIVIAL(debug) << "First inner circle found.";
 
     int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (secondMarker < 0) continue;
     
-    BOOST_LOG_TRIVIAL(debug) << "Second inner circle found.";
+    //BOOST_LOG_TRIVIAL(debug) << "Second inner circle found.";
 
     int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
@@ -140,7 +141,7 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
       }
     }
 
-    BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
+    //BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
  
     circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
 
@@ -150,9 +151,10 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     double pixelsPerMm = radius[i]*2 / HR_CODE_WIDTH;
-    string imgFilename = nextFilename("client/storage/detected_codes/detected", ".jpg");
+    string filename = nextFilename("client/storage/detected_codes/detected_code", ".jpg");
+    string imgFilename = "client/app/assets/images/" + filename;
     imwrite(imgFilename, rotatedHRCode);
-    HRCode codePos(rotatedHRCode, imgFilename, centers[i].x, centers[i].y, pixelsPerMm); 
+    HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, pixelsPerMm); 
     detectedCodes.push_back(codePos);
   }
   //imshow( "Contours", drawing );

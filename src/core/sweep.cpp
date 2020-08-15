@@ -33,18 +33,22 @@ using namespace cv;
 // When a sticker disappers, it asks the arduino what position it is.
 // It can then triangulate the real position of the 
 
-void detect(Heda& heda, Mat& frame, PolarCoord c) {
+void detectCode(Heda& heda, Mat& frame, PolarCoord c) {
 
+  cout << "Running detect code." << endl;
   HRCodeParser parser(0.2, 0.2);
   vector<HRCode> positions;
   parser.findHRCodes(frame, positions, 100);
 
   if (!positions.empty()) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {
+      cout << "Detected one HRCode!!!" << endl;
       DetectedHRCode d(*it, c);
       heda.db.insert(heda.codes, d);
     }
+    return;
   }
+  cout << "No codes were detected..." << endl;
 }
 
 void sweepCallback(Heda& heda) {
@@ -54,7 +58,7 @@ void sweepCallback(Heda& heda) {
   heda.captureFrame(frame);
 
   BOOST_LOG_TRIVIAL(debug) << "Trying to detect HR code positions.";
-  detect(heda, frame, heda.getPosition()); 
+  detectCode(heda, frame, heda.getPosition()); 
 }
 
 void calculateSweepMovements(Heda& heda, vector<Movement>& movements) {

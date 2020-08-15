@@ -43,6 +43,13 @@ ADD_LIBRARY(ExternLibsModule
 # src/lib/sqlite3.c
 )
 
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} ExternLibsModule SQLiteCpp sqlite3 dl pthread )
+# ruby-2.5 gmp crypt m
+set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} /usr/local/include/simple-web-server/ )
+
+include_directories(${MyDirs})
+link_libraries(${MyLibs})
+
 ADD_LIBRARY(MyLibsModule
   src/utils/io_common.cpp
   src/utils/utils.cpp
@@ -63,57 +70,35 @@ ADD_LIBRARY(MyLibsModule
   src/helper/logging.cpp
   src/core/parser.cpp
 )
-
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} MyLibsModule ExternLibsModule SQLiteCpp sqlite3 dl pthread )
-# ruby-2.5 gmp crypt m
-set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
-
-target_link_libraries( MyLibsModule ${MyLibs})
-target_include_directories(MyLibsModule PRIVATE ${MyDirs})
+link_libraries(MyLibsModule)
 
 #message(STATUS "HERE!!!")
 #message(STATUS ${Python2_INCLUDE_DIRS})
 #message(STATUS "THERE!!!")
 
-add_executable( run_tests ${MyCpp} src/test/test.cpp )
-target_include_directories(run_tests PRIVATE ${MyDirs})
-target_link_libraries( run_tests ${MyLibs})
+add_executable( run_tests src/test/test.cpp )
 
-add_executable( test_db ${MyCpp} src/test/db.cpp )
-target_include_directories(test_db PRIVATE ${MyDirs})
-target_link_libraries( test_db ${MyLibs})
+add_executable( heda_run src/heda_run.cpp )
 
-add_executable( test_jar_position_analyzer ${MyCpp} src/test/jar_position_analyzer.cpp )
-target_include_directories(test_jar_position_analyzer PRIVATE ${MyDirs})
-target_link_libraries(test_jar_position_analyzer ${MyLibs})
+add_executable( test_db src/test/db.cpp )
 
-add_executable( test_axis ${MyCpp} src/test/axis.cpp )
-target_include_directories(test_axis PRIVATE ${MyDirs})
-target_link_libraries(test_axis ${MyLibs})
+add_executable( test_jar_position_analyzer src/test/jar_position_analyzer.cpp )
 
-add_executable( test_parser ${MyCpp} src/test/parser.cpp )
-target_include_directories(test_parser PRIVATE ${MyDirs})
-target_link_libraries(test_parser ${MyLibs})
+add_executable( test_axis src/test/axis.cpp )
 
-add_executable( test_heda ${MyCpp} src/test/heda.cpp )
-target_include_directories(test_heda PRIVATE ${MyDirs})
-target_link_libraries(test_heda ${MyLibs})
+add_executable( test_parser src/test/parser.cpp )
+
+add_executable( capture src/capture.cpp )
+
+add_executable( test_heda src/test/heda.cpp )
 
 add_executable( simulation src/simulation.cpp )
-target_include_directories(simulation PRIVATE ${MyDirs})
-target_link_libraries( simulation ${MyLibs} )
 
 add_executable( server src/server.cpp )
-target_link_libraries( server ${MyLibs}  )
-target_include_directories( server PRIVATE "/usr/local/include/simple-web-server/" )
 
 add_executable( rasp_server src/rasp_server.cpp )
-target_link_libraries( rasp_server ${MyLibs}  )
-target_include_directories( rasp_server PRIVATE "/usr/local/include/simple-web-server/" )
 
 add_executable( jar_parser src/jar_parser.cpp )
-target_include_directories(jar_parser PRIVATE ${MyDirs})
-target_link_libraries( jar_parser ${MyLibs}  )
 
 #add_executable( simulation src/server.cpp )
 #target_link_libraries( simulation ${MyLibs}  )
@@ -121,7 +106,6 @@ target_link_libraries( jar_parser ${MyLibs}  )
 #target_compile_definitions(simulation PUBLIC SIMULATION)
 
 add_executable( calibrate src/calibrate.cpp )
-target_link_libraries( calibrate ${MyLibs}  )
 
 enable_testing()
 add_test( regularTests bin/run_tests )

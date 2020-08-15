@@ -1,8 +1,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
-#include <chrono>
-#include "lib/opencv.h"
+#include "core/Heda.h"
+#include "core/writer/serial_writer.h"
+#include "core/reader/serial_reader.h"
 
 //#include <filesystem>
 //namespace fs = std::filesystem;
@@ -17,7 +18,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
   // Use utils/io_common nextFilename
-  string outfile_name;
+  /*string outfile_name;
   if ( argc == 2 ) {
     outfile_name = "output/";
     outfile_name += argv[1];
@@ -31,18 +32,28 @@ int main(int argc, char** argv)
 	break;
       }
     }
-  }/* else {
+  }*//* else {
     system_clock::time_point now = std::chrono::system_clock::now();
     time_t t_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
     ss << "capture_" << put_time(std::localtime(&t_c), "%F_%T") << ".jpg";
     outfile_name += ss.str();
   }*/
-  cout << outfile_name << endl;
+  //cout << outfile_name << endl;
+  Database db(DB_DEV);
+
+  SerialPort serialPort;
+  if (serialPort.openPort("/tmp/heda0") < 0) {
+    throw InitSerialPortException();
+  }
+  
+  SerialReader serialReader(serialPort);
+  SerialWriter serialWriter(serialPort);
+  
+  Heda heda(serialWriter, serialReader, db); 
 
   Mat frame;
-  captureVideoImage(frame);
-  imwrite(outfile_name, frame);
+  heda.captureFrame(frame);
   imshow("Live", frame);
   waitKey();
   return 0;
