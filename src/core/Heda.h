@@ -113,6 +113,7 @@ class Heda {
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
       m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
       m_commands["detect"] = [&](ParseResult tokens) {detect();};
+      m_commands["parse"] = [&](ParseResult tokens) {parse();};
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -227,6 +228,8 @@ class Heda {
     void sweep();
 
     void detect();
+    
+    void parse();
 
     // goto an empty place and drop the jar
     void store() {

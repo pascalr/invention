@@ -14,6 +14,14 @@ void Heda::sweep() {
   move(mvts);
 }
 
+void Heda::parse() {
+  for (size_t i = 0; i < codes.items.size(); i++) {
+    DetectedHRCode& code = codes.items[i];
+    parseJarCode(code);
+    db.update(codes, code);
+  }
+}
+
 void Heda::detect() {
   Mat frame;
   captureFrame(frame);

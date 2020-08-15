@@ -57,8 +57,8 @@ ADD_LIBRARY(MyLibsModule
   src/core/fake_program.cpp
   src/core/writer/writer.cpp
   src/core/reader/reader.cpp
-  src/core/jar_parser.cpp
   src/core/axis.cpp
+  src/core/jar_parser.cpp
   src/core/Heda.cpp
   src/core/sweep.cpp
   src/core/position.cpp
@@ -97,8 +97,6 @@ add_executable( simulation src/simulation.cpp )
 add_executable( server src/server.cpp )
 
 add_executable( rasp_server src/rasp_server.cpp )
-
-add_executable( jar_parser src/jar_parser.cpp )
 
 #add_executable( simulation src/server.cpp )
 #target_link_libraries( simulation ${MyLibs}  )
