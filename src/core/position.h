@@ -35,13 +35,33 @@ Y: Y0 est la tablette la plus basse.
 Z: Z0 est à partir du devant.
 */
 
-class PolarCoord : public Vector3d {
+class PolarCoord {
+  public:
+    PolarCoord(double x, double y, double t) : x(x), y(y), t(t) {}
+    //PolarCoord(UserCoord c) : x(x), y(y), t(t) {}
+
+    Vector3d vector() {
+      Vector3d vect; vect << x, y, t;
+      return vect;
+    }
+
+    double x;
+    double y;
+    double t;
 };
 
-class CartesianCoord : public Vector3d {
-};
+class UserCoord {
+  public:
+    UserCoord(double x, double y, double z) : x(x), y(y), z(z) {}
+    
+    Vector3d vector() {
+      Vector3d vect; vect << x, y, z;
+      return vect;
+    }
 
-class UserCoord : public CartesianCoord {
+    double x;
+    double y;
+    double z;
 };
 
 

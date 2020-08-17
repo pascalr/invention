@@ -11,6 +11,8 @@
 
 class WrongModelTypeException : public exception {};
 
+// TODO: Validate column names indexes
+
 template<class T>
 class Table {
   public:
@@ -70,15 +72,15 @@ class HedaConfigTable : public Table<HedaConfig> {
 
     HedaConfig parseItem(SQLite::Statement& query) {
       HedaConfig config;
-      config.working_shelf_id = query.getColumn(0);
-      config.created_at = query.getColumn(1);
-      config.updated_at = query.getColumn(2);
-      config.user_coord_offset_x = query.getColumn(3);
-      config.user_coord_offset_y = query.getColumn(4);
-      config.user_coord_offset_z = query.getColumn(5);
-      config.camera_radius = query.getColumn(6);
-      config.gripper_radius = query.getColumn(7);
-      config.camera_focal_point = query.getColumn(8);
+      config.working_shelf_id = query.getColumn(1);
+      config.created_at = query.getColumn(2);
+      config.updated_at = query.getColumn(3);
+      config.user_coord_offset_x = query.getColumn(4);
+      config.user_coord_offset_y = query.getColumn(5);
+      config.user_coord_offset_z = query.getColumn(6);
+      config.camera_radius = query.getColumn(7);
+      config.gripper_radius = query.getColumn(8);
+      config.camera_focal_point = query.getColumn(9);
       return config;
     }
 
@@ -140,7 +142,6 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     
     DetectedHRCode parseItem(SQLite::Statement& query) {
       DetectedHRCode code;
-      code.id = query.getColumn(0);
       code.coord << query.getColumn(1), query.getColumn(2), query.getColumn(3);
       code.centerX = query.getColumn(4);
       code.centerY = query.getColumn(5);

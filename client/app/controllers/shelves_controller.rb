@@ -40,6 +40,6 @@ class ShelvesController < ApplicationController
 
   private
     def shelf_params
-      params.require(:shelf).permit(:height, :width, :depth)
+      params.require(:shelf).permit(:height, :width, :depth, :offset_x, :offset_z)
     end
 end

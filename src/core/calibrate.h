@@ -41,11 +41,11 @@ void Heda::calibrate() {
 
   Shelf shelf = getWorkingShelf();
 
-  // double jarHeight = gripped_jar.height;
   PolarCoord destination;
   destination << 0.0, shelf.height + format.height + 4, 45.0;
   moveTo(destination);
 
+  // double jarHeight = gripped_jar.height;
   //putdown(); 
   //DetectedHRCode code = detectOneCode(Heda& heda);
   //heda.camera_radius = ...
