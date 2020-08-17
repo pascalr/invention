@@ -41,12 +41,10 @@ void Heda::calibrate() {
 
   Shelf shelf = getWorkingShelf();
 
-  //UserCoord c = toUserCoord(m_position, config.camera_radius, config.user_coord_offset_x, config.user_coord_offset_z);
-  // = toUserCoordPolarCoord(0.0, self.height+folat.height);
+  PolarCoord c = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 4, 0.0), config.gripper_radius);
 
-  //PolarCoord destination;
-  //destination << 0.0, shelf.height + format.height + 4, 45.0;
-  //moveTo(destination);
+  PolarCoord destination(0.0, c.y, 45.0);
+  moveTo(destination);
 
   // double jarHeight = gripped_jar.height;
   //putdown(); 

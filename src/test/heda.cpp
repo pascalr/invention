@@ -45,12 +45,14 @@ void testPosition() {
 
   StreamWriter ss;
   FakeReader reader;
-  Database db("data/test.db");
+  Database db(DB_TEST);
   Heda heda(ss, reader, db);
-
   doReference(heda, reader);
+
   PolarCoord pos(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T);
   assertEqual("home position", pos, heda.getPosition());
+  //assertEqual("toUserPosition", UserCoord(0.0, 0.0, 0.0), heda.toUserCoord(heda.getPosition(), 100.0));
+  //assertEqual("toUserPositionToPolarCoord", pos, heda.toPolarCoord(heda.toUserCoord(heda.getPosition(), 100.0), 100.0));
 
   heda.move(Movement('x', 100.0));
   executeAllPending(heda, reader);
@@ -67,7 +69,7 @@ void testHomeCommand() {
 
   StreamWriter ss;
   FakeReader reader;
-  Database db("data/test.db");
+  Database db(DB_TEST);
   Heda heda(ss, reader, db);
 
   heda.reference();

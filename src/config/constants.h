@@ -16,6 +16,7 @@
 #include "camera_constants.h"
 #include "shelves_constants.h"
 
+#define asind(x) (asin(x * M_PI / 180))
 #define sind(x) (sin(fmod((x),360) * M_PI / 180))
 #define cosd(x) (cos(fmod((x),360) * M_PI / 180))
 

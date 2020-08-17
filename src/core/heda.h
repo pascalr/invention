@@ -303,14 +303,21 @@ class Heda {
     }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
-    /*PolarCoord toPolarCoord(const UserCoord c, double reference) {
+    // The x axis and the z axis are reversed
+    // Warning: There are two solutions.
+    // The offset is the offset between the two zeroes.
+    // FIXME: Only the Y is updated, because I don't know how to handle the two solutions.
+    PolarCoord toPolarCoord(const UserCoord c, double reference) {
 
-      double offsetX = config.user_coord_offset_x;
       double offsetY = config.user_coord_offset_y;
+      /*double offsetX = config.user_coord_offset_x;
       double offsetZ = config.user_coord_offset_z;
-      // The x axis and the z axis are reverse (hence * -1)
-      return PolarCoord(c.x);
-    }*/
+      double otherX = offsetX - c.x;
+      double otherZ = offsetZ - c.z;
+      double theta = asind(otherZ / reference);
+      double deltaX = cos(theta) * reference;*/
+      return PolarCoord(0.0, c.y - offsetY, 0.0);
+    }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
     UserCoord toUserCoord(const PolarCoord p, double reference) {
