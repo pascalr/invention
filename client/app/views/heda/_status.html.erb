@@ -5,6 +5,9 @@
 <%= label_tag(:position)  %>
 <%= text_field_tag :position, @position, readonly: true %><br/>
 
+<%= label_tag(:gripped_jar_format_id)  %>
+<%= text_field_tag :gripped_jar_format_id, @gripped_jar_format_id, readonly: true %><br/>
+
 <%= label_tag(:pending)  %>
 <%= text_area_tag :pending, @pending || 'aucun', size: "100x10", readonly: true %><br/>
 

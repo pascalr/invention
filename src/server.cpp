@@ -143,6 +143,7 @@ int main(int argc, char** argv) {
     pt.put("cmd", heda.getCurrentCommand());
     pt.put("pending", heda.getPendingCommands());
     pt.put("output", getAllAvailable(serverReader));
+    pt.put("gripped_jar_format_id", heda.gripped_jar.jar_format_id);
     sendJson(response, pt);
   };
 

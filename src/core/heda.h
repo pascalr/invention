@@ -232,6 +232,8 @@ class Heda {
     void detect();
     void parse();
     void pinpoint();
+    void calibrate();
+    void putdown();
 
     void clearDetectedCodes() {
       db.clear(codes);
@@ -326,6 +328,7 @@ class Heda {
     
     DetectedHRCodeTable codes;
     ShelfTable shelves;
+    JarFormatTable formats;
     Database& db;
 
     bool isDoneWorking() {
@@ -333,6 +336,8 @@ class Heda {
     }
     
     HedaConfig config;
+
+    Jar gripped_jar;
 
   protected:
 

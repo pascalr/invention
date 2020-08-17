@@ -5,9 +5,9 @@
 <table>
   <thead>
     <tr>
+      <th>Id</th>
       <th>Jar format</th>
       <th>Ingredient</th>
-      <th>Position</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -15,9 +15,9 @@
   <tbody>
     <% @jars.each do |jar| %>
       <tr>
+        <td><%= jar.id %></td>
         <td><%= jar.jar_format_id %></td>
         <td><%= jar.ingredient_id %></td>
-        <td><%= jar.position_id %></td>
         <td><%= link_to 'Show', jar %></td>
         <td><%= link_to 'Edit', edit_jar_path(jar) %></td>
         <td><%= link_to 'Destroy', jar, method: :delete, data: { confirm: 'Are you sure?' } %></td>

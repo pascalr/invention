@@ -1,5 +1,4 @@
 class Jar < ApplicationRecord
-  belongs_to :jar_format
-  belongs_to :ingredient
-  belongs_to :position
+  belongs_to :jar_format, optional: true
+  belongs_to :ingredient, optional: true
 end

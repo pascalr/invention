@@ -2,6 +2,7 @@
  
 <table>
   <tr>
+    <th>Id</th>
     <th>Name</th>
     <th>Empty weight</th>
     <th>Height</th>
@@ -13,6 +14,7 @@
  
   <tr>
     <td></td>
+    <td></td>
     <td>(kg)</td>
     <td>(mm)</td>
     <td>(mm)</td>
@@ -22,6 +24,7 @@
   </tr>
   <% (@jar_formats || []).each do |jar_format| %>
     <tr>
+      <td><%= jar_format.id %></td>
       <td><%= jar_format.name %></td>
       <td><%= jar_format.empty_weight %></td>
       <td><%= jar_format.height %></td>

@@ -69,6 +69,6 @@ class JarsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def jar_params
-      params.require(:jar).permit(:jar_format_id, :ingredient_id, :position_id)
+      params.require(:jar).permit(:jar_format_id, :ingredient_id)
     end
 end

@@ -75,7 +75,7 @@ JarTable loadJars() {
   return jars;
 }
 
-void insertOneJar(JarTable& jars) {
+/*void insertOneJar(JarTable& jars) {
   Database db("data/unit_tests.db");
   Jar j; j.position << 10, 10, 10;
   db.insert(jars, j);
@@ -94,7 +94,7 @@ void testDatabase() {
   
   jars = loadJars();
   assertEqual("one jar added (after reloading)", (unsigned)1, jars.items.size());
-}
+}*/
 
 int main (int argc, char *argv[]) {
 

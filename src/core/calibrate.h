@@ -1,10 +1,12 @@
 #include <iostream>
 
-#include "core/heda.h"
-#include "core/writer/serial_writer.h"
-#include "core/reader/serial_reader.h"
+#include "heda.h"
+#include "writer/serial_writer.h"
+#include "reader/serial_reader.h"
 
 using namespace std;
+
+class NoGrippedJarException : public exception {};
 
 DetectedHRCode detectOneCode(Heda& heda) {
  
@@ -32,55 +34,23 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
 
 void Heda::calibrate() {
   // TODO: Validate that the working shelf is clear
-  // TODO: Validate that Heda is gripping a reference jar.
+  // TODO: Make sure heda is referenced
+ 
+  JarFormat format; 
+  if (!formats.get(format, gripped_jar.jar_format_id)) {throw NoGrippedJarException();}
 
-  Heda should have a current jar variable.
+  Shelf shelf = getWorkingShelf();
 
-  putdown(); 
-  drop the reference jar
-  goto apprimatively on the of the jar with the camera
-  DetectedHRCode code = detectOneCode(Heda& heda);
+  // double jarHeight = gripped_jar.height;
+  PolarCoord destination;
+  destination << 0.0, shelf.height + format.height + 4, 45.0;
+  moveTo(destination);
 
-  Vector3d destination;
-  //destination << 0.0, heda.config.working_shelf_idworkingShelfHeight + height + 4, 45.0;
+  //putdown(); 
+  //DetectedHRCode code = detectOneCode(Heda& heda);
+  //heda.camera_radius = ...
 
-  heda.reference(); // Make sure it is referenced.
-  //heda.move(Movement('T', CHANGE_LEVEL_ANGLE_LOW));
-  //heda.move(Movement('Y', WORKING_SHELF_HEIGHT+height+4));
-  //heda.move(Movement('T', 30.0));
-  heda.camera_radius = ...
-  heda.camera_focal_point = ...
-
-  heda.release();
-
-  cerr << "Please add the reference jar inside the jaws. Press any key when ready..";
-  cin >> key;
-
-  destination.y = MAX_WORKING_HEIGHT;
-  heda.moveTo(destination);
-
-  DetectedHRCode code = heda.detectOneCode();
-
-  //SerialWriter writer("/dev/ttyACM0"); 
-  //Heda heda(writer);
-
-  //calibrateShelvesHeight(workingShelfHeight);
-  //calibrateCamWithJarRef(heda);
-
-  Mat frame;
-  heda.captureFrame(frame);
-
-  // TODO: Latter take multiple images have a reference. Go up and down to take many images.
-  cerr << "WARNING: Assuming camera to jar label distance to be 202 mm.\n";
-  double cameraDistance = 202;
-
-  double pixelsPerMm = code.code.scale;
-  cerr << "Pixels per mm: " << code.code.scale << endl;
-
-  double codePixelsWidth = pixelsPerMm * HR_CODE_WIDTH;
-  double focalPoint = computeFocalPoint(codePixelsWidth, cameraDistance, HR_CODE_WIDTH);
-
-  cout << "#endif\n";
-
-  return 0;
+  // double cameraDistance = getCameraPosition()(1) - jarHeight - shelf.height;
+  //double codePixelsWidth = HR_CODE_WIDTH * code.scale;
+  //heda.config.camera_focal_point = computeFocalPoint(codePixelsWidth, cameraDistance, HR_CODE_WIDTH);
 }

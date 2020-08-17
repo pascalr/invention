@@ -39,9 +39,7 @@ class HedaController < ApplicationController
     @pending = vals["pending"]
     @position = vals["pos"]
     @tool_position = vals["toolPos"]
-
-    puts "vals = "
-    puts vals
+    @gripped_jar_format_id = vals["gripped_jar_format_id"]
 
     render partial: "status"
   end

@@ -20,6 +20,15 @@ class Table {
     //virtual string getValues(const T& item) = 0;
     virtual void bindQuery(SQLite::Statement& query, const T& item) = 0;
     //virtual void bindQuery(SQLite::Statement& query, const T& item, int i) = 0;
+    int get(T& item, int id) {
+      for (auto it = items.begin(); it != items.end(); ++it) {
+        if (it->id == id) {
+          item = *it;
+          return 1;
+        }
+      }
+      return 0;
+    }
 
     //bool exists = false;
 
@@ -40,19 +49,6 @@ class Model {
     time_t created_at;
     time_t updated_at;
 };
-
-/*
-0|id|integer|1||1
-1|shelf_id|integer|0|NULL|0
-2|created_at|datetime(6)|1||0
-3|updated_at|datetime(6)|1||0
-4|user_coord_offset_x|float|0|NULL|0
-5|user_coord_offset_y|float|0|NULL|0
-6|user_coord_offset_z|float|0|NULL|0
-7|camera_radius|float|0|NULL|0
-8|gripper_radius|float|0|NULL|0
-9|camera_focal_point|float|0|NULL|0
-*/
 
 class HedaConfig : public Model {
   public:
@@ -166,13 +162,48 @@ class JarFormat : public Model {
   public:
     double empty_weight;
     double height;
-    double width;
+    double diameter;
     string name;
+    double lid_diameter;
+    double lid_weight;
+};
+
+class JarFormatTable : public Table<JarFormat> {
+  public:
+    const char* TABLE_NAME = "jar_formats";
+    string getTableName() { return TABLE_NAME; };
+    
+    void bindQuery(SQLite::Statement& query, const JarFormat& item) {
+      query.bind(1, item.empty_weight);
+      query.bind(2, item.height);
+      query.bind(3, item.diameter);
+      query.bind(4, item.created_at);
+      query.bind(5, item.updated_at);
+      query.bind(6, item.name);
+      query.bind(7, item.lid_diameter);
+      query.bind(8, item.lid_weight);
+    }
+
+    JarFormat parseItem(SQLite::Statement& query) {
+      JarFormat item;
+      item.empty_weight = query.getColumn(1);
+      item.height = query.getColumn(2);
+      item.diameter = query.getColumn(3);
+      item.created_at = query.getColumn(4);
+      item.updated_at = query.getColumn(5);
+      item.name = (const char*)query.getColumn(6);
+      item.lid_diameter = query.getColumn(7);
+      item.lid_weight = query.getColumn(8);
+      return item;
+    }
+
 };
 
 class Jar : public Model {
   public:
-    PolarCoord position;
+    int jar_format_id = -1;
+    int ingredient_id = -1;
+    //PolarCoord position;
 };
 
 class JarTable : public Table<Jar> {
@@ -181,17 +212,25 @@ class JarTable : public Table<Jar> {
     string getTableName() { return TABLE_NAME; };
     
     void bindQuery(SQLite::Statement& query, const Jar& item) {
-      query.bind(1, item.position(0));
-      query.bind(2, item.position(1));
-      query.bind(3, item.position(2));
+      query.bind(1, item.jar_format_id);
+      query.bind(2, item.ingredient_id);
+      query.bind(3, item.created_at);
+      query.bind(4, item.updated_at);
+      //query.bind(1, item.position(0));
+      //query.bind(2, item.position(1));
+      //query.bind(3, item.position(2));
     }
 
     Jar parseItem(SQLite::Statement& query) {
       Jar jar;
-      double x = query.getColumn(1);
-      double y = query.getColumn(2);
-      double t = query.getColumn(3);
-      jar.position << x, y, t;
+      jar.jar_format_id = query.getColumn(1);
+      jar.ingredient_id = query.getColumn(2);
+      jar.created_at = query.getColumn(3);
+      jar.updated_at = query.getColumn(4);
+      //double x = query.getColumn(1);
+      //double y = query.getColumn(2);
+      //double t = query.getColumn(3);
+      //jar.position << x, y, t;
       return jar;
     }
 

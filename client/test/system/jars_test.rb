@@ -16,7 +16,6 @@ class JarsTest < ApplicationSystemTestCase
 
     fill_in "Ingredient", with: @jar.ingredient_id
     fill_in "Jar format", with: @jar.jar_format_id
-    fill_in "Position", with: @jar.position_id
     click_on "Create Jar"
 
     assert_text "Jar was successfully created"
@@ -29,7 +28,6 @@ class JarsTest < ApplicationSystemTestCase
 
     fill_in "Ingredient", with: @jar.ingredient_id
     fill_in "Jar format", with: @jar.jar_format_id
-    fill_in "Position", with: @jar.position_id
     click_on "Update Jar"
 
     assert_text "Jar was successfully updated"

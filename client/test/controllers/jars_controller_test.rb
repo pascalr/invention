@@ -17,7 +17,7 @@ class JarsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create jar" do
     assert_difference('Jar.count') do
-      post jars_url, params: { jar: { ingredient_id: @jar.ingredient_id, jar_format_id: @jar.jar_format_id, position_id: @jar.position_id } }
+      post jars_url, params: { jar: { ingredient_id: @jar.ingredient_id, jar_format_id: @jar.jar_format_id } }
     end
 
     assert_redirected_to jar_url(Jar.last)
@@ -34,7 +34,7 @@ class JarsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update jar" do
-    patch jar_url(@jar), params: { jar: { ingredient_id: @jar.ingredient_id, jar_format_id: @jar.jar_format_id, position_id: @jar.position_id } }
+    patch jar_url(@jar), params: { jar: { ingredient_id: @jar.ingredient_id, jar_format_id: @jar.jar_format_id } }
     assert_redirected_to jar_url(@jar)
   end
 
