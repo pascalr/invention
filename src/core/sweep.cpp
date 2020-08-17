@@ -80,10 +80,10 @@ void calculateSweepMovements(Heda& heda, vector<Movement>& movements) {
     bool zUp = true; // Wheter the z axis goes from 0 to MAX or from MAX to 0
     for (x = xUp ? 0.0 : MAX_X; xUp ? x <= MAX_X : x >= 0.0; x += xStep * (xUp ? 1 : -1)) {
       for (z = zUp ? 0.0 : MAX_Z; zUp ? z <= MAX_Z : z >= 0.0; z += zStep * (zUp ? 1 : -1)) {
-        CartesianCoord c; c << x, heights[i], z;
-        PolarCoord p = toolCartesianToPolar(c);
-        calculateGoto(movements, oldP, p, [&heda](){sweepCallback(heda);});
-        oldP = p;
+        //UserCoord c(c << x, heights[i], z);
+        //PolarCoord p = toolCartesianToPolar(c);
+        //calculateGoto(movements, oldP, p, [&heda](){sweepCallback(heda);});
+        //oldP = p;
       }
       zUp = !zUp;
     }

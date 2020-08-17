@@ -37,12 +37,12 @@ Z: Z0 est à partir du devant.
 
 class PolarCoord {
   public:
+    PolarCoord() {}
     PolarCoord(double x, double y, double t) : x(x), y(y), t(t) {}
-    //PolarCoord(UserCoord c) : x(x), y(y), t(t) {}
-
-    Vector3d vector() {
-      Vector3d vect; vect << x, y, t;
-      return vect;
+    PolarCoord(const PolarCoord& c) : x(c.x), y(c.y), t(c.t) {}
+    
+    inline bool operator==(const PolarCoord& r){
+      return std::tie(x, y, t) == std::tie(r.x, r.y, r.t);
     }
 
     double x;
@@ -52,13 +52,14 @@ class PolarCoord {
 
 class UserCoord {
   public:
+    UserCoord() {}
     UserCoord(double x, double y, double z) : x(x), y(y), z(z) {}
-    
-    Vector3d vector() {
-      Vector3d vect; vect << x, y, z;
-      return vect;
-    }
+    UserCoord(const UserCoord& c) : x(c.x), y(c.y), z(c.z) {}
 
+    inline bool operator==(const UserCoord& r){
+      return std::tie(x, y, z) == std::tie(r.x, r.y, r.z);
+    }
+    
     double x;
     double y;
     double z;
@@ -78,11 +79,7 @@ class Movement {
     std::function<void()> callback;
 };
 
-PolarCoord toolCartesianToPolar(const CartesianCoord c);
-UserCoord toUserCoord(const PolarCoord p, double reference, double offsetX, double offsetZ);
-
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
-std::ostream& operator<<(std::ostream &os, const CartesianCoord& c);
 std::ostream& operator<<(std::ostream &os, const UserCoord& c);
 
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);

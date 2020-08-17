@@ -146,7 +146,7 @@ class Heda {
         double x = tokens.popScalaire();
         double y = tokens.popScalaire();
         double t = tokens.popScalaire();
-        PolarCoord dest; dest << x, y, t;
+        PolarCoord dest(x, y, t);
         moveTo(dest);
       };
       
@@ -169,7 +169,7 @@ class Heda {
     void reference() {
       cerr << "Doing reference...\n";
       pushCommand("H", [&]() {
-        m_position << HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T;
+        m_position = PolarCoord(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T);
       });
     }
 
@@ -206,11 +206,11 @@ class Heda {
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
       pushCommand(mvt.str(), [&,mvt]() {
         if (mvt.axis == 'x' || mvt.axis == 'X') {
-          m_position(0) = mvt.destination;
+          m_position.x = mvt.destination;
         } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
-          m_position(1) = mvt.destination;
+          m_position.y = mvt.destination;
         } else if (mvt.axis == 't' || mvt.axis == 'T') {
-          m_position(2) = mvt.destination;
+          m_position.t = mvt.destination;
         }
         if (mvt.callback) {mvt.callback();}
       });
@@ -302,12 +302,34 @@ class Heda {
       return m_current_command.cmd;
     }
 
+    // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
+    /*PolarCoord toPolarCoord(const UserCoord c, double reference) {
+
+      double offsetX = config.user_coord_offset_x;
+      double offsetY = config.user_coord_offset_y;
+      double offsetZ = config.user_coord_offset_z;
+      // The x axis and the z axis are reverse (hence * -1)
+      return PolarCoord(c.x);
+    }*/
+
+    // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
+    UserCoord toUserCoord(const PolarCoord p, double reference) {
+
+      double offsetX = config.user_coord_offset_x;
+      double offsetY = config.user_coord_offset_y;
+      double offsetZ = config.user_coord_offset_z;
+      // The x axis and the z axis are reverse (hence * -1)
+      return UserCoord(((p.x + cosd(p.t) * reference)*-1)+offsetX,
+                  p.y+offsetY,
+                  ((sind(p.t) * reference)*-1)+offsetZ);
+    }
+
     UserCoord getCameraPosition() {
-      return toUserCoord(m_position, config.camera_radius, config.user_coord_offset_x, config.user_coord_offset_z);
+      return toUserCoord(m_position, config.camera_radius);
     }
 
     UserCoord getToolPosition() {
-      return toUserCoord(m_position, config.gripper_radius, config.user_coord_offset_x, config.user_coord_offset_z);
+      return toUserCoord(m_position, config.gripper_radius);
     }
     
     PolarCoord getPosition() {
@@ -388,7 +410,7 @@ class Heda {
               Parser parser;
               ParseResult result;
               parser.parse(result, pos);
-              m_position << result.popScalaire(), result.popScalaire(), result.popScalaire();
+              m_position = PolarCoord(result.popScalaire(), result.popScalaire(), result.popScalaire());
             }
             this_thread::sleep_for(chrono::milliseconds(5));
           }

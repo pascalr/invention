@@ -38,11 +38,24 @@ Z: Z0 est à partir du devant.
 // Above which shelf is the arm on?
 int calculateLevel(PolarCoord position) {
 
+// FIXME
+// FIXME
+// FIXME
+// FIXME
+// FIXME
+// FIXME use shelves from database
+// FIXME
+// FIXME
+// FIXME
+// FIXME
+// FIXME
+// FIXME
+
   double heights[SHELVES_TOTAL] = SHELVES_HEIGHT;
 
   for (int i = 0; i < SHELVES_TOTAL; i++) {
 
-    if (position(1) < heights[i]) {
+    if (position.y < heights[i]) {
       return i - 1;
     }
   }
@@ -55,17 +68,8 @@ string Movement::str() const {
   return ss.str();
 }
 
-// reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
-UserCoord toUserCoord(const PolarCoord p, double reference, double offsetX, double offsetZ) {
-  UserCoord c; 
-  // The x axis and the z axis are reverse (hence * -1)
-  c << ((p(0) + cosd(p(2)) * reference)*-1)+offsetX,
-       p(1),
-       ((sind(p(2)) * reference)*-1)+offsetZ;
-  return c;
-}
 
-PolarCoord toolCartesianToPolar(const CartesianCoord c) {
+/*PolarCoord toolCartesianToPolar(const CartesianCoord c) {
 
   double t = (asin(c(2) / CLAW_RADIUS) * 180.0 / PI);
   if (c(0) < X_MIDDLE) {
@@ -75,18 +79,14 @@ PolarCoord toolCartesianToPolar(const CartesianCoord c) {
   PolarCoord r;
   r << c(0)-deltaX, c(1), t;
   return r;
-} 
+}*/
 
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
-  return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
+  return os << "(" << c.x << ", " << c.y << ", " << c.t << ")";
 }
 
 std::ostream& operator<<(std::ostream &os, const UserCoord& c) {
-  return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
-}
-
-std::ostream& operator<<(std::ostream &os, const CartesianCoord& c) {
-  return os << "(" << c(0) << ", " << c(1) << ", " << c(2) << ")";
+  return os << "(" << c.x << ", " << c.y << ", " << c.z << ")";
 }
 
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition) {
@@ -107,27 +107,27 @@ void calculateGoto(vector<Movement> &movements, const PolarCoord position, const
   int currentLevel = calculateLevel(position);
   int destinationLevel = calculateLevel(destination);
     
-  double positionT = position(2);
+  double positionT = position.t;
 
   // must change level
   if (currentLevel != destinationLevel) {
 
-    positionT = ((position(0)) > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    positionT = (position.x > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     movements.push_back(Movement('t', positionT));
   }
  
-  addMovementIfDifferent(movements, Movement('y', destination(1)), position(1)); 
+  addMovementIfDifferent(movements, Movement('y', destination.y), position.y); 
 
   // If moving theta would colide, move x first
-  double deltaX = cosd(destination(2)) * CLAW_RADIUS;
-  double xIfTurnsFirst = position(0) + deltaX;
+  double deltaX = cosd(destination.t) * CLAW_RADIUS;
+  double xIfTurnsFirst = position.x + deltaX;
 
   if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
-    addMovementIfDifferent(movements, Movement('x', destination(0)), position(0)); 
-    addMovementIfDifferent(movements, Movement('t', destination(2)), positionT); 
+    addMovementIfDifferent(movements, Movement('x', destination.x), position.x); 
+    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
   } else {
-    addMovementIfDifferent(movements, Movement('t', destination(2)), positionT); 
-    addMovementIfDifferent(movements, Movement('x', destination(0)), position(0)); 
+    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+    addMovementIfDifferent(movements, Movement('x', destination.x), position.x); 
   }
 
   if (callback && movements.size() != size) {
