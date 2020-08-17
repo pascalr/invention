@@ -37,7 +37,7 @@ void Heda::calibrate() {
   // TODO: Make sure heda is referenced
  
   JarFormat format; 
-  if (!formats.get(format, gripped_jar.jar_format_id)) {throw NoGrippedJarException();}
+  if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw NoGrippedJarException();}
 
   Shelf shelf = getWorkingShelf();
 

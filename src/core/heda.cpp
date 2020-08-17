@@ -8,12 +8,22 @@
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
+class InvalidJarIdException : public exception {};
+
 void Heda::sweep() {
   std::cout << "Heda::sweep()\n";
   db.clear(codes);
   vector<Movement> mvts;
   calculateSweepMovements(*this, mvts);
   move(mvts);
+}
+
+void Heda::grip(int id) {
+  Jar jar;
+  if (!jars.get(jar, id)) {throw InvalidJarIdException();}
+  
+  grab(40.0); // TODO: Read the grab strength from the jar_format model
+  gripped_jar = jar; // TODO: Do this as a callbacké
 }
 
 // Lower to the shelf based on jar height

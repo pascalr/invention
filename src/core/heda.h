@@ -89,10 +89,12 @@ class Heda {
     void loadDb() {
       HedaConfigTable table;
       db.load(table);
-      db.load(shelves);
-      db.load(codes);
       if (table.items.empty()) {throw MissingConfigException();}
       config = *table.items.begin();
+      db.load(shelves);
+      db.load(codes);
+      db.load(jar_formats);
+      db.load(jars);
     }
 
     void setupCommands() {
@@ -117,6 +119,10 @@ class Heda {
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
       m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
+      m_commands["grip"] = [&](ParseResult tokens) {
+        unsigned long id = tokens.popPositiveInteger();
+        grip(id);
+      };
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -234,6 +240,7 @@ class Heda {
     void pinpoint();
     void calibrate();
     void putdown();
+    void grip(int id);
 
     void clearDetectedCodes() {
       db.clear(codes);
@@ -328,7 +335,8 @@ class Heda {
     
     DetectedHRCodeTable codes;
     ShelfTable shelves;
-    JarFormatTable formats;
+    JarFormatTable jar_formats;
+    JarTable jars;
     Database& db;
 
     bool isDoneWorking() {
