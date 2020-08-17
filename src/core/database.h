@@ -48,6 +48,7 @@ class Database {
       cout << "DB LOAD: " << queryStr << endl;
       while (query.executeStep()) {
         T item = table.parseItem(query);
+        item.id = query.getColumn(0);
         table.items.push_back(item);
       }
     }

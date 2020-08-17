@@ -70,7 +70,8 @@ void setupAxes(Program& p) {
   p.baseAxisX.setDefaultMaxSpeed(1.5);
   p.baseAxisX.setAcceleration(1.5);
 
-  p.axisY.setStepsPerUnit(200 * 2 * 16 / (2.625*25.4*3.1416) * (51/13));
+  double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
+  p.axisY.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
   p.axisY.setStepsPerTurn(200 * 2 * 16);
   //p.axisY.limitSwitchPin = 12;
   p.axisY.setupPins(8,7,6);

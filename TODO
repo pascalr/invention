@@ -1,5 +1,7 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+stop has a bug, it keeps writing stop, and if I try to put another command it crashes
+
 Shelf has_many shelf JarLocation
 JarLocation belongs_to Shelf string de comment allez chercher le pot. has_and_belongs_to_many JarLocation (empty locations required to take out the jar)
 

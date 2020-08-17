@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class NoGrippedJarException : public exception {};
+class InvalidGrippedJarFormatException : public exception {};
 
 DetectedHRCode detectOneCode(Heda& heda) {
  
@@ -37,7 +37,7 @@ void Heda::calibrate() {
   // TODO: Make sure heda is referenced
  
   JarFormat format; 
-  if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw NoGrippedJarException();}
+  if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
 
   Shelf shelf = getWorkingShelf();
 
