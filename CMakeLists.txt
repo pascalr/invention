@@ -103,8 +103,6 @@ add_executable( rasp_server src/rasp_server.cpp )
 #target_include_directories( simulation PRIVATE "/usr/local/include/simple-web-server/" )
 #target_compile_definitions(simulation PUBLIC SIMULATION)
 
-add_executable( calibrate src/calibrate.cpp )
-
 enable_testing()
 add_test( regularTests bin/run_tests )
 add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )

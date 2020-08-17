@@ -115,6 +115,8 @@ class Heda {
       m_commands["detect"] = [&](ParseResult tokens) {detect();};
       m_commands["parse"] = [&](ParseResult tokens) {parse();};
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
+      m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
+      m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -231,6 +233,10 @@ class Heda {
     void parse();
     void pinpoint();
 
+    void clearDetectedCodes() {
+      db.clear(codes);
+    }
+
     // goto an empty place and drop the jar
     void store() {
       
@@ -325,6 +331,8 @@ class Heda {
     bool isDoneWorking() {
       return m_current_command.isDone() && m_stack.empty();
     }
+    
+    HedaConfig config;
 
   protected:
 
@@ -392,7 +400,6 @@ class Heda {
 
     string m_pending_commands;
 
-    HedaConfig config;
 };
 
 #endif

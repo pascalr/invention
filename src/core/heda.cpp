@@ -4,6 +4,7 @@
 #include "client_http.hpp"
 #include "pinpoint.h"
 #include "../lib/opencv.h"
+#include "calibrate.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
@@ -13,6 +14,12 @@ void Heda::sweep() {
   vector<Movement> mvts;
   calculateSweepMovements(*this, mvts);
   move(mvts);
+}
+
+// Lower to the shelf based on jar height
+// Then release.
+// Then a little above the jar
+void Heda::putdown() {
 }
 
 void Heda::pinpoint() {

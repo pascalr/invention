@@ -11,63 +11,48 @@
 using namespace std;
 using namespace Eigen;
 
-/*double calculateJarHeight(double perceivedWidth) {
-  double distanceFromCam = HR_CODE_WIDTH * CAMERA_FOCAL_POINT / perceivedWidth;
-  return DISTANCE_CAMERA_SHELF - distanceFromCam;
+
+// https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/
+// F = (P x  D) / W
+// The focal point (F) equals the apparent width in pixels (P) times the distance from the camera D
+// divided by the actual width of the object (W)
+// I find F by an average with some data.
+// Then I can always get the distance from the other values.
+// D’ = (W x F) / P
+
+double heightOffset(Heda& heda, DetectedHRCode& input) {
+
+  //double perseivedWidth = HR_CODE_WITH * input.scale;
+  //double distanceFromCam = HR_CODE_WIDTH * heda.config.camera_focal_point / perceivedWidth;
+  return heda.config.camera_focal_point / input.scale;
 }
 
-Vector2d cameraPosition(Vector2d toolPosition, double angle) {
+Vector2d imageOffset(DetectedHRCode& input) {
 
-  double offset = CAMERA_TOOL_DISTANCE;
-  Vector2d cameraOffset(offset*cosd(angle),offset*sind(angle));
-  return toolPosition - cameraOffset;
-}
-
-Vector2d jarOffset(Vector2d imgCenter, double angle, double scale) {
-
-  Vector2d imgCenterOffset = imgCenter - Vector2d(CAMERA_WIDTH/2, CAMERA_HEIGHT/2) ;
+  Vector2d jarCenter; jarCenter << input.centerX, input.centerY;
+  Vector2d imgCenterOffset = jarCenter - Vector2d(CAMERA_WIDTH/2, CAMERA_HEIGHT/2) ;
 
   // Gauche droite sur l'image (donc jarCenter.x) c'est les z quand l'angle est à 0.
   // jarCenter.x positif c'est z négatif.
   // jarCenter.y positif c'est x négatif.
-  Vector2d jarCenter;
-  jarCenter << -imgCenterOffset(1), -imgCenterOffset(0);
+  Vector2d jarOffset; jarOffset << -imgCenterOffset(1), -imgCenterOffset(0);
 
-  jarCenter /= scale; // Translate pixels dimensions into mm.
+  jarOffset /= input.scale; // Translate pixels dimensions into mm.
 
   // I must rotate the offset value because the camera is rotated.
-  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(angle / 180.0 * PI));
-  jarCenter = t * jarCenter;
+  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(input.coord(2) / 180.0 * PI));
+  jarOffset = t * jarOffset;
 
-  return jarCenter;
+  return jarOffset;
 }
-
-
-Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d imgCenter, double scale) {
-  
-  Vector2d cameraPos = cameraPosition(toolPosition, angle);
-
-  return cameraPos + jarOffset(imgCenter, angle, scale);
-}*/
 
 void pinpointCode(Heda& heda, DetectedHRCode& input) {
 
-  /*Vector2d toolPosition;
-  toolPosition << input.x, input.z;
+  UserCoord camPos = heda.getCameraPosition();
+  double heightOffset0 = heightOffset(heda, input);
+  Vector2d imgOffset = imageOffset(input);
 
-  Vector2d jarCenter;
-  jarCenter << input.code.x, input.code.y;
-
-  Vector2d jarPosition = convertToAbsolutePosition(toolPosition, input.angle, jarCenter, input.code.scale);
-
-  PositionedHRCode result(input.code, jarPosition(0), 0, jarPosition(1));
-  return result;*/
+  input.lid_coord << camPos(0) + imgOffset(0), camPos(1) - heightOffset0, camPos(2) + imgOffset(1);
 }
-
-/*void pinpointCode(Heda& heda, vector<DetectedHRCode>& input) {
-  for (auto it = input.begin(); it != input.end(); ++it) {
-    pinpoint(heda, *it);
-  }
-}*/
 
 #endif

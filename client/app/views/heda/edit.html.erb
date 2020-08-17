@@ -46,9 +46,14 @@
     <%= form.number_field :camera_radius, readonly: true %>
   </div>
 
+  <p>
+  Pour entrer cette donnée, déplacer le bras au centre de l'axe x. Ensuite mettre le bras à theta=0. Mettre outils crayon dans la pince. Faire une marque.
+  Déplacer theta = 180. Faire une marque. Divisier la distance en 2.
+  </p>
+
   <div class="field">
     <%= form.label :gripper_radius %>
-    <%= form.number_field :gripper_radius, readonly: true  %>
+    <%= form.number_field :gripper_radius %>
   </div>
 
   <div class="field">
@@ -61,5 +66,20 @@
   </div>
 <% end %>
 
-
 <%= render :file => 'jar_formats/index' %>
+
+<h2>Calibrate camera</h2>
+
+<p>
+La tablette de travail doit être libre.
+</p>
+
+<p>
+Insérer un pot de référence dans les pinces et remplir le forumulaire suivant.
+</p>
+
+<%= form_with url: heda_run_path(cmd: "calibrate") do |form| %>
+  <%= form.label :jar_height %>
+  <%= form.number_field :jar_height %>
+  <%= form.submit "Calibrate" %>
+<% end %>

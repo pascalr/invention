@@ -113,7 +113,7 @@ class DetectedHRCode : public Model {
     string weight;
     string content_name;
     string content_id;
-    CartesianCoord lid_coord;
+    UserCoord lid_coord;
 };
 
 class DetectedHRCodeTable : public Table<DetectedHRCode> {
