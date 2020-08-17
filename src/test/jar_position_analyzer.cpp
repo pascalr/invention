@@ -1,6 +1,6 @@
 #include "test.h"
 
-#include "../core/jar_position_analyzer.h"
+#include "../core/pinpoint.h"
 #include "../utils/io_common.h"
 #include "../core/sweep.h"
 #include "../config/constants.h"

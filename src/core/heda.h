@@ -14,7 +14,7 @@
 #include "jar_parser.h"
 //#include "jar_packer.h"
 
-#include "Database.h"
+#include "database.h"
 
 class HedaException : public exception {};
 
@@ -114,6 +114,7 @@ class Heda {
       m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
       m_commands["detect"] = [&](ParseResult tokens) {detect();};
       m_commands["parse"] = [&](ParseResult tokens) {parse();};
+      m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
       
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
@@ -226,10 +227,9 @@ class Heda {
     }
 
     void sweep();
-
     void detect();
-    
     void parse();
+    void pinpoint();
 
     // goto an empty place and drop the jar
     void store() {
@@ -287,8 +287,12 @@ class Heda {
       return m_current_command.cmd;
     }
 
+    UserCoord getCameraPosition() {
+      return toUserCoord(m_position, config.camera_radius, config.user_coord_offset_x, config.user_coord_offset_z);
+    }
+
     UserCoord getToolPosition() {
-      return toUserCoord(m_position, CLAW_RADIUS, config.user_coord_offset_x, config.user_coord_offset_z);
+      return toUserCoord(m_position, config.gripper_radius, config.user_coord_offset_x, config.user_coord_offset_z);
     }
     
     PolarCoord getPosition() {

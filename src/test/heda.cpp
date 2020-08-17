@@ -1,6 +1,6 @@
 #include "test.h"
 
-#include "../core/Heda.h"
+#include "../core/heda.h"
 #include "../core/writer/stream_writer.h"
 #include "../core/reader/fake_reader.h"
 

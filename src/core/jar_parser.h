@@ -1,7 +1,7 @@
 #ifndef JAR_PARSER_H
 #define JAR_PARSER_H
 
-#include "Model.h"
+#include "model.h"
 
 void parseJarCode(DetectedHRCode& p);
 

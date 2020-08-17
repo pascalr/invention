@@ -12,7 +12,7 @@
 #include "core/input_parser.h"
 #include "core/simulation.h"
 #include "lib/draw_matplotlib.h"
-#include "core/Heda.h"
+#include "core/heda.h"
 #include "core/writer/echo_writer.h"
       
 using namespace std;

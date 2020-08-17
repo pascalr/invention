@@ -1,7 +1,7 @@
 #include "test.h"
 
-#include "../core/Database.h"
-#include "../core/Model.h"
+#include "../core/database.h"
+#include "../core/model.h"
 
 using namespace std;
 

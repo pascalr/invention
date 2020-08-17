@@ -1,10 +1,12 @@
 #ifndef JAR_POSITION_DETECTOR
 #define JAR_POSITION_DETECTOR
 
+// Maybe rename to pinpoint
+
 #include "position.h"
 #include "sweep.h"
 #include <vector>
-#include "jar.h"
+#include "model.h"
  
 using namespace std;
 using namespace Eigen;
@@ -48,7 +50,7 @@ Vector2d convertToAbsolutePosition(Vector2d toolPosition, double angle, Vector2d
   return cameraPos + jarOffset(imgCenter, angle, scale);
 }*/
 
-void analyzePosition(DetectedHRCode& input) {
+void pinpointCode(Heda& heda, DetectedHRCode& input) {
 
   /*Vector2d toolPosition;
   toolPosition << input.x, input.z;
@@ -62,10 +64,10 @@ void analyzePosition(DetectedHRCode& input) {
   return result;*/
 }
 
-void analyzePosition(vector<DetectedHRCode>& input) {
+/*void pinpointCode(Heda& heda, vector<DetectedHRCode>& input) {
   for (auto it = input.begin(); it != input.end(); ++it) {
-    analyzePosition(*it);
+    pinpoint(heda, *it);
   }
-}
+}*/
 
 #endif

@@ -1,7 +1,8 @@
-#include "Heda.h"
+#include "heda.h"
 #include "position.h"
 #include "sweep.h"
 #include "client_http.hpp"
+#include "pinpoint.h"
 #include "../lib/opencv.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
@@ -12,6 +13,14 @@ void Heda::sweep() {
   vector<Movement> mvts;
   calculateSweepMovements(*this, mvts);
   move(mvts);
+}
+
+void Heda::pinpoint() {
+  for (size_t i = 0; i < codes.items.size(); i++) {
+    DetectedHRCode& code = codes.items[i];
+    pinpointCode(*this, code);
+    db.update(codes, code);
+  }
 }
 
 void Heda::parse() {

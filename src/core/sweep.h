@@ -20,8 +20,8 @@
 #include <thread>
 
 #include "position.h"
-#include "Model.h"
-#include "Heda.h"
+#include "model.h"
+#include "heda.h"
 
 class Heda;
 //class Mat;

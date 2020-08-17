@@ -59,7 +59,7 @@ ADD_LIBRARY(MyLibsModule
   src/core/reader/reader.cpp
   src/core/axis.cpp
   src/core/jar_parser.cpp
-  src/core/Heda.cpp
+  src/core/heda.cpp
   src/core/sweep.cpp
   src/core/position.cpp
   src/lib/lib.cpp

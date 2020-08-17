@@ -19,8 +19,8 @@
 #include <thread>
 
 #include "position.h"
-#include "Model.h"
-#include "Heda.h"
+#include "model.h"
+#include "heda.h"
 
 using namespace std;
 using namespace cv;

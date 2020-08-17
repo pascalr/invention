@@ -1,5 +1,5 @@
 #include "position.h"
-#include "Heda.h"
+#include "heda.h"
 
 #include "../config/constants.h"
 

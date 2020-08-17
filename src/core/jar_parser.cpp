@@ -2,7 +2,7 @@
 #include <leptonica/allheaders.h>
 
 #include "../lib/opencv.h"
-#include "Model.h"
+#include "model.h"
 #include "../lib/hr_code.h"
 #include <string>
 #include "../config/constants.h"

@@ -2,7 +2,7 @@
 #define _DATABASE_H
 
 #include "SQLiteCpp/SQLiteCpp.h"
-#include "Model.h"
+#include "model.h"
 #include <vector>
 
 using namespace std;

@@ -1,5 +1,8 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+Shelf has_many shelf JarLocation
+JarLocation belongs_to Shelf string de comment allez chercher le pot. has_and_belongs_to_many JarLocation (empty locations required to take out the jar)
+
 Une page d'acceuil du projet avec une feature list. Faire une feature list.
 
 DCMotor avec un encodeur pour l'axe vertical. Comme ça je vais pouvoir à côté les pots sur les tablettes?

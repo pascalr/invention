@@ -12,8 +12,7 @@
 #include "lib/serial.h"
 #include "lib/linux.h"
 #include "helper/logging.h"
-#include "core/jar_position_analyzer.h"
-#include "core/Heda.h"
+#include "core/heda.h"
 
 #include "lib/opencv.h"
 

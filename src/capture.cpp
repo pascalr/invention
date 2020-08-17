@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
-#include "core/Heda.h"
+#include "core/heda.h"
 #include "core/writer/serial_writer.h"
 #include "core/reader/serial_reader.h"
 
