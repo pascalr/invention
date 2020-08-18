@@ -3,6 +3,7 @@
 
 #include "Motor.h"
 #include "../lib/ArduinoMock.h"
+#include "referencer.h"
 
 class StepperMotor : public Motor {
   public:
@@ -292,7 +293,7 @@ class StepperMotor : public Motor {
     double m_default_max_speed; // tour/s [turn/sec]
     double m_speed;
 
-
+    LimitSwitchReferencer referencer;
 
     // TODO:
     // bool m_jog_forward; No more forceRotation.
@@ -300,8 +301,7 @@ class StepperMotor : public Motor {
 
   protected:
 
-    virtual void doStartReferencing() {
-      referenceReached();
+    void doStartReferencing() {
     }
 
     // Resets some stuff.
@@ -315,10 +315,13 @@ class StepperMotor : public Motor {
     // Returns true if the axis is still working.
     virtual bool handleAxis(unsigned long currentTime) {
       //unsigned int delay = getDelay();
+
+      if (isReferencing && referencer.isReferenceReached()) {
+        referenceReached();
+        return false;
+      }
       
-      if (isReferencing) {
-        return moveToReference();
-      } else if (forceRotation || !isDestinationReached()) {
+      if (isReferencing || forceRotation || !isDestinationReached()) {
         unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
         if (currentTime >= m_next_step_time) {
           turnOneStep(timeSinceStart);
@@ -327,7 +330,6 @@ class StepperMotor : public Motor {
       }
       return false;
     }
-
 };
 
 class BaseXAxis : public StepperMotor {

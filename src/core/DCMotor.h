@@ -71,9 +71,6 @@ class DCMotor : public Motor {
   protected:
 
     virtual void doStartReferencing() {
-      isReferencing = true;
-      isReferenced = false;
-      setMotorDirection(REVERSE);
       setDutyCycle(25);
     }
 
@@ -90,9 +87,9 @@ class DCMotor : public Motor {
       if (isReferencing) {
         if (isNotMoving) {
           referenceReached();
-	  return false;
-	}
-	return true;
+      	  return false;
+      	}
+      	return true;
       }
 
 

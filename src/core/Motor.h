@@ -61,6 +61,9 @@ class Motor {
 
     void startReferencing() {
       isWorking = true;
+      isReferenced = false;
+      isReferencing = true;
+      setMotorDirection(REVERSE);
       doStartReferencing();
     }
     

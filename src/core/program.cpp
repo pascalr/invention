@@ -80,5 +80,6 @@ void setupAxes(Program& p) {
   p.axisY.setDefaultMaxSpeed(1.5);
   p.axisY.setAcceleration(1.5);
   p.axisY.setReverseMotorDirection(true);
+  p.axisY.referencer = LimitSwitchReferencer(12);
 
 }
