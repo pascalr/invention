@@ -26,7 +26,7 @@ Motor* parseInputMotorAxis(Program& p, char** input, Motor* &axis) {
   return 0;
 }
 
-void doReferencingAll(Program& p) {
+/*void doReferencingAll(Program& p) {
   p.getWriter() << "Referencing...\n";
   p.axisR.startReferencing();
   p.axisT.startReferencing(); // TODO: Use the potentiometer to do the referencing. Move to 90 degrees.
@@ -39,7 +39,7 @@ void doReferencingAll(Program& p) {
       };
     };
   };
-}
+}*/
 
 // Référencement: 2 situations:
 // - Le bras est orienté de manière à ce qu'il n'y ait pas de collision pour monter descendre:
@@ -82,7 +82,8 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
-    doReferencingAll(p);
+    if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    motorAxis->startReferencing();
 
   // Wait or sleep for some time
   } else if (cmd == 'w' || cmd == 'W') {
