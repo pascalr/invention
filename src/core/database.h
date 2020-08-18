@@ -24,13 +24,16 @@ class Database {
       db.exec(cmd);
     }
 
+    // Optional used for like ORDER BY
+    // It is added at the end of the query
     template<class T> 
-    void load(Table<T>& table) {
+    void load(Table<T>& table, string optional = "") {
       std::lock_guard<std::mutex> guard(dbMutex);
     
-      string queryStr = "SELECT * FROM ";
-      queryStr += table.getTableName();
-      SQLite::Statement query(db, queryStr);
+      stringstream queryStr; queryStr << "SELECT * FROM " << table.getTableName();
+      queryStr << " " << optional;
+
+      SQLite::Statement query(db, queryStr.str());
       table.column_count = query.getColumnCount();
       table.update_query = "UPDATE " + table.getTableName() + " SET ";
       table.insert_query = "INSERT INTO " + table.getTableName() + " VALUES(NULL, ";
@@ -45,7 +48,7 @@ class Database {
       table.update_query += " WHERE id = ?";
       table.insert_query += ")";
       
-      cout << "DB LOAD: " << queryStr << endl;
+      cout << "DB LOAD: " << queryStr.str() << endl;
       while (query.executeStep()) {
         T item = table.parseItem(query);
         item.id = query.getColumn(0);

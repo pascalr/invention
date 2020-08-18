@@ -1,5 +1,5 @@
 #include "test.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 #include "../core/axis.h"
 #include "../core/fake_program.h"

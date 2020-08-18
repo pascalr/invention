@@ -31,13 +31,29 @@ class Table {
       }
       return 0;
     }
+    typename std::vector<T>::iterator begin() {
+      return items.begin();
+    }
+    typename std::vector<T>::iterator end() {
+      return items.end();
+    }
+    int size() {
+      return items.size();
+    }
+    bool empty() {
+      return items.empty();
+    }
+    T& back() {
+      return items.back();
+    }
+    // TODO: operator[]
 
     //bool exists = false;
 
     int column_count;
     std::string update_query;
     std::string insert_query;
-    std::vector<T> items;
+    std::vector<T> items; // TODO: Make items protected
 };
 
 class Model {

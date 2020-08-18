@@ -91,7 +91,7 @@ class Heda {
       db.load(table);
       if (table.items.empty()) {throw MissingConfigException();}
       config = *table.items.begin();
-      db.load(shelves);
+      db.load(shelves, "ORDER BY height");
       db.load(codes);
       db.load(jar_formats);
       db.load(jars);
@@ -378,6 +378,12 @@ class Heda {
     HedaConfig config;
 
     Jar gripped_jar;
+
+    // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
+    void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
+
+    // Above which shelf is the arm on?
+    int calculateLevel(PolarCoord position);
 
   protected:
 

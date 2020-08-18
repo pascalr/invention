@@ -62,6 +62,7 @@ void testPosition() {
   stringstream stream; stream << heda.getToolPosition();
   assertEqual("wrong", "wrong", stream.str());
 
+  cout << "-----------Position!!!: " << heda.toPolarCoord(UserCoord(0.0, 772.0 + 95.0 + 4, 0.0), 10.0);
 }
 
 void testHomeCommand() {

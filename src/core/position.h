@@ -65,10 +65,6 @@ class UserCoord {
     double z;
 };
 
-
-// Above which shelf is the arm on?
-int calculateLevel(PolarCoord position);
-
 class Movement {
   public:
     Movement(char axis, double destination, std::function<void()> callback) : axis(axis), destination(destination), callback(callback) {}
@@ -85,8 +81,5 @@ std::ostream& operator<<(std::ostream &os, const UserCoord& c);
 void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);
 
 void doNothing();
-
-// Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
-void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
 
 #endif

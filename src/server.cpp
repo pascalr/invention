@@ -23,6 +23,7 @@
 #include "core/reader/io_reader.h"
 #include "core/writer/console_writer.h"
 #include "core/two_way_stream.h"
+#include "core/serialize.h"
 
 using namespace std;
 //using namespace boost::property_tree; // json

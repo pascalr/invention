@@ -3,7 +3,7 @@
 #include "../core/pinpoint.h"
 #include "../utils/io_common.h"
 #include "../core/sweep.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 #include "../lib/hr_code.h"
 #include "../lib/opencv.h"

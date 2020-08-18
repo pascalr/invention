@@ -36,31 +36,18 @@ Z: Z0 est à partir du devant.
 */
 
 // Above which shelf is the arm on?
-int calculateLevel(PolarCoord position) {
+// Returns the id of the self
+int Heda::calculateLevel(PolarCoord position) {
 
-// FIXME
-// FIXME
-// FIXME
-// FIXME
-// FIXME
-// FIXME use shelves from database
-// FIXME
-// FIXME
-// FIXME
-// FIXME
-// FIXME
-// FIXME
+  auto previousIt = shelves.begin();
+  for (auto it = shelves.begin(); it != shelves.end(); ++it) {
 
-  double heights[SHELVES_TOTAL] = SHELVES_HEIGHT;
-
-  for (int i = 0; i < SHELVES_TOTAL; i++) {
-
-    if (position.y < heights[i]) {
-      return i - 1;
-    }
+    if (position.y < it->height) {return previousIt->id;}
+    previousIt = it;
   }
-
-  return heights[SHELVES_TOTAL - 1];
+ 
+  if (shelves.empty()) {return -1;}
+  return shelves.back().id;
 }
 
 string Movement::str() const {
@@ -99,7 +86,7 @@ void doNothing() {}
 
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 //void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback = doNothing) {
-void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
+void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
 
   unsigned int size = movements.size();
   // TODO: Collision detection
@@ -119,7 +106,7 @@ void calculateGoto(vector<Movement> &movements, const PolarCoord position, const
   addMovementIfDifferent(movements, Movement('y', destination.y), position.y); 
 
   // If moving theta would colide, move x first
-  double deltaX = cosd(destination.t) * CLAW_RADIUS;
+  double deltaX = cosd(destination.t) * config.gripper_radius;
   double xIfTurnsFirst = position.x + deltaX;
 
   if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {

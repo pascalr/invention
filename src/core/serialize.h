@@ -37,6 +37,17 @@ template <typename T>
 void writeJson(T& writer, const char* key, unsigned long val) {
   writer << "\"" << key << "\": " << val << ", ";
 }
+#ifndef ARDUINO
+#include <string>
+template <typename T>
+void writeJson(T& writer, const char* key, std::string val) {
+  writer << "\"" << key << "\": " << val << ", ";
+}
+template <typename T, typename P>
+void writeJson(T& writer, const char* key, P val) {
+  writer << "\"" << key << "\": " << val << ", ";
+}
+#endif
 
 template <typename T>
 void serialize(Program& p, T& out) {
