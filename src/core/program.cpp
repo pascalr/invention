@@ -68,6 +68,7 @@ void setupAxes(Program& p) {
   p.baseAxisX.setMinPosition(0);
   p.baseAxisX.setDefaultMaxSpeed(1.5);
   p.baseAxisX.setAcceleration(1.5);
+  p.baseAxisX.referencer = LimitSwitchReferencer(4);
 
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
   p.axisY.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);

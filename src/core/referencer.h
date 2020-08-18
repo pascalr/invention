@@ -48,7 +48,7 @@ class LimitSwitchReferencer {
     LimitSwitchReferencer(int pin) : m_pin(pin) {}
     bool isReferenceReached() {
       if (m_pin == -1) {return true;}
-      digitalRead(m_pin);
+      return digitalRead(m_pin) == HIGH;
     }
   protected:
     int m_pin = -1;

@@ -15,6 +15,7 @@ cp src/core/writer/writer.cpp ../Arduino/libraries/core/writer.cpp
 
 cp src/utils/constants.h ../Arduino/libraries/utils/constants.h
 cp src/core/program.h ../Arduino/libraries/core/program.h
+cp src/core/referencer.h ../Arduino/libraries/core/referencer.h
 cp src/core/program.cpp ../Arduino/libraries/core/program.cpp
 cp src/core/input_parser.h ../Arduino/libraries/core/input_parser.h
 cp src/core/input_parser.cpp ../Arduino/libraries/core/input_parser.cpp
