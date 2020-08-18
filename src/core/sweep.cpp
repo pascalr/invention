@@ -12,7 +12,7 @@
 #include "../lib/serial.h"
 #include "../lib/opencv.h"
 #include "../helper/logging.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 #include "fake_program.h"
 
 #include <chrono>

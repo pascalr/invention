@@ -25,6 +25,10 @@ sudo ldconfig
 # barcode
 sudo apt install barcode
 
+# leptonica for tesseract (either sudo apt install libleptonica-dev, or install from source
+https://github.com/DanBloomberg/leptonica.git
+
+
 # opencv OCR tesseract
 # DOESNT WORK FOR c++ for me sudo apt install tesseract-ocr
 # DOESNT WORK FOR c++ for me sudo apt install libtesseract-dev
@@ -38,7 +42,7 @@ sudo apt-get install libboost-all-dev
 sudo apt-get install python-matplotlib python-numpy python2.7-dev
 
 # Simple Web Server (c++)
-git clone https://gitlab.com/eidheim/Simple-Web-Server.git
+(cd .. && git clone https://gitlab.com/eidheim/Simple-Web-Server.git)
 sudo apt-get install libssl-dev libboost-filesystem-dev libboost-thread-dev
 
 (cd .. && git clone https://gitlab.com/libeigen/eigen.git)

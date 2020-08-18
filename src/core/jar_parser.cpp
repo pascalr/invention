@@ -5,7 +5,7 @@
 #include "model.h"
 #include "../lib/hr_code.h"
 #include <string>
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 /*class JarLabel {
   public:

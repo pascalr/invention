@@ -54,6 +54,12 @@ void Heda::detect() {
   detectCode(*this, frame, getPosition());
 }
 
+void Heda::capture() {
+  Mat frame;
+  captureFrame(frame);
+  imshow("capture", frame);
+  waitKey();
+}
 void Heda::captureFrame(Mat& frame) {
 
   HttpClient client("192.168.0.19:8889");

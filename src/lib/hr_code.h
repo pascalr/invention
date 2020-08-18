@@ -19,7 +19,7 @@
 #include "../lib/lib.h"
 #include "../lib/opencv.h"
 
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 #include <vector>
 

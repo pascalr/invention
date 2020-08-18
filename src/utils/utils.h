@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "constants.h"
 #include <string.h>
 #include <math.h>
 

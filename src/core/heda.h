@@ -137,6 +137,8 @@ class Heda {
       m_commands["rapporte"] = [&](ParseResult tokens) {
       };
 
+      m_commands["capture"] = [&](ParseResult tokens) {capture();};
+
       m_commands["photo"] = [&](ParseResult tokens) {
         Mat mat;
         captureFrame(mat);
@@ -194,6 +196,7 @@ class Heda {
     }
 
     void captureFrame(Mat& frame);
+    void capture();
 
     void move(const std::vector<Movement>& mvts) {
       for (auto it = mvts.begin(); it != mvts.end(); it++) {

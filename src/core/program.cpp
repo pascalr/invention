@@ -5,7 +5,7 @@
 #include "StepperMotor.h"
 #include "DCMotor.h"
 #include "reader/reader.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 #include <float.h>
 
 #define NUMBER_OF_MOTORS 6

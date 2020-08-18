@@ -34,9 +34,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp)
 
-include_directories(
-  ${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp/include
-)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/Eigen)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp/include)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/simple-web-server)
 
 ADD_LIBRARY(ExternLibsModule
   src/lib/NLTemplate.cpp
@@ -45,7 +46,8 @@ ADD_LIBRARY(ExternLibsModule
 
 set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} ExternLibsModule SQLiteCpp sqlite3 dl pthread )
 # ruby-2.5 gmp crypt m
-set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} /usr/local/include/simple-web-server/ )
+#set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} /usr/local/include/simple-web-server/ )
+set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 
 include_directories(${MyDirs})
 link_libraries(${MyLibs})
@@ -87,8 +89,6 @@ add_executable( test_jar_position_analyzer src/test/jar_position_analyzer.cpp )
 add_executable( test_axis src/test/axis.cpp )
 
 add_executable( test_parser src/test/parser.cpp )
-
-add_executable( capture src/capture.cpp )
 
 add_executable( test_heda src/test/heda.cpp )
 

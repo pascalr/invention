@@ -4,7 +4,7 @@
 #include "Motor.h"
 
 #include "writer/writer.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 #include "../utils/utils.h"
 #include <math.h>
 #include "../lib/ArduinoMock.h"

@@ -7,7 +7,7 @@ using namespace boost::property_tree;
 
 #include "program.h"
 #include "axis.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 #include "../helper/logging.h"
 
 void deserialize(Axis* axis, ptree pt) {

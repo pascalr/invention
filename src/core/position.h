@@ -1,7 +1,7 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 // COORDINATES:
 // Where does the 0 starts?

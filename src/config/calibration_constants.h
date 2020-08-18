@@ -1,1 +1,0 @@
-#define CLAW_RADIUS 338.0

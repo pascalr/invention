@@ -1,7 +1,7 @@
 #include "position.h"
 #include "heda.h"
 
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 // COORDINATES:
 // Where does the 0 starts?

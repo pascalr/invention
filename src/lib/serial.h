@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include "../lib/lib.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 #include <thread>
 #include <chrono>
 

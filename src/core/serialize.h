@@ -7,7 +7,7 @@
 #include "program.h"
 #include "axis.h"
 #include "writer/writer.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 
 template <typename T>
 void writeJson(T& writer, const char* key, const char* val) {

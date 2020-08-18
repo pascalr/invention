@@ -2,7 +2,7 @@
 #define AXIS_H
 
 #include "writer/writer.h"
-#include "../config/constants.h"
+#include "../utils/constants.h"
 #include "../utils/utils.h"
 #include <math.h>
 
