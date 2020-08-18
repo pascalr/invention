@@ -37,12 +37,12 @@ Z: Z0 est à partir du devant.
 
 // Above which shelf is the arm on?
 // Returns the id of the self
-int Heda::calculateLevel(PolarCoord position) {
+int Heda::calculateLevel(double userHeight) {
 
   auto previousIt = shelves.begin();
   for (auto it = shelves.begin(); it != shelves.end(); ++it) {
 
-    if (position.y < it->height) {return previousIt->id;}
+    if (userHeight < it->height) {return previousIt->id;}
     previousIt = it;
   }
  
@@ -91,8 +91,8 @@ void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position,
   unsigned int size = movements.size();
   // TODO: Collision detection
 
-  int currentLevel = calculateLevel(position);
-  int destinationLevel = calculateLevel(destination);
+  int currentLevel = calculateLevel(toUserHeight(position));
+  int destinationLevel = calculateLevel(toUserHeight(destination));
     
   double positionT = position.t;
 

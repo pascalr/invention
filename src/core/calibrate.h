@@ -41,17 +41,21 @@ void Heda::calibrate() {
 
   Shelf shelf = getWorkingShelf();
 
-  PolarCoord c = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 4, 0.0), config.gripper_radius);
+  PolarCoord c = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 7, 0.0), config.gripper_radius);
 
-  PolarCoord destination(0.0, c.y, 45.0);
-  moveTo(destination);
+  moveTo(PolarCoord(0.0, c.y, 45.0));
+  openJaw();
+  moveTo(PolarCoord(0.0, config.detect_height, 45.0));
+  moveTo(PolarCoord(175.0, config.detect_height, 75.0));
+  DetectedHRCode code = detectOneCode(*this);
 
   // double jarHeight = gripped_jar.height;
   //putdown(); 
   //DetectedHRCode code = detectOneCode(Heda& heda);
   //heda.camera_radius = ...
 
-  // double cameraDistance = getCameraPosition()(1) - jarHeight - shelf.height;
-  //double codePixelsWidth = HR_CODE_WIDTH * code.scale;
-  //heda.config.camera_focal_point = computeFocalPoint(codePixelsWidth, cameraDistance, HR_CODE_WIDTH);
+  double cameraDistance = config.detect_height - format.height - shelf.height;
+  double codePixelsWidth = HR_CODE_WIDTH * code.scale;
+  config.camera_focal_point = computeFocalPoint(codePixelsWidth, cameraDistance, HR_CODE_WIDTH);
+  db.update(configs, config);
 }

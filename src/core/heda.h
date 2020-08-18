@@ -87,10 +87,9 @@ class Heda {
     }
 
     void loadDb() {
-      HedaConfigTable table;
-      db.load(table);
-      if (table.items.empty()) {throw MissingConfigException();}
-      config = *table.items.begin();
+      db.load(configs);
+      if (configs.empty()) {throw MissingConfigException();}
+      config = *configs.begin();
       db.load(shelves, "ORDER BY height");
       db.load(codes);
       db.load(jar_formats);
@@ -322,6 +321,10 @@ class Heda {
       return PolarCoord(0.0, c.y - offsetY, 0.0);
     }
 
+    double toUserHeight(const PolarCoord p) {
+      return p.y+config.user_coord_offset_y;
+    }
+
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
     UserCoord toUserCoord(const PolarCoord p, double reference) {
 
@@ -366,6 +369,7 @@ class Heda {
     RawCommand m_current_command;
     
     DetectedHRCodeTable codes;
+    HedaConfigTable configs;
     ShelfTable shelves;
     JarFormatTable jar_formats;
     JarTable jars;
@@ -383,7 +387,7 @@ class Heda {
     void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
 
     // Above which shelf is the arm on?
-    int calculateLevel(PolarCoord position);
+    int calculateLevel(double userHeight);
 
   protected:
 

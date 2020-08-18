@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_17_153502) do
+ActiveRecord::Schema.define(version: 2020_08_18_133729) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 2020_08_17_153502) do
     t.float "camera_radius"
     t.float "gripper_radius"
     t.float "camera_focal_point"
+    t.float "detect_height"
     t.index ["shelf_id"], name: "index_hedas_on_shelf_id"
   end
 

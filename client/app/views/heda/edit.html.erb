@@ -42,6 +42,11 @@
   </div>
 
   <div class="field">
+    <%= form.label :detect_height %>
+    <%= form.number_field :detect_height, step: 0.01 %>
+  </div>
+
+  <div class="field">
     <%= form.label :camera_radius %>
     <%= form.number_field :camera_radius, readonly: true %>
   </div>

@@ -3,9 +3,9 @@
 #include "status_code.hpp"
 #include <future>
 
-//#define BOOST_SPIRIT_THREADSAFE
-//#include <boost/property_tree/json_parser.hpp>
-//#include <boost/property_tree/ptree.hpp>
+#define BOOST_SPIRIT_THREADSAFE
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include <unistd.h> // To parse arguments
 #include <vector>
@@ -26,7 +26,7 @@
 #include "core/serialize.h"
 
 using namespace std;
-//using namespace boost::property_tree; // json
+using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
 
   server.resource["^/poll$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-    stringstream ss;
+    /*stringstream ss;
     ss << "{";
     writeJson(ss, "pos", heda.getPosition());
     writeJson(ss, "toolPos", heda.getToolPosition());
@@ -144,7 +144,18 @@ int main(int argc, char** argv) {
     writeJson(ss, "pending", heda.getPendingCommands());
     writeJson(ss, "output", getAllAvailable(serverReader));
     ss << "\"" << "gripped_jar_format_id" << "\": " << heda.gripped_jar.jar_format_id;
-    ss << "}";
+    ss << "}";*/
+
+    ptree pt;
+    pt.put("pos", heda.getPosition());
+    pt.put("toolPos", heda.getToolPosition());
+    pt.put("cmd", heda.getCurrentCommand());
+    pt.put("pending", heda.getPendingCommands());
+    pt.put("output", getAllAvailable(serverReader));
+    pt.put("gripped_jar_format_id", heda.gripped_jar.jar_format_id);
+    stringstream ss;
+    json_parser::write_json(ss, pt);
+
     sendJson(response, ss);
   };
 
