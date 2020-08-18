@@ -108,7 +108,8 @@ class Heda {
       };
       
       m_commands["stop"] = [&](ParseResult tokens) {stop();};
-      m_commands["home"] = [&](ParseResult tokens) {reference();};
+      m_commands["reference"] = [&](ParseResult tokens) {reference();};
+      m_commands["home"] = [&](ParseResult tokens) {home();};
       m_commands["info"] = [&](ParseResult tokens) {info();};
       m_commands["store"] = [&](ParseResult tokens) {store();};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
@@ -169,10 +170,24 @@ class Heda {
 
     void reference() {
       cerr << "Doing reference...\n";
-      pushCommand("H", [&]() {
+      is_referenced = false;
+      pushCommand("hr");
+      pushCommand("ht");
+      pushCommand("hx");
+      pushCommand("mt185"); // FIXME hardcoded
+      pushCommand("hy", [&]() {
         m_position = PolarCoord(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T);
+        is_referenced = true;
       });
     }
+
+    void home() {
+      if (!is_referenced) {reference();}
+      moveTo(PolarCoord(config.home_position_x, config.home_position_y, config.home_position_t));
+      openJaw();
+    }
+
+    bool is_referenced = false;
 
     void execute(string str) {
 
@@ -332,7 +347,7 @@ class Heda {
       double offsetY = config.user_coord_offset_y;
       double offsetZ = config.user_coord_offset_z;
       // The x axis and the z axis are reverse (hence * -1)
-      return UserCoord(((p.x + cosd(p.t) * reference)*-1)+offsetX,
+      return UserCoord(p.x + cosd(p.t) * reference + offsetX,
                   p.y+offsetY,
                   ((sind(p.t) * reference)*-1)+offsetZ);
     }

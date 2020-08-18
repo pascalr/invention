@@ -99,7 +99,7 @@ void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position,
   // must change level
   if (currentLevel != destinationLevel) {
 
-    positionT = (position.x > X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    positionT = (position.x < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     movements.push_back(Movement('t', positionT));
   }
  
