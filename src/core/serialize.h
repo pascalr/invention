@@ -99,6 +99,15 @@ void serialize(Motor* axis, T& out) {
   writeJson(out, PROPERTY_FORWARD, axis->isForward);
   writeJson(out, PROPERTY_REFERENCED, axis->isReferenced);
   writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
+  char name = axis->getName();
+  if (name == 'x' || name == 'X' || name == 'y' || name == 'Y' || name == 't' || name == 'T') {
+    StepperMotor* stepper = (StepperMotor*)axis;
+    writeJson(out, "m_speed", stepper->m_speed);
+    writeJson(out, "m_next_step_time", stepper->m_next_step_time);
+    writeJson(out, "m_acceleration", stepper->m_acceleration);
+    writeJson(out, "m_max_speed", stepper->m_max_speed);
+    writeJson(out, "m_default_max_speed", stepper->m_default_max_speed);
+  }
   out << "\"" << PROPERTY_DESTINATION << "\": " << axis->getDestination(); 
   // CAREFULL: JSON MUST NOT END WITH COMMA
   out << "}";

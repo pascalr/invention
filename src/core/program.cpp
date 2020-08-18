@@ -64,8 +64,9 @@ void setupAxes(Program& p) {
   p.baseAxisX.setStepsPerTurn(200 * 2 * 8);
   //p.baseAxisX.limitSwitchPin = 12;
   p.baseAxisX.setupPins(8,2,3);
-  p.baseAxisX.setMaxPosition(AXIS_X_MAX_POS);
-  p.baseAxisX.setMinPosition(0);
+  p.baseAxisX.setMaxPosition(900); // FIXME
+  //p.baseAxisX.setMinPosition(0);
+  p.baseAxisX.setMinPosition(-900); // FIXME
   p.baseAxisX.setDefaultMaxSpeed(1.5);
   p.baseAxisX.setAcceleration(1.5);
   p.baseAxisX.setReverseMotorDirection(true);
