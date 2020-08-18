@@ -15,6 +15,7 @@ src/arduino/config
 src/arduino/utils
 log
 *.FCStd1
+data/ingredients/
 
 
 # See https://help.github.com/articles/ignoring-files for more about ignoring files.

@@ -65,7 +65,17 @@ sudo apt install libsqlite3-dev sqlite3
 
 pkg-config --cflags --libs ruby-2.5
 
-sudo apt install ruby ruby-dev zlib1g-dev liblzma-dev
+install ruby with rvm
+sudo apt-get install zlib1g-dev libssl-dev liblzma-dev
+\curl -sSL https://get.rvm.io | bash -s stable --ruby
+rvm list known
+
+
+
+Download ruby and compile from source
+https://www.ruby-lang.org/en/downloads/
+
+# sudo apt install ruby-dev not usefulll probably since installing from source
 
 install yarn for rails
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
