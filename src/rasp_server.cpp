@@ -44,10 +44,15 @@ int main(int argc, char** argv) {
 
   // Start server and receive assigned port when server is listening for requests
   promise<unsigned short> server_port;
-  cout << "Server listening on " << server.config.address << " port " << server_port.get_future().get() << endl << endl;
-  server.start([&server_port](unsigned short port) {
-    server_port.set_value(port);
+  thread server_thread([&server, &server_port]() {
+    // Start server
+    server.start([&server_port](unsigned short port) {
+      server_port.set_value(port);
+    });
   });
+  cout << "Server listening on " << server.config.address << " port " << server_port.get_future().get() << endl << endl;
+
+  server_thread.join();
 
   return 0;
 
