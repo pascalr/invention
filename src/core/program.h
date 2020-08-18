@@ -21,7 +21,7 @@
 class Program {
   public:
     Program(Writer& writer, Reader& reader) :
-        axisT(writer, 'T'), baseAxisX(writer, 'X', axisT),
+        axisT(writer, 'T'), baseAxisX(writer, 'X'),
         axisY(writer, 'Y'), axisR(writer, 'R') {
     }
 
@@ -36,10 +36,8 @@ class Program {
 
     void stopMoving();
     
-    MotorT axisT; // Real one
-
-    BaseXAxis baseAxisX; // Real one
-
+    MotorT axisT;
+    StepperMotor baseAxisX;
     StepperMotor axisY;
 
     DCMotor axisR;

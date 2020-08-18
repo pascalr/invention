@@ -332,43 +332,6 @@ class StepperMotor : public Motor {
     }
 };
 
-class BaseXAxis : public StepperMotor {
-  public:
-    BaseXAxis(Writer& writer, char name, Motor& thetaAxis) : StepperMotor(writer, name), m_theta_axis(thetaAxis) {
-    }
-    
-    /*void prepare(unsigned long time) {
-      MotorAxis::prepare();
-      m_start_time = time;
-    }*/
-
-    /*unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
-      // Maybe use my own time because the theta position directly could get out of sync
-      if (m_theta_axis.isDestinationReached()) {return MAX_STEP_DELAY;}
-      double angularSpeedRad = m_theta_axis.getCurrentSpeed() / 180 * PI;
-      double angle = m_theta_axis.getPosition();
-      double vx = RAYON * angularSpeedRad * sind(angle);
-
-      if (vx <= 0.001) {
-        return MAX_STEP_DELAY; // us
-      }
-
-      double frequency = vx * stepsPerUnit;
-      unsigned long delay = 1000000 / frequency;
-      cout << "delay: " << delay << endl;
-
-      if (delay > MAX_STEP_DELAY) {
-        return MAX_STEP_DELAY;
-      }
-
-      return 1000000 / frequency;
-    }*/
-
-  private:
-    //unsigned long m_start_time;
-    Motor& m_theta_axis;
-};
-
 class MotorT : public StepperMotor {
   public:
 
