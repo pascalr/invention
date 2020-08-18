@@ -2,7 +2,6 @@
 #define INPUT_PARSER_H
 
 #include "program.h"
-#include "axis.h"
 #include "serialize.h"
 
 int parseNumber(char** input, double& n);

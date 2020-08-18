@@ -3,7 +3,7 @@
 
 
 #include <ctype.h>
-#include "axis.h"
+#include "Motor.h"
 #include "StepperMotor.h"
 #include "DCMotor.h"
 #include "reader/reader.h"

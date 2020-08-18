@@ -3,9 +3,8 @@
 
 // Implementing a custom json serializer for arduino.
 
-
+#include "Motor.h"
 #include "program.h"
-#include "axis.h"
 #include "writer/writer.h"
 #include "../utils/constants.h"
 
@@ -93,7 +92,7 @@ void serialize(StepperMotor* axis, T& out) {
 }
 
 template <typename T>
-void serialize(Axis* axis, T& out) {
+void serialize(Motor* axis, T& out) {
   out << "{";
   writeJson(out, PROPERTY_NAME, axis->getName());
   writeJson(out, PROPERTY_POSITION, axis->getPosition());

@@ -59,7 +59,6 @@ ADD_LIBRARY(MyLibsModule
   src/core/fake_program.cpp
   src/core/writer/writer.cpp
   src/core/reader/reader.cpp
-  src/core/axis.cpp
   src/core/jar_parser.cpp
   src/core/heda.cpp
   src/core/sweep.cpp
@@ -78,19 +77,19 @@ link_libraries(MyLibsModule)
 #message(STATUS ${Python2_INCLUDE_DIRS})
 #message(STATUS "THERE!!!")
 
-add_executable( run_tests src/test/test.cpp )
+#add_executable( run_tests src/test/test.cpp )
 
 add_executable( heda_run src/heda_run.cpp )
 
-add_executable( test_db src/test/db.cpp )
+#add_executable( test_db src/test/db.cpp )
 
-add_executable( test_jar_position_analyzer src/test/jar_position_analyzer.cpp )
+#add_executable( test_jar_position_analyzer src/test/jar_position_analyzer.cpp )
 
-add_executable( test_axis src/test/axis.cpp )
+#add_executable( test_axis src/test/axis.cpp )
 
-add_executable( test_parser src/test/parser.cpp )
+#add_executable( test_parser src/test/parser.cpp )
 
-add_executable( test_heda src/test/heda.cpp )
+#add_executable( test_heda src/test/heda.cpp )
 
 add_executable( simulation src/simulation.cpp )
 

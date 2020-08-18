@@ -205,7 +205,7 @@ class StepperMotor : public Motor {
     int setDestination(double dest) {
       if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
 
-      int status = Axis::setDestination(dest);
+      int status = Motor::setDestination(dest);
       if (status < 0) {return status;}
 
       calculateMovement();
@@ -332,7 +332,7 @@ class StepperMotor : public Motor {
 
 class BaseXAxis : public StepperMotor {
   public:
-    BaseXAxis(Writer& writer, char name, Axis& thetaAxis) : StepperMotor(writer, name), m_theta_axis(thetaAxis) {
+    BaseXAxis(Writer& writer, char name, Motor& thetaAxis) : StepperMotor(writer, name), m_theta_axis(thetaAxis) {
     }
     
     /*void prepare(unsigned long time) {
@@ -364,7 +364,7 @@ class BaseXAxis : public StepperMotor {
 
   private:
     //unsigned long m_start_time;
-    Axis& m_theta_axis;
+    Motor& m_theta_axis;
 };
 
 class MotorT : public StepperMotor {

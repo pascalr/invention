@@ -6,7 +6,6 @@
 #include "utils/io_common.h"
 #include "utils/utils.h"
 #include "lib/lib.h"
-#include "core/axis.h"
 #include "core/two_way_stream.h"
 #include "core/reader/io_reader.h"
 #include "core/input_parser.h"
