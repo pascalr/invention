@@ -4,10 +4,7 @@ mkdir ../Arduino/libraries/core
 mkdir ../Arduino/libraries/core/reader
 mkdir ../Arduino/libraries/core/writer
 mkdir ../Arduino/libraries/utils
-mkdir ../Arduino/libraries/config
 mkdir ../Arduino/libraries/lib
-cp src/core/axis.h ../Arduino/libraries/core/axis.h
-cp src/core/axis.cpp ../Arduino/libraries/core/axis.cpp
 cp src/utils/utils.h ../Arduino/libraries/utils/utils.h
 cp src/utils/utils.cpp ../Arduino/libraries/utils/utils.cpp
 
@@ -16,10 +13,7 @@ cp src/core/writer/writer.h ../Arduino/libraries/core/writer.h
 cp src/core/writer/writer.cpp ../Arduino/libraries/core/writer/writer.cpp
 cp src/core/writer/writer.cpp ../Arduino/libraries/core/writer.cpp
 
-cp src/config/constants.h ../Arduino/libraries/config/constants.h
-cp src/config/shelves_constants.h ../Arduino/libraries/config/shelves_constants.h
-cp src/config/calibration_constants.h ../Arduino/libraries/config/calibration_constants.h
-cp src/config/camera_constants.h ../Arduino/libraries/config/camera_constants.h
+cp src/utils/constants.h ../Arduino/libraries/utils/constants.h
 cp src/core/program.h ../Arduino/libraries/core/program.h
 cp src/core/program.cpp ../Arduino/libraries/core/program.cpp
 cp src/core/input_parser.h ../Arduino/libraries/core/input_parser.h
