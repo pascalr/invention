@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :locations
   resources :jars
   resources :recettes
   get 'image/show'

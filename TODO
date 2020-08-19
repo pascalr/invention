@@ -2,13 +2,9 @@ Ok I need to prioritize what I am working on. This will be an ordered list.
 
 Only Heda should be aware of position. Position in arduino slave should be relative.
 Still ask @ command to know how far it got. Anyway this is not a priority for now.
-
-stop has a bug, it keeps writing stop, and if I try to put another command it crashes
+Maybe this is not true. Wait.
 
 remove boost dependency
-
-Shelf has_many shelf JarLocation
-JarLocation belongs_to Shelf string de comment allez chercher le pot. has_and_belongs_to_many JarLocation (empty locations required to take out the jar)
 
 Une page d'acceuil du projet avec une feature list. Faire une feature list.
 

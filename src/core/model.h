@@ -125,6 +125,43 @@ class HedaConfigTable : public Table<HedaConfig> {
     }
 };
 
+class Location : public Model {
+  public:
+    Location() {}
+    Location(double x, double z, string moveCommand, int shelfId) : x(x), z(z), move_command(moveCommand), shelf_id(shelfId) {}
+
+    double x;
+    double z;
+    string move_command;
+    int shelf_id;
+};
+
+class LocationTable : public Table<Location> {
+  public:
+    const char* TABLE_NAME = "locations";
+    string getTableName() { return TABLE_NAME; };
+
+    Location parseItem(SQLite::Statement& query) {
+      Location item;
+      item.x = query.getColumn(1);
+      item.z = query.getColumn(2);
+      item.move_command = (const char*)query.getColumn(3);
+      item.shelf_id = query.getColumn(4);
+      item.created_at = query.getColumn(5);
+      item.updated_at = query.getColumn(6);
+      return item;
+    }
+
+    void bindQuery(SQLite::Statement& query, const Location& item) {
+      query.bind(1, item.x);
+      query.bind(2, item.z);
+      query.bind(3, item.move_command);
+      query.bind(4, item.shelf_id);
+      query.bind(5, item.created_at);
+      query.bind(6, item.updated_at);
+    }
+};
+
 class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}

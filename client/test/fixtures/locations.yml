@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  x: 1.5
+  z: 1.5
+  move_command: MyString
+  shelf: one
+
+two:
+  x: 1.5
+  z: 1.5
+  move_command: MyString
+  shelf: two

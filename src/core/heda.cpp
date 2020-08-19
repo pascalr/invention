@@ -6,10 +6,16 @@
 #include "../lib/opencv.h"
 #include "calibrate.h"
 #include <opencv2/highgui.hpp>
+#include "jar_packer.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 class InvalidJarIdException : public exception {};
+    
+void Heda::generateLocations() {
+  NaiveJarPacker packer;
+  packer.generateLocations(*this);
+}
 
 void Heda::sweep() {
   std::cout << "Heda::sweep()\n";

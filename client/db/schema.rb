@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_18_211237) do
+ActiveRecord::Schema.define(version: 2020_08_19_135618) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -80,6 +80,16 @@ ActiveRecord::Schema.define(version: 2020_08_18_211237) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "locations", force: :cascade do |t|
+    t.float "x"
+    t.float "z"
+    t.string "move_command"
+    t.integer "shelf_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["shelf_id"], name: "index_locations_on_shelf_id"
+  end
+
   create_table "positions", force: :cascade do |t|
     t.float "x"
     t.float "y"
@@ -108,4 +118,5 @@ ActiveRecord::Schema.define(version: 2020_08_18_211237) do
 
   add_foreign_key "hedas", "shelves"
   add_foreign_key "ingredients", "aliments"
+  add_foreign_key "locations", "shelves"
 end

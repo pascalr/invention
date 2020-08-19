@@ -8,6 +8,7 @@
     <th>Depth</th>
     <th>Offset x</th>
     <th>Offset z</th>
+    <th>Locations</th>
     <th></th>
     <th></th>
   </tr>
@@ -20,6 +21,7 @@
     <td>(mm)</td>
     <td></td>
     <td></td>
+    <td></td>
   </tr>
   <% (@shelves || []).each do |shelf| %>
     <tr>
@@ -29,6 +31,7 @@
       <td><%= shelf.depth %></td>
       <td><%= shelf.offset_x %></td>
       <td><%= shelf.offset_z %></td>
+      <td><%= shelf.locations.size %></td>
       <td><%= link_to 'éditer', edit_shelf_path(shelf) %></td>
       <td><%= link_to 'supprimer', shelf_path(shelf), method: :delete, data: { confirm: 'Êtes-vous sure du vouloir supprimer?' }%></td>
     </tr>

@@ -12,7 +12,6 @@
 #include "parser.h"
 
 #include "jar_parser.h"
-//#include "jar_packer.h"
 
 #include "database.h"
 
@@ -66,7 +65,7 @@ class RawCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db)/*, m_packer(db)*/ {
+    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db) {
     
       //cerr << "Initializing video...\n";
       //m_video_working = initVideo(m_cap);
@@ -76,8 +75,6 @@ class Heda {
       m_commands_thread_run = true;
       m_commands_thread = std::thread(&Heda::loopCommandStack, this);
       //m_commands_thread.detach(); Do I need to detach?
-      
-      //m_packer.setup();
 
       loadDb();
     }
@@ -95,6 +92,7 @@ class Heda {
       db.load(codes);
       db.load(jar_formats);
       db.load(jars);
+      db.load(locations);
     }
 
     void setupCommands() {
@@ -117,6 +115,7 @@ class Heda {
       m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
       m_commands["detect"] = [&](ParseResult tokens) {detect();};
       m_commands["parse"] = [&](ParseResult tokens) {parse();};
+      m_commands["genloc"] = [&](ParseResult tokens) {generateLocations();}; // FIXME: The user should not be able to do this easily..
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
       m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
@@ -268,7 +267,6 @@ class Heda {
     void store() {
       
       vector<Movement> mvts;
-      //m_packer.calculateStoreMovements();
       move(mvts);
     }
 
@@ -389,6 +387,7 @@ class Heda {
     ShelfTable shelves;
     JarFormatTable jar_formats;
     JarTable jars;
+    LocationTable locations;
     Database& db;
 
     bool isDoneWorking() {
@@ -404,6 +403,8 @@ class Heda {
 
     // Above which shelf is the arm on?
     int calculateLevel(double userHeight);
+
+    void generateLocations();
 
   protected:
 
@@ -482,8 +483,6 @@ class Heda {
       }
       throw NoWorkingShelfException();
     }
-
-    //NaiveJarPacker m_packer;
 
     std::mutex commandsMutex;
 

@@ -10,6 +10,8 @@ using namespace std;
 // HUUUUUUUUGEEEE FIXME: I do not validate the user input. It could insert sql...
 // I should probably use ruby on rails which does all this already...
 
+// FIXME: Instead of db.insert(table, ...), it should be table.insert(...), the table should have a reference to the database when initiated.
+
 #include <mutex>
 
 class Database {

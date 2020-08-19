@@ -55,6 +55,7 @@ link_libraries(${MyLibs})
 ADD_LIBRARY(MyLibsModule
   src/utils/io_common.cpp
   src/utils/utils.cpp
+  src/core/jar_packer.cpp
   src/core/program.cpp
   src/core/fake_program.cpp
   src/core/writer/writer.cpp
