@@ -80,6 +80,9 @@ class HedaConfig : public Model {
     double gripper_radius;
     double camera_focal_point;
     double detect_height;
+    double home_position_x;
+    double home_position_y;
+    double home_position_t;
 };
 
 class HedaConfigTable : public Table<HedaConfig> {
@@ -99,6 +102,9 @@ class HedaConfigTable : public Table<HedaConfig> {
       config.gripper_radius = query.getColumn(8);
       config.camera_focal_point = query.getColumn(9);
       config.detect_height = query.getColumn(10);
+      config.home_position_x = query.getColumn(11);
+      config.home_position_y = query.getColumn(12);
+      config.home_position_t = query.getColumn(13);
       return config;
     }
 
@@ -113,6 +119,9 @@ class HedaConfigTable : public Table<HedaConfig> {
       query.bind(8, item.gripper_radius);
       query.bind(9, item.camera_focal_point);
       query.bind(10, item.detect_height);
+      query.bind(11, item.home_position_x);
+      query.bind(12, item.home_position_y);
+      query.bind(13, item.home_position_t);
     }
 };
 

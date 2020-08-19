@@ -42,6 +42,21 @@
   </div>
 
   <div class="field">
+    <%= form.label :home_position_x %>
+    <%= form.number_field :home_position_x, step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :home_position_y %>
+    <%= form.number_field :home_position_y, step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :home_position_t %>
+    <%= form.number_field :home_position_t, step: 0.01 %>
+  </div>
+
+  <div class="field">
     <%= form.label :detect_height %>
     <%= form.number_field :detect_height, step: 0.01 %>
   </div>
