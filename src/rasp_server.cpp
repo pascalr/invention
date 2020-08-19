@@ -5,6 +5,7 @@
 
 #include <vector>
 #include "lib/opencv.h"
+#include <opencv2/imgcodecs.hpp>
 
 using namespace std;
 

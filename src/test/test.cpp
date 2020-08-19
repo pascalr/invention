@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "../lib/lib.h"
-#include "../lib/matplotlibcpp.h"
 #include "../core/writer/console_writer.h"
 #include "../core/axis.h"
 #include "../core/input_parser.h"
@@ -22,7 +21,6 @@
 #include <limits.h>
 
 using namespace std;
-namespace plt = matplotlibcpp;
 
 /*class PlotWriter : public ConsoleWriter {
   public:
@@ -315,10 +313,6 @@ void testTimeDifference() {
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
-
-  //plt::figure_size(axisX.getMaxPosition(), axisZ.getMaxPosition());
-  
-  //plt::ion();
 
   //testSerialize();
   testTimeDifference();

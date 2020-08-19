@@ -5,6 +5,7 @@
 #include "pinpoint.h"
 #include "../lib/opencv.h"
 #include "calibrate.h"
+#include <opencv2/highgui.hpp>
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 

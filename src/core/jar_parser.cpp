@@ -1,6 +1,7 @@
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 
+#include <opencv2/imgcodecs.hpp>
 #include "../lib/opencv.h"
 #include "model.h"
 #include "../lib/hr_code.h"
