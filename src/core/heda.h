@@ -148,15 +148,13 @@ class Heda {
         double x = tokens.popScalaire();
         double y = tokens.popScalaire();
         double t = tokens.popScalaire();
-        PolarCoord dest(x, y, t);
-        moveTo(dest);
+        moveTo(PolarCoord(x, y, t));
       };
       
       m_commands["move"] = [&](ParseResult tokens) {
         char axis = tokens.popAxis();
         double dest = tokens.popScalaire();
-        stringstream ss; ss << "m" << axis << dest;
-        pushCommand(ss.str());
+        move(Movement(axis,dest));
       };
 
       m_commands["open"] = [&](ParseResult tokens) {
@@ -182,7 +180,7 @@ class Heda {
     }
 
     void home() {
-      if (!is_referenced) {reference();}
+      reference();
       moveTo(PolarCoord(config.home_position_x, config.home_position_y, config.home_position_t));
       openJaw();
     }
@@ -200,10 +198,11 @@ class Heda {
       Parser parser;
       ParseResult result;
       parser.parse(result, cmd);
-      try {
+
+      if (m_commands.find(result.getCommand()) == m_commands.end()) {
+        cerr << "Error unkown command: " << result.getCommand();
+      } else {
         m_commands.at(result.getCommand())(result);
-      } catch (const out_of_range &e) {
-        // If the command does not exist, it throws an out of range exception.
       }
 
       if (pos != string::npos) {execute(str.substr(pos+1));}
@@ -213,8 +212,8 @@ class Heda {
     void capture();
 
     void move(const std::vector<Movement>& mvts) {
-      for (auto it = mvts.begin(); it != mvts.end(); it++) {
-        move(*it);
+      for (const Movement& mvt : mvts) {
+        move(mvt);
       }
     }
 
@@ -234,7 +233,6 @@ class Heda {
     }
 
     void moveTo(PolarCoord destination) {
-
       vector<Movement> mvts;
       calculateGoto(mvts, m_position, destination, doNothing);
       move(mvts);
@@ -283,6 +281,8 @@ class Heda {
       m_stack.clear();
       m_pending_commands.clear();
       m_current_command.clear();
+      gripped_jar.id = -1;
+      is_gripping = false;
       cout << "Executing stop" << endl;
       m_writer << "s";
       askPosition();
@@ -320,7 +320,7 @@ class Heda {
 
       double z = -c.z + config.user_coord_offset_z;
       double t = (asin(z / reference) * 180.0 / PI);
-      if (c.x < X_MIDDLE) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
+      if (c.x > X_MIDDLE) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
         t = 180.0 - t;
       }
       double x = c.x - config.user_coord_offset_x + (cosd(t) * reference);

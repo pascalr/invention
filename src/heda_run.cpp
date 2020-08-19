@@ -4,6 +4,8 @@
 #include "core/heda.h"
 #include "core/writer/serial_writer.h"
 #include "core/reader/serial_reader.h"
+#include <thread>
+#include <chrono>
 
 using namespace std::chrono;
 using namespace cv;
@@ -30,36 +32,8 @@ int main(int argc, char** argv)
   
   Heda heda(serialWriter, serialReader, db); 
   heda.execute(cmd);
+  while (!heda.isDoneWorking()) {
+    this_thread::sleep_for(chrono::milliseconds(50));
+  }
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-#include <wiringPi.h>
-int main (void)
-{
-  wiringPiSetup () ;
-  pinMode (0, OUTPUT) ;
-  for (;;)
-  {
-    digitalWrite (0, HIGH) ; delay (500) ;
-    digitalWrite (0,  LOW) ; delay (500) ;
-  }
-  return 0 ;
-}
-*/
