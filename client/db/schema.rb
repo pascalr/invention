@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_19_135618) do
+ActiveRecord::Schema.define(version: 2020_08_19_150756) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -87,6 +87,7 @@ ActiveRecord::Schema.define(version: 2020_08_19_135618) do
     t.integer "shelf_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "diameter"
     t.index ["shelf_id"], name: "index_locations_on_shelf_id"
   end
 

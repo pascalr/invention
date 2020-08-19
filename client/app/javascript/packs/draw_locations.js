@@ -6,7 +6,7 @@ var elems = document.getElementsByClassName("drawing_location");
  
   var locations = JSON.parse(elem.dataset["locations"]);
   locations.forEach(loc => {
-    var circle = two.makeCircle(loc.x, loc.z, 30);
+    var circle = two.makeCircle(loc.x, loc.z, loc.diameter/2);
     circle.fill = '#FF8000';
     circle.stroke = 'orangered'; // Accepts all valid css color
     circle.linewidth = 5;

@@ -50,6 +50,7 @@ client/storage/*
 !client/storage/.keep
 
 client/public/assets
+client/public/packs # I added this not sure it's ok
 client/.byebug_history
 
 # Ignore master key for decrypting credentials and more.

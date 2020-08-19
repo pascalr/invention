@@ -128,12 +128,14 @@ class HedaConfigTable : public Table<HedaConfig> {
 class Location : public Model {
   public:
     Location() {}
-    Location(double x, double z, string moveCommand, int shelfId) : x(x), z(z), move_command(moveCommand), shelf_id(shelfId) {}
+    Location(double x, double z, string moveCommand, int shelfId, double diameter) : x(x), z(z), move_command(moveCommand), shelf_id(shelfId), diameter(diameter) {}
 
     double x;
     double z;
     string move_command;
     int shelf_id;
+
+    double diameter;
 };
 
 class LocationTable : public Table<Location> {
@@ -149,6 +151,7 @@ class LocationTable : public Table<Location> {
       item.shelf_id = query.getColumn(4);
       item.created_at = query.getColumn(5);
       item.updated_at = query.getColumn(6);
+      item.diameter = query.getColumn(7);
       return item;
     }
 
@@ -159,6 +162,7 @@ class LocationTable : public Table<Location> {
       query.bind(4, item.shelf_id);
       query.bind(5, item.created_at);
       query.bind(6, item.updated_at);
+      query.bind(7, item.diameter);
     }
 };
 
