@@ -47,6 +47,7 @@ class RawCommand {
     }
     void clear() {
       cmd = "";
+      callback = doNothing;
     }
     void finish() {
       if (callback) {
@@ -287,11 +288,11 @@ class Heda {
 
     void stop() {
       std::lock_guard<std::mutex> guard(commandsMutex);
-      cout << "Executing stop" << endl;
-      m_writer << "s";
       m_stack.clear();
       m_pending_commands.clear();
       m_current_command.clear();
+      cout << "Executing stop" << endl;
+      m_writer << "s";
       m_writer << "@";
     }
 
