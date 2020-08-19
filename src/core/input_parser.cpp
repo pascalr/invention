@@ -139,7 +139,7 @@ void myLoop(Program& p) {
       p.getWriter() << "\n" << MESSAGE_POSITION << "\n";
       p.getWriter() << p.baseAxisX.getPosition() << " "
                     << p.axisY.getPosition() << " "
-                    << p.axisT.getPosition();
+                    << p.axisT.getPosition() << "\n";
       
     // ignore
     } else if (cmd == '\r' || cmd == '\n') {
