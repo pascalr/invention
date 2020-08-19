@@ -51,8 +51,9 @@ void testPosition() {
 
   PolarCoord pos(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T);
   assertEqual("home position", pos, heda.getPosition());
-  //assertEqual("toUserPosition", UserCoord(0.0, 0.0, 0.0), heda.toUserCoord(heda.getPosition(), 100.0));
-  //assertEqual("toUserPositionToPolarCoord", pos, heda.toPolarCoord(heda.toUserCoord(heda.getPosition(), 100.0), 100.0));
+  UserCoord u = heda.toUserCoord(heda.getPosition(), heda.config.gripper_radius);
+  assertEqual("toUserPosition", UserCoord(0.0, 0.0, 0.0), u);
+  assertEqual("toUserPositionToPolarCoord", pos, heda.toPolarCoord(u, heda.config.gripper_radius));
 
   heda.move(Movement('x', 100.0));
   executeAllPending(heda, reader);

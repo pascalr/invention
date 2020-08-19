@@ -8,9 +8,15 @@
 int NaiveJarPacker::nextLocation(Heda& heda) {
   for (const Location& loc : heda.locations.items) {
     for (const Jar& jar : heda.jars.items) {
+      if (jar.location_id == loc.id) {goto cnt;}
     }
+    return loc.id;
+    cnt:;
   }
+  return -1;
 }
+
+// TODO: Order the locations by somethings.
 
 // Naive Jar Packer makes spaces appart for the largest diameter allowed.
 void NaiveJarPacker::generateLocations(Heda& heda) {

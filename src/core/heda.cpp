@@ -17,6 +17,11 @@ void Heda::generateLocations() {
   packer.generateLocations(*this);
 }
 
+void Heda::store() {
+  NaiveJarPacker packer;
+  int locId = packer.nextLocation(*this);
+}
+
 void Heda::sweep() {
   std::cout << "Heda::sweep()\n";
   db.clear(codes);

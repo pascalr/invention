@@ -90,7 +90,7 @@ add_executable( heda_run src/heda_run.cpp )
 
 #add_executable( test_parser src/test/parser.cpp )
 
-#add_executable( test_heda src/test/heda.cpp )
+add_executable( test_heda src/test/heda.cpp )
 
 add_executable( simulation src/simulation.cpp )
 

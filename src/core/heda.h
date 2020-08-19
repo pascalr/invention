@@ -258,16 +258,10 @@ class Heda {
     void calibrate();
     void putdown();
     void grip(int id);
+    void store();
 
     void clearDetectedCodes() {
       db.clear(codes);
-    }
-
-    // goto an empty place and drop the jar
-    void store() {
-      
-      vector<Movement> mvts;
-      move(mvts);
     }
 
     void pushCommand(string str, std::function<void()> callback) {
@@ -320,19 +314,19 @@ class Heda {
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
     // The x axis and the z axis are reversed
-    // Warning: There are two solutions.
+    // Warning: There are two solutions sometimes.
     // The offset is the offset between the two zeroes.
-    // FIXME: Only the Y is updated, because I don't know how to handle the two solutions.
     PolarCoord toPolarCoord(const UserCoord c, double reference) {
 
-      double offsetY = config.user_coord_offset_y;
-      /*double offsetX = config.user_coord_offset_x;
-      double offsetZ = config.user_coord_offset_z;
-      double otherX = offsetX - c.x;
-      double otherZ = offsetZ - c.z;
-      double theta = asind(otherZ / reference);
-      double deltaX = cos(theta) * reference;*/
-      return PolarCoord(0.0, c.y - offsetY, 0.0);
+      double z = -c.z + config.user_coord_offset_z;
+      double t = (asin(z / reference) * 180.0 / PI);
+      if (c.x < X_MIDDLE) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
+        t = 180.0 - t;
+      }
+      double x = c.x - config.user_coord_offset_x + (cosd(t) * reference);
+
+      double y = c.y - config.user_coord_offset_y;
+      return PolarCoord(x, y, t);
     }
 
     double toUserHeight(const PolarCoord p) {
@@ -346,7 +340,7 @@ class Heda {
       double offsetY = config.user_coord_offset_y;
       double offsetZ = config.user_coord_offset_z;
       // The x axis and the z axis are reverse (hence * -1)
-      return UserCoord(p.x + cosd(p.t) * reference + offsetX,
+      return UserCoord(p.x + (cosd(p.t) * reference) + offsetX,
                   p.y+offsetY,
                   ((sind(p.t) * reference)*-1)+offsetZ);
     }
