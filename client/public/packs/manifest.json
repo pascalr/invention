@@ -1,6 +1,8 @@
 {
   "application.js": "/packs/js/application-434aa2e1fa1e74ccf6ec.js",
   "application.js.map": "/packs/js/application-434aa2e1fa1e74ccf6ec.js.map",
+  "draw_locations.js": "/packs/js/draw_locations-5d7fc85fd55a5f04e11b.js",
+  "draw_locations.js.map": "/packs/js/draw_locations-5d7fc85fd55a5f04e11b.js.map",
   "entrypoints": {
     "application": {
       "js": [
@@ -10,6 +12,14 @@
         "/packs/js/application-434aa2e1fa1e74ccf6ec.js.map"
       ]
     },
+    "draw_locations": {
+      "js": [
+        "/packs/js/draw_locations-5d7fc85fd55a5f04e11b.js"
+      ],
+      "js.map": [
+        "/packs/js/draw_locations-5d7fc85fd55a5f04e11b.js.map"
+      ]
+    },
     "heda_index": {
       "js": [
         "/packs/js/heda_index-40c37ebe05c187a748f9.js"
@@ -17,8 +27,18 @@
       "js.map": [
         "/packs/js/heda_index-40c37ebe05c187a748f9.js.map"
       ]
+    },
+    "two": {
+      "js": [
+        "/packs/js/two-7e47734a77bf9813925a.js"
+      ],
+      "js.map": [
+        "/packs/js/two-7e47734a77bf9813925a.js.map"
+      ]
     }
   },
   "heda_index.js": "/packs/js/heda_index-40c37ebe05c187a748f9.js",
-  "heda_index.js.map": "/packs/js/heda_index-40c37ebe05c187a748f9.js.map"
+  "heda_index.js.map": "/packs/js/heda_index-40c37ebe05c187a748f9.js.map",
+  "two.js": "/packs/js/two-7e47734a77bf9813925a.js",
+  "two.js.map": "/packs/js/two-7e47734a77bf9813925a.js.map"
 }
