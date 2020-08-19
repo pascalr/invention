@@ -273,6 +273,7 @@ class Jar : public Model {
   public:
     int jar_format_id = -1;
     int ingredient_id = -1;
+    int location_id = -1;
     //PolarCoord position;
 };
 
@@ -286,6 +287,7 @@ class JarTable : public Table<Jar> {
       query.bind(2, item.ingredient_id);
       query.bind(3, item.created_at);
       query.bind(4, item.updated_at);
+      query.bind(5, item.location_id);
       //query.bind(1, item.position(0));
       //query.bind(2, item.position(1));
       //query.bind(3, item.position(2));
@@ -297,6 +299,7 @@ class JarTable : public Table<Jar> {
       jar.ingredient_id = query.getColumn(2);
       jar.created_at = query.getColumn(3);
       jar.updated_at = query.getColumn(4);
+      jar.location_id = query.getColumn(5);
       //double x = query.getColumn(1);
       //double y = query.getColumn(2);
       //double t = query.getColumn(3);

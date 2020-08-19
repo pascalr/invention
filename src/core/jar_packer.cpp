@@ -5,6 +5,13 @@
 #include "position.h"
 #include "database.h"
 
+int NaiveJarPacker::nextLocation(Heda& heda) {
+  for (const Location& loc : heda.locations.items) {
+    for (const Jar& jar : heda.jars.items) {
+    }
+  }
+}
+
 // Naive Jar Packer makes spaces appart for the largest diameter allowed.
 void NaiveJarPacker::generateLocations(Heda& heda) {
   //for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {

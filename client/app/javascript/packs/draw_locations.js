@@ -1,15 +1,23 @@
 var elems = document.getElementsByClassName("drawing_location");
+
+var LINE_THICKNESS = 5;
+
 [].forEach.call(elems, elem => {
   var shelf = JSON.parse(elem.dataset["shelf"]);
   var params = { width: shelf.width, height: shelf.depth };
   var two = new Two(params).appendTo(elem);
  
   var locations = JSON.parse(elem.dataset["locations"]);
-  locations.forEach(loc => {
-    var circle = two.makeCircle(loc.x, loc.z, loc.diameter/2);
-    circle.fill = '#FF8000';
+  var jars = JSON.parse(elem.dataset["jars"]);
+  locations.forEach((loc, i) => {
+    var circle = two.makeCircle(loc.x, loc.z, (loc.diameter/2)-LINE_THICKNESS);
+    if (jars[i]) {
+      circle.fill = '#FF8000';
+    } else {
+      circle.fill = '#FFFFFF';
+    }
     circle.stroke = 'orangered'; // Accepts all valid css color
-    circle.linewidth = 5;
+    circle.linewidth = LINE_THICKNESS;
   });
   
   // The object returned has many stylable properties:
