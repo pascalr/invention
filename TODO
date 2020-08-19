@@ -1,5 +1,8 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+Only Heda should be aware of position. Position in arduino slave should be relative.
+Still ask @ command to know how far it got. Anyway this is not a priority for now.
+
 stop has a bug, it keeps writing stop, and if I try to put another command it crashes
 
 remove boost dependency

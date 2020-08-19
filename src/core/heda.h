@@ -128,7 +128,7 @@ class Heda {
       m_commands["help"] = [&](ParseResult tokens) {
         // TODO
       };
-
+      
       m_commands["cherche"] = [&](ParseResult tokens) { // fetch
       };
       
@@ -293,7 +293,7 @@ class Heda {
       m_current_command.clear();
       cout << "Executing stop" << endl;
       m_writer << "s";
-      m_writer << "@";
+      askPosition();
     }
 
     void info() {
@@ -407,6 +407,34 @@ class Heda {
 
   protected:
 
+    void askPosition() {
+      
+      // TODO: Assert already in this mutex. std::lock_guard<std::mutex> guard(commandsMutex);
+      m_writer << "@";
+
+      bool receivedMessagePosition = false;
+
+      while (true) {
+        if (m_reader.inputAvailable()) {
+          string str = getInputLine(m_reader);
+
+          if (str == MESSAGE_POSITION) {
+            receivedMessagePosition = true; continue;
+
+          } else if (receivedMessagePosition) {
+            cout << "Parsing position = " << str << endl;
+            Parser parser;
+            ParseResult result;
+            parser.parse(result, "foo " + str); // FIXME: useless command at beginning
+            m_position = PolarCoord(result.popScalaire(), result.popScalaire(), result.popScalaire());
+            cout << "Done parsing position. Result: " << m_position << endl;
+            return;
+          }
+        }
+        this_thread::sleep_for(chrono::milliseconds(10));
+      }
+    }
+
     void loopCommandStack() {
       while (m_commands_thread_run) {
         this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
@@ -434,22 +462,12 @@ class Heda {
       } else if (m_reader.inputAvailable()) {
 
         string str = getInputLine(m_reader);
+        cout << "Received message: " << str << endl;
 
         if (str == MESSAGE_DONE) {
           m_current_command.finish();
           calculatePendingCommands();
           return 0;
-        } else if (str == MESSAGE_POSITION) {
-          while (true) {
-            if (m_reader.inputAvailable()) {
-              string pos = getInputLine(m_reader);
-              Parser parser;
-              ParseResult result;
-              parser.parse(result, pos);
-              m_position = PolarCoord(result.popScalaire(), result.popScalaire(), result.popScalaire());
-            }
-            this_thread::sleep_for(chrono::milliseconds(5));
-          }
         }
       }
 
