@@ -35,13 +35,13 @@ class DCMotor : public Motor {
 
     void release() {
       setMotorDirection(FORWARD);
-      setDutyCycle(25);
+      setDutyCycle(40);
       setDestination(90 * 8 * 0.75);
     }
         
     void rotate(bool direction) {
       setMotorDirection(direction);
-      setDutyCycle(25);
+      setDutyCycle(40);
     }
 
     void setupPins(uint8_t dirPin, uint8_t pwmPin, uint8_t stepPin) {

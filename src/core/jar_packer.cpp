@@ -5,6 +5,18 @@
 #include "position.h"
 #include "database.h"
 
+class MissingShelfException : public exception {};
+    
+void NaiveJarPacker::moveToLocation(Heda& heda, Location& loc) {
+
+  Shelf shelf;
+  if (!heda.shelves.get(shelf, loc.shelf_id)) {throw MissingShelfException();}
+
+  UserCoord c(loc.x, shelf.moving_height, loc.z);
+  PolarCoord p = heda.toPolarCoord(c, heda.config.gripper_radius);
+  heda.moveTo(p);
+}
+
 int NaiveJarPacker::nextLocation(Heda& heda) {
   for (const Location& loc : heda.locations.items) {
     for (const Jar& jar : heda.jars.items) {
@@ -23,6 +35,7 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
   //for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
   heda.db.clear(heda.locations);
   double dia = 148.0; // mm
+  heda.shelves.orderBy(shelfHeightCmp, false); // start with highest shelf (fastest)
   for (const Shelf& shelf : heda.shelves.items) {
 
     if (shelf.id == heda.config.working_shelf_id) {continue;}
@@ -34,11 +47,6 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
         
         double x = i*dia + (dia / 2);
         double z = j*dia + (dia / 2);
-        //UserCoord c(x, shelf.height, z);
-        //cout << "Calculated possible jar cartesian at " << c << endl;
-        //PolarCoord r = toolCartesianToPolar(c);
-        //cout << "Calculated possible jar location at " << r << endl;
-        //possible_locations.push_back(r);
         Location l(x, z, "", shelf.id, dia);
         heda.db.insert(heda.locations, l);
       }

@@ -35,13 +35,14 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
 void Heda::calibrate() {
   // TODO: Validate that the working shelf is clear
   // TODO: Make sure heda is referenced
+  // TODO: Use putdown function.
  
   JarFormat format; 
   if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
 
   Shelf shelf = getWorkingShelf();
 
-  PolarCoord c = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 7, 0.0), config.gripper_radius);
+  PolarCoord c = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 7, 0.0), config.gripper_radius); // FIXME HARDCODED VALUE
 
   moveTo(PolarCoord(0.0, c.y, 45.0));
   openJaw();

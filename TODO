@@ -1,5 +1,7 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+It is too easy to make an error between polar y and user y... At least rename one variable, or do something...
+
 Only Heda should be aware of position. Position in arduino slave should be relative.
 Still ask @ command to know how far it got. Anyway this is not a priority for now.
 Maybe this is not true. Wait.

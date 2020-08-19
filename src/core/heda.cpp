@@ -11,6 +11,7 @@
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 class InvalidJarIdException : public exception {};
+class InvalidShelfException : public exception {};
     
 void Heda::generateLocations() {
   NaiveJarPacker packer;
@@ -18,8 +19,16 @@ void Heda::generateLocations() {
 }
 
 void Heda::store() {
-  NaiveJarPacker packer;
-  int locId = packer.nextLocation(*this);
+  // TODO: Error message is not gripping
+  if (is_gripping) {
+    NaiveJarPacker packer;
+    int locId = packer.nextLocation(*this);
+    Location loc;
+    if (locations.get(loc, locId)) {
+      packer.moveToLocation(*this, loc);
+      putdown();
+    }
+  }
 }
 
 void Heda::sweep() {
@@ -36,12 +45,32 @@ void Heda::grip(int id) {
   
   grab(40.0); // TODO: Read the grab strength from the jar_format model
   gripped_jar = jar; // TODO: Do this as a callbacké
+  is_gripping = true;
 }
 
+// It would be nice if the y axis was with an encoder... So just lower until there is a resistance.
 // Lower to the shelf based on jar height
 // Then release.
-// Then a little above the jar
+// Then back to it's previous height
 void Heda::putdown() {
+  // TODO: Error message is not gripping
+  if (is_gripping) {
+
+    double previousHeight = m_position.y;
+
+    Shelf shelf;
+    if (!shelves.get(shelf, shelfByHeight(toUserHeight(m_position)))) {throw InvalidShelfException();}
+    PolarCoord p(m_position);
+
+    JarFormat format; 
+    if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+  
+    p.y = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 7, 0.0), config.gripper_radius).y; // FIXME HARDCODED VALUE 7
+    moveTo(p);
+    openJaw();
+    p.y = previousHeight;
+    moveTo(p);
+  }
 }
 
 void Heda::pinpoint() {

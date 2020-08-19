@@ -88,7 +88,7 @@ class Heda {
       db.load(configs);
       if (configs.empty()) {throw MissingConfigException();}
       config = *configs.begin();
-      db.load(shelves, "ORDER BY height");
+      db.load(shelves);
       db.load(codes);
       db.load(jar_formats);
       db.load(jars);
@@ -391,12 +391,10 @@ class Heda {
     HedaConfig config;
 
     Jar gripped_jar;
+    bool is_gripping = false;
 
     // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
     void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
-
-    // Above which shelf is the arm on?
-    int calculateLevel(double userHeight);
 
     void generateLocations();
 
@@ -467,6 +465,21 @@ class Heda {
       }
 
       return 10;
+    }
+
+    // Returns the id of the self
+    int shelfByHeight(double userHeight) {
+    
+      shelves.orderBy(shelfHeightCmp);
+      auto previousIt = shelves.begin();
+      for (auto it = shelves.begin(); it != shelves.end(); ++it) {
+    
+        if (userHeight < it->height) {return previousIt->id;}
+        previousIt = it;
+      }
+     
+      if (shelves.empty()) {return -1;}
+      return shelves.back().id;
     }
 
     Shelf getWorkingShelf() {

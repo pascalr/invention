@@ -26,40 +26,6 @@ Motor* parseInputMotorAxis(Program& p, char** input, Motor* &axis) {
   return 0;
 }
 
-/*void doReferencingAll(Program& p) {
-  p.getWriter() << "Referencing...\n";
-  p.axisR.startReferencing();
-  p.axisT.startReferencing(); // TODO: Use the potentiometer to do the referencing. Move to 90 degrees.
-  p.axisT.doneWorkingCallback = [](Program& p) {
-    p.baseAxisX.startReferencing();
-    p.baseAxisX.doneWorkingCallback = [](Program& p) {
-      p.axisT.setDestination(CHANGE_LEVEL_ANGLE_HIGH);
-      p.axisT.doneWorkingCallback = [](Program& p) {
-        p.axisY.startReferencing();
-      };
-    };
-  };
-}*/
-
-// Référencement: 2 situations:
-// - Le bras est orienté de manière à ce qu'il n'y ait pas de collision pour monter descendre:
-//     => Faire le référencement de l'axe vertical, puis descendre à la table de travail, faire les autres
-//        ( Parce que si le bras était en train de monter ou de descendre, il ne peut pas tourner s'il
-//        est vis à vis une tablette.) TODO: edge case, later, not a priority
-// - Sinon:
-//     => Orienter le bras vers l'avant. Référencer l'axe horizontal, puis le vertical.
-/*void doReferencingAll(Program& p) {
-  p.getWriter() << "Referencing...\n";
-  p.axisR.startReferencing();
-  p.axisT.startReferencing(); // TODO: Use the potentiometer to do the referencing. Move to 90 degrees.
-  p.axisT.doneWorkingCallback = [](Program& p) {
-    p.baseAxisX.startReferencing();
-    p.baseAxisX.doneWorkingCallback = [](Program& p) {
-      p.axisY.startReferencing();
-    };
-  };
-}*/
-
 int parseActionCommand(char cmd, Program& p) {
 
   Motor* motorAxis;

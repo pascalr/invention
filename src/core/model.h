@@ -46,6 +46,13 @@ class Table {
     T& back() {
       return items.back();
     }
+    void orderBy(bool (*cmp)(const T&, const T&), bool ascending=true) {
+      if (ascending) {
+        std::sort(items.begin(), items.end(), cmp);
+      } else {
+        std::sort(items.rbegin(), items.rend(), cmp);
+      }
+    }
     // TODO: operator[]
 
     //bool exists = false;
@@ -54,6 +61,7 @@ class Table {
     std::string update_query;
     std::string insert_query;
     std::vector<T> items; // TODO: Make items protected
+
 };
 
 class Model {
@@ -313,7 +321,9 @@ class Shelf : public Model {
     double height;
     double width;
     double depth;
-    int is_working_shelf; // deprecated, see HedaConfig.working_shelf_id
+    double offset_x; // deprecated
+    double offset_z; // deprecated
+    double moving_height;
 };
 
 class ShelfTable : public Table<Shelf> {
@@ -325,7 +335,9 @@ class ShelfTable : public Table<Shelf> {
       query.bind(1, item.height);
       query.bind(2, item.width);
       query.bind(3, item.depth);
-      query.bind(4, item.is_working_shelf);
+      query.bind(6, item.created_at);
+      query.bind(7, item.updated_at);
+      query.bind(8, item.moving_height);
     }
     
     Shelf parseItem(SQLite::Statement& query) {
@@ -333,10 +345,14 @@ class ShelfTable : public Table<Shelf> {
       i.height = query.getColumn(1);
       i.width = query.getColumn(2);
       i.depth = query.getColumn(3);
-      i.is_working_shelf = query.getColumn(4);
+      i.created_at = query.getColumn(6);
+      i.updated_at = query.getColumn(7);
+      i.moving_height = query.getColumn(8);
       return i;
     }
 
 };
+
+bool shelfHeightCmp(const Shelf& arg0, const Shelf& arg1);
 
 #endif

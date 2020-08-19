@@ -8,6 +8,7 @@
     <th>Depth</th>
     <th>Offset x</th>
     <th>Offset z</th>
+    <th>Moving height</th>
     <th>Locations</th>
     <th></th>
     <th></th>
@@ -22,6 +23,7 @@
     <td></td>
     <td></td>
     <td></td>
+    <td></td>
   </tr>
   <% (@shelves || []).each do |shelf| %>
     <tr>
@@ -31,6 +33,7 @@
       <td><%= shelf.depth %></td>
       <td><%= shelf.offset_x %></td>
       <td><%= shelf.offset_z %></td>
+      <td><%= shelf.moving_height %></td>
       <td>
         <%= content_tag "div", class: "drawing_location", data: {shelf: shelf, locations: shelf.locations, jars: shelf.locations.map {|e| e.jar}} do %>
         <% end %>
