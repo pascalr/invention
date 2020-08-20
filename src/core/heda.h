@@ -119,6 +119,11 @@ class Heda {
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
       m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
+      m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
+        string ingredientName = tokens.popNoun();
+        cout << "About to fetch ingredient = " << ingredientName << endl;
+        //fetch();
+      }; 
       m_commands["grip"] = [&](ParseResult tokens) {
         unsigned long id = tokens.popPositiveInteger();
         grip(id);

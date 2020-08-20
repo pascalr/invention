@@ -55,6 +55,16 @@ bool ParseResult::checkArgument(TokenType type) {
   shared_ptr<Token> token = *m_tokens.begin();
   return token->getType() == type;
 }
+    
+string ParseResult::popNoun() {
+
+  expectArgument(NOUN);
+  
+  string val = (dynamic_pointer_cast<Noun> (*m_tokens.begin()))->value;
+  m_tokens.erase(m_tokens.begin());
+
+  return val;
+}
 
 char ParseResult::popAxis() {
 
@@ -132,6 +142,20 @@ bool Parser::parseAxis(ParseResult &result, const string &word) {
   }
   
   return false;
+}
+
+bool parseNoun(ParseResult &result, const string &word) {
+
+  for (auto it = word.begin(); it != word.end(); it++) {
+    bool isDigit = (*it >= '0' && *it <= '9');
+    bool isLetter = (*it >= 'A' && *it <= 'Z') || (*it >= 'a' && *it <= 'z');
+    bool isOtherValid = *it == '-' || *it == '_';
+    if (!isDigit && !isLetter && !isOtherValid) {return false;} 
+  }
+
+  shared_ptr<Token> tok = make_shared<Noun>(word);
+  result.addToken(tok);
+  return true;
 }
 
 bool Parser::parseUnkown(ParseResult &result, const string &word) {

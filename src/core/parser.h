@@ -16,6 +16,7 @@ enum TokenType {
   SCALAIRE,
   AXIS,
   POSITIVE_INTEGER,
+  NOUN, // A noun is a word composed of either a letter, a number and a dash. Orange. Vitamin-B-12. Or an underscore
   UNKOWN
 };
 
@@ -84,6 +85,13 @@ class PositiveInteger : public Token {
     TokenType getType() {return POSITIVE_INTEGER;}
 };
 
+class Noun : public Token {
+  public:
+    Noun(const string &val) : value(val) {}
+    string value;
+    TokenType getType() {return NOUN;}
+};
+
 class Unkown : public Token {
   public:
     Unkown(const string &val) : value(val) {}
@@ -109,6 +117,8 @@ class ParseResult {
     unsigned long popPositiveInteger();
 
     double popScalaire();
+    
+    string popNoun();
 
     void addToken(shared_ptr<Token> tok);
 
@@ -129,6 +139,8 @@ class ParseResult {
 class Parser {
   public:
 
+
+    bool parseNoun(ParseResult &result, const string &word);
 
     bool parseScalaire(ParseResult &result, const string &word);
       
