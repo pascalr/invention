@@ -81,7 +81,7 @@ link_libraries(MyLibsModule)
 
 #add_executable( run_tests src/test/test.cpp )
 
-add_executable( heda_run src/heda_run.cpp )
+add_executable( heda src/heda.cpp )
 
 #add_executable( test_db src/test/db.cpp )
 

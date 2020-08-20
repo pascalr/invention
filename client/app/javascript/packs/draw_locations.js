@@ -71,7 +71,9 @@ function toggleMenuOn(e, id) {
   var locations = JSON.parse(elem.dataset["locations"]);
   var jars = JSON.parse(elem.dataset["jars"]);
   locations.forEach((loc, i) => {
-    var circle = two.makeCircle(loc.x, loc.z, (loc.diameter/2)-LINE_THICKNESS);
+
+    var z = shelf.depth - loc.z;
+    var circle = two.makeCircle(loc.x, z, (loc.diameter/2)-LINE_THICKNESS);
     if (jars[i]) {
       circle.fill = '#FF8000';
     } else {
@@ -79,6 +81,10 @@ function toggleMenuOn(e, id) {
     }
     circle.stroke = 'orangered'; // Accepts all valid css color
     circle.linewidth = LINE_THICKNESS;
+
+    var text = new Two.Text(loc.id, loc.x, z);
+    two.makeGroup(text);
+
     ids = [...ids, circle.id]
   });
   

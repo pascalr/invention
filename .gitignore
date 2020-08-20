@@ -49,9 +49,8 @@ client/tmp/pids/*
 # Ignore uploaded files in development.
 client/storage/*
 !client/storage/.keep
-
 client/public/assets
-client/public/packs/ # I added this not sure it's ok
+client/public/packs/
 client/.byebug_history
 
 # Ignore master key for decrypting credentials and more.

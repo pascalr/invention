@@ -42,8 +42,8 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
 
     int nbCols = shelf.width / dia;
     int nbRows = shelf.depth / dia;
-    for (int i = 0; i < nbCols; i++) {
-      for (int j = 0; j < nbRows; j++) {
+    for (int j = 0; j < nbRows; j++) {
+      for (int i = 0; i < nbCols; i++) {
         
         double x = i*dia + (dia / 2);
         double z = j*dia + (dia / 2);
