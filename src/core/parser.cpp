@@ -6,6 +6,8 @@
 
 using namespace std;
 
+class BadTokenTypeException : public exception {};
+
 const char* tokenTypeName(TokenType e) {
   switch (e) {
     case UNIT: return "UNIT";
@@ -13,8 +15,9 @@ const char* tokenTypeName(TokenType e) {
     case SCALAIRE: return "SCALAIRE";
     case AXIS: return "AXIS";
     case UNKOWN: return "UNKOWN";
+    case NOUN: return "NOUN";
     case POSITIVE_INTEGER: return "POSITIVE_INTEGER";
-    default: throw "Bad TokenType";
+    default: throw BadTokenTypeException();
   }
 }
 
@@ -144,7 +147,7 @@ bool Parser::parseAxis(ParseResult &result, const string &word) {
   return false;
 }
 
-bool parseNoun(ParseResult &result, const string &word) {
+bool Parser::parseNoun(ParseResult &result, const string &word) {
 
   for (auto it = word.begin(); it != word.end(); it++) {
     bool isDigit = (*it >= '0' && *it <= '9');
@@ -168,7 +171,7 @@ bool Parser::parseUnkown(ParseResult &result, const string &word) {
 
 void Parser::tokenize(ParseResult &result, const string &word) {
 
-  parsePositiveInteger(result, word) || parseScalaire(result, word) || parseAxis(result, word) || parseUnkown(result, word);
+  parsePositiveInteger(result, word) || parseScalaire(result, word) || parseAxis(result, word) || parseNoun(result, word) || parseUnkown(result, word);
 }
 
 

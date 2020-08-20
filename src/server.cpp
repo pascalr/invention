@@ -89,11 +89,13 @@ int main(int argc, char** argv) {
   SharedReaderClient hedaReader(sharedReader, READER_CLIENT_ID_HEDA);
   SharedReaderClient serverReader(sharedReader, READER_CLIENT_ID_SERVER);
 
+  TwoWayStream serverStream;
+
   Database db(DB_PROD);
   Heda heda(serialWriter, hedaReader, db); 
 
   // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
-  server.resource["^/run$"]["POST"] = [&heda](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/run$"]["POST"] = [&heda,&serverStream](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "POST /run" << endl;
 
     SimpleWeb::CaseInsensitiveMultimap vals;
@@ -101,7 +103,8 @@ int main(int argc, char** argv) {
 
     for(auto &field : vals) {
       if (field.first == "cmd") {
-        try {
+        serverStream << field.second.c_str();
+        /*try {
           heda.execute(field.second);
         } catch (const exception& e) {
           cout << "Caught an exception: " << e.what() << endl;
@@ -111,7 +114,7 @@ int main(int argc, char** argv) {
           cout << "Caught an exception which does not inherit exception class." << endl;
           std::exception_ptr p = std::current_exception();
           std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
-        }
+        }*/
       }
     }
     response->write("ok");
@@ -179,5 +182,5 @@ int main(int argc, char** argv) {
   cout << "Server listening on " << serverAddress << " port " << server_port.get_future().get() << endl << endl;
 
   //server_thread.join();
-  heda.loopCommandStack();
+  heda.loopCommandStack(serverStream);
 }

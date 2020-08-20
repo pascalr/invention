@@ -418,9 +418,12 @@ class Heda {
       return shelves.back().id;
     }
 
-    void loopCommandStack() {
+    void loopCommandStack(Reader& reader) {
       while (true) {
-      //while (m_commands_thread_run) {
+        if(reader.inputAvailable()) {
+          string cmd = getInputLine(reader);
+          execute(cmd);
+        }
         this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
       }
     }

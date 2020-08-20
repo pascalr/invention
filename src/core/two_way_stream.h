@@ -5,12 +5,15 @@
 #include "reader/reader.h"
 #include <sstream>
 
+#include <mutex>
+
 using namespace std;
 
 class TwoWayStream : public StdWriter, public Reader {
   public:
 
     string str() {
+      std::lock_guard<std::mutex> guard(streamMutex);
       string str = ss.str();
       ss.str("");
       ss.clear();
@@ -18,18 +21,23 @@ class TwoWayStream : public StdWriter, public Reader {
     }
     
     void doPrint(string str) {
+      std::lock_guard<std::mutex> guard(streamMutex);
       ss << str << "\n";
     }
     
     bool inputAvailable() {
+      std::lock_guard<std::mutex> guard(streamMutex);
       return ss.rdbuf()->in_avail();
     }
 
     int getByte() {
+      std::lock_guard<std::mutex> guard(streamMutex);
       return ss.get();
     }
 
     stringstream ss;
+   
+    std::mutex streamMutex;
 };
 
 #endif
