@@ -5,6 +5,7 @@
 <table>
   <thead>
     <tr>
+      <th>Id</th>
       <th>Nom</th>
       <th>Aliment</th>
       <th colspan="3">Actions</th>
@@ -14,6 +15,7 @@
   <tbody>
     <% @ingredients.each do |ingredient| %>
       <tr>
+        <td><%= ingredient.id %></td>
         <td><%= ingredient.name %></td>
         <td><%= ingredient.aliment_id %></td>
         <td><%= link_to 'Show', ingredient %></td>

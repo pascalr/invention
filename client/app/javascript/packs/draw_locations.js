@@ -70,20 +70,24 @@ function toggleMenuOn(e, id) {
   var ids = []
   var locations = JSON.parse(elem.dataset["locations"]);
   var jars = JSON.parse(elem.dataset["jars"]);
+  var ingredients = JSON.parse(elem.dataset["ingredients"]);
   locations.forEach((loc, i) => {
 
     var z = shelf.depth - loc.z;
     var circle = two.makeCircle(loc.x, z, (loc.diameter/2)-LINE_THICKNESS);
     if (jars[i]) {
       circle.fill = '#FF8000';
+      
+      var text = new Two.Text(ingredients[i], loc.x, z);
+      two.makeGroup(text);
     } else {
       circle.fill = '#FFFFFF';
+
+      var text = new Two.Text(loc.id, loc.x, z);
+      two.makeGroup(text);
     }
     circle.stroke = 'orangered'; // Accepts all valid css color
     circle.linewidth = LINE_THICKNESS;
-
-    var text = new Two.Text(loc.id, loc.x, z);
-    two.makeGroup(text);
 
     ids = [...ids, circle.id]
   });

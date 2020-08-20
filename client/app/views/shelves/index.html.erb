@@ -29,7 +29,7 @@
       <td><%= shelf.depth %></td>
       <td><%= shelf.moving_height %></td>
       <td>
-        <%= content_tag "div", class: "drawing_location", data: {shelf: shelf, locations: shelf.locations, jars: shelf.locations.map {|e| e.jar}} do %>
+        <%= content_tag "div", class: "drawing_location", data: {shelf: shelf, locations: shelf.locations, jars: shelf.locations.map {|e| e.jar}, ingredients: shelf.locations.map {|e| e.jar && e.jar.ingredient ? e.jar.ingredient.name : nil}} do %>
         <% end %>
       </td>
       <td><%= link_to 'éditer', edit_shelf_path(shelf) %></td>
