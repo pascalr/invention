@@ -18,6 +18,10 @@ void Heda::generateLocations() {
   NaiveJarPacker packer;
   packer.generateLocations(*this);
 }
+    
+void Heda::pickup(Jar jar) {
+  lowerForGrip(jar);
+}
 
 void Heda::fetch(std::string ingredientName) {
   cout << "About to fetch ingredient = " << ingredientName << endl;
@@ -35,9 +39,11 @@ void Heda::fetch(std::string ingredientName) {
           NaiveJarPacker packer;
           packer.moveToLocation(*this, loc);
           // TODO: pickup(jar);
+          return;
         }
       }
       cout << "Oups. No jar were found containing this ingredient..." << endl;
+      return;
     }
   }
   cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
@@ -75,6 +81,19 @@ void Heda::grip(int id) {
   is_gripping = true;
 }
 
+// Get lower, either to pickup, or to putdown
+void Heda::lowerForGrip(const Jar& jar) {
+  Shelf shelf;
+  if (!shelves.get(shelf, shelfByHeight(toUserHeight(m_position)))) {throw InvalidShelfException();}
+  PolarCoord p(m_position);
+
+  JarFormat format; 
+  if (!jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+  
+  p.v = toPolarCoord(UserCoord(0.0, shelf.height + format.height + config.grip_offset, 0.0), config.gripper_radius).v;
+  moveTo(p);
+}
+
 // It would be nice if the y axis was with an encoder... So just lower until there is a resistance.
 // Lower to the shelf based on jar height
 // Then release.
@@ -83,19 +102,9 @@ void Heda::putdown() {
   // TODO: Error message is not gripping
   if (is_gripping) {
 
-    double previousHeight = m_position.v;
-
-    Shelf shelf;
-    if (!shelves.get(shelf, shelfByHeight(toUserHeight(m_position)))) {throw InvalidShelfException();}
     PolarCoord p(m_position);
-
-    JarFormat format; 
-    if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
-  
-    p.v = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 10, 0.0), config.gripper_radius).v; // FIXME HARDCODED VALUE 7
-    moveTo(p);
+    lowerForGrip(gripped_jar);
     openJaw();
-    p.v = previousHeight;
     moveTo(p);
   }
 }

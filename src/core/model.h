@@ -92,6 +92,7 @@ class HedaConfig : public Model {
     double home_position_x;
     double home_position_y;
     double home_position_t;
+    double grip_offset;
 };
 
 class HedaConfigTable : public Table<HedaConfig> {
@@ -100,21 +101,22 @@ class HedaConfigTable : public Table<HedaConfig> {
     string getTableName() { return TABLE_NAME; };
 
     HedaConfig parseItem(SQLite::Statement& query) {
-      HedaConfig config;
-      config.working_shelf_id = query.getColumn(1);
-      config.created_at = query.getColumn(2);
-      config.updated_at = query.getColumn(3);
-      config.user_coord_offset_x = query.getColumn(4);
-      config.user_coord_offset_y = query.getColumn(5);
-      config.user_coord_offset_z = query.getColumn(6);
-      config.camera_radius = query.getColumn(7);
-      config.gripper_radius = query.getColumn(8);
-      config.camera_focal_point = query.getColumn(9);
-      config.detect_height = query.getColumn(10);
-      config.home_position_x = query.getColumn(11);
-      config.home_position_y = query.getColumn(12);
-      config.home_position_t = query.getColumn(13);
-      return config;
+      HedaConfig c;
+      c.working_shelf_id = query.getColumn(1);
+      c.created_at = query.getColumn(2);
+      c.updated_at = query.getColumn(3);
+      c.user_coord_offset_x = query.getColumn(4);
+      c.user_coord_offset_y = query.getColumn(5);
+      c.user_coord_offset_z = query.getColumn(6);
+      c.camera_radius = query.getColumn(7);
+      c.gripper_radius = query.getColumn(8);
+      c.camera_focal_point = query.getColumn(9);
+      c.detect_height = query.getColumn(10);
+      c.home_position_x = query.getColumn(11);
+      c.home_position_y = query.getColumn(12);
+      c.home_position_t = query.getColumn(13);
+      c.grip_offset = query.getColumn(14);
+      return c;
     }
 
     void bindQuery(SQLite::Statement& query, const HedaConfig& item) {
@@ -131,6 +133,7 @@ class HedaConfigTable : public Table<HedaConfig> {
       query.bind(11, item.home_position_x);
       query.bind(12, item.home_position_y);
       query.bind(13, item.home_position_t);
+      query.bind(14, item.grip_offset);
     }
 };
 

@@ -121,6 +121,16 @@ class Heda {
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
       m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
+      m_commands["pickup"] = [&](ParseResult tokens) {
+        int id = tokens.popPositiveInteger();
+        for (const Jar& jar : jars.items) {
+          if (jar.id == id) {
+            pickup(jar);
+            return;
+          }
+        }
+        cout << "Oups. No jar were found with this id." << endl;
+      };
       m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
         string ingredientName = tokens.popNoun();
         fetch(ingredientName);
@@ -220,6 +230,7 @@ class Heda {
 
     void captureFrame(Mat& frame);
     void capture();
+    void pickup(Jar jar);
 
     void move(const std::vector<Movement>& mvts) {
       for (const Movement& mvt : mvts) {
@@ -265,6 +276,7 @@ class Heda {
     void pinpoint();
     void calibrate();
     void putdown();
+    void lowerForGrip(const Jar& jar); // Get lower, either to pickup, or to putdown
     void grip(int id);
     void store();
     void fetch(std::string ingredientName);
