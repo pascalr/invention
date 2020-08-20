@@ -178,5 +178,6 @@ int main(int argc, char** argv) {
   });
   cout << "Server listening on " << serverAddress << " port " << server_port.get_future().get() << endl << endl;
 
-  server_thread.join();
+  //server_thread.join();
+  heda.loopCommandStack();
 }

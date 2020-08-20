@@ -8,6 +8,7 @@ using namespace std;
 
 void executeAllPending(Heda& heda, FakeReader& reader) {
   while(!heda.isDoneWorking()) {
+    heda.handleCommandStack();
     reader.setFakeInput(MESSAGE_DONE);
     this_thread::sleep_for(chrono::milliseconds(10));
   }

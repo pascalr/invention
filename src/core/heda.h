@@ -72,17 +72,17 @@ class Heda {
 
       setupCommands();
 
-      m_commands_thread_run = true;
-      m_commands_thread = std::thread(&Heda::loopCommandStack, this);
+      //m_commands_thread_run = true;
+      //m_commands_thread = std::thread(&Heda::loopCommandStack, this);
       //m_commands_thread.detach(); Do I need to detach?
 
       loadDb();
     }
 
-    ~Heda() {
-      m_commands_thread_run = false;
-      m_commands_thread.join();
-    }
+    //~Heda() {
+    //  m_commands_thread_run = false;
+    //  m_commands_thread.join();
+    //}
 
     void loadDb() {
       db.load(configs);
@@ -366,8 +366,8 @@ class Heda {
     // It is NOT the stack of commands sent to Heda.
     std::list<RawCommand> m_stack;
     
-    std::thread m_commands_thread;
-    std::atomic<bool> m_commands_thread_run;
+    //std::thread m_commands_thread;
+    //std::atomic<bool> m_commands_thread_run;
 
     PolarCoord m_position;
     //VideoCapture m_cap;
@@ -413,38 +413,9 @@ class Heda {
       return shelves.back().id;
     }
 
-  protected:
-
-    void askPosition() {
-      
-      // TODO: Assert already in this mutex. std::lock_guard<std::mutex> guard(commandsMutex);
-      m_writer << "@";
-
-      bool receivedMessagePosition = false;
-
-      while (true) {
-        if (m_reader.inputAvailable()) {
-          string str = getInputLine(m_reader);
-
-          if (str == MESSAGE_POSITION) {
-            receivedMessagePosition = true; continue;
-
-          } else if (receivedMessagePosition) {
-            cout << "Parsing position = " << str << endl;
-            Parser parser;
-            ParseResult result;
-            parser.parse(result, "foo " + str); // FIXME: useless command at beginning
-            m_position = PolarCoord(result.popScalaire(), result.popScalaire(), result.popScalaire());
-            cout << "Done parsing position. Result: " << m_position << endl;
-            return;
-          }
-        }
-        this_thread::sleep_for(chrono::milliseconds(10));
-      }
-    }
-
     void loopCommandStack() {
-      while (m_commands_thread_run) {
+      while (true) {
+      //while (m_commands_thread_run) {
         this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
       }
     }
@@ -481,6 +452,41 @@ class Heda {
 
       return 10;
     }
+
+  protected:
+
+    void askPosition() {
+      
+      // TODO: Assert already in this mutex. std::lock_guard<std::mutex> guard(commandsMutex);
+      m_writer << "@";
+
+      bool receivedMessagePosition = false;
+
+      while (true) {
+        if (m_reader.inputAvailable()) {
+          string str = getInputLine(m_reader);
+
+          if (str == MESSAGE_POSITION) {
+            receivedMessagePosition = true; continue;
+
+          } else if (receivedMessagePosition) {
+            cout << "Parsing position = " << str << endl;
+            Parser parser;
+            ParseResult result;
+            parser.parse(result, "foo " + str); // FIXME: useless command at beginning
+            double x = result.popScalaire();
+            double y = result.popScalaire();
+            double t = result.popScalaire();
+            m_position = PolarCoord(x, y, t);
+            cout << "Done parsing position. Result: " << m_position << endl;
+            return;
+          }
+        }
+        this_thread::sleep_for(chrono::milliseconds(10));
+      }
+    }
+
+
 
 
     Shelf getWorkingShelf() {
