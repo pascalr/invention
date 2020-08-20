@@ -36,3 +36,16 @@ body {
 #menu a:visited{
   color:white;
 }
+
+.context-menu {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  border: solid 1px black;
+  border-radius: 10px;
+}
+
+ul.context-menu__items {
+  list-style-type: none;
+}

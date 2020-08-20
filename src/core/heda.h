@@ -398,6 +398,21 @@ class Heda {
 
     void generateLocations();
 
+    // Returns the id of the self
+    int shelfByHeight(double userHeight) {
+    
+      shelves.orderBy(shelfHeightCmp);
+      auto previousIt = shelves.begin();
+      for (auto it = shelves.begin(); it != shelves.end(); ++it) {
+    
+        if (userHeight < it->height) {return previousIt->id;}
+        previousIt = it;
+      }
+     
+      if (shelves.empty()) {return -1;}
+      return shelves.back().id;
+    }
+
   protected:
 
     void askPosition() {
@@ -467,20 +482,6 @@ class Heda {
       return 10;
     }
 
-    // Returns the id of the self
-    int shelfByHeight(double userHeight) {
-    
-      shelves.orderBy(shelfHeightCmp);
-      auto previousIt = shelves.begin();
-      for (auto it = shelves.begin(); it != shelves.end(); ++it) {
-    
-        if (userHeight < it->height) {return previousIt->id;}
-        previousIt = it;
-      }
-     
-      if (shelves.empty()) {return -1;}
-      return shelves.back().id;
-    }
 
     Shelf getWorkingShelf() {
       for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {

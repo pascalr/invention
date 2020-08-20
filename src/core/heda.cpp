@@ -27,6 +27,8 @@ void Heda::store() {
     if (locations.get(loc, locId)) {
       packer.moveToLocation(*this, loc);
       putdown();
+      gripped_jar.location_id = loc.id;
+      db.update(jars, gripped_jar);
     }
   }
 }
@@ -65,7 +67,7 @@ void Heda::putdown() {
     JarFormat format; 
     if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
   
-    p.y = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 7, 0.0), config.gripper_radius).y; // FIXME HARDCODED VALUE 7
+    p.y = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 10, 0.0), config.gripper_radius).y; // FIXME HARDCODED VALUE 7
     moveTo(p);
     openJaw();
     p.y = previousHeight;

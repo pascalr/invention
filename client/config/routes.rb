@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resources :locations
+  get 'location/clear/:id', to: 'locations#clear'
   resources :jars
   resources :recettes
   get 'image/show'

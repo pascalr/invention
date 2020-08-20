@@ -21,6 +21,17 @@ class LocationsController < ApplicationController
   def edit
   end
 
+  # GET /location/clear # FIXME: Should be delete
+  def clear
+    location = Location.find(params[:id])
+    jar = location.jar
+    if jar
+      jar.location_id = nil
+      jar.save!
+    end
+    redirect_to shelves_path
+  end
+
   # POST /locations
   # POST /locations.json
   def create

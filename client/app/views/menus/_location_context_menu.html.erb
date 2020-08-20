@@ -1,0 +1,31 @@
+<script>
+  function onClickClearLocation() {
+    let menu = document.querySelector("#location-context-menu");
+    let id = menu.dataset["location_id"]
+    let link = document.createElement("a");
+    link.href = "location/clear/" + id;
+    link.dataset["method"] = "delete"; // FIXME: Does not work
+    link.click();
+    //window.location.href = "location/clear/" + id
+  }
+</script>
+
+<nav id="location-context-menu" class="context-menu">
+  <ul class="context-menu__items">
+    <li class="context-menu__item">
+      <a class="context-menu__link" onclick="onClickClearLocation()">
+        Libérer
+      </a>
+    </li>
+    <li class="context-menu__item">
+      <a class="context-menu__link">
+        TODO
+      </a>
+    </li>
+    <li class="context-menu__item">
+      <a class="context-menu__link">
+        TODO
+      </a>
+    </li>
+  </ul>
+</nav>

@@ -65,6 +65,8 @@ void testPosition() {
   
   assertEqual("toPolarCoord", PolarCoord(0.0, 0.0, 0.0), heda.toPolarCoord(UserCoord(74.0, 74.0, 74.0), heda.config.gripper_radius));
 
+  assertEqual("shelfByHeight", 3, heda.shelfByHeight(500));
+
   cout << "-----------Position!!!: " << heda.toPolarCoord(UserCoord(0.0, 772.0 + 95.0 + 4, 0.0), 10.0);
 }
 

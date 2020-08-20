@@ -1,5 +1,8 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+Remove the thread from Heda, it will make it much simpler to debug.
+Instead of server thread.join() in server.cpp, simply loop there for Heda.
+
 Maybe print the number ordering of the positions in the shelves view?
 
 It is too easy to make an error between polar y and user y... At least rename one variable, or do something...

@@ -6,8 +6,6 @@
     <th>Height</th>
     <th>Width</th>
     <th>Depth</th>
-    <th>Offset x</th>
-    <th>Offset z</th>
     <th>Moving height</th>
     <th>Locations</th>
     <th></th>
@@ -15,8 +13,6 @@
   </tr>
  
   <tr>
-    <td>(mm)</td>
-    <td>(mm)</td>
     <td>(mm)</td>
     <td>(mm)</td>
     <td>(mm)</td>
@@ -31,8 +27,6 @@
       <td><%= shelf.height %></td>
       <td><%= shelf.width %></td>
       <td><%= shelf.depth %></td>
-      <td><%= shelf.offset_x %></td>
-      <td><%= shelf.offset_z %></td>
       <td><%= shelf.moving_height %></td>
       <td>
         <%= content_tag "div", class: "drawing_location", data: {shelf: shelf, locations: shelf.locations, jars: shelf.locations.map {|e| e.jar}} do %>
@@ -45,6 +39,8 @@
 </table>
 
 <%= link_to 'Add shelf', new_shelf_path %>
+
+<%= render "menus/location_context_menu" %>
 
 <%= javascript_pack_tag 'two' %>
 <%= javascript_pack_tag 'draw_locations' %>
