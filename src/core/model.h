@@ -31,6 +31,7 @@ class Table {
       }
       return 0;
     }
+
     typename std::vector<T>::iterator begin() {
       return items.begin();
     }
@@ -312,6 +313,35 @@ class JarTable : public Table<Jar> {
       //double y = query.getColumn(2);
       //double t = query.getColumn(3);
       return jar;
+    }
+
+};
+
+class Ingredient : public Model {
+  public:
+    string name;
+    int aliment_id;
+};
+
+class IngredientTable : public Table<Ingredient> {
+  public:
+    const char* TABLE_NAME = "ingredients";
+    string getTableName() { return TABLE_NAME; };
+    
+    void bindQuery(SQLite::Statement& query, const Ingredient& item) {
+      query.bind(1, item.name);
+      query.bind(2, item.aliment_id);
+      query.bind(3, item.created_at);
+      query.bind(4, item.updated_at);
+    }
+    
+    Ingredient parseItem(SQLite::Statement& query) {
+      Ingredient i;
+      i.name = (const char*)query.getColumn(1);
+      i.aliment_id = query.getColumn(2);
+      i.created_at = query.getColumn(3);
+      i.updated_at = query.getColumn(4);
+      return i;
     }
 
 };

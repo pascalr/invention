@@ -12,10 +12,35 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
+class InvalidLocationException : public exception {};
     
 void Heda::generateLocations() {
   NaiveJarPacker packer;
   packer.generateLocations(*this);
+}
+
+void Heda::fetch(std::string ingredientName) {
+  cout << "About to fetch ingredient = " << ingredientName << endl;
+  for (const Ingredient& ing : ingredients.items) {
+    if (iequals(ing.name, ingredientName)) {
+
+      cout << "The ingredient exists. Now checking to find a jar that has some." << endl;
+      for (const Jar& jar : jars.items) {
+        if (jar.ingredient_id == ing.id) {
+
+          // TODO: Make sure the the quantity of ingredients left in the jar is ok.
+          // Ok now get the location.
+          Location loc;
+          if (!locations.get(loc, jar.location_id)) {throw InvalidLocationException();} // TODO: Handle error message missing location
+          NaiveJarPacker packer;
+          packer.moveToLocation(*this, loc);
+          // TODO: pickup(jar);
+        }
+      }
+      cout << "Oups. No jar were found containing this ingredient..." << endl;
+    }
+  }
+  cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
 }
 
 void Heda::store() {

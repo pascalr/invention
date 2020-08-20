@@ -93,6 +93,7 @@ class Heda {
       db.load(jar_formats);
       db.load(jars);
       db.load(locations);
+      db.load(ingredients);
     }
 
     void setupCommands() {
@@ -109,6 +110,7 @@ class Heda {
       m_commands["stop"] = [&](ParseResult tokens) {stop();};
       m_commands["reference"] = [&](ParseResult tokens) {reference();};
       m_commands["home"] = [&](ParseResult tokens) {home();};
+      m_commands["gohome"] = [&](ParseResult tokens) {gohome();};
       m_commands["info"] = [&](ParseResult tokens) {info();};
       m_commands["store"] = [&](ParseResult tokens) {store();};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
@@ -121,8 +123,7 @@ class Heda {
       m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
       m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
         string ingredientName = tokens.popNoun();
-        cout << "About to fetch ingredient = " << ingredientName << endl;
-        //fetch();
+        fetch(ingredientName);
       }; 
       m_commands["grip"] = [&](ParseResult tokens) {
         unsigned long id = tokens.popPositiveInteger();
@@ -186,6 +187,10 @@ class Heda {
 
     void home() {
       reference();
+      gohome();
+    }
+
+    void gohome() {
       moveTo(PolarCoord(config.home_position_x, config.home_position_y, config.home_position_t));
       openJaw();
     }
@@ -262,6 +267,7 @@ class Heda {
     void putdown();
     void grip(int id);
     void store();
+    void fetch(std::string ingredientName);
 
     void clearDetectedCodes() {
       db.clear(codes);
@@ -386,6 +392,7 @@ class Heda {
     ShelfTable shelves;
     JarFormatTable jar_formats;
     JarTable jars;
+    IngredientTable ingredients;
     LocationTable locations;
     Database& db;
 
