@@ -55,7 +55,7 @@ string Movement::str() const {
 }*/
 
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
-  return os << "(" << c.x << ", " << c.y << ", " << c.t << ")";
+  return os << "(" << c.h << ", " << c.v << ", " << c.t << ")";
 }
 
 std::ostream& operator<<(std::ostream &os, const UserCoord& c) {
@@ -85,22 +85,22 @@ void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position,
   // must change level
   if (currentLevel != destinationLevel) {
 
-    positionT = (position.x < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     movements.push_back(Movement('t', positionT));
   }
  
-  addMovementIfDifferent(movements, Movement('y', destination.y), position.y); 
+  addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
 
   // If moving theta would colide, move x first
   double deltaX = cosd(destination.t) * config.gripper_radius;
-  double xIfTurnsFirst = position.x + deltaX;
+  double xIfTurnsFirst = position.h + deltaX;
 
   if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
-    addMovementIfDifferent(movements, Movement('x', destination.x), position.x); 
+    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
     addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
   } else {
     addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-    addMovementIfDifferent(movements, Movement('x', destination.x), position.x); 
+    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
   }
 
   if (callback && movements.size() != size) {

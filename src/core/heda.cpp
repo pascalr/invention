@@ -58,7 +58,7 @@ void Heda::putdown() {
   // TODO: Error message is not gripping
   if (is_gripping) {
 
-    double previousHeight = m_position.y;
+    double previousHeight = m_position.v;
 
     Shelf shelf;
     if (!shelves.get(shelf, shelfByHeight(toUserHeight(m_position)))) {throw InvalidShelfException();}
@@ -67,10 +67,10 @@ void Heda::putdown() {
     JarFormat format; 
     if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
   
-    p.y = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 10, 0.0), config.gripper_radius).y; // FIXME HARDCODED VALUE 7
+    p.v = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 10, 0.0), config.gripper_radius).v; // FIXME HARDCODED VALUE 7
     moveTo(p);
     openJaw();
-    p.y = previousHeight;
+    p.v = previousHeight;
     moveTo(p);
   }
 }

@@ -38,15 +38,15 @@ Z: Z0 est à partir du devant.
 class PolarCoord {
   public:
     PolarCoord() {}
-    PolarCoord(double x, double y, double t) : x(x), y(y), t(t) {}
-    PolarCoord(const PolarCoord& c) : x(c.x), y(c.y), t(c.t) {}
+    PolarCoord(double h, double v, double t) : h(h), v(v), t(t) {}
+    PolarCoord(const PolarCoord& c) : h(c.h), v(c.v), t(c.t) {}
     
     inline bool operator==(const PolarCoord& r){
-      return std::tie(x, y, t) == std::tie(r.x, r.y, r.t);
+      return std::tie(h, v, t) == std::tie(r.h, r.v, r.t);
     }
 
-    double x;
-    double y;
+    double h;
+    double v;
     double t;
 };
 

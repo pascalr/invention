@@ -44,7 +44,7 @@ void Heda::calibrate() {
 
   PolarCoord c = toPolarCoord(UserCoord(0.0, shelf.height + format.height + 7, 0.0), config.gripper_radius); // FIXME HARDCODED VALUE
 
-  moveTo(PolarCoord(0.0, c.y, 45.0));
+  moveTo(PolarCoord(0.0, c.v, 45.0));
   openJaw();
   moveTo(PolarCoord(0.0, config.detect_height, 45.0));
   moveTo(PolarCoord(175.0, config.detect_height, 75.0));

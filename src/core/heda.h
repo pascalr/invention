@@ -222,9 +222,9 @@ class Heda {
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
       pushCommand(mvt.str(), [&,mvt]() {
         if (mvt.axis == 'x' || mvt.axis == 'X') {
-          m_position.x = mvt.destination;
+          m_position.h = mvt.destination;
         } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
-          m_position.y = mvt.destination;
+          m_position.v = mvt.destination;
         } else if (mvt.axis == 't' || mvt.axis == 'T') {
           m_position.t = mvt.destination;
         }
@@ -330,7 +330,7 @@ class Heda {
     }
 
     double toUserHeight(const PolarCoord p) {
-      return p.y+config.user_coord_offset_y;
+      return p.v+config.user_coord_offset_y;
     }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
@@ -340,8 +340,8 @@ class Heda {
       double offsetY = config.user_coord_offset_y;
       double offsetZ = config.user_coord_offset_z;
       // The x axis and the z axis are reverse (hence * -1)
-      return UserCoord(p.x + (cosd(p.t) * reference) + offsetX,
-                  p.y+offsetY,
+      return UserCoord(p.h + (cosd(p.t) * reference) + offsetX,
+                  p.v+offsetY,
                   ((sind(p.t) * reference)*-1)+offsetZ);
     }
 

@@ -197,8 +197,8 @@ class DetectedHRCodeTable : public Table<DetectedHRCode> {
     string getTableName() { return TABLE_NAME; };
     
     void bindQuery(SQLite::Statement& query, const DetectedHRCode& item) {
-      query.bind(1, item.coord.x);
-      query.bind(2, item.coord.y);
+      query.bind(1, item.coord.h);
+      query.bind(2, item.coord.v);
       query.bind(3, item.coord.t);
       query.bind(4, item.centerX);
       query.bind(5, item.centerY);

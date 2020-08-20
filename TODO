@@ -1,7 +1,5 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
-Maybe print the number ordering of the positions in the shelves view?
-
 It is too easy to make an error between polar y and user y... At least rename one variable, or do something...
 
 Only Heda should be aware of position. Position in arduino slave should be relative.
