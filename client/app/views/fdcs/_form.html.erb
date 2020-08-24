@@ -1,0 +1,37 @@
+<%= form_with(model: fdc, local: true) do |form| %>
+  <% if fdc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(fdc.errors.count, "error") %> prohibited this fdc from being saved:</h2>
+
+      <ul>
+        <% fdc.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :data_type %>
+    <%= form.text_field :data_type %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_field :description %>
+  </div>
+
+  <div class="field">
+    <%= form.label :food_category_id %>
+    <%= form.text_field :food_category_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :publication_date %>
+    <%= form.text_field :publication_date %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

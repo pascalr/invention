@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Fdcs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Data type</th>
+      <th>Description</th>
+      <th>Food category</th>
+      <th>Publication date</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @fdcs.each do |fdc| %>
+      <tr>
+        <td><%= fdc.data_type %></td>
+        <td><%= fdc.description %></td>
+        <td><%= fdc.food_category_id %></td>
+        <td><%= fdc.publication_date %></td>
+        <td><%= link_to 'Show', fdc %></td>
+        <td><%= link_to 'Edit', edit_fdc_path(fdc) %></td>
+        <td><%= link_to 'Destroy', fdc, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Fdc', new_fdc_path %>

@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Data type:</strong>
+  <%= @fdc.data_type %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @fdc.description %>
+</p>
+
+<p>
+  <strong>Food category:</strong>
+  <%= @fdc.food_category_id %>
+</p>
+
+<p>
+  <strong>Publication date:</strong>
+  <%= @fdc.publication_date %>
+</p>
+
+<%= link_to 'Edit', edit_fdc_path(@fdc) %> |
+<%= link_to 'Back', fdcs_path %>

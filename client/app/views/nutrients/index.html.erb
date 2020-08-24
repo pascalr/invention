@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Nutrients</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Unit name</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @nutrients.each do |nutrient| %>
+      <tr>
+        <td><%= nutrient.name %></td>
+        <td><%= nutrient.unit_name %></td>
+        <td><%= link_to 'Show', nutrient %></td>
+        <td><%= link_to 'Edit', edit_nutrient_path(nutrient) %></td>
+        <td><%= link_to 'Destroy', nutrient, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Nutrient', new_nutrient_path %>

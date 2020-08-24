@@ -114,6 +114,7 @@ class Heda {
       m_commands["info"] = [&](ParseResult tokens) {info();};
       m_commands["store"] = [&](ParseResult tokens) {store();};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
+      m_commands["sync"] = [&](ParseResult tokens) {sync();};
       m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
       m_commands["detect"] = [&](ParseResult tokens) {detect();};
       m_commands["parse"] = [&](ParseResult tokens) {parse();};
@@ -308,6 +309,13 @@ class Heda {
       is_gripping = false;
       cout << "Executing stop" << endl;
       m_writer << "s";
+      askPosition();
+    }
+
+    // Get the state of the arduino and set Heda with it. (I dont change arduino much now,
+    // mainly Heda. So this avoids doing a reference every time I change something to Heda.)
+    void sync() {
+      std::lock_guard<std::mutex> guard(commandsMutex);
       askPosition();
     }
 

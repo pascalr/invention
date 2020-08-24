@@ -1,0 +1,2 @@
+class Fdc < ApplicationRecord
+end

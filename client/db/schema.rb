@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_20_170050) do
+ActiveRecord::Schema.define(version: 2020_08_24_181339) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -35,6 +35,26 @@ ActiveRecord::Schema.define(version: 2020_08_20_170050) do
     t.float "lid_x"
     t.float "lid_y"
     t.float "lid_z"
+  end
+
+  create_table "fdc_nutrients", force: :cascade do |t|
+    t.integer "fdc_id", null: false
+    t.integer "nutrient_id", null: false
+    t.float "amount"
+    t.float "median"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["fdc_id"], name: "index_fdc_nutrients_on_fdc_id"
+    t.index ["nutrient_id"], name: "index_fdc_nutrients_on_nutrient_id"
+  end
+
+  create_table "fdcs", force: :cascade do |t|
+    t.string "data_type"
+    t.string "description"
+    t.integer "food_category_id"
+    t.string "publication_date"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "hedas", force: :cascade do |t|
@@ -93,6 +113,13 @@ ActiveRecord::Schema.define(version: 2020_08_20_170050) do
     t.index ["shelf_id"], name: "index_locations_on_shelf_id"
   end
 
+  create_table "nutrients", force: :cascade do |t|
+    t.string "name"
+    t.string "unit_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "positions", force: :cascade do |t|
     t.float "x"
     t.float "y"
@@ -120,6 +147,8 @@ ActiveRecord::Schema.define(version: 2020_08_20_170050) do
     t.float "moving_height"
   end
 
+  add_foreign_key "fdc_nutrients", "fdcs"
+  add_foreign_key "fdc_nutrients", "nutrients"
   add_foreign_key "hedas", "shelves"
   add_foreign_key "ingredients", "aliments"
   add_foreign_key "locations", "shelves"
