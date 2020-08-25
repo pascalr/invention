@@ -32,17 +32,20 @@ namespace :fdc do
    
     FdcNutrient.delete_all 
     # rails g model FdcNutrient fdc:references nutrient:references amount:float median:float
-    filename = "../data/ingredients/food_nutrient.csv"
-    table = CSV.parse(File.read(filename), headers: true)
-    table.each { |row|
-      item = FdcNutrient.new
-      item.id = row["id"]
-      item.fdc_id = row["fdc_id"]
-      item.nutrient_id = row["nutrient_id"]
-      item.amount = row["amount"]
-      item.median = row["median"]
-      item.save!
-    }
+    # split food_nutrient.csv food_nutrient_ -n l/26
+    filenames = ('a'..'z').map{|c| "../data/ingredients/food_nutrient/food_nutrient_a" + c}
+    filenames.each do |filename|
+      table = CSV.parse(File.read(filename), headers: true)
+      table.each { |row|
+        item = FdcNutrient.new
+        item.id = row["id"]
+        item.fdc_id = row["fdc_id"]
+        item.nutrient_id = row["nutrient_id"]
+        item.amount = row["amount"]
+        item.median = row["median"]
+        item.save!
+      }
+    end
   end
 
 end
