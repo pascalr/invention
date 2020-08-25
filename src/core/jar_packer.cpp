@@ -17,8 +17,9 @@ void NaiveJarPacker::moveToLocation(Heda& heda, Location& loc) {
   heda.moveTo(p);
 }
 
-int NaiveJarPacker::nextLocation(Heda& heda) {
+int NaiveJarPacker::nextLocation(Heda& heda, bool storageWanted) {
   for (const Location& loc : heda.locations.items) {
+    if (loc.is_storage != storageWanted) {continue;}
     for (const Jar& jar : heda.jars.items) {
       if (jar.location_id == loc.id) {goto cnt;}
     }
@@ -38,8 +39,6 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
   heda.shelves.orderBy(shelfHeightCmp, false); // start with highest shelf (fastest)
   for (const Shelf& shelf : heda.shelves.items) {
 
-    if (shelf.id == heda.config.working_shelf_id) {continue;}
-
     int nbCols = shelf.width / dia;
     int nbRows = shelf.depth / dia;
     for (int j = 0; j < nbRows; j++) {
@@ -48,6 +47,7 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
         double x = i*dia + (dia / 2);
         double z = j*dia + (dia / 2);
         Location l(x, z, "", shelf.id, dia);
+        l.is_storage = shelf.id != heda.config.working_shelf_id;
         heda.db.insert(heda.locations, l);
       }
     }

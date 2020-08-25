@@ -9,7 +9,7 @@ class JarPacker {
   public:
   
     virtual void generateLocations(Heda& heda) = 0;
-    virtual int nextLocation(Heda& heda) = 0;
+    virtual int nextLocation(Heda& heda, bool storageWanted=true) = 0;
     virtual void moveToLocation(Heda& heda, Location& loc) = 0;
 };
 
@@ -24,7 +24,7 @@ class NaiveJarPacker : public JarPacker {
   public:
 
     void generateLocations(Heda& heda);
-    int nextLocation(Heda& heda);
+    int nextLocation(Heda& heda, bool storageWanted=true);
     void moveToLocation(Heda& heda, Location& loc);
 };
 

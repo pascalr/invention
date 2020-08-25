@@ -76,7 +76,7 @@ function toggleMenuOn(e, id) {
     var z = shelf.depth - loc.z;
     var circle = two.makeCircle(loc.x, z, (loc.diameter/2)-LINE_THICKNESS);
     if (jars[i]) {
-      circle.fill = '#FF8000';
+      circle.fill = loc.is_storage ? '#FF8000' : '#7777FF';
       
       var text = new Two.Text(ingredients[i], loc.x, z);
       two.makeGroup(text);
@@ -86,7 +86,7 @@ function toggleMenuOn(e, id) {
       var text = new Two.Text(loc.id, loc.x, z);
       two.makeGroup(text);
     }
-    circle.stroke = 'orangered'; // Accepts all valid css color
+    circle.stroke = loc.is_storage ? 'orangered' : 'blue'; // Accepts all valid css color
     circle.linewidth = LINE_THICKNESS;
 
     ids = [...ids, circle.id]
