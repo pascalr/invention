@@ -41,8 +41,8 @@
 #define BASE_X_MAX 680.0 // mm
 #define BASE_X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
 
-#define CHANGE_LEVEL_ANGLE_LOW -6
-#define CHANGE_LEVEL_ANGLE_HIGH 186
+#define CHANGE_LEVEL_ANGLE_LOW 0
+#define CHANGE_LEVEL_ANGLE_HIGH 180
 
 #define X_MIN 0.0 // mm
 #define X_MAX 640.0 // mm
