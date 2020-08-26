@@ -20,9 +20,14 @@ class Database {
     Database(const char* dbName) : db(dbName, SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE) {
     }
 
+    template <typename T>
+    void log(const char* name, T val) {
+      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << endl;
+    }
+
     void execute(const char* cmd) {
       std::lock_guard<std::mutex> guard(dbMutex);
-      cout << "DB EXEC: " << cmd << endl;
+      log("DB EXEC", cmd);
       db.exec(cmd);
     }
 
@@ -50,7 +55,7 @@ class Database {
       table.update_query += " WHERE id = ?";
       table.insert_query += ")";
       
-      cout << "DB LOAD: " << queryStr.str() << endl;
+      log("DB LOAD", queryStr.str());
       while (query.executeStep()) {
         T item = table.parseItem(query);
         item.id = query.getColumn(0);
@@ -72,7 +77,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
     
       stringstream ss; ss << "DELETE FROM " << table.getTableName();
-      cout << "DB CLEAR: " << ss.str() << endl;
+      log("DB CLEAR", ss.str());
       db.exec(ss.str());
     }
     
@@ -80,7 +85,7 @@ class Database {
     void insert(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
   
-      cout << "DB INSERT: " << table.insert_query << endl;
+      log("DB INSERT", table.insert_query);
       SQLite::Statement insertQuery(db, table.insert_query);
       table.bindQuery(insertQuery, item);
       insertQuery.exec();
@@ -110,7 +115,7 @@ class Database {
     void update(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
    
-      cout << "DB UPDATE: " << table.update_query << endl;
+      log("DB UPDATE", table.update_query);
       SQLite::Statement updateQuery(db, table.update_query);
       table.bindQuery(updateQuery, item);
       updateQuery.bind(table.column_count, item.id);
