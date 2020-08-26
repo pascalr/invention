@@ -141,9 +141,10 @@ class Heda {
       m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
       m_commands["pickup"] = [&](ParseResult tokens) {
         int id = tokens.popPositiveInteger();
+        string locationName = tokens.popNoun();
         for (const Jar& jar : jars.items) {
           if (jar.id == id) {
-            pickup(jar);
+            pickup(jar, locationName);
             return;
           }
         }
@@ -240,9 +241,10 @@ class Heda {
     Axis axisT;
     Axis axisR;
 
+    // Commands can be split with a semicolon (;)
     void execute(string str) {
 
-      string::size_type pos = str.find('\n');
+      string::size_type pos = str.find(';');
       string cmd = (pos == string::npos) ? str : str.substr(0, pos);
 
       cerr << "Executing cmd = " << cmd << "\n";
@@ -263,7 +265,7 @@ class Heda {
 
     void captureFrame(Mat& frame);
     void capture();
-    void pickup(Jar jar);
+    void pickup(Jar jar, const string& locationName);
 
     void move(const std::vector<Movement>& mvts) {
       for (const Movement& mvt : mvts) {
@@ -311,6 +313,7 @@ class Heda {
     void putdown();
     void lowerForGrip(const Jar& jar); // Get lower, either to pickup, or to putdown
     void grip(int id);
+    void grip(Jar jar);
     void store(const string& noun);
     void fetch(std::string ingredientName);
 

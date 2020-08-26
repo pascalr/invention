@@ -19,8 +19,19 @@ void Heda::generateLocations() {
   packer.generateLocations(*this);
 }
     
-void Heda::pickup(Jar jar) {
+void Heda::pickup(Jar jar, const string& locationName) {
+  NaiveJarPacker packer;
+  Location loc;
+  if (locations.byName(loc, locationName) < 0) {
+    cout << "A location name was given, but it was not found. Aborting pickup.";
+    return;
+  }
+  packer.moveToLocation(*this, loc);
   lowerForGrip(jar);
+  grip(jar);
+  jar.location_id = -1;
+  db.update(jars, jar);
+  packer.moveToLocation(*this, loc);
 }
 
 void Heda::fetch(std::string ingredientName) {
@@ -56,13 +67,10 @@ void Heda::store(const string& locationName) {
     NaiveJarPacker packer;
     Location loc;
     if (!locationName.empty()) {
-      for (const Location& l : locations.items) {
-        if (iequals(l.name, locationName)) {
-          loc = l;
-          break;
-        }
+      if (locations.byName(loc, locationName) < 0) {
+        cout << "A location name was given, but it was not found. Aborting store.";
+        return;
       }
-      cout << "Store: There was a location name specified, but it was not found. Aborting store." << endl;
     } else {
       int locId = packer.nextLocation(*this);
       locations.get(loc, locId);
@@ -75,7 +83,10 @@ void Heda::store(const string& locationName) {
       putdown();
       gripped_jar.location_id = loc.id;
       db.update(jars, gripped_jar);
+      packer.moveToLocation(*this, loc);
     }
+  } else {
+    cout << "Warning heda is not gripping. Aborting store..." << endl;
   }
 }
 
@@ -87,13 +98,16 @@ void Heda::sweep() {
   move(mvts);
 }
 
+void Heda::grip(Jar jar) {
+  grab(40.0); // TODO: Read the grab strength from the jar_format model
+  gripped_jar = jar; // TODO: Do this as a callback
+  is_gripping = true;
+}
+
 void Heda::grip(int id) {
   Jar jar;
   if (!jars.get(jar, id)) {throw InvalidJarIdException();}
-  
-  grab(40.0); // TODO: Read the grab strength from the jar_format model
-  gripped_jar = jar; // TODO: Do this as a callbacké
-  is_gripping = true;
+  grip(jar);
 }
 
 // Get lower, either to pickup, or to putdown
@@ -117,10 +131,8 @@ void Heda::putdown() {
   // TODO: Error message is not gripping
   if (is_gripping) {
 
-    PolarCoord p(m_position);
     lowerForGrip(gripped_jar);
     openJaw();
-    moveTo(p);
   }
 }
 

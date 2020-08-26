@@ -191,6 +191,16 @@ class LocationTable : public Table<Location> {
       query.bind(8, item.is_storage);
       query.bind(9, item.name);
     }
+
+    int byName(Location& loc, const string& name) {
+      for (const Location& l : items) {
+        if (iequals(l.name, name)) {
+          loc = l;
+          return 1;
+        }
+      }
+      return -1;
+    }
 };
 
 class DetectedHRCode : public Model {

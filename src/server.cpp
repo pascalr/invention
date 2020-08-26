@@ -186,6 +186,7 @@ int main(int argc, char** argv) {
   cout << "Server listening on " << serverAddress << " port " << server_port.get_future().get() << endl << endl;
 
   //server_thread.join();
-  LogReader serverLogReader("From server", serverStream);
+  LogReader serverLogReader("\033[36mFrom server\033[0m", serverStream);
+  heda.sync();
   heda.loopCommandStack(serverLogReader);
 }

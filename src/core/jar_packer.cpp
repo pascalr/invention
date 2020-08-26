@@ -7,7 +7,7 @@
 
 class MissingShelfException : public exception {};
     
-void NaiveJarPacker::moveToLocation(Heda& heda, Location& loc) {
+void NaiveJarPacker::moveToLocation(Heda& heda, const Location& loc) {
 
   Shelf shelf;
   if (!heda.shelves.get(shelf, loc.shelf_id)) {throw MissingShelfException();}
