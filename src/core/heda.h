@@ -127,10 +127,7 @@ class Heda {
       m_commands["info"] = [&](ParseResult tokens) {info();};
       m_commands["store"] = [&](ParseResult tokens) {
         string name = "";
-        try {
-          name = tokens.popNoun();
-        } catch (const MissingArgumentException& e) {
-        }
+        try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional. If empty store in the next available location.*/}
         store(name);
       };
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
@@ -517,7 +514,6 @@ class Heda {
       } else if (m_reader.inputAvailable()) {
 
         string str = getInputLine(m_reader);
-        cout << "Received message: " << str << endl;
 
         if (str == MESSAGE_DONE) {
           m_current_command.finish();
