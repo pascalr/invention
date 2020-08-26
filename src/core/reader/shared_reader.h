@@ -11,6 +11,9 @@ using namespace std;
 
 class UnregisteredClientException : public exception {};
 
+// OPTIMIZE: I don't like the way this is implemented. You should call SharedReader::register,
+// which returns a handle which the client uses. There should be no such thing as clientId.
+// But this is far from a priority. This works so let's leave it at that.
 class SharedReader {
   public:
     

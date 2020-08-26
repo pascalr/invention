@@ -13,15 +13,16 @@
 #include "lib/linux.h"
 #include "helper/logging.h"
 #include "core/heda.h"
+#include "utils/io_common.h"
 
 #include "lib/opencv.h"
 
 #include "core/writer/serial_writer.h"
+#include "core/writer/log_writer.h"
 //#include "core/writer/command_writer.h"
 #include "core/reader/serial_reader.h"
 #include "core/reader/shared_reader.h"
-#include "core/reader/io_reader.h"
-#include "core/writer/console_writer.h"
+#include "core/reader/log_reader.h"
 #include "core/two_way_stream.h"
 #include "core/serialize.h"
 
@@ -91,8 +92,11 @@ int main(int argc, char** argv) {
 
   TwoWayStream serverStream;
 
+  LogWriter hedaLogWriter("Heda out", serialWriter);
+  LogReader hedaLogReader("Heda in", hedaReader);
+
   Database db(DB_PROD);
-  Heda heda(serialWriter, hedaReader, db); 
+  Heda heda(hedaLogWriter, hedaLogReader, db); 
 
   // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
   server.resource["^/run$"]["POST"] = [&heda,&serverStream](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {

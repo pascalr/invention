@@ -83,7 +83,7 @@ function toggleMenuOn(e, id) {
     } else {
       circle.fill = '#FFFFFF';
 
-      var text = new Two.Text(loc.id, loc.x, z);
+      var text = new Two.Text(loc.name, loc.x, z);
       two.makeGroup(text);
     }
     circle.stroke = loc.is_storage ? 'orangered' : 'blue'; // Accepts all valid css color

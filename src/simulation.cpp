@@ -12,7 +12,7 @@
 #include "core/simulation.h"
 #include "lib/draw_matplotlib.h"
 #include "core/heda.h"
-#include "core/writer/echo_writer.h"
+#include "core/writer/log_writer.h"
       
 using namespace std;
 
@@ -62,8 +62,8 @@ int main (int argc, char *argv[]) {
   TwoWayStream hedaInput;
   TwoWayStream hedaOutput;
 
-  EchoWriter simulationOut = EchoWriter("Simulation output", hedaInput);
-  EchoWriter hedaOut = EchoWriter("Heda output", hedaOutput);
+  LogWriter simulationOut = LogWriter("Simulation output", hedaInput);
+  LogWriter hedaOut = LogWriter("Heda output", hedaOutput);
 
   Simulation simulation(hedaOutput, simulationOut); // reader, writer
   Heda heda(hedaOut, hedaInput, db); 

@@ -58,6 +58,19 @@ class RawCommand {
     std::function<void()> callback;
 };
 
+// TODO: Rename x and y to h and v at some point.
+#define AXIS_H 'x'
+#define AXIS_V 'y'
+#define AXIS_T 't'
+#define AXIS_R 'r'
+
+class Axis {
+  public:
+    Axis(char id) : id(id) {}
+    char id;
+    bool is_referenced = false;
+};
+
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
 // It keeps a copy of the serial it has read if it required at some point.
@@ -65,7 +78,7 @@ class RawCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db) : m_reader(reader), m_writer(writer), db(db) {
+    Heda(Writer& writer, Reader& reader, Database &db) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), m_reader(reader), m_writer(writer), db(db) {
     
       //cerr << "Initializing video...\n";
       //m_video_working = initVideo(m_cap);
@@ -183,17 +196,29 @@ class Heda {
     void waitUntilNotWorking() {
     }
 
+    void referenceAxis(Axis& axis) {
+      string str = "h"; str += axis.id;
+      pushCommand(str, [&]() {
+        if (axis.id == AXIS_H) {
+          m_position.h = REFERENCE_POSITION_H;
+        } else if (axis.id == AXIS_V) {
+          m_position.v = REFERENCE_POSITION_V;
+        } else if (axis.id == AXIS_T) {
+          m_position.t = REFERENCE_POSITION_T;
+        //} else if (axis.id == AXIS_R) {
+        }
+        axis.is_referenced = true;
+      });
+    }
+
     void reference() {
       cerr << "Doing reference...\n";
-      is_referenced = false;
-      pushCommand("hr");
-      pushCommand("ht");
-      pushCommand("hx");
-      pushCommand("mt185"); // FIXME hardcoded
-      pushCommand("hy", [&]() {
-        m_position = PolarCoord(HOME_POSITION_X, HOME_POSITION_Y, HOME_POSITION_T);
-        is_referenced = true;
-      });
+      //is_referenced = false; // Should set all axis to not referenced anymore?
+      referenceAxis(axisR);
+      referenceAxis(axisT);
+      referenceAxis(axisH);
+      move(Movement('t', CHANGE_LEVEL_ANGLE_HIGH));
+      referenceAxis(axisV);
     }
 
     void home() {
@@ -206,7 +231,10 @@ class Heda {
       openJaw();
     }
 
-    bool is_referenced = false;
+    Axis axisH;
+    Axis axisV;
+    Axis axisT;
+    Axis axisR;
 
     void execute(string str) {
 

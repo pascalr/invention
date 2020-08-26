@@ -122,7 +122,6 @@ class SerialPort {
       write(m_serial_port, str, strlen(str));
       char newline = '\n';
       write(m_serial_port, &newline, 1);
-      cout << "Serial: Writing: " << str << endl;
     }
 
     int readBytes(char* buf, int length) {

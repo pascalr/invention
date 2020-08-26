@@ -1,13 +1,13 @@
-#ifndef _ECHO_WRITER_H
-#define _ECHO_WRITER_H
+#ifndef _LOG_WRITER_H
+#define _LOG_WRITER_H
 
 #include "std_writer.h"
 
 using namespace std;
 
-class EchoWriter : public StdWriter {
+class LogWriter : public StdWriter {
   public:
-    EchoWriter(string name, Writer& writer) : name(name), writer(writer) {}
+    LogWriter(const string& name, Writer& writer) : name(name), writer(writer) {}
     
     void doPrint(string str) {
       cout << name << ": " << str << endl;

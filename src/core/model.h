@@ -146,9 +146,10 @@ class Location : public Model {
     double z;
     string move_command;
     int shelf_id;
-    bool is_storage;
 
     double diameter;
+    bool is_storage;
+    string name;
 };
 
 class LocationTable : public Table<Location> {
@@ -166,6 +167,7 @@ class LocationTable : public Table<Location> {
       item.updated_at = query.getColumn(6);
       item.diameter = query.getColumn(7);
       item.is_storage = (int)query.getColumn(8);
+      item.name = (const char*)query.getColumn(9);
       return item;
     }
 
@@ -178,6 +180,7 @@ class LocationTable : public Table<Location> {
       query.bind(6, item.updated_at);
       query.bind(7, item.diameter);
       query.bind(8, item.is_storage);
+      query.bind(9, item.name);
     }
 };
 

@@ -37,10 +37,14 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
   heda.db.clear(heda.locations);
   double dia = 148.0; // mm
   heda.shelves.orderBy(shelfHeightCmp, false); // start with highest shelf (fastest)
+
+  char shelfLetter = 'A';
   for (const Shelf& shelf : heda.shelves.items) {
 
     int nbCols = shelf.width / dia;
     int nbRows = shelf.depth / dia;
+
+    int locationNumber = 1;
     for (int j = 0; j < nbRows; j++) {
       for (int i = 0; i < nbCols; i++) {
         
@@ -48,8 +52,11 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
         double z = j*dia + (dia / 2);
         Location l(x, z, "", shelf.id, dia);
         l.is_storage = shelf.id != heda.config.working_shelf_id;
+        l.name = shelfLetter; l.name += to_string(locationNumber);
         heda.db.insert(heda.locations, l);
+        locationNumber++;
       }
     }
+    shelfLetter++;
   }
 }

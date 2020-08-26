@@ -5,12 +5,13 @@
 #define CAMERA_HEIGHT 480
 #define CAMERA_FOCAL_POINT 568.214
 
-#define REFERENCE_POSITION_X 0.0 // mm
-#define REFERENCE_POSITION_Y 0.0 // mm
-#define REFERENCE_POSITION_T 90.0 // mm
+#define REFERENCE_POSITION_H 0.0 // mm
+#define REFERENCE_POSITION_V 0.0 // mm
+#define REFERENCE_POSITION_T 90.0 // degrees
+#define REFERENCE_POSITION_R 0.0
 
-#define HOME_POSITION_X REFERENCE_POSITION_X // deprecated home_position refers to the config value now 
-#define HOME_POSITION_Y REFERENCE_POSITION_Y // deprecated home_position refers to the config value now 
+#define HOME_POSITION_X REFERENCE_POSITION_H // deprecated home_position refers to the config value now 
+#define HOME_POSITION_Y REFERENCE_POSITION_V // deprecated home_position refers to the config value now 
 #define HOME_POSITION_T REFERENCE_POSITION_T // deprecated home_position refers to the config value now 
 
 #define DETECTED_CODES_BASE_PATH "client/storage/detected_codes/"
