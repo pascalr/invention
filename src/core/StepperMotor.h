@@ -337,14 +337,15 @@ class MotorT : public StepperMotor {
     void referenceReached() {
       Motor::referenceReached();
 
-      int total = 100;
-      double sum;
-      for (int i = 0; i < total; i++) {
-        sum += analogRead(PIN_THETA_POT);
-      }
-      double mean = sum/total;
-      double degreesPerAnalog = 180 / (POT_180_VAL - POT_0_VAL);
-      double pos = degreesPerAnalog * mean;
+      //int total = 100;
+      //double sum;
+      //for (int i = 0; i < total; i++) {
+      //  sum += analogRead(PIN_THETA_POT);
+      //}
+      //double mean = sum/total;
+      //double degreesPerAnalog = 180.0 / (POT_180_VAL - POT_0_VAL);
+      //double pos = degreesPerAnalog * mean;
+      double pos = 90.0;
       
       setPosition(pos);
       setDestination(pos);

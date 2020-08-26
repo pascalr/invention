@@ -50,15 +50,15 @@ void writeJson(T& writer, const char* key, P val) {
 
 template <typename T>
 void serialize(Program& p, T& out) {
-  out << "{";
+  out << "{\n";
   for (int i = 0; p.motors[i] != 0; i++) {
     out << "\"axis_" << p.motors[i]->getName() << "\": ";
     serialize(p.motors[i], out);
     if (p.motors[i+1] != 0) {
-      out << ", ";
+      out << ", \n";
     }
   }
-  out << "}";
+  out << "\n}";
 }
 
 template <typename T>

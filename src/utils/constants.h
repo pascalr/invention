@@ -113,8 +113,8 @@
 #define DB_PROD "client/db/development.sqlite3"
 
 #define PIN_THETA_POT 4
-#define POT_180_VAL 715
-#define POT_0_VAL 21
+#define POT_180_VAL 715.0
+#define POT_0_VAL 21.0
 
 // Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12

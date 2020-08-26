@@ -92,5 +92,7 @@ void setup() {
 }
 
 void loop() {
+  //Serial.println(analogRead(4));
+  //delay(1000);
   myLoop(p);
 }
