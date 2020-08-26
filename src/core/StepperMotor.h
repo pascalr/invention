@@ -123,14 +123,6 @@ class StepperMotor : public Motor {
       isMotorEnabled = value;
     }
 
-
-
-    // Only the vertical axis moves in order to do a reference
-    virtual bool moveToReference() {
-      referenceReached();
-      return true;
-    }
-
     void setIsReferenced(bool isRef) {
       isReferenced = isRef;
     }
@@ -338,10 +330,24 @@ class MotorT : public StepperMotor {
     MotorT(Writer& writer, char theName) : StepperMotor(writer, theName) {
     }
 
+    void doStartReferencing() {
+      referenceReached();
+    }
+
     void referenceReached() {
       Motor::referenceReached();
-      setPosition(90.0);
-      setDestination(90.0);
+
+      int total = 100;
+      double sum;
+      for (int i = 0; i < total; i++) {
+        sum += analogRead(PIN_THETA_POT);
+      }
+      double mean = sum/total;
+      double degreesPerAnalog = 180 / (POT_180_VAL - POT_0_VAL);
+      double pos = degreesPerAnalog * mean;
+      
+      setPosition(pos);
+      setDestination(pos);
     }
 
 };
