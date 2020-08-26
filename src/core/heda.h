@@ -125,7 +125,14 @@ class Heda {
       m_commands["home"] = [&](ParseResult tokens) {home();};
       m_commands["gohome"] = [&](ParseResult tokens) {gohome();};
       m_commands["info"] = [&](ParseResult tokens) {info();};
-      m_commands["store"] = [&](ParseResult tokens) {store();};
+      m_commands["store"] = [&](ParseResult tokens) {
+        string name = "";
+        try {
+          name = tokens.popNoun();
+        } catch (const MissingArgumentException& e) {
+        }
+        store(name);
+      };
       m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
       m_commands["sync"] = [&](ParseResult tokens) {sync();};
       m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
@@ -307,7 +314,7 @@ class Heda {
     void putdown();
     void lowerForGrip(const Jar& jar); // Get lower, either to pickup, or to putdown
     void grip(int id);
-    void store();
+    void store(const string& noun);
     void fetch(std::string ingredientName);
 
     void clearDetectedCodes() {
@@ -471,6 +478,12 @@ class Heda {
      
       if (shelves.empty()) {return -1;}
       return shelves.back().id;
+    }
+
+    void runAllCommandStack() {
+      while (!isDoneWorking()) {
+        this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
+      }
     }
 
     void loopCommandStack(Reader& reader) {

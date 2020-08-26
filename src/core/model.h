@@ -75,6 +75,15 @@ class Model {
     long id = -1;
     time_t created_at;
     time_t updated_at;
+
+    bool exists() {
+      return id != -1;
+    }
+
+    // This could be bad because of implicit conversion to other types from what I've read.
+    //operator bool() const {
+    //  return id == -1;
+    //}
 };
 
 class HedaConfig : public Model {

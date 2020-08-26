@@ -49,13 +49,28 @@ void Heda::fetch(std::string ingredientName) {
   cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
 }
 
-void Heda::store() {
+void Heda::store(const string& locationName) {
   // TODO: Error message is not gripping
   if (is_gripping) {
+
     NaiveJarPacker packer;
-    int locId = packer.nextLocation(*this);
     Location loc;
-    if (locations.get(loc, locId)) {
+    if (!locationName.empty()) {
+      for (const Location& l : locations.items) {
+        if (iequals(l.name, locationName)) {
+          loc = l;
+          break;
+        }
+      }
+      cout << "Store: There was a location name specified, but it was not found. Aborting store." << endl;
+    } else {
+      int locId = packer.nextLocation(*this);
+      locations.get(loc, locId);
+    }
+
+    // TODO: Handle and show to the user all possible errors
+
+    if (loc.exists()) {
       packer.moveToLocation(*this, loc);
       putdown();
       gripped_jar.location_id = loc.id;

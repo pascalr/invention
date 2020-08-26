@@ -3,7 +3,9 @@
 #include <string>
 #include "core/heda.h"
 #include "core/writer/serial_writer.h"
+#include "core/writer/log_writer.h"
 #include "core/reader/serial_reader.h"
+#include "core/reader/log_reader.h"
 #include <thread>
 #include <chrono>
 
@@ -30,10 +32,12 @@ int main(int argc, char** argv)
   SerialReader serialReader(serialPort);
   SerialWriter serialWriter(serialPort);
   
-  Heda heda(serialWriter, serialReader, db); 
+  LogWriter hedaLogWriter("\033[33mTo slave\033[0m", serialWriter);
+  LogReader hedaLogReader("\033[34mFrom slave\033[0m", serialReader);
+  
+  Heda heda(hedaLogWriter, hedaLogReader, db); 
+  heda.sync();
   heda.execute(cmd);
-  while (!heda.isDoneWorking()) {
-    this_thread::sleep_for(chrono::milliseconds(50));
-  }
+  heda.runAllCommandStack();
   return 0;
 }

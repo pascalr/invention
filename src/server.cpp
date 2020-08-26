@@ -92,8 +92,8 @@ int main(int argc, char** argv) {
 
   TwoWayStream serverStream;
 
-  LogWriter hedaLogWriter("Heda out", serialWriter);
-  LogReader hedaLogReader("Heda in", hedaReader);
+  LogWriter hedaLogWriter("\033[33mTo slave\033[0m", serialWriter);
+  LogReader hedaLogReader("\033[34mFrom slave\033[0m", hedaReader);
 
   Database db(DB_PROD);
   Heda heda(hedaLogWriter, hedaLogReader, db); 
@@ -186,5 +186,6 @@ int main(int argc, char** argv) {
   cout << "Server listening on " << serverAddress << " port " << server_port.get_future().get() << endl << endl;
 
   //server_thread.join();
-  heda.loopCommandStack(serverStream);
+  LogReader serverLogReader("From server", serverStream);
+  heda.loopCommandStack(serverLogReader);
 }
