@@ -40,6 +40,7 @@ enum HedaCommandType {
   MOVE,
   GENLOC,
   SWEEP,
+  GRIP,
   PINPOINT,
   DETECT,
   PUTDOWN,
@@ -151,7 +152,7 @@ class MoveCommand : public SlaveCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), m_reader(reader), m_writer(writer), db(db) {
+    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), m_reader(reader), m_writer(writer), server_writer(serverWriter), db(db) {
     
       setupCommands();
 
@@ -189,6 +190,21 @@ class Heda {
         try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional.*/}
         store(name);
       }, "Store the gripped jar to the location given. If no location is specified, store in the next available location.");
+      addAvailableCommand(GRIP, "grip", [&](ParseResult tokens) {
+        unsigned long id = tokens.popPositiveInteger();
+        grip(id);
+      }, "Grips a jar with the given id.");
+      addAvailableCommand(PICKUP, "pickup", [&](ParseResult tokens) {
+        int id = tokens.popPositiveInteger();
+        string locationName = tokens.popNoun();
+        for (const Jar& jar : jars.items) {
+          if (jar.id == id) {
+            pickup(jar, locationName);
+            return;
+          }
+        }
+        cout << "Oups. No jar were found with this id." << endl;
+      }, "Pickup a jar with the given id and location name.");
     
       // All lowercase
       // m_commands["grab"] = [&](ParseResult tokens) {
@@ -208,25 +224,10 @@ class Heda {
       // m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
       // m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
       // m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
-      // m_commands["pickup"] = [&](ParseResult tokens) {
-      //   int id = tokens.popPositiveInteger();
-      //   string locationName = tokens.popNoun();
-      //   for (const Jar& jar : jars.items) {
-      //     if (jar.id == id) {
-      //       pickup(jar, locationName);
-      //       return;
-      //     }
-      //   }
-      //   cout << "Oups. No jar were found with this id." << endl;
-      // };
       // m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
       //   string ingredientName = tokens.popNoun();
       //   fetch(ingredientName);
       // }; 
-      // m_commands["grip"] = [&](ParseResult tokens) {
-      //   unsigned long id = tokens.popPositiveInteger();
-      //   grip(id);
-      // };
       // 
       // m_commands["help"] = [&](ParseResult tokens) {
       //   // TODO
@@ -491,6 +492,8 @@ class Heda {
 
     Reader& m_reader;
     Writer& m_writer;
+
+    Writer& server_writer;
 
     std::list<shared_ptr<HedaCommand>> m_stack;
     

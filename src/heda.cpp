@@ -3,6 +3,8 @@
 #include <string>
 #include "core/heda.h"
 #include "core/writer/serial_writer.h"
+#include "core/writer/console_writer.h"
+#include "core/writer/log_writer.h"
 #include "core/writer/log_writer.h"
 #include "core/reader/serial_reader.h"
 #include "core/reader/log_reader.h"
@@ -34,8 +36,10 @@ int main(int argc, char** argv)
   
   LogWriter hedaLogWriter("\033[33mTo slave\033[0m", serialWriter);
   LogReader hedaLogReader("\033[34mFrom slave\033[0m", serialReader);
+
+  LogWriter hedaOutputWriter("\033[37mTo server\033[0m");
   
-  Heda heda(hedaLogWriter, hedaLogReader, db); 
+  Heda heda(hedaLogWriter, hedaLogReader, db, hedaOutputWriter); 
   heda.sync();
   heda.execute(cmd);
   heda.runAllCommandStack();

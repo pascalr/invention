@@ -13,6 +13,7 @@
 #include "lib/draw_matplotlib.h"
 #include "core/heda.h"
 #include "core/writer/log_writer.h"
+#include "core/writer/console_writer.h"
       
 using namespace std;
 
@@ -65,8 +66,10 @@ int main (int argc, char *argv[]) {
   LogWriter simulationOut = LogWriter("Simulation output", hedaInput);
   LogWriter hedaOut = LogWriter("Heda output", hedaOutput);
 
+  ConsoleWriter hedaOutputWriter;
+
   Simulation simulation(hedaOutput, simulationOut); // reader, writer
-  Heda heda(hedaOut, hedaInput, db); 
+  Heda heda(hedaOut, hedaInput, db, hedaOutputWriter); 
 
   while (true) {
     string input;

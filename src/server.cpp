@@ -91,12 +91,14 @@ int main(int argc, char** argv) {
   SharedReaderClient serverReader(sharedReader, READER_CLIENT_ID_SERVER);
 
   TwoWayStream serverStream;
+  TwoWayStream hedaToServerStream;
+  LogWriter hedaToServerLogStream("\033[37mTo server\033[0m", hedaToServerStream);
 
   LogWriter hedaLogWriter("\033[33mTo slave\033[0m", serialWriter);
   LogReader hedaLogReader("\033[34mFrom slave\033[0m", hedaReader);
 
   Database db(DB_PROD);
-  Heda heda(hedaLogWriter, hedaLogReader, db); 
+  Heda heda(hedaLogWriter, hedaLogReader, db, hedaToServerStream); 
 
   // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
   server.resource["^/run$"]["POST"] = [&heda,&serverStream](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
