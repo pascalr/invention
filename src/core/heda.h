@@ -58,14 +58,12 @@ class HedaCommand {
     virtual void doneCallback(Heda& heda) {}
 };
 
+using HedaCommandPtr = shared_ptr<HedaCommand>;
+
 class SlaveCommand : public HedaCommand {
   public:
     
     SlaveCommand(string cmd) : cmd(cmd) {}
-
-    virtual string str() {
-      return "SlaveCommand(" + cmd + ")";
-    }
 
     void start(Heda& heda);
 
@@ -88,6 +86,20 @@ class ReferencingCommand : public SlaveCommand {
     Axis& axis;
 };
 
+class OpenGripCommand : public SlaveCommand {
+  public:
+    OpenGripCommand() : SlaveCommand("r") {}
+    string str() {return "open";}
+    void doneCallback(Heda& heda);
+};
+
+class GrabCommand : public SlaveCommand {
+  public:
+    GrabCommand(double strength0) : SlaveCommand("g" + to_string(strength0)), strength(strength0) {}
+    string str() {return "grab " + to_string(strength);}
+    double strength;
+};
+
 class MoveCommand : public SlaveCommand {
   public:
     
@@ -104,7 +116,7 @@ class MoveCommand : public SlaveCommand {
     double destination;
 };
 
-class GotoCommand : public HedaCommand {
+/* class GotoCommand : public HedaCommand {
   public:
     GotoCommand(PolarCoord destination) : destination(destination) {}
     
@@ -119,6 +131,59 @@ class GotoCommand : public HedaCommand {
     PolarCoord destination;
     vector<MoveCommand> mvts;
     vector<MoveCommand>::iterator currentMove;
+}; */ 
+
+// Execute sub commands
+class MetaCommand : public HedaCommand {
+  public:
+
+    void start(Heda& heda);
+
+    bool isDone(Heda& heda);
+
+  protected:
+
+    vector<shared_ptr<HedaCommand>> commands;
+    vector<shared_ptr<HedaCommand>>::iterator currentCommand;
+    virtual void setup(Heda& heda) = 0;
+};
+
+class GripCommand : public MetaCommand {
+  public:
+    GripCommand(int id) : id(id) {}
+    string str() {return "grip " + to_string(id);}
+    void doneCallback(Heda& heda);
+    void setup(Heda& heda);
+    int id;
+    Jar jar;
+};
+
+class StoreCommand : public MetaCommand {
+  public:
+    StoreCommand(std::string name) : location_name(name) {}
+    string str() {return "store " + location_name;}
+    void doneCallback(Heda& heda);
+    void setup(Heda& heda);
+    std::string location_name;
+    Location loc;
+};
+
+class GotoCommand : public MetaCommand {
+  public:
+    GotoCommand(PolarCoord destination) : destination(destination) {}
+    
+    string str() {return "goto " + to_string(destination.h) + " " + to_string(destination.v) + " " + to_string(destination.t);}
+
+  protected:
+    PolarCoord destination;
+    void setup(Heda& heda);
+};
+
+class PutdownCommand : public MetaCommand {
+  public:
+    string str() {return "putdown";}
+  protected:
+    void setup(Heda& heda);
 };
 
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
@@ -153,36 +218,13 @@ class Heda {
     void waitUntilNotWorking() {
     }
 
-    void reference() {
-      cerr << "Doing reference...\n";
-      //is_referenced = false; // Should set all axis to not referenced anymore?
-      pushCommand(make_shared<ReferencingCommand>(axisR));
-      pushCommand(make_shared<ReferencingCommand>(axisT));
-      pushCommand(make_shared<ReferencingCommand>(axisH));
-      move(Movement('t', CHANGE_LEVEL_ANGLE_HIGH));
-      pushCommand(make_shared<ReferencingCommand>(axisV));
-    }
-
-    void home() {
-      reference();
-      gohome();
-    }
-
-    void gohome() {
-      moveTo(PolarCoord(config.home_position_x, config.home_position_y, config.home_position_t));
-      openJaw();
-    }
-
     Axis axisH;
     Axis axisV;
     Axis axisT;
     Axis axisR;
 
-
     void captureFrame(Mat& frame);
     void capture();
-    void pickup(Jar jar, const string& locationName);
-
     void move(const std::vector<Movement>& mvts) {
       for (const Movement& mvt : mvts) {
         move(mvt);
@@ -208,10 +250,6 @@ class Heda {
       pushCommand(make_shared<GotoCommand>(destination));
     }
 
-    void grab(double strength) {
-      pushCommand(make_shared<SlaveCommand>("g" + to_string(strength)));
-    }
-
     void find(string ingredientName) {
     }
 
@@ -223,12 +261,6 @@ class Heda {
     void detect();
     void parse();
     void pinpoint();
-    void calibrate();
-    void putdown();
-    void lowerForGrip(const Jar& jar); // Get lower, either to pickup, or to putdown
-    void grip(int id);
-    void grip(Jar jar);
-    void store(const string& noun);
     void fetch(std::string ingredientName);
 
     void clearDetectedCodes() {
@@ -236,6 +268,8 @@ class Heda {
     }
 
     void pushCommand(shared_ptr<HedaCommand> cmd) {
+
+      stack_writer << "Pushing command: " + cmd->str();
       std::lock_guard<std::mutex> guard(commandsMutex);
       m_stack.push_back(cmd);
       calculatePendingCommands();
@@ -263,10 +297,6 @@ class Heda {
       m_writer << "?";
     }
 
-    void openJaw() {
-      pushCommand(make_shared<SlaveCommand>("r"));
-    }
-
     void calculatePendingCommands() {
       m_pending_commands = "";
       // FIXME: Pretty print the commands
@@ -287,6 +317,14 @@ class Heda {
       //return m_commands.at(m_stack.front()->type).name;
     }
 
+    double unitV(double unitY) {
+      return unitY - config.user_coord_offset_y;
+    }
+
+    double unitY(double unitV) {
+      return unitV + config.user_coord_offset_y;
+    }
+
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
     // The x axis and the z axis are reversed
     // Warning: There are two solutions sometimes.
@@ -302,10 +340,6 @@ class Heda {
 
       double y = c.y - config.user_coord_offset_y;
       return PolarCoord(x, y, t);
-    }
-
-    double toUserHeight(const PolarCoord p) {
-      return p.v+config.user_coord_offset_y;
     }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc

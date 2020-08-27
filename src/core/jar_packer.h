@@ -10,7 +10,7 @@ class JarPacker {
   
     virtual void generateLocations(Heda& heda) = 0;
     virtual int nextLocation(Heda& heda, bool storageWanted=true) = 0;
-    virtual void moveToLocation(Heda& heda, const Location& loc) = 0;
+    virtual HedaCommandPtr moveToLocationCmd(Heda& heda, const Location& loc) = 0;
 };
 
 // TODO: Save the things into possible locations. Only run this once.
@@ -25,7 +25,7 @@ class NaiveJarPacker : public JarPacker {
 
     void generateLocations(Heda& heda);
     int nextLocation(Heda& heda, bool storageWanted=true);
-    void moveToLocation(Heda& heda, const Location& loc);
+    HedaCommandPtr moveToLocationCmd(Heda& heda, const Location& loc);
 };
 
 #endif

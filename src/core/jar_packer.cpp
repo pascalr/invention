@@ -7,14 +7,13 @@
 
 class MissingShelfException : public exception {};
     
-void NaiveJarPacker::moveToLocation(Heda& heda, const Location& loc) {
+HedaCommandPtr NaiveJarPacker::moveToLocationCmd(Heda& heda, const Location& loc) {
 
   Shelf shelf;
   if (!heda.shelves.get(shelf, loc.shelf_id)) {throw MissingShelfException();}
 
   UserCoord c(loc.x, shelf.moving_height, loc.z);
-  PolarCoord p = heda.toPolarCoord(c, heda.config.gripper_radius);
-  heda.moveTo(p);
+  return make_shared<GotoCommand>(heda.toPolarCoord(c, heda.config.gripper_radius));
 }
 
 int NaiveJarPacker::nextLocation(Heda& heda, bool storageWanted) {

@@ -127,8 +127,8 @@ void Heda::calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination
 
   PolarCoord position = getPosition();
 
-  int currentLevel = shelfByHeight(toUserHeight(position));
-  int destinationLevel = shelfByHeight(toUserHeight(destination));
+  int currentLevel = shelfByHeight(unitY(position.v));
+  int destinationLevel = shelfByHeight(unitY(destination.v));
     
   double positionT = position.t;
 

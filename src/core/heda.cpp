@@ -4,7 +4,7 @@
 #include "client_http.hpp"
 #include "pinpoint.h"
 #include "../lib/opencv.h"
-#include "calibrate.h"
+//#include "calibrate.h"
 #include <opencv2/highgui.hpp>
 #include "jar_packer.h"
 
@@ -13,22 +13,95 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
+class InvalidGrippedJarFormatException : public exception {};
+
     
-void GotoCommand::start(Heda& heda) {
-  heda.calculateGoto(mvts, destination);
-  currentMove = mvts.begin();
-  currentMove->start(heda);
+void MetaCommand::start(Heda& heda) {
+  setup(heda);
+  currentCommand = commands.begin();
+  (*currentCommand)->start(heda);
 }
 
-bool GotoCommand::isDone(Heda& heda) {
+void OpenGripCommand::doneCallback(Heda& heda) {
+  heda.gripped_jar.id = -1;
+  heda.is_gripping = false;
+}
 
-  if (currentMove == mvts.end()) {return true;}
+// Get lower, either to pickup, or to putdown
+HedaCommandPtr lowerForGripCmd(Heda& heda, const Jar& jar) {
+  Shelf shelf;
+  if (!heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v)))) {throw InvalidShelfException();}
 
-  if (currentMove->isDone(heda)) {
-    currentMove->doneCallback(heda);
-    currentMove++;
-    if (currentMove == mvts.end()) {return true;}
-    currentMove->start(heda);
+  JarFormat format; 
+  if (!heda.jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+ 
+  double v = heda.unitV(shelf.height + format.height + heda.config.grip_offset);
+  return make_shared<MoveCommand>(heda.axisV, v);
+}
+
+void GripCommand::doneCallback(Heda& heda) {
+  heda.gripped_jar = jar;
+  heda.is_gripping = true;
+}
+
+void GripCommand::setup(Heda& heda) {
+  if (!heda.jars.get(jar, id)) {throw InvalidJarIdException();}
+  commands.push_back(make_shared<GrabCommand>(40.0)); // TODO: Read the grab strength from the jar_format model
+}
+
+void PutdownCommand::setup(Heda& heda) {
+  // TODO: Error message is not gripping
+  if (heda.is_gripping) {
+    commands.push_back(lowerForGripCmd(heda, heda.gripped_jar));
+    commands.push_back(make_shared<OpenGripCommand>());
+  }
+}
+
+void GotoCommand::setup(Heda& heda) {
+
+  PolarCoord position = heda.getPosition();
+
+  int currentLevel = heda.shelfByHeight(heda.unitY(position.v));
+  int destinationLevel = heda.shelfByHeight(heda.unitY(destination.v));
+    
+  double positionT = position.t;
+
+  // must change level
+  if (currentLevel != destinationLevel) {
+
+    positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    commands.push_back(make_shared<MoveCommand>(heda.axisT, positionT));
+  }
+
+  commands.push_back(make_shared<MoveCommand>(heda.axisV, destination.v)); 
+  //addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
+
+  // If moving theta would colide, move x first
+  double deltaX = cosd(destination.t) * heda.config.gripper_radius;
+  double xIfTurnsFirst = position.h + deltaX;
+
+  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
+    commands.push_back(make_shared<MoveCommand>(heda.axisH, destination.h)); 
+    commands.push_back(make_shared<MoveCommand>(heda.axisT, destination.t)); 
+    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+  } else {
+    commands.push_back(make_shared<MoveCommand>(heda.axisT, destination.t)); 
+    commands.push_back(make_shared<MoveCommand>(heda.axisH, destination.h)); 
+    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+  }
+}
+
+bool MetaCommand::isDone(Heda& heda) {
+
+  if (currentCommand == commands.end()) {return true;}
+
+  if ((*currentCommand)->isDone(heda)) {
+    (*currentCommand)->doneCallback(heda);
+    currentCommand++;
+    if (currentCommand == commands.end()) {return true;}
+    (*currentCommand)->start(heda);
   }
 
   return false;
@@ -78,7 +151,7 @@ void Heda::generateLocations() {
   packer.generateLocations(*this);
 }
     
-void Heda::pickup(Jar jar, const string& locationName) {
+/*void Heda::pickup(Jar jar, const string& locationName) {
   NaiveJarPacker packer;
   Location loc;
   if (locations.byName(loc, locationName) < 0) {
@@ -86,7 +159,7 @@ void Heda::pickup(Jar jar, const string& locationName) {
     return;
   }
   packer.moveToLocation(*this, loc);
-  lowerForGrip(jar);
+  //lowerForGrip(jar);
   grip(jar);
   jar.location_id = -1;
   db.update(jars, jar);
@@ -117,35 +190,39 @@ void Heda::fetch(std::string ingredientName) {
     }
   }
   cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
-}
+}*/
 
-void Heda::store(const string& locationName) {
+void StoreCommand::setup(Heda& heda) {
   // TODO: Error message is not gripping
-  if (is_gripping) {
+  if (heda.is_gripping) {
 
     NaiveJarPacker packer;
-    Location loc;
-    if (!locationName.empty()) {
-      if (locations.byName(loc, locationName) < 0) {
+    if (!location_name.empty()) {
+      if (heda.locations.byName(loc, location_name) < 0) {
         cout << "A location name was given, but it was not found. Aborting store.";
         return;
       }
     } else {
-      int locId = packer.nextLocation(*this);
-      locations.get(loc, locId);
+      int locId = packer.nextLocation(heda);
+      heda.locations.get(loc, locId);
     }
 
     // TODO: Handle and show to the user all possible errors
 
     if (loc.exists()) {
-      packer.moveToLocation(*this, loc);
-      putdown();
-      gripped_jar.location_id = loc.id;
-      db.update(jars, gripped_jar);
-      packer.moveToLocation(*this, loc);
+      commands.push_back(packer.moveToLocationCmd(heda, loc));
+      commands.push_back(make_shared<PutdownCommand>());
+      commands.push_back(packer.moveToLocationCmd(heda, loc));
     }
   } else {
     cout << "Warning heda is not gripping. Aborting store..." << endl;
+  }
+}
+
+void StoreCommand::doneCallback(Heda& heda) {
+  if (loc.exists()) {
+    heda.gripped_jar.location_id = loc.id;
+    heda.db.update(heda.jars, heda.gripped_jar);
   }
 }
 
@@ -155,44 +232,6 @@ void Heda::sweep() {
   vector<Movement> mvts;
   calculateSweepMovements(*this, mvts);
   move(mvts);
-}
-
-void Heda::grip(Jar jar) {
-  grab(40.0); // TODO: Read the grab strength from the jar_format model
-  gripped_jar = jar; // TODO: Do this as a callback
-  is_gripping = true;
-}
-
-void Heda::grip(int id) {
-  Jar jar;
-  if (!jars.get(jar, id)) {throw InvalidJarIdException();}
-  grip(jar);
-}
-
-// Get lower, either to pickup, or to putdown
-void Heda::lowerForGrip(const Jar& jar) {
-  Shelf shelf;
-  if (!shelves.get(shelf, shelfByHeight(toUserHeight(m_position)))) {throw InvalidShelfException();}
-  PolarCoord p(m_position);
-
-  JarFormat format; 
-  if (!jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
-  
-  p.v = toPolarCoord(UserCoord(0.0, shelf.height + format.height + config.grip_offset, 0.0), config.gripper_radius).v;
-  moveTo(p);
-}
-
-// It would be nice if the y axis was with an encoder... So just lower until there is a resistance.
-// Lower to the shelf based on jar height
-// Then release.
-// Then back to it's previous height
-void Heda::putdown() {
-  // TODO: Error message is not gripping
-  if (is_gripping) {
-
-    lowerForGrip(gripped_jar);
-    openJaw();
-  }
 }
 
 void Heda::pinpoint() {

@@ -10,23 +10,36 @@ class HedaController {
      
       // at throws a out of range exception 
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
-      m_commands["home"] = [&](ParseResult tokens) {heda.home();};
-      m_commands["gohome"] = [&](ParseResult tokens) {heda.gohome();};
+
+      m_commands["home"] = [&](ParseResult tokens) {
+        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisR));
+        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisT));
+        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisH));
+        heda.pushCommand(make_shared<MoveCommand>(heda.axisT, CHANGE_LEVEL_ANGLE_HIGH));
+        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisV));
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.config.home_position_x, heda.config.home_position_y, heda.config.home_position_t)));
+        heda.pushCommand(make_shared<OpenGripCommand>());
+      };
+
+      m_commands["gohome"] = [&](ParseResult tokens) {
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.config.home_position_x, heda.config.home_position_y, heda.config.home_position_t)));
+      };
+
       m_commands["store"] = [&](ParseResult tokens) {
         string name = "";
         try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional.*/}
-        heda.store(name);
+        heda.pushCommand(make_shared<StoreCommand>(name));
       };
       m_commands["grip"] = [&](ParseResult tokens) {
         unsigned long id = tokens.popPositiveInteger();
-        heda.grip(id);
+        heda.pushCommand(make_shared<GripCommand>(id));
       };
       m_commands["pickup"] = [&](ParseResult tokens) {
         int id = tokens.popPositiveInteger();
         string locationName = tokens.popNoun();
         for (const Jar& jar : heda.jars.items) {
           if (jar.id == id) {
-            heda.pickup(jar, locationName);
+            //heda.pickup(jar, locationName);
             return;
           }
         }
@@ -41,31 +54,31 @@ class HedaController {
       m_commands["grab"] = [&](ParseResult tokens) {
         double strength = tokens.popScalaire();
         cout << "Executing grab with strength = " << strength << endl;
-        heda.grab(strength);
+        heda.pushCommand(make_shared<GrabCommand>(strength));
       };
       m_commands["capture"] = [&](ParseResult tokens) {heda.capture();};
       m_commands["detect"] = [&](ParseResult tokens) {heda.detect();};
       m_commands["parse"] = [&](ParseResult tokens) {heda.parse();};
       m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();}; // FIXME: The user should not be able to do this easily..
       m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pinpoint();};
-      m_commands["calibrate"] = [&](ParseResult tokens) {heda.calibrate();};
-      m_commands["putdown"] = [&](ParseResult tokens) {heda.putdown();};
+      //m_commands["calibrate"] = [&](ParseResult tokens) {heda.calibrate();};
+      m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
       m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
         string ingredientName = tokens.popNoun();
-        heda.fetch(ingredientName);
+        //heda.fetch(ingredientName);
       }; 
       m_commands["photo"] = [&](ParseResult tokens) {
         Mat mat;
         heda.captureFrame(mat);
       };
       m_commands["goto"] = [&](ParseResult tokens) {
-        double x = tokens.popScalaire();
-        double y = tokens.popScalaire();
+        double h = tokens.popScalaire();
+        double v = tokens.popScalaire();
         double t = tokens.popScalaire();
-        heda.moveTo(PolarCoord(x, y, t));
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(h,v,t)));
       };
       m_commands["open"] = [&](ParseResult tokens) {
-        heda.openJaw();
+        heda.pushCommand(make_shared<OpenGripCommand>());
       };
     
     }
