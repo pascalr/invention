@@ -19,4 +19,9 @@ Writer& operator<<(Writer& writer, unsigned long val);
 Writer& operator<<(Writer& writer, bool val);
 Writer& operator<<(Writer& writer, int val);
 
+#ifndef ARDUINO
+#include <string>
+Writer& operator<<(Writer& writer, std::string val);
+#endif
+
 #endif

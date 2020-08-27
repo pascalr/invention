@@ -34,3 +34,9 @@ Writer& operator<<(Writer& writer, int val) {
   writer.doPrint((long)val);
   return writer;
 }
+
+#ifndef ARDUINO
+Writer& operator<<(Writer& writer, std::string val) {
+  return writer << val.c_str();
+}
+#endif

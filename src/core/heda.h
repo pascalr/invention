@@ -1,6 +1,8 @@
 #ifndef _HEDA_H
 #define _HEDA_H
 
+class Heda;
+
 #include "position.h"
 #include "../lib/serial.h"
 #include "../lib/opencv.h"
@@ -28,35 +30,24 @@ class NoWorkingShelfException : public exception {};
 
 #include <mutex>
 
-// RawCommand is bad. We should not be able to execute "mx..." this is too low level.
-// The stack should be HedaCommand, which are object and not strings.
-// A HedaCommand can be a Movement, a Detect, a Capture, etc...
-// Utilies like sweep generates other HedaCommands
-// Or they are done directrly by reading Heda source code.
-
-// Low level command, sent to the arduino. "mx..." not "move x ..."
-class RawCommand {
-  public:
-    RawCommand() {}
-    RawCommand(std::string cmd) : cmd(cmd) {}
-    RawCommand(std::string cmd, std::function<void()> callback) : cmd(cmd), callback(callback) {}
-
-    bool isDone() {
-      return cmd.empty();
-    }
-    void clear() {
-      cmd = "";
-      callback = doNothing;
-    }
-    void finish() {
-      if (callback) {
-        callback();
-      }
-      cmd = "";
-    }
-    std::string cmd;
-    std::function<void()> callback;
+enum HedaCommandType {
+  STOP,
+  HOME,
+  GOHOME,
+  STORE,
+  GRAB,
+  PICKUP,
+  MOVE,
+  GENLOC,
+  SWEEP,
+  PINPOINT,
+  DETECT,
+  PUTDOWN,
+  FETCH,
+  REFERENCE,
+  OPEN
 };
+
 
 // TODO: Rename x and y to h and v at some point.
 #define AXIS_H 'x'
@@ -71,6 +62,88 @@ class Axis {
     bool is_referenced = false;
 };
 
+
+class AvailableHedaCommand {
+  public:
+    AvailableHedaCommand() {}
+    AvailableHedaCommand(string name, std::function<void(ParseResult)> func, string help) : name(name), func(func), help(help) {}
+    string name;
+    std::function<void(ParseResult)> func;
+    string help;
+};
+
+
+class HedaCommand {
+  public:
+
+    virtual void start(Heda& heda) = 0;
+
+    virtual bool isDone(Heda& heda) {
+      return true;
+    }
+
+    virtual void doneCallback(Heda& heda) {}
+};
+
+class SlaveCommand : public HedaCommand {
+  public:
+
+    SlaveCommand(string cmd) : cmd(cmd) {}
+
+    void start(Heda& heda);
+
+    bool isDone(Heda& heda);
+
+    string cmd;
+};
+
+class ReferencingCommand : public SlaveCommand {
+  public:
+
+    ReferencingCommand(Axis& axis0) : SlaveCommand("h" + string(1, axis0.id)), axis(axis0) {}
+    
+    void doneCallback(Heda& heda);
+
+    Axis& axis;
+};
+
+class MoveCommand : public SlaveCommand {
+  public:
+
+    MoveCommand(Axis& axis0, double destination0) : SlaveCommand("m" + string(1, axis0.id) + to_string(destination0)), axis(axis0), destination(destination0) {
+    }
+    
+    void doneCallback(Heda& heda);
+
+    Axis& axis;
+    double destination;
+};
+
+/*class HedaCommandItem {
+  public:
+    HedaCommandItem() {}
+    HedaCommandItem(std::string cmd) : cmd(cmd) {}
+    HedaCommandItem(std::string cmd, std::function<void()> callback) : cmd(cmd), callback(callback) {}
+
+    bool isDone() {
+      return cmd.empty();
+    }
+    void clear() {
+      cmd = "";
+      callback = doNothing;
+    }
+    void finish() {
+      if (callback) {
+        callback();
+      }
+      cmd = "";
+    }
+    HedaCommandType type;
+    std::string cmd;
+    std::function<void()> callback;
+};*/
+
+
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
 // It keeps a copy of the serial it has read if it required at some point.
@@ -80,22 +153,10 @@ class Heda {
 
     Heda(Writer& writer, Reader& reader, Database &db) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), m_reader(reader), m_writer(writer), db(db) {
     
-      //cerr << "Initializing video...\n";
-      //m_video_working = initVideo(m_cap);
-
       setupCommands();
-
-      //m_commands_thread_run = true;
-      //m_commands_thread = std::thread(&Heda::loopCommandStack, this);
-      //m_commands_thread.detach(); Do I need to detach?
 
       loadDb();
     }
-
-    //~Heda() {
-    //  m_commands_thread_run = false;
-    //  m_commands_thread.join();
-    //}
 
     void loadDb() {
       db.load(configs);
@@ -109,121 +170,114 @@ class Heda {
       db.load(ingredients);
     }
 
+    void addAvailableCommand(HedaCommandType type, const char* name, std::function<void(ParseResult)> func, const char* help="") {
+      m_commands[type] = AvailableHedaCommand(name, func, help);
+    }
+
+    AvailableHedaCommand getAvailableCommand(HedaCommandType type) {
+      return m_commands[type];
+    }
+
     void setupCommands() {
      
       // at throws a out of range exception 
+      addAvailableCommand(STOP, "stop", [&](ParseResult tokens) {stop();}, "Stop everything the slave is doing.");
+      addAvailableCommand(HOME, "home", [&](ParseResult tokens) {home();}, "References all axes then moves to the home position.");
+      addAvailableCommand(GOHOME, "gohome", [&](ParseResult tokens) {gohome();}, "Moves to the home position.");
+      addAvailableCommand(STORE, "store", [&](ParseResult tokens) {
+        string name = "";
+        try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional.*/}
+        store(name);
+      }, "Store the gripped jar to the location given. If no location is specified, store in the next available location.");
     
       // All lowercase
-      m_commands["grab"] = [&](ParseResult tokens) {
-        double strength = tokens.popScalaire();
-        cout << "Executing grab with strength = " << strength << endl;
-        grab(strength);
-      };
-      
-      m_commands["stop"] = [&](ParseResult tokens) {stop();};
-      m_commands["reference"] = [&](ParseResult tokens) {reference();};
-      m_commands["home"] = [&](ParseResult tokens) {home();};
-      m_commands["gohome"] = [&](ParseResult tokens) {gohome();};
-      m_commands["info"] = [&](ParseResult tokens) {info();};
-      m_commands["store"] = [&](ParseResult tokens) {
-        string name = "";
-        try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional. If empty store in the next available location.*/}
-        store(name);
-      };
-      m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
-      m_commands["sync"] = [&](ParseResult tokens) {sync();};
-      m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
-      m_commands["detect"] = [&](ParseResult tokens) {detect();};
-      m_commands["parse"] = [&](ParseResult tokens) {parse();};
-      m_commands["genloc"] = [&](ParseResult tokens) {generateLocations();}; // FIXME: The user should not be able to do this easily..
-      m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
-      m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
-      m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
-      m_commands["pickup"] = [&](ParseResult tokens) {
-        int id = tokens.popPositiveInteger();
-        string locationName = tokens.popNoun();
-        for (const Jar& jar : jars.items) {
-          if (jar.id == id) {
-            pickup(jar, locationName);
-            return;
-          }
-        }
-        cout << "Oups. No jar were found with this id." << endl;
-      };
-      m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
-        string ingredientName = tokens.popNoun();
-        fetch(ingredientName);
-      }; 
-      m_commands["grip"] = [&](ParseResult tokens) {
-        unsigned long id = tokens.popPositiveInteger();
-        grip(id);
-      };
-      
-      m_commands["help"] = [&](ParseResult tokens) {
-        // TODO
-      };
-      
-      m_commands["cherche"] = [&](ParseResult tokens) { // fetch
-      };
-      
-      m_commands["trouve"] = [&](ParseResult tokens) {
-      };
-      
-      m_commands["rapporte"] = [&](ParseResult tokens) {
-      };
+      // m_commands["grab"] = [&](ParseResult tokens) {
+      //   double strength = tokens.popScalaire();
+      //   cout << "Executing grab with strength = " << strength << endl;
+      //   grab(strength);
+      // };
+      // 
+      // m_commands["reference"] = [&](ParseResult tokens) {reference();};
+      // m_commands["info"] = [&](ParseResult tokens) {info();};
+      // m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
+      // m_commands["sync"] = [&](ParseResult tokens) {sync();};
+      // m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
+      // m_commands["detect"] = [&](ParseResult tokens) {detect();};
+      // m_commands["parse"] = [&](ParseResult tokens) {parse();};
+      // m_commands["genloc"] = [&](ParseResult tokens) {generateLocations();}; // FIXME: The user should not be able to do this easily..
+      // m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
+      // m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
+      // m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
+      // m_commands["pickup"] = [&](ParseResult tokens) {
+      //   int id = tokens.popPositiveInteger();
+      //   string locationName = tokens.popNoun();
+      //   for (const Jar& jar : jars.items) {
+      //     if (jar.id == id) {
+      //       pickup(jar, locationName);
+      //       return;
+      //     }
+      //   }
+      //   cout << "Oups. No jar were found with this id." << endl;
+      // };
+      // m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
+      //   string ingredientName = tokens.popNoun();
+      //   fetch(ingredientName);
+      // }; 
+      // m_commands["grip"] = [&](ParseResult tokens) {
+      //   unsigned long id = tokens.popPositiveInteger();
+      //   grip(id);
+      // };
+      // 
+      // m_commands["help"] = [&](ParseResult tokens) {
+      //   // TODO
+      // };
+      // 
+      // m_commands["cherche"] = [&](ParseResult tokens) { // fetch
+      // };
+      // 
+      // m_commands["trouve"] = [&](ParseResult tokens) {
+      // };
+      // 
+      // m_commands["rapporte"] = [&](ParseResult tokens) {
+      // };
 
-      m_commands["capture"] = [&](ParseResult tokens) {capture();};
+      // m_commands["capture"] = [&](ParseResult tokens) {capture();};
 
-      m_commands["photo"] = [&](ParseResult tokens) {
-        Mat mat;
-        captureFrame(mat);
-      };
+      // m_commands["photo"] = [&](ParseResult tokens) {
+      //   Mat mat;
+      //   captureFrame(mat);
+      // };
 
-      m_commands["goto"] = [&](ParseResult tokens) {
-        double x = tokens.popScalaire();
-        double y = tokens.popScalaire();
-        double t = tokens.popScalaire();
-        moveTo(PolarCoord(x, y, t));
-      };
-      
-      m_commands["move"] = [&](ParseResult tokens) {
-        char axis = tokens.popAxis();
-        double dest = tokens.popScalaire();
-        move(Movement(axis,dest));
-      };
+      // m_commands["goto"] = [&](ParseResult tokens) {
+      //   double x = tokens.popScalaire();
+      //   double y = tokens.popScalaire();
+      //   double t = tokens.popScalaire();
+      //   moveTo(PolarCoord(x, y, t));
+      // };
+      // 
+      // m_commands["move"] = [&](ParseResult tokens) {
+      //   char axis = tokens.popAxis();
+      //   double dest = tokens.popScalaire();
+      //   move(Movement(axis,dest));
+      // };
 
-      m_commands["open"] = [&](ParseResult tokens) {
-        openJaw();
-      };
+      // m_commands["open"] = [&](ParseResult tokens) {
+      //   openJaw();
+      // };
     
     }
 
     void waitUntilNotWorking() {
     }
 
-    void referenceAxis(Axis& axis) {
-      string str = "h"; str += axis.id;
-      pushCommand(str, [&]() {
-        if (axis.id == AXIS_H) {
-          m_position.h = REFERENCE_POSITION_H;
-        } else if (axis.id == AXIS_V) {
-          m_position.v = REFERENCE_POSITION_V;
-        } else if (axis.id == AXIS_T) {
-          m_position.t = REFERENCE_POSITION_T;
-        //} else if (axis.id == AXIS_R) {
-        }
-        axis.is_referenced = true;
-      });
-    }
-
     void reference() {
       cerr << "Doing reference...\n";
       //is_referenced = false; // Should set all axis to not referenced anymore?
-      referenceAxis(axisR);
-      referenceAxis(axisT);
-      referenceAxis(axisH);
+      pushCommand(make_shared<ReferencingCommand>(axisR));
+      pushCommand(make_shared<ReferencingCommand>(axisT));
+      pushCommand(make_shared<ReferencingCommand>(axisH));
       move(Movement('t', CHANGE_LEVEL_ANGLE_HIGH));
-      referenceAxis(axisV);
+      pushCommand(make_shared<ReferencingCommand>(axisV));
     }
 
     void home() {
@@ -242,6 +296,8 @@ class Heda {
     Axis axisR;
 
     // Commands can be split with a semicolon (;)
+    // FIXME: Don't execute the commands as soon as I get them. Stack them. Add a ServerCommand or something to the stack.
+    // But check for the stop command.
     void execute(string str) {
 
       string::size_type pos = str.find(';');
@@ -254,10 +310,15 @@ class Heda {
       ParseResult result;
       parser.parse(result, cmd);
 
-      if (m_commands.find(result.getCommand()) == m_commands.end()) {
+      bool found = false;
+      for (auto item : m_commands) {
+        if (iequals(item.second.name, result.getCommand())) {
+          item.second.func(result);
+          found = true; break;
+        }
+      }
+      if (!found) {
         cerr << "Error unkown command: " << result.getCommand();
-      } else {
-        m_commands.at(result.getCommand())(result);
       }
 
       if (pos != string::npos) {execute(str.substr(pos+1));}
@@ -273,19 +334,19 @@ class Heda {
       }
     }
 
-    void move(const Movement& mvt) {
+    void move(const Movement& mvt) { // Deprecated, movement is deprecated, superseded by MoveCommand
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
-      pushCommand(mvt.str(), [&,mvt]() {
-        if (mvt.axis == 'x' || mvt.axis == 'X') {
-          m_position.h = mvt.destination;
-        } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
-          m_position.v = mvt.destination;
-        } else if (mvt.axis == 't' || mvt.axis == 'T') {
-          m_position.t = mvt.destination;
-        }
-        if (mvt.callback) {mvt.callback();}
-      });
+      Axis* axis = 0;
+      if (mvt.axis == 'x' || mvt.axis == 'X') {
+        axis = &axisH;
+      } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
+        axis = &axisV;
+      } else if (mvt.axis == 't' || mvt.axis == 'T') {
+        axis = &axisT;
+      }
+      if (axis == 0) {return;}
+      pushCommand(make_shared<MoveCommand>(*axis, mvt.destination));
     }
 
     void moveTo(PolarCoord destination) {
@@ -295,7 +356,7 @@ class Heda {
     }
 
     void grab(double strength) {
-      pushCommand("g"+to_string(strength));
+      pushCommand(make_shared<SlaveCommand>("g" + to_string(strength)));
     }
 
     void find(string ingredientName) {
@@ -321,16 +382,8 @@ class Heda {
       db.clear(codes);
     }
 
-    void pushCommand(string str, std::function<void()> callback) {
+    void pushCommand(shared_ptr<HedaCommand> cmd) {
       std::lock_guard<std::mutex> guard(commandsMutex);
-      RawCommand cmd(str, callback);
-      m_stack.push_back(cmd);
-      calculatePendingCommands();
-    }
-
-    void pushCommand(string str) {
-      std::lock_guard<std::mutex> guard(commandsMutex);
-      RawCommand cmd(str);
       m_stack.push_back(cmd);
       calculatePendingCommands();
     }
@@ -339,7 +392,6 @@ class Heda {
       std::lock_guard<std::mutex> guard(commandsMutex);
       m_stack.clear();
       m_pending_commands.clear();
-      m_current_command.clear();
       gripped_jar.id = -1;
       is_gripping = false;
       cout << "Executing stop" << endl;
@@ -359,23 +411,27 @@ class Heda {
     }
 
     void openJaw() {
-      pushCommand("r");
+      pushCommand(make_shared<SlaveCommand>("r"));
     }
 
     void calculatePendingCommands() {
-      m_pending_commands = m_current_command.cmd + "\n";
-      for (const RawCommand& cmd : m_stack) {
-        m_pending_commands += cmd.cmd;
+      m_pending_commands = "";
+      // FIXME: Pretty print the commands
+      /*for (const shared_ptr<HedaCommand>& cmd : m_stack) {
+        m_pending_commands += m_commands.at(cmd->type).name;
         m_pending_commands += "\n";
-      }
+      }*/
     }
 
     string getPendingCommands() {
       return m_pending_commands;
     }
-
+    
     string getCurrentCommand() {
-      return m_current_command.cmd;
+      // FIXME: Pretty print the commands
+      return "";
+      //if (m_stack.empty()) {return "";}
+      //return m_commands.at(m_stack.front()->type).name;
     }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
@@ -423,25 +479,24 @@ class Heda {
       return m_position;
     }
 
+    /*Reader& getSlaveReader() {
+      return m_reader;
+    }
+    
+    Writer& getSlaveWriter() {
+      return m_writer;
+    }*/
+
 //  protected:
 
     Reader& m_reader;
     Writer& m_writer;
 
-    // This is the stack of raw commands sent to the arduino.
-    // It is NOT the stack of commands sent to Heda.
-    std::list<RawCommand> m_stack;
+    std::list<shared_ptr<HedaCommand>> m_stack;
     
-    //std::thread m_commands_thread;
-    //std::atomic<bool> m_commands_thread_run;
-
     PolarCoord m_position;
-    //VideoCapture m_cap;
-    std::unordered_map<string, std::function<void(ParseResult)>> m_commands;
-    //bool m_video_working = false;
+    std::unordered_map<HedaCommandType, AvailableHedaCommand> m_commands;
 
-    RawCommand m_current_command;
-    
     DetectedHRCodeTable codes;
     HedaConfigTable configs;
     ShelfTable shelves;
@@ -452,7 +507,7 @@ class Heda {
     Database& db;
 
     bool isDoneWorking() {
-      return m_current_command.isDone() && m_stack.empty();
+      return m_stack.empty();
     }
     
     HedaConfig config;
@@ -496,36 +551,29 @@ class Heda {
       }
     }
 
+    bool is_command_started = false;
+
     // returns the time to sleep
     int handleCommandStack() {
 
       std::lock_guard<std::mutex> guard(commandsMutex);
 
-      // Check if there is a command being executed right now
-      if (m_current_command.isDone()) {
+      if (m_stack.empty()) {return 100;}
 
-        // Check if a new command is available
-        if (m_stack.empty()) { return 100;}
-
-        m_current_command = *m_stack.begin();
-        m_writer << m_current_command.cmd.c_str();
-        m_stack.pop_front();
-        calculatePendingCommands();
-        return 0;
-
-      // Check if the message MESSAGE_DONE has been received.
-      } else if (m_reader.inputAvailable()) {
-
-        string str = getInputLine(m_reader);
-
-        if (str == MESSAGE_DONE) {
-          m_current_command.finish();
-          calculatePendingCommands();
-          return 0;
-        }
+      shared_ptr<HedaCommand>& current = *m_stack.begin();
+      if (!is_command_started) {
+        current->start(*this);
+        is_command_started = true;
       }
 
-      return 10;
+      if (!current->isDone(*this)) {return 10;}
+
+      current->doneCallback(*this);
+      is_command_started = false;
+      m_stack.pop_front();
+      calculatePendingCommands();
+
+      return 0;
     }
 
   protected:

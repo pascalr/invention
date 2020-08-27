@@ -20,8 +20,6 @@ enum TokenType {
   UNKOWN
 };
 
-enum MyEnum {VAL1, VAL2,VAL3};
-
 const char* tokenTypeName(TokenType e);
 
 class MissingArgumentException : public exception {

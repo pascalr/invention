@@ -13,7 +13,46 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
+
+void ReferencingCommand::doneCallback(Heda& heda) {
+  if (axis.id == AXIS_H) {
+    heda.m_position.h = REFERENCE_POSITION_H;
+  } else if (axis.id == AXIS_V) {
+    heda.m_position.v = REFERENCE_POSITION_V;
+  } else if (axis.id == AXIS_T) {
+    heda.m_position.t = REFERENCE_POSITION_T;
+  //} else if (axis.id == AXIS_R) {
+  }
+  axis.is_referenced = true;
+}
+
+void MoveCommand::doneCallback(Heda& heda) {
+  if (axis.id == AXIS_H) {
+    heda.m_position.h = destination;
+  } else if (axis.id == AXIS_V) {
+    heda.m_position.v = destination;
+  } else if (axis.id == AXIS_T) {
+    heda.m_position.t = destination;
+  //} else if (axis.id == AXIS_R) {
+  }
+  axis.is_referenced = true;
+}
+
+bool SlaveCommand::isDone(Heda& heda) {
+  // Check if the message MESSAGE_DONE has been received.
+  if (heda.m_reader.inputAvailable()) {
+
+    string str = getInputLine(heda.m_reader);
+
+    if (str == MESSAGE_DONE) { return true; }
+  }
+  return false;
+}
     
+void SlaveCommand::start(Heda& heda) {
+  heda.m_writer << cmd;
+}
+
 void Heda::generateLocations() {
   NaiveJarPacker packer;
   packer.generateLocations(*this);
