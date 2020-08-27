@@ -32,17 +32,25 @@ class HedaController {
       };
       m_commands["grip"] = [&](ParseResult tokens) {
         unsigned long id = tokens.popPositiveInteger();
-        heda.pushCommand(make_shared<GripCommand>(id));
+        Jar jar;
+        if (heda.jars.get(jar, id)) {
+          heda.pushCommand(make_shared<GripCommand>(jar));
+        } // TODO Handle error
       };
       m_commands["pickup"] = [&](ParseResult tokens) {
+        // TODO: popLocation? worth it? wait to see...
         int id = tokens.popPositiveInteger();
         string locationName = tokens.popNoun();
-        for (const Jar& jar : heda.jars.items) {
-          if (jar.id == id) {
-            //heda.pickup(jar, locationName);
-            return;
-          }
+        Location loc;
+        if (heda.locations.byName(loc, locationName) < 0) {
+          cout << "A location name was given, but it was not found. Aborting pickup.";
+          return;
         }
+        Jar jar;
+        if (heda.jars.get(jar, id)) {
+          heda.pushCommand(make_shared<PickupCommand>(jar, loc));
+          return;
+        } // TODO Handle error
         cout << "Oups. No jar were found with this id." << endl;
       };
       m_commands["move"] = [&](ParseResult tokens) {

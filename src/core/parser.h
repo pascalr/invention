@@ -5,6 +5,9 @@
 #include <sstream>
 #include <bits/stdc++.h>
 
+// Maybe change the parser. Because all I want to do with is is call popSomething.
+// So only the functions popSomething should be implemented, and the args are parse one at a time...
+
 using namespace std;
 
 enum TokenType {

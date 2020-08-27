@@ -116,23 +116,6 @@ class MoveCommand : public SlaveCommand {
     double destination;
 };
 
-/* class GotoCommand : public HedaCommand {
-  public:
-    GotoCommand(PolarCoord destination) : destination(destination) {}
-    
-    string str() {
-      return "goto " + to_string(destination.h) + " " + to_string(destination.v) + " " + to_string(destination.t);
-    }
-
-    void start(Heda& heda);
-
-    bool isDone(Heda& heda);
-
-    PolarCoord destination;
-    vector<MoveCommand> mvts;
-    vector<MoveCommand>::iterator currentMove;
-}; */ 
-
 // Execute sub commands
 class MetaCommand : public HedaCommand {
   public:
@@ -150,11 +133,18 @@ class MetaCommand : public HedaCommand {
 
 class GripCommand : public MetaCommand {
   public:
-    GripCommand(int id) : id(id) {}
-    string str() {return "grip " + to_string(id);}
+    GripCommand(Jar jar) : jar(jar) {}
+    string str() {return "grip " + to_string(jar.id);}
     void doneCallback(Heda& heda);
     void setup(Heda& heda);
-    int id;
+    Jar jar;
+};
+
+class LowerForGripCommand : public MetaCommand {
+  public:
+    LowerForGripCommand(Jar jar) : jar(jar) {}
+    string str() {return "lowerforgrip " + to_string(jar.id);}
+    void setup(Heda& heda);
     Jar jar;
 };
 
@@ -165,6 +155,16 @@ class StoreCommand : public MetaCommand {
     void doneCallback(Heda& heda);
     void setup(Heda& heda);
     std::string location_name;
+    Location loc;
+};
+
+class PickupCommand : public MetaCommand {
+  public:
+    PickupCommand(Jar jar, Location loc) : jar(jar), loc(loc) {}
+    string str() {return "pickup " + to_string(jar.id) + " " + loc.name;}
+    void doneCallback(Heda& heda);
+    void setup(Heda& heda);
+    Jar jar;
     Location loc;
 };
 

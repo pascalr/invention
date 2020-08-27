@@ -20,6 +20,7 @@ void MetaCommand::start(Heda& heda) {
   setup(heda);
   currentCommand = commands.begin();
   (*currentCommand)->start(heda);
+  heda.stack_writer << "Sub: Starting command: " + (*currentCommand)->str();
 }
 
 void OpenGripCommand::doneCallback(Heda& heda) {
@@ -28,7 +29,7 @@ void OpenGripCommand::doneCallback(Heda& heda) {
 }
 
 // Get lower, either to pickup, or to putdown
-HedaCommandPtr lowerForGripCmd(Heda& heda, const Jar& jar) {
+void LowerForGripCommand::setup(Heda& heda) {
   Shelf shelf;
   if (!heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v)))) {throw InvalidShelfException();}
 
@@ -36,7 +37,7 @@ HedaCommandPtr lowerForGripCmd(Heda& heda, const Jar& jar) {
   if (!heda.jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
  
   double v = heda.unitV(shelf.height + format.height + heda.config.grip_offset);
-  return make_shared<MoveCommand>(heda.axisV, v);
+  commands.push_back(make_shared<MoveCommand>(heda.axisV, v));
 }
 
 void GripCommand::doneCallback(Heda& heda) {
@@ -45,14 +46,13 @@ void GripCommand::doneCallback(Heda& heda) {
 }
 
 void GripCommand::setup(Heda& heda) {
-  if (!heda.jars.get(jar, id)) {throw InvalidJarIdException();}
   commands.push_back(make_shared<GrabCommand>(40.0)); // TODO: Read the grab strength from the jar_format model
 }
 
 void PutdownCommand::setup(Heda& heda) {
   // TODO: Error message is not gripping
   if (heda.is_gripping) {
-    commands.push_back(lowerForGripCmd(heda, heda.gripped_jar));
+    commands.push_back(make_shared<LowerForGripCommand>(heda.gripped_jar));
     commands.push_back(make_shared<OpenGripCommand>());
   }
 }
@@ -98,10 +98,12 @@ bool MetaCommand::isDone(Heda& heda) {
   if (currentCommand == commands.end()) {return true;}
 
   if ((*currentCommand)->isDone(heda)) {
+    heda.stack_writer << "Sub: Finished command: " + (*currentCommand)->str();
     (*currentCommand)->doneCallback(heda);
     currentCommand++;
     if (currentCommand == commands.end()) {return true;}
     (*currentCommand)->start(heda);
+    heda.stack_writer << "Sub: Starting command: " + (*currentCommand)->str();
   }
 
   return false;
@@ -151,22 +153,8 @@ void Heda::generateLocations() {
   packer.generateLocations(*this);
 }
     
-/*void Heda::pickup(Jar jar, const string& locationName) {
-  NaiveJarPacker packer;
-  Location loc;
-  if (locations.byName(loc, locationName) < 0) {
-    cout << "A location name was given, but it was not found. Aborting pickup.";
-    return;
-  }
-  packer.moveToLocation(*this, loc);
-  //lowerForGrip(jar);
-  grip(jar);
-  jar.location_id = -1;
-  db.update(jars, jar);
-  packer.moveToLocation(*this, loc);
-}
 
-void Heda::fetch(std::string ingredientName) {
+/*void Heda::fetch(std::string ingredientName) {
   cout << "About to fetch ingredient = " << ingredientName << endl;
   for (const Ingredient& ing : ingredients.items) {
     if (iequals(ing.name, ingredientName)) {
@@ -191,6 +179,19 @@ void Heda::fetch(std::string ingredientName) {
   }
   cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
 }*/
+
+void PickupCommand::setup(Heda& heda) {
+  NaiveJarPacker packer;
+  commands.push_back(packer.moveToLocationCmd(heda, loc));
+  commands.push_back(make_shared<LowerForGripCommand>(jar));
+  commands.push_back(make_shared<GripCommand>(jar));
+  commands.push_back(packer.moveToLocationCmd(heda, loc));
+}
+
+void PickupCommand::doneCallback(Heda& heda) {
+  jar.location_id = -1;
+  heda.db.update(heda.jars, jar);
+}
 
 void StoreCommand::setup(Heda& heda) {
   // TODO: Error message is not gripping
