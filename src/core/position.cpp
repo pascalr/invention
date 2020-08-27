@@ -54,6 +54,14 @@ string Movement::str() const {
   return r;
 }*/
 
+std::string to_string(const PolarCoord& c) {
+  return "(" + to_string(c.h) + ", " + to_string(c.v) + ", " + to_string(c.t) + ")";
+}
+
+std::string to_string(const UserCoord& c) {
+  return "(" + to_string(c.x) + ", " + to_string(c.y) + ", " + to_string(c.z) + ")";
+}
+
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c) {
   return os << "(" << c.h << ", " << c.v << ", " << c.t << ")";
 }
@@ -72,10 +80,52 @@ void doNothing() {}
 
 // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
 //void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback = doNothing) {
-void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
+//void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback) {
+//
+//  unsigned int size = movements.size();
+//  // TODO: Collision detection
+//
+//  int currentLevel = shelfByHeight(toUserHeight(position));
+//  int destinationLevel = shelfByHeight(toUserHeight(destination));
+//    
+//  double positionT = position.t;
+//
+//  // must change level
+//  if (currentLevel != destinationLevel) {
+//
+//    positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+//    movements.push_back(Movement('t', positionT));
+//  }
+// 
+//  addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
+//
+//  // If moving theta would colide, move x first
+//  double deltaX = cosd(destination.t) * config.gripper_radius;
+//  double xIfTurnsFirst = position.h + deltaX;
+//
+//  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
+//    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+//    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+//  } else {
+//    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+//    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+//  }
+//
+//  if (callback && movements.size() != size) {
+//    movements[movements.size()-1].callback = callback;
+//    //const Movement& oldLast = *movements.end();
+//    //const Movement& oldLast = movements[movements.size()-1];
+//    //Movement last = Movement(oldLast.axis, oldLast.destination, callback);
+//    //movements.pop_back();
+//    //movements.push_back(last);
+//  }
+//}
 
-  unsigned int size = movements.size();
-  // TODO: Collision detection
+// From the current position
+// TODO: Collision detection
+void Heda::calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination) {
+
+  PolarCoord position = getPosition();
 
   int currentLevel = shelfByHeight(toUserHeight(position));
   int destinationLevel = shelfByHeight(toUserHeight(destination));
@@ -86,30 +136,26 @@ void Heda::calculateGoto(vector<Movement> &movements, const PolarCoord position,
   if (currentLevel != destinationLevel) {
 
     positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
-    movements.push_back(Movement('t', positionT));
+    mvts.push_back(MoveCommand(axisT, positionT));
   }
- 
-  addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
+
+  mvts.push_back(MoveCommand(axisV, destination.v)); 
+  //addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
 
   // If moving theta would colide, move x first
   double deltaX = cosd(destination.t) * config.gripper_radius;
   double xIfTurnsFirst = position.h + deltaX;
 
   if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
-    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
-    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+    mvts.push_back(MoveCommand(axisH, destination.h)); 
+    mvts.push_back(MoveCommand(axisT, destination.t)); 
+    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
   } else {
-    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
-  }
-
-  if (callback && movements.size() != size) {
-    movements[movements.size()-1].callback = callback;
-    //const Movement& oldLast = *movements.end();
-    //const Movement& oldLast = movements[movements.size()-1];
-    //Movement last = Movement(oldLast.axis, oldLast.destination, callback);
-    //movements.pop_back();
-    //movements.push_back(last);
+    mvts.push_back(MoveCommand(axisT, destination.t)); 
+    mvts.push_back(MoveCommand(axisH, destination.h)); 
+    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
   }
 }
 

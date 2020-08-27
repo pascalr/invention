@@ -8,6 +8,7 @@ class Heda;
 #include "../lib/opencv.h"
 #include "reader/reader.h"
 #include "writer/writer.h"
+#include "writer/log_writer.h"
 
 #include "command_stack.h"
 
@@ -45,6 +46,7 @@ enum HedaCommandType {
   DETECT,
   PUTDOWN,
   FETCH,
+  GOTO,
   REFERENCE,
   OPEN
 };
@@ -77,6 +79,8 @@ class AvailableHedaCommand {
 class HedaCommand {
   public:
 
+    virtual string str() = 0;
+
     virtual void start(Heda& heda) = 0;
 
     virtual bool isDone(Heda& heda) {
@@ -88,8 +92,12 @@ class HedaCommand {
 
 class SlaveCommand : public HedaCommand {
   public:
-
+    
     SlaveCommand(string cmd) : cmd(cmd) {}
+
+    virtual string str() {
+      return "SlaveCommand(" + cmd + ")";
+    }
 
     void start(Heda& heda);
 
@@ -100,9 +108,13 @@ class SlaveCommand : public HedaCommand {
 
 class ReferencingCommand : public SlaveCommand {
   public:
-
+    
     ReferencingCommand(Axis& axis0) : SlaveCommand("h" + string(1, axis0.id)), axis(axis0) {}
     
+    string str() {
+      return "home " + string(1, axis.id);
+    }
+
     void doneCallback(Heda& heda);
 
     Axis& axis;
@@ -110,40 +122,36 @@ class ReferencingCommand : public SlaveCommand {
 
 class MoveCommand : public SlaveCommand {
   public:
-
+    
     MoveCommand(Axis& axis0, double destination0) : SlaveCommand("m" + string(1, axis0.id) + to_string(destination0)), axis(axis0), destination(destination0) {
     }
     
+    string str() {
+      return "move " + string(1, axis.id) + to_string(destination);
+    }
+
     void doneCallback(Heda& heda);
 
     Axis& axis;
     double destination;
 };
 
-/*class HedaCommandItem {
+class GotoCommand : public HedaCommand {
   public:
-    HedaCommandItem() {}
-    HedaCommandItem(std::string cmd) : cmd(cmd) {}
-    HedaCommandItem(std::string cmd, std::function<void()> callback) : cmd(cmd), callback(callback) {}
+    GotoCommand(PolarCoord destination) : destination(destination) {}
+    
+    string str() {
+      return "goto " + to_string(destination.h) + " " + to_string(destination.v) + " " + to_string(destination.t);
+    }
 
-    bool isDone() {
-      return cmd.empty();
-    }
-    void clear() {
-      cmd = "";
-      callback = doNothing;
-    }
-    void finish() {
-      if (callback) {
-        callback();
-      }
-      cmd = "";
-    }
-    HedaCommandType type;
-    std::string cmd;
-    std::function<void()> callback;
-};*/
+    void start(Heda& heda);
 
+    bool isDone(Heda& heda);
+
+    PolarCoord destination;
+    vector<MoveCommand> mvts;
+    vector<MoveCommand>::iterator currentMove;
+};
 
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
@@ -152,7 +160,12 @@ class MoveCommand : public SlaveCommand {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), m_reader(reader), m_writer(writer), server_writer(serverWriter), db(db) {
+    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R),
+              m_reader(reader),
+              m_writer(writer),
+              server_writer(serverWriter),
+              stack_writer("\033[38mStack\033[0m"),
+              db(db) {
     
       setupCommands();
 
@@ -205,6 +218,19 @@ class Heda {
         }
         cout << "Oups. No jar were found with this id." << endl;
       }, "Pickup a jar with the given id and location name.");
+      addAvailableCommand(MOVE, "move", [&](ParseResult tokens) {
+        char axis = tokens.popAxis();
+        double dest = tokens.popScalaire();
+        move(Movement(axis,dest));
+      });
+      addAvailableCommand(SWEEP, "sweep", [&](ParseResult tokens) {
+        char axis = tokens.popAxis();
+        double dest = tokens.popScalaire();
+        move(Movement(axis,dest));
+      });
+      // m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
+      // m_commands["move"] = [&](ParseResult tokens) {
+      // };
     
       // All lowercase
       // m_commands["grab"] = [&](ParseResult tokens) {
@@ -213,11 +239,6 @@ class Heda {
       //   grab(strength);
       // };
       // 
-      // m_commands["reference"] = [&](ParseResult tokens) {reference();};
-      // m_commands["info"] = [&](ParseResult tokens) {info();};
-      // m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
-      // m_commands["sync"] = [&](ParseResult tokens) {sync();};
-      // m_commands["balaye"] = [&](ParseResult tokens) {sweep();};
       // m_commands["detect"] = [&](ParseResult tokens) {detect();};
       // m_commands["parse"] = [&](ParseResult tokens) {parse();};
       // m_commands["genloc"] = [&](ParseResult tokens) {generateLocations();}; // FIXME: The user should not be able to do this easily..
@@ -256,11 +277,6 @@ class Heda {
       //   moveTo(PolarCoord(x, y, t));
       // };
       // 
-      // m_commands["move"] = [&](ParseResult tokens) {
-      //   char axis = tokens.popAxis();
-      //   double dest = tokens.popScalaire();
-      //   move(Movement(axis,dest));
-      // };
 
       // m_commands["open"] = [&](ParseResult tokens) {
       //   openJaw();
@@ -351,9 +367,7 @@ class Heda {
     }
 
     void moveTo(PolarCoord destination) {
-      vector<Movement> mvts;
-      calculateGoto(mvts, m_position, destination, doNothing);
-      move(mvts);
+      pushCommand(make_shared<GotoCommand>(destination));
     }
 
     void grab(double strength) {
@@ -495,6 +509,8 @@ class Heda {
 
     Writer& server_writer;
 
+    LogWriter stack_writer;
+
     std::list<shared_ptr<HedaCommand>> m_stack;
     
     PolarCoord m_position;
@@ -518,8 +534,9 @@ class Heda {
     Jar gripped_jar;
     bool is_gripping = false;
 
+    //void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
     // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
-    void calculateGoto(vector<Movement> &movements, const PolarCoord position, const PolarCoord destination, std::function<void()> callback);
+    void calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination);
 
     void generateLocations();
 
@@ -565,12 +582,14 @@ class Heda {
 
       shared_ptr<HedaCommand>& current = *m_stack.begin();
       if (!is_command_started) {
+        stack_writer << "Starting command: " << current->str();
         current->start(*this);
         is_command_started = true;
       }
 
       if (!current->isDone(*this)) {return 10;}
 
+      stack_writer << "Finished command: " << current->str();
       current->doneCallback(*this);
       is_command_started = false;
       m_stack.pop_front();

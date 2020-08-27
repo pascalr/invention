@@ -75,6 +75,9 @@ class Movement {
     std::function<void()> callback;
 };
 
+std::string to_string(const PolarCoord& c);
+std::string to_string(const UserCoord& c);
+
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
 std::ostream& operator<<(std::ostream &os, const UserCoord& c);
 

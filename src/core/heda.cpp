@@ -13,6 +13,26 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
+    
+void GotoCommand::start(Heda& heda) {
+  heda.calculateGoto(mvts, destination);
+  currentMove = mvts.begin();
+  currentMove->start(heda);
+}
+
+bool GotoCommand::isDone(Heda& heda) {
+
+  if (currentMove == mvts.end()) {return true;}
+
+  if (currentMove->isDone(heda)) {
+    currentMove->doneCallback(heda);
+    currentMove++;
+    if (currentMove == mvts.end()) {return true;}
+    currentMove->start(heda);
+  }
+
+  return false;
+}
 
 void ReferencingCommand::doneCallback(Heda& heda) {
   if (axis.id == AXIS_H) {
