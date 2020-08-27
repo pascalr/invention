@@ -25,6 +25,7 @@
 #include "core/reader/log_reader.h"
 #include "core/two_way_stream.h"
 #include "core/serialize.h"
+#include "core/heda_controller.h"
 
 using namespace std;
 using namespace boost::property_tree; // json
@@ -40,6 +41,7 @@ void sendJson(shared_ptr<HttpServer::Response> response, stringstream& ss) {
     header.emplace("Content-Type", "application/json");
     response->write(SimpleWeb::StatusCode::success_ok, str, header);
 }
+
 
 int main(int argc, char** argv) {
   
@@ -189,6 +191,9 @@ int main(int argc, char** argv) {
 
   //server_thread.join();
   LogReader serverLogReader("\033[36mFrom server\033[0m", serverStream);
+
   heda.sync();
-  heda.loopCommandStack(serverLogReader);
+
+  HedaController c(heda);
+  c.loopCommandStack(serverLogReader);
 }

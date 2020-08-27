@@ -8,6 +8,7 @@
 #include "core/writer/log_writer.h"
 #include "core/reader/serial_reader.h"
 #include "core/reader/log_reader.h"
+#include "core/heda_controller.h"
 #include <thread>
 #include <chrono>
 
@@ -41,7 +42,9 @@ int main(int argc, char** argv)
   
   Heda heda(hedaLogWriter, hedaLogReader, db, hedaOutputWriter); 
   heda.sync();
-  heda.execute(cmd);
+
+  HedaController c(heda);
+  c.execute(cmd);
   heda.runAllCommandStack();
   return 0;
 }

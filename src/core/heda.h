@@ -31,27 +31,6 @@ class NoWorkingShelfException : public exception {};
 
 #include <mutex>
 
-enum HedaCommandType {
-  STOP,
-  HOME,
-  GOHOME,
-  STORE,
-  GRAB,
-  PICKUP,
-  MOVE,
-  GENLOC,
-  SWEEP,
-  GRIP,
-  PINPOINT,
-  DETECT,
-  PUTDOWN,
-  FETCH,
-  GOTO,
-  REFERENCE,
-  OPEN
-};
-
-
 // TODO: Rename x and y to h and v at some point.
 #define AXIS_H 'x'
 #define AXIS_V 'y'
@@ -64,17 +43,6 @@ class Axis {
     char id;
     bool is_referenced = false;
 };
-
-
-class AvailableHedaCommand {
-  public:
-    AvailableHedaCommand() {}
-    AvailableHedaCommand(string name, std::function<void(ParseResult)> func, string help) : name(name), func(func), help(help) {}
-    string name;
-    std::function<void(ParseResult)> func;
-    string help;
-};
-
 
 class HedaCommand {
   public:
@@ -164,11 +132,9 @@ class Heda {
               m_reader(reader),
               m_writer(writer),
               server_writer(serverWriter),
-              stack_writer("\033[38mStack\033[0m"),
+              stack_writer("\033[38;5;215mStack\033[0m"),
               db(db) {
     
-      setupCommands();
-
       loadDb();
     }
 
@@ -182,106 +148,6 @@ class Heda {
       db.load(jars);
       db.load(locations);
       db.load(ingredients);
-    }
-
-    void addAvailableCommand(HedaCommandType type, const char* name, std::function<void(ParseResult)> func, const char* help="") {
-      m_commands[type] = AvailableHedaCommand(name, func, help);
-    }
-
-    AvailableHedaCommand getAvailableCommand(HedaCommandType type) {
-      return m_commands[type];
-    }
-
-    void setupCommands() {
-     
-      // at throws a out of range exception 
-      addAvailableCommand(STOP, "stop", [&](ParseResult tokens) {stop();}, "Stop everything the slave is doing.");
-      addAvailableCommand(HOME, "home", [&](ParseResult tokens) {home();}, "References all axes then moves to the home position.");
-      addAvailableCommand(GOHOME, "gohome", [&](ParseResult tokens) {gohome();}, "Moves to the home position.");
-      addAvailableCommand(STORE, "store", [&](ParseResult tokens) {
-        string name = "";
-        try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional.*/}
-        store(name);
-      }, "Store the gripped jar to the location given. If no location is specified, store in the next available location.");
-      addAvailableCommand(GRIP, "grip", [&](ParseResult tokens) {
-        unsigned long id = tokens.popPositiveInteger();
-        grip(id);
-      }, "Grips a jar with the given id.");
-      addAvailableCommand(PICKUP, "pickup", [&](ParseResult tokens) {
-        int id = tokens.popPositiveInteger();
-        string locationName = tokens.popNoun();
-        for (const Jar& jar : jars.items) {
-          if (jar.id == id) {
-            pickup(jar, locationName);
-            return;
-          }
-        }
-        cout << "Oups. No jar were found with this id." << endl;
-      }, "Pickup a jar with the given id and location name.");
-      addAvailableCommand(MOVE, "move", [&](ParseResult tokens) {
-        char axis = tokens.popAxis();
-        double dest = tokens.popScalaire();
-        move(Movement(axis,dest));
-      });
-      addAvailableCommand(SWEEP, "sweep", [&](ParseResult tokens) {
-        char axis = tokens.popAxis();
-        double dest = tokens.popScalaire();
-        move(Movement(axis,dest));
-      });
-      // m_commands["sweep"] = [&](ParseResult tokens) {sweep();};
-      // m_commands["move"] = [&](ParseResult tokens) {
-      // };
-    
-      // All lowercase
-      // m_commands["grab"] = [&](ParseResult tokens) {
-      //   double strength = tokens.popScalaire();
-      //   cout << "Executing grab with strength = " << strength << endl;
-      //   grab(strength);
-      // };
-      // 
-      // m_commands["detect"] = [&](ParseResult tokens) {detect();};
-      // m_commands["parse"] = [&](ParseResult tokens) {parse();};
-      // m_commands["genloc"] = [&](ParseResult tokens) {generateLocations();}; // FIXME: The user should not be able to do this easily..
-      // m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint();};
-      // m_commands["calibrate"] = [&](ParseResult tokens) {calibrate();};
-      // m_commands["putdown"] = [&](ParseResult tokens) {putdown();};
-      // m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
-      //   string ingredientName = tokens.popNoun();
-      //   fetch(ingredientName);
-      // }; 
-      // 
-      // m_commands["help"] = [&](ParseResult tokens) {
-      //   // TODO
-      // };
-      // 
-      // m_commands["cherche"] = [&](ParseResult tokens) { // fetch
-      // };
-      // 
-      // m_commands["trouve"] = [&](ParseResult tokens) {
-      // };
-      // 
-      // m_commands["rapporte"] = [&](ParseResult tokens) {
-      // };
-
-      // m_commands["capture"] = [&](ParseResult tokens) {capture();};
-
-      // m_commands["photo"] = [&](ParseResult tokens) {
-      //   Mat mat;
-      //   captureFrame(mat);
-      // };
-
-      // m_commands["goto"] = [&](ParseResult tokens) {
-      //   double x = tokens.popScalaire();
-      //   double y = tokens.popScalaire();
-      //   double t = tokens.popScalaire();
-      //   moveTo(PolarCoord(x, y, t));
-      // };
-      // 
-
-      // m_commands["open"] = [&](ParseResult tokens) {
-      //   openJaw();
-      // };
-    
     }
 
     void waitUntilNotWorking() {
@@ -312,34 +178,6 @@ class Heda {
     Axis axisT;
     Axis axisR;
 
-    // Commands can be split with a semicolon (;)
-    // FIXME: Don't execute the commands as soon as I get them. Stack them. Add a ServerCommand or something to the stack.
-    // But check for the stop command.
-    void execute(string str) {
-
-      string::size_type pos = str.find(';');
-      string cmd = (pos == string::npos) ? str : str.substr(0, pos);
-
-      cerr << "Executing cmd = " << cmd << "\n";
-
-      string cmdName;
-      Parser parser;
-      ParseResult result;
-      parser.parse(result, cmd);
-
-      bool found = false;
-      for (auto item : m_commands) {
-        if (iequals(item.second.name, result.getCommand())) {
-          item.second.func(result);
-          found = true; break;
-        }
-      }
-      if (!found) {
-        cerr << "Error unkown command: " << result.getCommand();
-      }
-
-      if (pos != string::npos) {execute(str.substr(pos+1));}
-    }
 
     void captureFrame(Mat& frame);
     void capture();
@@ -514,7 +352,6 @@ class Heda {
     std::list<shared_ptr<HedaCommand>> m_stack;
     
     PolarCoord m_position;
-    std::unordered_map<HedaCommandType, AvailableHedaCommand> m_commands;
 
     DetectedHRCodeTable codes;
     HedaConfigTable configs;
@@ -561,16 +398,6 @@ class Heda {
       }
     }
 
-    void loopCommandStack(Reader& reader) {
-      while (true) {
-        if(reader.inputAvailable()) {
-          string cmd = getInputLine(reader);
-          execute(cmd);
-        }
-        this_thread::sleep_for(chrono::milliseconds(handleCommandStack()));
-      }
-    }
-
     bool is_command_started = false;
 
     // returns the time to sleep
@@ -582,14 +409,14 @@ class Heda {
 
       shared_ptr<HedaCommand>& current = *m_stack.begin();
       if (!is_command_started) {
-        stack_writer << "Starting command: " << current->str();
+        stack_writer << "Starting command: " + current->str();
         current->start(*this);
         is_command_started = true;
       }
 
       if (!current->isDone(*this)) {return 10;}
 
-      stack_writer << "Finished command: " << current->str();
+      stack_writer << "Finished command: " + current->str();
       current->doneCallback(*this);
       is_command_started = false;
       m_stack.pop_front();
@@ -630,9 +457,6 @@ class Heda {
         this_thread::sleep_for(chrono::milliseconds(10));
       }
     }
-
-
-
 
     Shelf getWorkingShelf() {
       for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
