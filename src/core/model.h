@@ -102,6 +102,9 @@ class HedaConfig : public Model {
     double home_position_y;
     double home_position_t;
     double grip_offset;
+    double max_h;
+    double max_v;
+    double max_t;
 };
 
 class HedaConfigTable : public Table<HedaConfig> {
@@ -125,6 +128,9 @@ class HedaConfigTable : public Table<HedaConfig> {
       c.home_position_y = query.getColumn(12);
       c.home_position_t = query.getColumn(13);
       c.grip_offset = query.getColumn(14);
+      c.max_h = query.getColumn(15);
+      c.max_v = query.getColumn(16);
+      c.max_t = query.getColumn(17);
       return c;
     }
 
@@ -143,6 +149,9 @@ class HedaConfigTable : public Table<HedaConfig> {
       query.bind(12, item.home_position_y);
       query.bind(13, item.home_position_t);
       query.bind(14, item.grip_offset);
+      query.bind(15, item.max_h);
+      query.bind(16, item.max_v);
+      query.bind(17, item.max_t);
     }
 };
 

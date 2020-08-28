@@ -42,6 +42,21 @@
   </div>
 
   <div class="field">
+    <%= form.label :max_h %>
+    <%= form.number_field :max_h , step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :max_v %>
+    <%= form.number_field :max_v , step: 0.01 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :max_t %>
+    <%= form.number_field :max_t , step: 0.01 %>
+  </div>
+
+  <div class="field">
     <%= form.label :home_position_x %>
     <%= form.number_field :home_position_x, step: 0.01 %>
   </div>

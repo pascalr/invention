@@ -9,11 +9,12 @@
 #include "core/two_way_stream.h"
 #include "core/reader/io_reader.h"
 #include "core/input_parser.h"
-#include "core/simulation.h"
+#include "core/fake_program.h"
 #include "lib/draw_matplotlib.h"
 #include "core/heda.h"
 #include "core/writer/log_writer.h"
 #include "core/writer/console_writer.h"
+#include "core/heda_controller.h"
       
 using namespace std;
 
@@ -54,9 +55,16 @@ void draw(Program& p) {
   renderScene(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X, -OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z, "Position du bras");
 }
 
+void mySignalHandler( int signum ) {
+  std::cout << "Interrupt signal (" << signum << ") received.\n";
+  this_thread::sleep_for(chrono::milliseconds(100));
+  std::terminate();
+  exit(signum);
+}
+
 int main (int argc, char *argv[]) {
 
-  signal(SIGINT, signalHandler);
+  signal(SIGINT, mySignalHandler);
 
   Database db(DB_TEST);
 
@@ -68,15 +76,23 @@ int main (int argc, char *argv[]) {
 
   ConsoleWriter hedaOutputWriter;
 
-  Simulation simulation(hedaOutput, simulationOut); // reader, writer
+  FakeProgram simulation(simulationOut, hedaOutput); // writer, reader
+
+  TwoWayStream hedaToServerStream;
+  LogWriter hedaToServerLogStream("\033[37mTo server\033[0m", hedaToServerStream);
+
   Heda heda(hedaOut, hedaInput, db, hedaOutputWriter); 
 
-  while (true) {
-    string input;
-    cout << ">> ";
-    cin >> input;
-    heda.execute(input);
-  }
+  thread simulation_thread([&]() {
+    while (true) {
+      draw(simulation);
+      this_thread::sleep_for(chrono::milliseconds(20));
+    }
+  });
+
+  HedaController c(heda);
+  IOReader reader;
+  c.loopCommandStack(reader);
 
   /*
   IOReader userInput;

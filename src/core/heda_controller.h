@@ -58,15 +58,17 @@ class HedaController {
         double dest = tokens.popScalaire();
         heda.move(Movement(axis,dest));
       };
-      m_commands["sweep"] = [&](ParseResult tokens) {heda.sweep();};
+      m_commands["sweep"] = [&](ParseResult tokens) {
+        heda.pushCommand(make_shared<SweepCommand>());
+      };
       m_commands["grab"] = [&](ParseResult tokens) {
         double strength = tokens.popScalaire();
         cout << "Executing grab with strength = " << strength << endl;
         heda.pushCommand(make_shared<GrabCommand>(strength));
       };
       m_commands["capture"] = [&](ParseResult tokens) {heda.capture();};
-      m_commands["detect"] = [&](ParseResult tokens) {heda.detect();};
-      m_commands["parse"] = [&](ParseResult tokens) {heda.parse();};
+      m_commands["detect"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<DetectCommand>());};
+      m_commands["parse"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<ParseCodesCommand>());};
       m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();}; // FIXME: The user should not be able to do this easily..
       m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pinpoint();};
       //m_commands["calibrate"] = [&](ParseResult tokens) {heda.calibrate();};

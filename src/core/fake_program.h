@@ -7,32 +7,21 @@
 
 class FakeProgram : public Program {
   public:
-    FakeProgram() : Program(m_writer, m_reader) {
-    }
+    FakeProgram(Writer& writer0, Reader& reader0) : Program(writer0, reader0), writer(writer0), reader(reader0) {}
 
     Writer& getWriter() {
-      return m_writer;
+      return writer;
     }
 
     Reader& getReader() {
-      return m_reader;
+      return reader;
     } 
-
-    void setFakeInput(const char* str) {
-      m_reader.setFakeInput(str);
-    }
-    
-    void setFakeInput(std::string& str) {
-      m_reader.setFakeInput(str);
-    }
 
     void sleepMs(int time);
 
     void setCurrentTime(unsigned long time) {
       currentTime = time;
     }
-
-    void execute(const char* dest);
 
     void move(char axis, double destination);
 
@@ -42,10 +31,8 @@ class FakeProgram : public Program {
       return currentTime;
     }
 
-  protected:
-
-    FakeReader m_reader;
-    ConsoleWriter m_writer;
+    Writer& writer;
+    Reader& reader;
 };
 
 

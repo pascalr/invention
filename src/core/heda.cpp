@@ -15,6 +15,13 @@ class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 class InvalidGrippedJarFormatException : public exception {};
 
+void ParseCodesCommand::start(Heda& heda) {
+  for (size_t i = 0; i < heda.codes.items.size(); i++) {
+    DetectedHRCode& code = heda.codes.items[i];
+    parseJarCode(code);
+    heda.db.update(heda.codes, code);
+  }
+}
     
 void MetaCommand::start(Heda& heda) {
   setup(heda);
@@ -26,6 +33,52 @@ void MetaCommand::start(Heda& heda) {
 void OpenGripCommand::doneCallback(Heda& heda) {
   heda.gripped_jar.id = -1;
   heda.is_gripping = false;
+}
+    
+/*PolarCoord toolCartesianToPolar(const CartesianCoord c) {
+
+  double t = (asin(c(2) / CLAW_RADIUS) * 180.0 / PI);
+  if (c(0) < X_MIDDLE) {
+    t = 180 - t;
+  }
+  double deltaX = cosd(t) * CLAW_RADIUS;
+  PolarCoord r;
+  r << c(0)-deltaX, c(1), t;
+  return r;
+}*/
+void SweepCommand::setup(Heda& heda) {
+
+  heda.db.clear(heda.codes);
+  
+  PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
+
+  //heda.shelves.orderBy(shelfHeightCmp);
+  //for (const Shelf& shelf : heda.shelves) {
+  Shelf shelf = heda.getWorkingShelf();
+
+  int nStepX = 5;
+  int nStepZ = 5;
+  for (int i = 0; i < nStepX; i++) {
+    for (int j = 0; j < nStepZ; j++) {
+
+      // These are the cartesian coordinates of the polar coordinate system. (Not UserCoord)
+      double x = i*max.h/nStepX;
+      double z = j*heda.config.gripper_radius/nStepZ;
+
+      // t is between -90 and 90. So to get between 180 and 90, if the arm if smaller than the middle, do t=180-t
+      double t = (asin(z / heda.config.gripper_radius) * 180.0 / PI);
+      if (x < max.h / 2) {
+        t = 180 - t;
+      }
+      double deltaX = cosd(t) * heda.config.gripper_radius;
+
+      PolarCoord p = PolarCoord(x-deltaX, heda.unitV(shelf.moving_height), t);
+      commands.push_back(make_shared<GotoCommand>(p));
+      commands.push_back(make_shared<DetectCommand>());
+    }
+  }
+
+  commands.push_back(make_shared<ParseCodesCommand>());
 }
 
 // Get lower, either to pickup, or to putdown
@@ -227,14 +280,6 @@ void StoreCommand::doneCallback(Heda& heda) {
   }
 }
 
-void Heda::sweep() {
-  std::cout << "Heda::sweep()\n";
-  db.clear(codes);
-  vector<Movement> mvts;
-  calculateSweepMovements(*this, mvts);
-  move(mvts);
-}
-
 void Heda::pinpoint() {
   for (size_t i = 0; i < codes.items.size(); i++) {
     DetectedHRCode& code = codes.items[i];
@@ -243,18 +288,10 @@ void Heda::pinpoint() {
   }
 }
 
-void Heda::parse() {
-  for (size_t i = 0; i < codes.items.size(); i++) {
-    DetectedHRCode& code = codes.items[i];
-    parseJarCode(code);
-    db.update(codes, code);
-  }
-}
-
-void Heda::detect() {
+void DetectCommand::start(Heda& heda) {
   Mat frame;
-  captureFrame(frame);
-  detectCode(*this, frame, getPosition());
+  heda.captureFrame(frame);
+  detectCode(heda, frame, heda.getPosition());
 }
 
 void Heda::capture() {

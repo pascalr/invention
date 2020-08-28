@@ -182,7 +182,24 @@ class GotoCommand : public MetaCommand {
 class PutdownCommand : public MetaCommand {
   public:
     string str() {return "putdown";}
-  protected:
+    void setup(Heda& heda);
+};
+
+class ParseCodesCommand : public HedaCommand {
+  public:
+    string str() {return "parse";}
+    void start(Heda& heda);
+};
+
+class DetectCommand : public HedaCommand {
+  public:
+    string str() {return "detect";}
+    void start(Heda& heda);
+};
+
+class SweepCommand : public MetaCommand {
+  public:
+    string str() {return "sweep";}
     void setup(Heda& heda);
 };
 
@@ -257,9 +274,6 @@ class Heda {
     void retreive() {
     }
 
-    void sweep();
-    void detect();
-    void parse();
     void pinpoint();
     void fetch(std::string ingredientName);
 
@@ -458,6 +472,15 @@ class Heda {
 
       return 0;
     }
+    
+    Shelf getWorkingShelf() {
+      for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
+        if (it->id == config.working_shelf_id) {
+          return *it;
+        }
+      }
+      throw NoWorkingShelfException();
+    }
 
   protected:
 
@@ -492,14 +515,6 @@ class Heda {
       }
     }
 
-    Shelf getWorkingShelf() {
-      for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
-        if (it->id == config.working_shelf_id) {
-          return *it;
-        }
-      }
-      throw NoWorkingShelfException();
-    }
 
     std::mutex commandsMutex;
 

@@ -93,7 +93,7 @@ add_executable( heda src/heda.cpp )
 
 #add_executable( test_heda src/test/heda.cpp )
 
-#add_executable( simulation src/simulation.cpp )
+add_executable( simulation src/simulation.cpp )
 
 add_executable( server src/server.cpp )
 
