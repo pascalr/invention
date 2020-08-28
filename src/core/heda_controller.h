@@ -93,12 +93,12 @@ class HedaController {
     
     }
 
-    // Commands can be split with a semicolon (;)
+    // Commands can be split with a newline (\n)
     // FIXME: Don't execute the commands as soon as I get them. Stack them. Add a ServerCommand or something to the stack.
     // But check for the stop command.
     void execute(string str) {
 
-      string::size_type pos = str.find(';');
+      string::size_type pos = str.find('\n');
       string cmd = (pos == string::npos) ? str : str.substr(0, pos);
 
       cerr << "Executing cmd = " << cmd << "\n";
@@ -116,7 +116,7 @@ class HedaController {
         }
       }
       if (!found) {
-        cerr << "Error unkown command: " << result.getCommand();
+        cerr << "Error unkown command: " << result.getCommand() << "\n";
       }
 
       if (pos != string::npos) {execute(str.substr(pos+1));}

@@ -78,6 +78,7 @@ class Motor {
     }
 
     bool isDestinationReached() {
+      if (!isReferenced) {return true;}
       return (isForward && getPosition() >= getDestination()) ||
              (!isForward && getPosition() <= getDestination());
     }

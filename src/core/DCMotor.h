@@ -79,6 +79,11 @@ class DCMotor : public Motor {
     }
 
     bool handleAxis(unsigned long currentTime) {
+
+#ifndef ARDUINO
+      return false;
+#endif
+
       if (m_duty_cycle == 0) {return false;}
       
       m_encoder.checkPosition(currentTime, isForward);

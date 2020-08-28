@@ -47,6 +47,9 @@ class LimitSwitchReferencer {
     LimitSwitchReferencer() {}
     LimitSwitchReferencer(int pin) : m_pin(pin) {}
     bool isReferenceReached() {
+#ifndef ARDUINO
+      return true;
+#endif
       if (m_pin == -1) {return true;}
       return digitalRead(m_pin) == HIGH;
     }

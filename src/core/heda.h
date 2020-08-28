@@ -221,10 +221,16 @@ class Heda {
     }
 
     void loadDb() {
+
       db.load(configs);
       if (configs.empty()) {throw MissingConfigException();}
       config = *configs.begin();
+
       db.load(shelves);
+      if (!shelves.get(working_shelf, config.working_shelf_id)) {
+        throw NoWorkingShelfException();
+      }
+
       db.load(codes);
       db.load(jar_formats);
       db.load(jars);
@@ -363,7 +369,7 @@ class Heda {
       double offsetY = config.user_coord_offset_y;
       double offsetZ = config.user_coord_offset_z;
       // The x axis and the z axis are reverse (hence * -1)
-      return UserCoord(p.h + (cosd(p.t) * reference) + offsetX,
+      return UserCoord(p.h - (cosd(p.t) * reference) + offsetX,
                   p.v+offsetY,
                   ((sind(p.t) * reference)*-1)+offsetZ);
     }
@@ -472,16 +478,9 @@ class Heda {
 
       return 0;
     }
-    
-    Shelf getWorkingShelf() {
-      for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
-        if (it->id == config.working_shelf_id) {
-          return *it;
-        }
-      }
-      throw NoWorkingShelfException();
-    }
 
+    Shelf working_shelf;
+    
   protected:
 
     void askPosition() {

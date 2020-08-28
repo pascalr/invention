@@ -8,14 +8,20 @@ class IOReader : public Reader {
   public:
 
     bool inputAvailable() {
-      return linuxInputAvailable();
+
+      if (hadInput) {return true;}
+
+      return (hadInput = linuxInputAvailable());
     }
 
     int getByte() {
       char c;
       cin.get(c);
+      if (c == '\n') {hadInput = false;}
       return c;
     }
+
+    bool hadInput = false;
 
 };
 

@@ -52,10 +52,6 @@ void SweepCommand::setup(Heda& heda) {
   
   PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
 
-  //heda.shelves.orderBy(shelfHeightCmp);
-  //for (const Shelf& shelf : heda.shelves) {
-  Shelf shelf = heda.getWorkingShelf();
-
   int nStepX = 5;
   int nStepZ = 5;
   for (int i = 0; i < nStepX; i++) {
@@ -72,7 +68,7 @@ void SweepCommand::setup(Heda& heda) {
       }
       double deltaX = cosd(t) * heda.config.gripper_radius;
 
-      PolarCoord p = PolarCoord(x-deltaX, heda.unitV(shelf.moving_height), t);
+      PolarCoord p = PolarCoord(x-deltaX, heda.unitV(heda.working_shelf.moving_height), t);
       commands.push_back(make_shared<GotoCommand>(p));
       commands.push_back(make_shared<DetectCommand>());
     }

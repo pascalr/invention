@@ -18,41 +18,46 @@
       
 using namespace std;
 
+void drawArm(Heda& heda, Program& p) {
+  vector<double> x(2);
+  vector<double> z(2);
 
-void drawToolPosition(double x, double z) {
-  drawPoint(x, z);
+  UserCoord basePos = heda.toUserCoord(PolarCoord(p.baseAxisX.getPosition(),0,0), 0.0);
+  UserCoord toolPosition = heda.toUserCoord(PolarCoord(p.baseAxisX.getPosition(),0,p.axisT.getPosition()), heda.config.gripper_radius);
+
+  x[0] = basePos.x;
+  x[1] = toolPosition.x;
+  z[0] = basePos.z;
+  z[1] = toolPosition.z;
+  drawLines(x,z);
 }
 
-/*void drawArmCenterAxis(Program& p) {
+void drawAxisH(Heda& heda) {
   vector<double> x(2);
   vector<double> z(2);
-
-  x[0] = p.baseAxisX.getPosition();
-  x[1] = p.baseAxisX.getPosition();
-  z[0] = p.axisZ.getPosition();
-  z[1] = 0.0;
-  drawLines(x,z);
-}*/
-
-void drawPossibleXPosition(double maxX) {
-  vector<double> x(2);
-  vector<double> z(2);
-  x[0] = 0.0;
-  x[1] = maxX;
-  z[0] = 0.0;
-  z[1] = 0.0;
+  x[0] = heda.config.user_coord_offset_x;
+  z[0] = heda.config.user_coord_offset_z;
+  x[1] = heda.config.user_coord_offset_x + heda.config.max_h;
+  z[1] = heda.config.user_coord_offset_z;
   drawLines(x,z,"k-");
 }
 
-void draw(Program& p) {
+void draw(Program& p, Heda& heda) {
  
   beforeRenderScene(); 
   
-  drawPossibleXPosition(p.baseAxisX.getMaxPosition());
-  //drawArmCenterAxis(p);
+  drawAxisH(heda);
+  
+  drawArm(heda, p);
+  
+  UserCoord toolPosition = heda.toUserCoord(PolarCoord(p.baseAxisX.getPosition(),0,p.axisT.getPosition()), heda.config.gripper_radius);
+  drawPoint(toolPosition.x, toolPosition.z);
+
   //drawToolPosition(p.baseAxisX.getPosition(),p.axisZ.getPosition());
 
-  renderScene(-OFFSET_X, ARMOIRE_WIDTH-OFFSET_X, -OFFSET_Z, ARMOIRE_DEPTH-OFFSET_Z, "Position du bras");
+  double deltaZ = heda.config.user_coord_offset_z - heda.working_shelf.depth;
+  double z = heda.config.user_coord_offset_z + deltaZ;
+  renderScene(0, heda.working_shelf.width, 0, z, "Position du bras");
 }
 
 void mySignalHandler( int signum ) {
@@ -77,6 +82,7 @@ int main (int argc, char *argv[]) {
   ConsoleWriter hedaOutputWriter;
 
   FakeProgram simulation(simulationOut, hedaOutput); // writer, reader
+  setupAxes(simulation);
 
   TwoWayStream hedaToServerStream;
   LogWriter hedaToServerLogStream("\033[37mTo server\033[0m", hedaToServerStream);
@@ -85,14 +91,29 @@ int main (int argc, char *argv[]) {
 
   thread simulation_thread([&]() {
     while (true) {
-      draw(simulation);
-      this_thread::sleep_for(chrono::milliseconds(20));
+      draw(simulation, heda);
+      this_thread::sleep_for(chrono::milliseconds(50));
     }
   });
 
   HedaController c(heda);
+
+  simulation.setCurrentTime(1000);
+
   IOReader reader;
-  c.loopCommandStack(reader);
+  while (true) {
+    if(reader.inputAvailable()) {
+      string cmd = getInputLine(reader);
+      c.execute(cmd);
+    }
+    //for (int i = 0; i < 1000; i++) {
+    //}
+    simulation.setCurrentTime(simulation.getCurrentTime() + 20000);
+    myLoop(simulation);
+    heda.handleCommandStack();
+    this_thread::sleep_for(chrono::milliseconds(1));
+  }
+  
 
   /*
   IOReader userInput;

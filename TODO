@@ -1,5 +1,9 @@
 Ok I need to prioritize what I am working on. This will be an ordered list.
 
+Heda should be restarted after a config change.
+
+Calculate the price of a recipee. This will be used to calculate the savings of having the machine. A priority.
+
 Une pince comme un peigne pour soulever les pots lourds.
 
 Dont do heda.execute in the server, instead read from heda in the loopCommandStack

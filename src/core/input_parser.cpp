@@ -49,7 +49,11 @@ int parseActionCommand(char cmd, Program& p) {
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
     if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+#ifdef ARDUINO
     motorAxis->startReferencing();
+#else
+    if (motorAxis->getName() != p.axisR.getName()) {motorAxis->startReferencing();}
+#endif
 
   // Wait or sleep for some time
   } else if (cmd == 'w' || cmd == 'W') {
@@ -58,12 +62,16 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Release
   } else if (cmd == 'r' || cmd == 'R') {
+#ifdef ARDUINO
     p.axisR.release();
+#endif
 
   // Grab
   } else if (cmd == 'g' || cmd == 'G') {
     if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+#ifdef ARDUINO
     p.axisR.grab(number);
+#endif
 
   // Move forward
   } else if (cmd == '+') {
@@ -135,7 +143,8 @@ void myLoop(Program& p) {
 
   bool stillWorking = false;
   for (int i = 0; p.motors[i] != 0; i++) {
-    stillWorking = p.motors[i]->work(p, p.getCurrentTime()) || stillWorking;
+    bool isWorking = p.motors[i]->work(p, p.getCurrentTime());
+    stillWorking = isWorking || stillWorking;
   }
 
   if (!stillWorking) {
