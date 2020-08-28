@@ -18,6 +18,6 @@
 <%= render_async heda_status_path, interval: 1000, event_name: "logoutput-loaded", container_id: 'async-container'  %>
 
 <%= label_tag(:output)  %>
-<%= text_area_tag :output, nil, :size =>"100x10", :id => "logoutput", :readonly => true %>
+<%= text_area_tag :output, nil, :size =>"100x20", :id => "logoutput", :readonly => true %>
 
 <%= javascript_pack_tag 'heda_index' %>

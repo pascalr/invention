@@ -48,6 +48,11 @@ class HedaCommand {
   public:
 
     virtual string str() = 0;
+    virtual string allStr(int level = 0) {
+      string s;
+      for (int i = 0; i < level; i++) {s += '-';}
+      return s + str();
+    }
 
     virtual void start(Heda& heda) = 0;
 
@@ -56,6 +61,8 @@ class HedaCommand {
     }
 
     virtual void doneCallback(Heda& heda) {}
+    
+    virtual void setup(Heda& heda) {};
 };
 
 using HedaCommandPtr = shared_ptr<HedaCommand>;
@@ -120,15 +127,28 @@ class MoveCommand : public SlaveCommand {
 class MetaCommand : public HedaCommand {
   public:
 
+    string allStr(int level = 0) {
+      string s;
+      for (int i = 0; i < level; i++) {s += '-';}
+      s += str();
+      for (auto cmd : commands) {
+        s += '\n' + cmd->allStr(level+1);
+      }
+      return s;
+    }
+
     void start(Heda& heda);
 
     bool isDone(Heda& heda);
+
+    bool isMeta() {return true;}
+    
+    virtual void setup(Heda& heda) = 0;
 
   protected:
 
     vector<shared_ptr<HedaCommand>> commands;
     vector<shared_ptr<HedaCommand>>::iterator currentCommand;
-    virtual void setup(Heda& heda) = 0;
 };
 
 class GripCommand : public MetaCommand {
@@ -290,13 +310,14 @@ class Heda {
     void pushCommand(shared_ptr<HedaCommand> cmd) {
 
       stack_writer << "Pushing command: " + cmd->str();
-      std::lock_guard<std::mutex> guard(commandsMutex);
+//      std::lock_guard<std::mutex> guard(commandsMutex);
+      cmd->setup(*this);
       m_stack.push_back(cmd);
       calculatePendingCommands();
     }
 
     void stop() {
-      std::lock_guard<std::mutex> guard(commandsMutex);
+//      std::lock_guard<std::mutex> guard(commandsMutex);
       m_stack.clear();
       m_pending_commands.clear();
       gripped_jar.id = -1;
@@ -309,7 +330,7 @@ class Heda {
     // Get the state of the arduino and set Heda with it. (I dont change arduino much now,
     // mainly Heda. So this avoids doing a reference every time I change something to Heda.)
     void sync() {
-      std::lock_guard<std::mutex> guard(commandsMutex);
+//      std::lock_guard<std::mutex> guard(commandsMutex);
       askPosition();
     }
 
@@ -317,26 +338,17 @@ class Heda {
       m_writer << "?";
     }
 
-    void calculatePendingCommands() {
+    void calculatePendingCommands(int level = 0) {
       m_pending_commands = "";
-      // FIXME: Pretty print the commands
-      /*for (const shared_ptr<HedaCommand>& cmd : m_stack) {
-        m_pending_commands += m_commands.at(cmd->type).name;
-        m_pending_commands += "\n";
-      }*/
+      for (const shared_ptr<HedaCommand>& cmd : m_stack) {
+        m_pending_commands += cmd->allStr() + "\n";
+      }
     }
 
     string getPendingCommands() {
       return m_pending_commands;
     }
     
-    string getCurrentCommand() {
-      // FIXME: Pretty print the commands
-      return "";
-      //if (m_stack.empty()) {return "";}
-      //return m_commands.at(m_stack.front()->type).name;
-    }
-
     double unitV(double unitY) {
       return unitY - config.user_coord_offset_y;
     }
@@ -457,9 +469,9 @@ class Heda {
     // returns the time to sleep
     int handleCommandStack() {
 
-      std::lock_guard<std::mutex> guard(commandsMutex);
+//      std::lock_guard<std::mutex> guard(commandsMutex);
 
-      if (m_stack.empty()) {return 100;}
+      if (m_stack.empty() || is_paused) {return 100;}
 
       shared_ptr<HedaCommand>& current = *m_stack.begin();
       if (!is_command_started) {
@@ -480,12 +492,14 @@ class Heda {
     }
 
     Shelf working_shelf;
+
+    bool is_paused = false;
     
   protected:
 
     void askPosition() {
       
-      // TODO: Assert already in this mutex. std::lock_guard<std::mutex> guard(commandsMutex);
+//      // TODO: Assert already in this mutex. std::lock_guard<std::mutex> guard(commandsMutex);
       m_writer << "@";
 
       bool receivedMessagePosition = false;
@@ -515,7 +529,7 @@ class Heda {
     }
 
 
-    std::mutex commandsMutex;
+//    std::mutex commandsMutex;
 
     string m_pending_commands;
 

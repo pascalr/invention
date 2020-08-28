@@ -1,4 +1,7 @@
 
+<%= label_tag(:is_paused)  %>
+<%= text_field_tag :is_paused, @is_paused, readonly: true %><br/>
+
 <%= label_tag(:tool_position)  %>
 <%= text_field_tag :tool_position, @tool_position, readonly: true %><br/>
 
@@ -9,6 +12,6 @@
 <%= text_field_tag :gripped_jar_format_id, @gripped_jar_format_id, readonly: true %><br/>
 
 <%= label_tag(:pending)  %>
-<%= text_area_tag :pending, @pending || 'aucun', size: "100x10", readonly: true %><br/>
+<%= text_area_tag :pending, @pending || 'aucun', id: "pending_commands", size: "100x40", readonly: true %><br/>
 
 <span id="logoutputdata" hidden><%= @output %></span>

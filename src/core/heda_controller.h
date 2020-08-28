@@ -10,6 +10,8 @@ class HedaController {
      
       // at throws a out of range exception 
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
+      m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
+      m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
 
       m_commands["home"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<ReferencingCommand>(heda.axisR));
@@ -24,6 +26,7 @@ class HedaController {
       m_commands["gohome"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.config.home_position_x, heda.config.home_position_y, heda.config.home_position_t)));
       };
+
 
       m_commands["store"] = [&](ParseResult tokens) {
         string name = "";
@@ -93,6 +96,16 @@ class HedaController {
     
     }
 
+    std::function<void(ParseResult)> getCommand(string name) {
+       
+      for (auto item : m_commands) { // I am not using map[key] because I want to compare without case. OPTIMIZE better data structure to do this.
+        if (iequals(item.first, name)) {
+          return item.second;
+        }
+      }
+      return 0;
+    }
+
     // Commands can be split with a newline (\n)
     // FIXME: Don't execute the commands as soon as I get them. Stack them. Add a ServerCommand or something to the stack.
     // But check for the stop command.
@@ -108,16 +121,9 @@ class HedaController {
       ParseResult result;
       parser.parse(result, cmd);
 
-      bool found = false;
-      for (auto item : m_commands) {
-        if (iequals(item.first, result.getCommand())) {
-          item.second(result);
-          found = true; break;
-        }
-      }
-      if (!found) {
-        cerr << "Error unkown command: " << result.getCommand() << "\n";
-      }
+      auto func = getCommand(result.getCommand());
+      if (func) {func(result);}
+      else {cerr << "Error unkown command: " << result.getCommand() << "\n"; return;}
 
       if (pos != string::npos) {execute(str.substr(pos+1));}
     }

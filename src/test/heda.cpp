@@ -114,7 +114,7 @@ void testHomeCommand() {
 
 }*/
 
-void testPosition() {
+/*void testPosition() {
   title("testPosition");
 
   StreamWriter ss;
@@ -142,14 +142,38 @@ void testPosition() {
   assertEqual("shelfByHeight", 3, heda.shelfByHeight(500));
 
   cout << "-----------Position!!!: " << heda.toPolarCoord(UserCoord(0.0, 772.0 + 95.0 + 4, 0.0), 10.0);
+}*/
+
+void testMetaSweep() {
+  title("testMetaSweep");
 }
 
 int main (int argc, char *argv[]) {
 
   signal(SIGINT, signalHandler);
 
-  //testSweep();
-  testPosition();
+  Database db(DB_TEST);
+
+  TwoWayStream hedaInput;
+  TwoWayStream hedaOutput;
+
+  LogWriter simulationOut = LogWriter("Simulation output", hedaInput);
+  LogWriter hedaOut = LogWriter("Heda output", hedaOutput);
+
+  ConsoleWriter hedaOutputWriter;
+
+  FakeProgram simulation(simulationOut, hedaOutput); // writer, reader
+  setupAxes(simulation);
+
+  TwoWayStream hedaToServerStream;
+  LogWriter hedaToServerLogStream("\033[37mTo server\033[0m", hedaToServerStream);
+
+  Heda heda(hedaOut, hedaInput, db, hedaOutputWriter); 
+
+  HedaController c(heda);
+
+  testMetaSweep();
+  //testPosition();
   //testHomeCommand();
   //testSharedReader();
   //testCommandWriter();

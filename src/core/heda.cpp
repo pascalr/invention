@@ -9,6 +9,7 @@
 #include "jar_packer.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+using namespace std;
 
 class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
@@ -24,7 +25,6 @@ void ParseCodesCommand::start(Heda& heda) {
 }
     
 void MetaCommand::start(Heda& heda) {
-  setup(heda);
   currentCommand = commands.begin();
   (*currentCommand)->start(heda);
   heda.stack_writer << "Sub: Starting command: " + (*currentCommand)->str();
@@ -58,13 +58,13 @@ void SweepCommand::setup(Heda& heda) {
     for (int j = 0; j < nStepZ; j++) {
 
       // These are the cartesian coordinates of the polar coordinate system. (Not UserCoord)
-      double x = i*max.h/nStepX;
-      double z = j*heda.config.gripper_radius/nStepZ;
+      double x = i*1.0*max.h/nStepX;
+      double z = j*1.0*heda.config.gripper_radius/nStepZ;
 
       // t is between -90 and 90. So to get between 180 and 90, if the arm if smaller than the middle, do t=180-t
       double t = (asin(z / heda.config.gripper_radius) * 180.0 / PI);
       if (x < max.h / 2) {
-        t = 180 - t;
+        t = 180.0 - t;
       }
       double deltaX = cosd(t) * heda.config.gripper_radius;
 

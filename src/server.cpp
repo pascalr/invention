@@ -151,7 +151,6 @@ int main(int argc, char** argv) {
     ss << "{";
     writeJson(ss, "pos", heda.getPosition());
     writeJson(ss, "toolPos", heda.getToolPosition());
-    writeJson(ss, "cmd", heda.getCurrentCommand());
     writeJson(ss, "pending", heda.getPendingCommands());
     writeJson(ss, "output", getAllAvailable(serverReader));
     ss << "\"" << "gripped_jar_format_id" << "\": " << heda.gripped_jar.jar_format_id;
@@ -160,9 +159,9 @@ int main(int argc, char** argv) {
     ptree pt;
     pt.put("pos", heda.getPosition());
     pt.put("toolPos", heda.getToolPosition());
-    pt.put("cmd", heda.getCurrentCommand());
     pt.put("pending", heda.getPendingCommands());
     pt.put("output", getAllAvailable(serverReader));
+    pt.put("isPaused", heda.is_paused);
     pt.put("gripped_jar_format_id", heda.gripped_jar.jar_format_id);
     stringstream ss;
     json_parser::write_json(ss, pt);
