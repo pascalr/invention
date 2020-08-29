@@ -4,8 +4,11 @@
 
 <%= ingredient_quantity.ingredient.name %>
 
-. Costs:
-<%= number_with_precision(ingredient_quantity.cost, precision: 2) %>
+(<%= number_with_precision(ingredient_quantity.volume, precision: 2)  %> mL)
+
+[<%= number_with_precision(ingredient_quantity.weight, precision: 2)  %> g]
+
+-> <%= number_with_precision(ingredient_quantity.cost, precision: 2) %>
 $
 
 <br/>

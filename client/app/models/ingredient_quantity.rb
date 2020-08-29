@@ -18,4 +18,16 @@ class IngredientQuantity < ApplicationRecord
     return ingredient.cost * qty / ingredient.quantity
   end
 
+  def weight
+    return value * unit.value if unit.is_weight
+    return 0 if not ingredient.density
+    return value * unit.value * ingredient.density
+  end
+
+  def volume
+    return value * unit.value if not unit.is_weight
+    return 0 if not ingredient.density
+    return (value * unit.value) / ingredient.density
+  end
+
 end

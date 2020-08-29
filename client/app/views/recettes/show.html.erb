@@ -11,7 +11,12 @@
 </p>
 
 <p>
-  <strong>Ingredients:</strong>
+  <strong>Weight:</strong>
+  <%= number_with_precision(@recette.weight, precision: 2) %>g
+</p>
+
+<p>
+  <strong>Ingredients:</strong><br/>
   <%= render @recette.ingredient_quantities %>
 </p>
 
