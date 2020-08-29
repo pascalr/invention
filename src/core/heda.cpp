@@ -25,6 +25,7 @@ void ParseCodesCommand::start(Heda& heda) {
 }
     
 void MetaCommand::start(Heda& heda) {
+  setup(heda);
   currentCommand = commands.begin();
   (*currentCommand)->start(heda);
   heda.stack_writer << "Sub: Starting command: " + (*currentCommand)->str();
