@@ -32,6 +32,7 @@ client/Gemfile.lock
 
 # Ignore the default SQLite database.
 client/db/*.sqlite3
+client/db/*.sqlite3.backup
 client/db/*.sqlite3-journal
 client/db/*.sqlite3-*
 
