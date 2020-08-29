@@ -103,10 +103,31 @@ class Database {
       cout << ss.str() << endl;
       db.exec(ss.str());
 
+      vector<T>::iterator toRemove = table.items.end();
       for (auto it = table.items.begin(); it != table.items.end(); it++) {
-        if (it->id == item.id) {table.items.erase(it);}
+        if (it->id == item.id) {toRemove = it; break;}
+      }
+      if (toRemove != table.items.end()) {
+        table.items.erase(toRemove);
       }
     }*/
+
+    template<class T> 
+    void removeItem(Table<T>& table, int id) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+    
+      stringstream ss; ss << "DELETE FROM " << table.getTableName() << " WHERE id = " << id;
+      cout << ss.str() << endl;
+      db.exec(ss.str());
+
+      typename vector<T>::iterator toRemove = table.items.end();
+      for (auto it = table.items.begin(); it != table.items.end(); it++) {
+        if (it->id == id) {toRemove = it; break;}
+      }
+      if (toRemove != table.items.end()) {
+        table.items.erase(toRemove);
+      }
+    }
 
     // I want to use the same format, so I am not using UPDATE query.
     // TODO: Add a table: __updates to handle this with table_name:string, to_remove_id:int, to_add_id:int, so no record is lost

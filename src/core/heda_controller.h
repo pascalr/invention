@@ -21,8 +21,15 @@ class HedaController {
 
     void process(Heda& heda, Recipe& recipe) {
 
-      // Ah! Do it inefficient but easily, loop through all the ingredient_quantities and delete one by one those where recipe_id = recipe.id
-      heda.db.clear(heda.ingredient_quantities); // FIXME: clear where recipe_id = recipe.id
+      vector<int> ids;
+      for (const IngredientQuantity& qty : heda.ingredient_quantities) {
+        if (qty.recipe_id == recipe.id) {
+          ids.push_back(qty.id);
+        }
+      }
+      for (const int& id : ids) {
+        heda.db.removeItem(heda.ingredient_quantities, id);
+      }
 
       is_processing_recipe = true;
       recipe_being_process = recipe;
@@ -180,6 +187,8 @@ class HedaController {
     // FIXME: Don't execute the commands as soon as I get them. Stack them. Add a ServerCommand or something to the stack.
     // But check for the stop command.
     void execute(string str) {
+
+      if (str.empty()) {return;}
 
       string::size_type pos = str.find('\n');
       string cmd = (pos == string::npos) ? str : str.substr(0, pos);
