@@ -60,6 +60,8 @@ bool ParseResult::checkArgument(TokenType type) {
 }
     
 string ParseResult::popNoun() {
+  
+  if (checkArgument(AXIS)) {return string(1,popAxis());}
 
   expectArgument(NOUN);
   

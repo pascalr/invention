@@ -1,0 +1,11 @@
+<%= ingredient_quantity.value %>
+
+<%= ingredient_quantity.unit.name %>
+
+<%= ingredient_quantity.ingredient.name %>
+
+. Costs:
+<%= number_with_precision(ingredient_quantity.cost, precision: 2) %>
+$
+
+<br/>

@@ -7,8 +7,10 @@ Good TODO list:
 - Perfectionner les HRCode et relâcher.
 - Gérer les dates correctement des pots. Comme ça je vais pouvoir faire un inventaire et des suggestions de trucs qui devrait être manger bientôt.
 - Combien est-ce que ça coûterait avec un atelier?
+- Send error messages back to client.
 
 ----------
+
 
 ---------
 Feature list:
@@ -16,6 +18,9 @@ Feature list:
 Ne gaspillez plus de nourriture! Gestion automatique des dates des ingrédients. Recommandation des ingrédients dû à être manger bientôt.
 Tu te lève et ton café et ton pain frais t'attends!
 --------
+
+Parser les trucs au fur et à mesure que j'en ai de besoin. Parce que les trucs peuvent avoir des espaces. Par exemple:
+parseUnit => c. à thé
 
 Changer le système de monter/descendre pour qu'il ne fasse plus de bruit.
 Aussi, je tiendrais vraiment beaucoup à ce que le nouveau système soit simple à installer.

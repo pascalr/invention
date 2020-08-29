@@ -22,15 +22,45 @@ class Table {
     //virtual string getValues(const T& item) = 0;
     virtual void bindQuery(SQLite::Statement& query, const T& item) = 0;
     //virtual void bindQuery(SQLite::Statement& query, const T& item, int i) = 0;
-    int get(T& item, int id) {
+    bool get(T& item, int id) {
       for (auto it = items.begin(); it != items.end(); ++it) {
         if (it->id == id) {
           item = *it;
-          return 1;
+          return true;
         }
       }
-      return 0;
+      return false;
     }
+
+    bool ifind(T& t, string (*func)(const T&), string cmp) {
+      for (const T& i : items) {
+        if (iequals(func(i), cmp)) {
+          t = i;
+          return true;
+        }
+      }
+      return false;
+    }
+
+    template <class P>
+    bool find(T& t, P (*func)(const T&), P cmp) {
+      for (const T& i : items) {
+        if (func(i) == cmp) {
+          t = i;
+          return true;
+        }
+      }
+      return false;
+    }
+//    bool find(T& t, std::function<bool(const T&)> func) {
+//      for (const T& i : items) {
+//        if (func(i)) {
+//          t = i;
+//          return true;
+//        }
+//      }
+//      return false;
+//    }
 
     typename std::vector<T>::iterator begin() {
       return items.begin();
@@ -64,6 +94,11 @@ class Table {
     std::vector<T> items; // TODO: Make items protected
 
 };
+
+template <class T>
+string byName(T t) {
+  return t.name;
+}
 
 class Model {
   public:
@@ -358,6 +393,10 @@ class Ingredient : public Model {
   public:
     string name;
     int aliment_id;
+    double cost;
+    double quantity;
+    string unit_name;
+    double density;
 };
 
 class IngredientTable : public Table<Ingredient> {
@@ -370,6 +409,10 @@ class IngredientTable : public Table<Ingredient> {
       query.bind(2, item.aliment_id);
       query.bind(3, item.created_at);
       query.bind(4, item.updated_at);
+      query.bind(5, item.cost);
+      query.bind(6, item.quantity);
+      query.bind(7, item.unit_name);
+      query.bind(8, item.density);
     }
     
     Ingredient parseItem(SQLite::Statement& query) {
@@ -378,9 +421,112 @@ class IngredientTable : public Table<Ingredient> {
       i.aliment_id = query.getColumn(2);
       i.created_at = query.getColumn(3);
       i.updated_at = query.getColumn(4);
+      i.cost = query.getColumn(5);
+      i.quantity = query.getColumn(6);
+      i.unit_name = (const char*)query.getColumn(7);
+      i.density = query.getColumn(8);
       return i;
     }
 
+};
+
+class Unit : public Model {
+  public:
+    string name;
+    double value;
+    bool is_weight;
+};
+
+class UnitTable : public Table<Unit> {
+  public:
+    const char* TABLE_NAME = "units";
+    string getTableName() { return TABLE_NAME; };
+    
+    void bindQuery(SQLite::Statement& query, const Unit& item) {
+      query.bind(1, item.name);
+      query.bind(2, item.value);
+      query.bind(3, item.is_weight);
+      query.bind(4, item.created_at);
+      query.bind(5, item.updated_at);
+    }
+    
+    Unit parseItem(SQLite::Statement& query) {
+      Unit i;
+      i.name = (const char*)query.getColumn(1);
+      i.value = query.getColumn(2);
+      i.is_weight = (int)query.getColumn(3);
+      i.created_at = query.getColumn(4);
+      i.updated_at = query.getColumn(5);
+      return i;
+    }
+
+};
+
+
+class Recipe : public Model {
+  public:
+    string name;
+    string instructions;
+    double rating;
+};
+
+class RecipeTable : public Table<Recipe> {
+  public:
+    const char* TABLE_NAME = "recettes";
+    string getTableName() { return TABLE_NAME; };
+    
+    void bindQuery(SQLite::Statement& query, const Recipe& item) {
+      query.bind(1, item.name);
+      query.bind(2, item.instructions);
+      query.bind(3, item.rating);
+      query.bind(4, item.created_at);
+      query.bind(5, item.updated_at);
+    }
+    
+    Recipe parseItem(SQLite::Statement& query) {
+      Recipe i;
+      i.name = (const char*)query.getColumn(1);
+      i.instructions = (const char*)query.getColumn(2);
+      i.rating = query.getColumn(3);
+      i.created_at = query.getColumn(4);
+      i.updated_at = query.getColumn(5);
+      return i;
+    }
+
+};
+
+class IngredientQuantity : public Model {
+  public:
+    int recipe_id;
+    int ingredient_id;
+    double value;
+    int unit_id;
+};
+
+class IngredientQuantityTable : public Table<IngredientQuantity> {
+  public:
+    const char* TABLE_NAME = "ingredient_quantities";
+    string getTableName() { return TABLE_NAME; };
+    
+    void bindQuery(SQLite::Statement& query, const IngredientQuantity& item) {
+      query.bind(1, item.recipe_id);
+      query.bind(2, item.ingredient_id);
+      query.bind(3, item.value);
+      query.bind(4, item.created_at);
+      query.bind(5, item.updated_at);
+      query.bind(6, item.unit_id);
+    }
+    
+    IngredientQuantity parseItem(SQLite::Statement& query) {
+      IngredientQuantity i;
+      i.recipe_id = query.getColumn(1);
+      i.ingredient_id = query.getColumn(2);
+      i.value = query.getColumn(3);
+      i.created_at = query.getColumn(4);
+      i.updated_at = query.getColumn(5);
+      i.unit_id = query.getColumn(6);
+      return i;
+    }
 };
 
 class Shelf : public Model {

@@ -256,6 +256,9 @@ class Heda {
       db.load(jars);
       db.load(locations);
       db.load(ingredients);
+      db.load(units);
+      db.load(recipes);
+      db.load(ingredient_quantities);
     }
 
     void waitUntilNotWorking() {
@@ -425,7 +428,10 @@ class Heda {
     JarFormatTable jar_formats;
     JarTable jars;
     IngredientTable ingredients;
+    UnitTable units;
+    RecipeTable recipes;
     LocationTable locations;
+    IngredientQuantityTable ingredient_quantities;
     Database& db;
 
     bool isDoneWorking() {

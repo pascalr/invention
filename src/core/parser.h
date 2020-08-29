@@ -47,17 +47,12 @@ class WrongTypeArgumentException : public exception {
 class WrongTokenTypeException : public exception {};
 class EmptyCommandException : public exception {};
 
-// TODO: namespace Token. Token::Unit
+// TODO: namespace Token.
 
 class Token {
   public:
     virtual ~Token() {}
     virtual TokenType getType() = 0;
-};
-
-class Unit : public Token {
-  public:
-    TokenType getType() {return UNIT;}
 };
 
 class AxisToken : public Token {

@@ -6,6 +6,16 @@
 </p>
 
 <p>
+  <strong>Costs:</strong>
+  <%= number_with_precision(@recette.cost, precision: 2) %>$
+</p>
+
+<p>
+  <strong>Ingredients:</strong>
+  <%= render @recette.ingredient_quantities %>
+</p>
+
+<p>
   <strong>Instructions:</strong>
   <%= simple_format(@recette.instructions) %>
 </p>

@@ -3,15 +3,87 @@
 
 #include "heda.h"
 
+class EnsureException : public exception {};
+class UnitConversionException : public exception {};
+
 class HedaController {
   public:
 
+    void ensure(bool statement, const char* errorMessage) {
+      if (!statement) {
+        cerr << "\033[31mController error\033[0m: " << errorMessage << endl;
+        throw EnsureException();
+      }
+    }
+    
+    bool is_processing_recipe = false;
+    Recipe recipe_being_process;
+
+    void process(Heda& heda, Recipe& recipe) {
+
+      // Ah! Do it inefficient but easily, loop through all the ingredient_quantities and delete one by one those where recipe_id = recipe.id
+      heda.db.clear(heda.ingredient_quantities); // FIXME: clear where recipe_id = recipe.id
+
+      is_processing_recipe = true;
+      recipe_being_process = recipe;
+      execute(recipe.instructions);
+      is_processing_recipe = false;
+    }
+
+    double convert(double val, Unit fromUnit, Unit toUnit, double density) {
+
+      if (fromUnit.is_weight != toUnit.is_weight) {
+        if (fromUnit.is_weight) {
+          return val * (fromUnit.value / density) / toUnit.value;
+        } else {
+          return val * fromUnit.value / (toUnit.value / density);
+        }
+      }
+      return val * fromUnit.value / toUnit.value;
+    }
+
     HedaController(Heda& heda) : m_heda(heda) {
+
+      // ------- FIXME -------- All those are commands to the HedaController, not to Heda itself (they would not belong in a recipee!)-------------
      
       // at throws a out of range exception 
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
+      m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee
+        // Delete all the ingredient quantities 
+        Recipe recipe;
+        string name = tokens.popNoun();
+        ensure(heda.recipes.ifind(recipe, byName, name), "process command must have a valid recipe name");
+        process(heda, recipe);
+      };
+      m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();};
+      
+      // -----------------------------------------------------------------------------------------------------
+      
+      m_commands["ajouter"] = [&](ParseResult tokens) {
+
+        ensure(is_processing_recipe, "Must be processing recipe, because actually doing it is not implemented yet");
+
+        double s = tokens.popScalaire();
+        string unitName = tokens.popNoun();
+        string ingredientName = tokens.popNoun();
+
+        Unit unit;
+        Unit toUnit;
+        Ingredient ingredient;
+        ensure(heda.units.ifind(unit, byName, unitName), "ajouter must have a valid unit name");
+        ensure(heda.ingredients.ifind(ingredient, byName, ingredientName), "ajouter must have a valid ingredient name");
+        ensure(heda.units.ifind(toUnit, byName, ingredient.unit_name), "ingredient must have a valid unit");
+
+        IngredientQuantity qty;
+        qty.recipe_id = recipe_being_process.id;
+        qty.ingredient_id = ingredient.id;
+        qty.value = s;
+        //qty.value = convert(s, unit, toUnit, ingredient.density);
+        qty.unit_id = unit.id;
+        heda.db.insert(heda.ingredient_quantities, qty);
+      };
 
       m_commands["home"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<ReferencingCommand>(heda.axisR));
@@ -26,7 +98,6 @@ class HedaController {
       m_commands["gohome"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.config.home_position_x, heda.config.home_position_y, heda.config.home_position_t)));
       };
-
 
       m_commands["store"] = [&](ParseResult tokens) {
         string name = "";
@@ -72,7 +143,6 @@ class HedaController {
       m_commands["capture"] = [&](ParseResult tokens) {heda.capture();};
       m_commands["detect"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<DetectCommand>());};
       m_commands["parse"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<ParseCodesCommand>());};
-      m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();}; // FIXME: The user should not be able to do this easily..
       m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pinpoint();};
       //m_commands["calibrate"] = [&](ParseResult tokens) {heda.calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
@@ -122,8 +192,12 @@ class HedaController {
       parser.parse(result, cmd);
 
       auto func = getCommand(result.getCommand());
-      if (func) {func(result);}
-      else {cerr << "Error unkown command: " << result.getCommand() << "\n"; return;}
+      if (func) {
+        try {
+          func(result);
+        } catch (const EnsureException& e) {
+        } catch (const MissingArgumentException& e) {cerr << "Caught a missing argument exception" << endl;}
+      } else {cerr << "Error unkown command: " << result.getCommand() << "\n"; return;}
 
       if (pos != string::npos) {execute(str.substr(pos+1));}
     }

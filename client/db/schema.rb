@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_27_190706) do
+ActiveRecord::Schema.define(version: 2020_08_29_163507) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -78,11 +78,27 @@ ActiveRecord::Schema.define(version: 2020_08_27_190706) do
     t.index ["shelf_id"], name: "index_hedas_on_shelf_id"
   end
 
+  create_table "ingredient_quantities", force: :cascade do |t|
+    t.integer "recette_id", null: false
+    t.integer "ingredient_id", null: false
+    t.float "value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "unit_id", null: false
+    t.index ["ingredient_id"], name: "index_ingredient_quantities_on_ingredient_id"
+    t.index ["recette_id"], name: "index_ingredient_quantities_on_recette_id"
+    t.index ["unit_id"], name: "index_ingredient_quantities_on_unit_id"
+  end
+
   create_table "ingredients", force: :cascade do |t|
     t.string "name"
     t.integer "aliment_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "cost"
+    t.float "quantity"
+    t.string "unit_name"
+    t.float "density"
     t.index ["aliment_id"], name: "index_ingredients_on_aliment_id"
   end
 
@@ -152,9 +168,20 @@ ActiveRecord::Schema.define(version: 2020_08_27_190706) do
     t.float "moving_height"
   end
 
+  create_table "units", force: :cascade do |t|
+    t.string "name"
+    t.float "value"
+    t.boolean "is_weight"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   add_foreign_key "fdc_nutrients", "fdcs"
   add_foreign_key "fdc_nutrients", "nutrients"
   add_foreign_key "hedas", "shelves"
+  add_foreign_key "ingredient_quantities", "ingredients"
+  add_foreign_key "ingredient_quantities", "recettes"
+  add_foreign_key "ingredient_quantities", "units"
   add_foreign_key "ingredients", "aliments"
   add_foreign_key "locations", "shelves"
 end
