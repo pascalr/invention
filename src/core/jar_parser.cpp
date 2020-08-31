@@ -8,6 +8,107 @@
 #include <string>
 #include "../utils/constants.h"
 
+// These files are only included in order to debug, to manipulate the image
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+
+// I am having bad results with Tesseract. Probably implement my own OCR with openCV.
+// Detect the shapes (findCoutours), which should give me the number of characters approximatively.
+// (if the number of characters is even or odd, maybe skip this step for now)
+// And the contours gives me the side limits.
+// then recognize the characters with a dnn.
+
+string parseCharTesseract(Mat& im) {
+  tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
+  char config_name[] = "chars";
+  char* config_ptr = config_name;
+  //char config[][10] = {"chars"};
+  //ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
+  ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
+  ocr->SetPageSegMode(tesseract::PSM_SINGLE_CHAR);
+  ocr->SetVariable("user_defined_dpi", "300"); // FIXME: Is it
+  //ocr->SetVariable("user_words_suffix", "eng.user-words"); Does this work? Rebuild and retrain my own dictionnary I think with only words that can be content.
+  // But that means everytime a user adds a new product, it must retrain et rebuild everything??? Maybe, if it's fast to do...
+
+  ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
+  string outText = string(ocr->GetUTF8Text());
+  trim(outText);
+
+  ocr->End();
+
+  return outText;
+}
+
+string parseLineTesseract(Mat& im) {
+  tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
+  char config_name[] = "chars";
+  char* config_ptr = config_name;
+  //char config[][10] = {"chars"};
+  //ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
+  ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
+  ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
+  // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
+  ocr->SetVariable("user_defined_dpi", "300"); // FIXME: Is it
+  //ocr->SetVariable("user_words_suffix", "eng.user-words"); Does this work? Rebuild and retrain my own dictionnary I think with only words that can be content.
+  // But that means everytime a user adds a new product, it must retrain et rebuild everything??? Maybe, if it's fast to do...
+
+  ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
+  string outText = string(ocr->GetUTF8Text());
+  trim(outText);
+
+  ocr->End();
+
+  return outText;
+}
+
+void parseJarCode(DetectedHRCode& code) {
+
+  cout << "Loading image: " << code.imgFilename << endl;
+  Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
+  Mat mat;
+  cvtColor(gray, mat, COLOR_GRAY2BGR);
+
+  //BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
+  //double scale = gray.cols/110.0;
+  double scale = code.scale * 0.2799;
+  double topOffset = 10.0 * scale;
+  double charWidth = 12 * scale;
+  double charHeight = 26 * scale;
+  double lineInterspace = 24 * scale;
+
+  int nbLines = 4;
+  int pattern[nbLines] = {3,7,8,4}; // number of char per line
+  string rawHRCode[nbLines];
+
+  // Get the sub-matrices (minors) for every character.
+  for (int i = 0; i < nbLines; i++) {
+    int nbChar = pattern[i];
+    double y = i*lineInterspace + topOffset;
+    /*for (int j = 0; j < nbChar; j++) {
+      double x = (0.0+j-1.0*nbChar/2.0)*charWidth + mat.cols/2;
+      Rect r = Rect(x, y, charWidth*1.2, charHeight);
+      rectangle(mat, r, Scalar(0,0,255), 1, LINE_8);
+      Mat charMat(mat, Rect(x, y, charWidth, charHeight));
+      rawHRCode[i] += parseCharTesseract(charMat);
+    }*/
+    double x = nbChar/-2.0*charWidth + gray.cols/2.0;
+    Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
+    rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
+    Mat lineMat(gray, lineRect);
+    rawHRCode[i] = parseLineTesseract(lineMat);
+  }
+  imshow("show_rectangles",mat);
+  waitKey(0);
+
+  code.jar_id = rawHRCode[0];
+  code.weight = rawHRCode[1];
+  code.content_name = rawHRCode[2];
+  code.content_id = rawHRCode[3];
+}
+
+
 /*class JarLabel {
   public:
     JarLabel() {}
@@ -132,65 +233,3 @@ ostream &operator<<(std::ostream &os, const HRCode &m) {
   os << "#" << m.getJarIdStr() << "[" << m.getWeightStr() << " kg]: ";
   return os << m.getContentName() << " (" << m.mContentIdStr() << ")";
 }*/
-
-string parseLineTesseract(Mat& im) {
-  tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
-  char config_name[] = "chars";
-  char* config_ptr = config_name;
-  //char config[][10] = {"chars"};
-  //ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, config, 1, nullptr, nullptr, false);
-  ocr->Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY, &config_ptr, 1, nullptr, nullptr, false);
-  ocr->SetVariable("user_defined_dpi", "300"); // FIXME: Is it
-  //ocr->SetVariable("user_words_suffix", "eng.user-words"); Does this work? Rebuild and retrain my own dictionnary I think with only words that can be content.
-  // But that means everytime a user adds a new product, it must retrain et rebuild everything??? Maybe, if it's fast to do...
-  ocr->SetPageSegMode(tesseract::PSM_SINGLE_LINE);
-  // ocr->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
-
-  ocr->SetImage(im.data, im.cols, im.rows, 3, im.step);
-  string outText = string(ocr->GetUTF8Text());
-  trim(outText);
-
-  BOOST_LOG_TRIVIAL(debug) << outText;
-  ocr->End();
-
-  return outText;
-}
-
-void parseJarCode(DetectedHRCode& code) {
-  cout << "Loading image: " << code.imgFilename << endl;
-  Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
-  BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
-  double scale = gray.cols/110.0;
-  BOOST_LOG_TRIVIAL(debug) << "scale: " << scale;
-  double topOffset = 10.0 * scale;
-  double charWidth = 12 * scale;
-  double charHeight = 26 * scale;
-  double lineInterspace = 24 * scale;
-
-  int nbLines = 4;
-  int pattern[nbLines] = {3,7,8,4}; // number of char per line
-  string rawHRCode[nbLines];
-
-  // Get the sub-matrices (minors) for every character.
-  for (int i = 0; i < nbLines; i++) {
-    int nbChar = pattern[i];
-    double y = i*lineInterspace + topOffset;
-    /*for (int j = 0; j < nbChar; j++) {
-      double x = (0.0+j-1.0*nbChar/2.0)*charWidth + mat.cols/2;
-      Rect r = Rect(x, y, charWidth, charHeight);
-      //rectangle(mat, r, Scalar(0,0,255), 1, LINE_8);
-      //Mat charMat(mat, Rect(x, y, charWidth, charHeight));
-    }*/
-    double x = nbChar/-2.0*charWidth + gray.cols/2;
-    Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
-    //rectangle(mat, lineRect, Scalar(0,255,0), 1, LINE_8);
-    Mat lineMat(gray, lineRect);
-    //imshow(string("line")+to_string(i),lineMat);
-    rawHRCode[i] = parseLineTesseract(lineMat);
-  }
-
-  code.jar_id = rawHRCode[0];
-  code.weight = rawHRCode[1];
-  code.content_name = rawHRCode[2];
-  code.content_id = rawHRCode[3];
-}
