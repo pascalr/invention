@@ -80,6 +80,7 @@ void SweepCommand::setup(Heda& heda) {
     zUp = !zUp;
   }
 
+  commands.push_back(make_shared<PinpointCommand>());
   commands.push_back(make_shared<ParseCodesCommand>());
 }
 
@@ -294,11 +295,11 @@ void StoreCommand::doneCallback(Heda& heda) {
   }
 }
 
-void Heda::pinpoint() {
-  for (size_t i = 0; i < codes.items.size(); i++) {
-    DetectedHRCode& code = codes.items[i];
-    pinpointCode(*this, code);
-    db.update(codes, code);
+void PinpointCommand::start(Heda& heda) {
+  for (size_t i = 0; i < heda.codes.items.size(); i++) {
+    DetectedHRCode& code = heda.codes.items[i];
+    pinpointCode(heda, code);
+    heda.db.update(heda.codes, code);
   }
 }
 

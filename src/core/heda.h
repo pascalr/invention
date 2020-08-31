@@ -211,6 +211,12 @@ class ParseCodesCommand : public HedaCommand {
     void start(Heda& heda);
 };
 
+class PinpointCommand : public HedaCommand {
+  public:
+    string str() {return "pinpoint";}
+    void start(Heda& heda);
+};
+
 class DetectCommand : public HedaCommand {
   public:
     string str() {return "detect";}
@@ -303,7 +309,6 @@ class Heda {
     void retreive() {
     }
 
-    void pinpoint();
     void fetch(std::string ingredientName);
 
     void clearDetectedCodes() {

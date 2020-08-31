@@ -150,7 +150,7 @@ class HedaController {
       m_commands["capture"] = [&](ParseResult tokens) {heda.capture();};
       m_commands["detect"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<DetectCommand>());};
       m_commands["parse"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<ParseCodesCommand>());};
-      m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pinpoint();};
+      m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PinpointCommand>());};
       //m_commands["calibrate"] = [&](ParseResult tokens) {heda.calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
       m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
