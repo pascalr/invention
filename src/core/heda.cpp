@@ -55,12 +55,16 @@ void SweepCommand::setup(Heda& heda) {
 
   int nStepX = 5;
   int nStepZ = 5;
-  for (int i = 0; i < nStepX; i++) {
-    for (int j = 0; j < nStepZ; j++) {
+
+  bool zUp = true;
+  for (int i = 0; i <= nStepX; i++) {
+    for (int j = 0; j <= nStepZ; j++) {
 
       // These are the cartesian coordinates of the polar coordinate system. (Not UserCoord)
       double x = i*1.0*max.h/nStepX;
       double z = j*1.0*heda.config.gripper_radius/nStepZ;
+
+      if (!zUp) {z = heda.config.gripper_radius - z;}
 
       // t is between -90 and 90. So to get between 180 and 90, if the arm if smaller than the middle, do t=180-t
       double t = (asin(z / heda.config.gripper_radius) * 180.0 / PI);
@@ -73,6 +77,7 @@ void SweepCommand::setup(Heda& heda) {
       commands.push_back(make_shared<GotoCommand>(p));
       commands.push_back(make_shared<DetectCommand>());
     }
+    zUp = !zUp;
   }
 
   commands.push_back(make_shared<ParseCodesCommand>());
