@@ -17,6 +17,7 @@ void beforeRenderScene() {
 
 void renderScene(double xMin, double xMax, double yMin, double yMax, const char* title) {
 
+  plt::axis("equal");
   plt::xlim(xMin, xMax);
   plt::ylim(yMin, yMax);
 

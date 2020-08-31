@@ -15,6 +15,8 @@
 #include "core/writer/log_writer.h"
 #include "core/writer/console_writer.h"
 #include "core/heda_controller.h"
+
+#include <unistd.h>
       
 using namespace std;
 
@@ -111,7 +113,8 @@ int main (int argc, char *argv[]) {
     simulation.setCurrentTime(simulation.getCurrentTime() + 20000);
     myLoop(simulation);
     heda.handleCommandStack();
-    this_thread::sleep_for(chrono::milliseconds(1));
+    usleep(50);
+    //this_thread::sleep_for(chrono::milliseconds(0.5));
   }
   
 

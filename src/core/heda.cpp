@@ -64,12 +64,12 @@ void SweepCommand::setup(Heda& heda) {
 
       // t is between -90 and 90. So to get between 180 and 90, if the arm if smaller than the middle, do t=180-t
       double t = (asin(z / heda.config.gripper_radius) * 180.0 / PI);
-      if (x < max.h / 2) {
+      if (x > max.h / 2) {
         t = 180.0 - t;
       }
       double deltaX = cosd(t) * heda.config.gripper_radius;
 
-      PolarCoord p = PolarCoord(x-deltaX, heda.unitV(heda.working_shelf.moving_height), t);
+      PolarCoord p = PolarCoord(x+deltaX, heda.unitV(heda.working_shelf.moving_height), t);
       commands.push_back(make_shared<GotoCommand>(p));
       commands.push_back(make_shared<DetectCommand>());
     }
@@ -127,10 +127,22 @@ void GotoCommand::setup(Heda& heda) {
   //addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
 
   // If moving theta would colide, move x first
-  double deltaX = cosd(destination.t) * heda.config.gripper_radius;
-  double xIfTurnsFirst = position.h + deltaX;
+  double deltaH = cosd(destination.t) * heda.config.gripper_radius;
+  double hIfTurnsFirst = position.h - deltaH;
 
-  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
+  cout << "position.h: " << position.h << endl;
+  cout << "deltaH: " << deltaH << endl;
+  cout << "hIfTurnsFirst: " << hIfTurnsFirst << endl;
+  cout << "destination.h: " << destination.h << endl;
+  cout << "positionT: " << positionT << endl;
+
+  if (hIfTurnsFirst < 0.0 || hIfTurnsFirst > heda.config.max_h) {
+
+    // To avoid collision, if the arm goes over the middle, go to the middle before moving
+    if ((positionT < 90.0 && destination.t > 90.0) || (positionT > 90.0 && destination.t < 90.0)) {
+      commands.push_back(make_shared<MoveCommand>(heda.axisT, 90.0)); 
+    }
+
     commands.push_back(make_shared<MoveCommand>(heda.axisH, destination.h)); 
     commands.push_back(make_shared<MoveCommand>(heda.axisT, destination.t)); 
     //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
