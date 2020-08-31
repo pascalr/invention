@@ -19,6 +19,10 @@ Ne gaspillez plus de nourriture! Gestion automatique des dates des ingrédients.
 Tu te lève et ton café et ton pain frais t'attends!
 --------
 
+Draw all the detected codes to see where they are. This will help with writing the removeNearDuplicates code.
+Also write the code to manually enter the sticker values.
+Add a light to the camera and start taking some data!
+
 Parser les trucs au fur et à mesure que j'en ai de besoin. Parce que les trucs peuvent avoir des espaces. Par exemple:
 parseUnit => c. à thé
 

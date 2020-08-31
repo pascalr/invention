@@ -77,6 +77,19 @@ class HedaController {
       
       // -----------------------------------------------------------------------------------------------------
       
+      // hover command => Move on top of the thing in x and z, at the moving height of the shelf.
+      m_commands["hover"] = [&](ParseResult tokens) {
+
+        double x = tokens.popScalaire();
+        double z = tokens.popScalaire();
+
+        Shelf shelf;
+        ensure(heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v))), "hover must have a valid shelf to hover unto");
+
+        UserCoord c(x, shelf.moving_height, z);
+        return make_shared<GotoCommand>(heda.toPolarCoord(c, heda.config.gripper_radius));
+      };
+      
       m_commands["ajouter"] = [&](ParseResult tokens) {
 
         ensure(is_processing_recipe, "Must be processing recipe, because actually doing it is not implemented yet");
