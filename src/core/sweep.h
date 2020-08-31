@@ -26,8 +26,8 @@
 class Heda;
 //class Mat;
 
-void detectCode(Heda& heda, Mat& frame, PolarCoord c);
+void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c);
 
-void calculateSweepMovements(Heda& heda, std::vector<Movement>& movements);
+//void calculateSweepMovements(Heda& heda, std::vector<Movement>& movements);
 
 #endif

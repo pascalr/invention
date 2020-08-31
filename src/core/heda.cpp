@@ -16,6 +16,86 @@ class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 class InvalidGrippedJarFormatException : public exception {};
 
+double computeFocalPoint(double perceivedWidth, double distanceFromCamera, double actualWidth) {
+
+  return perceivedWidth * distanceFromCamera / actualWidth;
+}
+
+// TODO: Check previous to make sure it improves and not doing an infinite loop.
+/*void moveOver(Heda& heda, double previousDistanceSq) {
+
+  pushCommand(make_shared<DetectCommand>());
+  pushCommand(make_shared<PinpointCommand>());
+
+  pushCommand(make_shared<LambdaCommand>([&format](Heda& heda) {
+
+    if (heda.codes.items.size() < 1) {throw MissingHRCodeException();}
+    if (heda.codes.items.size() > 1) {throw TooManyHRCodeException();}
+    DetectedHRCode code = heda.codes.items[0];
+
+    Vector2f detectedAt; detectedAt << code.centerX, code.centerY;
+    Vector2f center; center << CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2;
+    double distSquare = (detectedAt - center).sqaredNorm();
+
+    if (distSquare > previousDistanceSq) {
+      cout << "The moveover distance has stopped improving. Dist = " << sqrt(distSquare) << " mm." << endl;
+      // I think it should be camera to tool offset.
+      cout << "Camera radius is = TODO" << endl;
+      break;
+    }
+    cout << "The moveover distance is still getting better, continuing.." << endl;
+
+    moveOver(heda, distSquare);
+  }));
+}*/
+
+//void Heda::calibrate() {
+//  // TODO: Validate that the working shelf is clear
+//  // TODO: Make sure heda is referenced
+//  // TODO: Use putdown function.
+//
+//  JarFormat format; 
+//  if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+//
+//  //pushCommand(make_shared<GotoCommand>(PolarCoord(config.home_position_x, config.home_position_y, config.home_position_t)));
+//  pushCommand(make_shared<StoreCommand>("a8"));
+//  //pushCommand(make_shared<MoveCommand>(axisV, unitV(config.detect_height)));
+//  pushCommand(make_shared<DetectCommand>());
+//  pushCommand(make_shared<LambdaCommand>([&format](Heda& heda) {
+//
+//    if (heda.codes.items.size() < 1) {throw MissingHRCodeException();}
+//    if (heda.codes.items.size() > 1) {throw TooManyHRCodeException();}
+//    DetectedHRCode code = heda.codes.items[0];
+//
+//    double cameraDistance = heda.unitY(heda.getPosition().v) - format.height - heda.working_shelf.height;
+//    //double codePixelsWidth = HR_CODE_WIDTH * code.scale;
+//    heda.config.camera_focal_point = code.scale * cameraDistance;
+//    //config.camera_focal_point = computeFocalPoint(codePixelsWidth, cameraDistance, HR_CODE_WIDTH);
+//    heda.db.update(heda.configs, heda.config);
+//  }));
+//
+//  // double jarHeight = gripped_jar.height;
+//  //putdown(); 
+//  //DetectedHRCode code = detectOneCode(Heda& heda);
+//  //heda.camera_radius = ...
+//
+//}
+
+void Heda::calibrate(JarFormat& format) {
+
+  Mat frame;
+  captureFrame(frame);
+  vector<DetectedHRCode> detected;
+  detectCodes(*this, detected, frame, getPosition());
+ 
+  if (detected.size() < 1) {throw MissingHRCodeException();}
+  if (detected.size() > 1) {throw TooManyHRCodeException();}
+
+  double cameraDistance = unitY(getPosition().v) - format.height - working_shelf.height;
+  config.camera_focal_point = detected[0].scale * cameraDistance;
+  db.update(configs, config);
+}
+
 void ParseCodesCommand::start(Heda& heda) {
   for (size_t i = 0; i < heda.codes.items.size(); i++) {
     DetectedHRCode& code = heda.codes.items[i];
@@ -306,14 +386,21 @@ void PinpointCommand::start(Heda& heda) {
 void DetectCommand::start(Heda& heda) {
   Mat frame;
   heda.captureFrame(frame);
-  detectCode(heda, frame, heda.getPosition());
+  vector<DetectedHRCode> detected;
+  detectCodes(heda, detected, frame, heda.getPosition());
+  for (DetectedHRCode& it : detected) {
+    heda.db.insert(heda.codes, it);
+  }
 }
 
 void Heda::capture() {
   Mat frame;
   captureFrame(frame);
-  imshow("capture", frame);
-  waitKey();
+  //thread show_image_thread([frame]() {
+    imshow("capture", frame);
+    waitKey(1000);
+  //});
+  //show_image_thread.detach();
 }
 void Heda::captureFrame(Mat& frame) {
 

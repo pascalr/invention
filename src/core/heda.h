@@ -16,14 +16,14 @@ class Heda;
 
 #include "jar_parser.h"
 
+#include "calibrate.h"
+
 #include "database.h"
 
 class HedaException : public exception {};
 
 class InitVideoException : public HedaException {};
 class InitArduinoException : public HedaException {};
-class MissingHRCodeException : public HedaException {};
-class TooManyHRCodeException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 
 class MissingConfigException : public exception {};
@@ -63,6 +63,17 @@ class HedaCommand {
     virtual void doneCallback(Heda& heda) {}
     
     virtual void setup(Heda& heda) {};
+};
+
+class LambdaCommand : public HedaCommand {
+  public:
+    LambdaCommand(std::function<void(Heda& heda)> func) : func(func) {}
+    string str() {return "lambda";}
+    virtual void start(Heda& heda) {
+      func(heda);
+    }
+
+    std::function<void(Heda& heda)> func;
 };
 
 using HedaCommandPtr = shared_ptr<HedaCommand>;
@@ -305,15 +316,9 @@ class Heda {
     void find(string ingredientName) {
     }
 
-    // bring back to the working area
-    void retreive() {
-    }
+    void calibrate(JarFormat& format);
 
     void fetch(std::string ingredientName);
-
-    void clearDetectedCodes() {
-      db.clear(codes);
-    }
 
     void pushCommand(shared_ptr<HedaCommand> cmd) {
 

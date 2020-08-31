@@ -65,6 +65,15 @@ class HedaController {
         process(heda, recipe);
       };
       m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();};
+      m_commands["calibrate"] = [&](ParseResult tokens) {
+        string jarFormatName = tokens.popNoun();
+        JarFormat format;
+        ensure(heda.jar_formats.ifind(format, byName, jarFormatName), "calibrate must have a valid jar format name");
+        heda.calibrate(format);
+      };
+      //m_commands["moveover"] = [&](ParseResult tokens) {
+      //  moveOver(Heda& heda);
+      //};
       
       // -----------------------------------------------------------------------------------------------------
       
@@ -151,7 +160,6 @@ class HedaController {
       m_commands["detect"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<DetectCommand>());};
       m_commands["parse"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<ParseCodesCommand>());};
       m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PinpointCommand>());};
-      //m_commands["calibrate"] = [&](ParseResult tokens) {heda.calibrate();};
       m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
       m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
         string ingredientName = tokens.popNoun();
@@ -166,6 +174,12 @@ class HedaController {
         double v = tokens.popScalaire();
         double t = tokens.popScalaire();
         heda.pushCommand(make_shared<GotoCommand>(PolarCoord(h,v,t)));
+      };
+      m_commands["getto"] = [&](ParseResult tokens) {
+        double x = tokens.popScalaire();
+        double y = tokens.popScalaire();
+        double z = tokens.popScalaire();
+        heda.pushCommand(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(x,y,z), heda.config.gripper_radius)));
       };
       m_commands["open"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<OpenGripCommand>());

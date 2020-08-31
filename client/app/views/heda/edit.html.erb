@@ -26,6 +26,10 @@
     <%= form.text_field :shelf_id %>
   </div>
 
+  <p>
+    Pour pas mal toute les mesures, faire un marque sur l'axe centrale et se mesurer à partir du zéro.
+  </p>
+
   <div class="field">
     <%= form.label :user_coord_offset_x %>
     <%= form.number_field :user_coord_offset_x, step: 0.01 %>
@@ -76,19 +80,25 @@
     <%= form.number_field :detect_height, step: 0.01 %>
   </div>
 
+  <p>
+    Faire un trait vis-à-vis la caméra, faire un trait vis-a-vis le centre de rotation et mesurer cette distance.
+  </p>
+
   <div class="field">
     <%= form.label :camera_radius %>
-    <%= form.number_field :camera_radius, readonly: true %>
+    <%= form.number_field :camera_radius, step: 0.01 %>
   </div>
 
   <p>
   Pour entrer cette donnée, déplacer le bras au centre de l'axe x. Ensuite mettre le bras à theta=0. Mettre outils crayon dans la pince. Faire une marque.
   Déplacer theta = 180. Faire une marque. Divisier la distance en 2.
+
+  Ça ne fonctionne pas trop. Simplement faire un trait vis-à-vis le centre de l'outil, faire un trait vis-a-vis le centre de rotation et mesurer cette distance.
   </p>
 
   <div class="field">
     <%= form.label :gripper_radius %>
-    <%= form.number_field :gripper_radius %>
+    <%= form.number_field :gripper_radius, step: 0.01 %>
   </div>
 
   <div class="field">

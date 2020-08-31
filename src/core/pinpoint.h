@@ -48,7 +48,7 @@ Vector2d imageOffset(DetectedHRCode& input) {
 
 void pinpointCode(Heda& heda, DetectedHRCode& input) {
 
-  UserCoord camPos = heda.getCameraPosition();
+  UserCoord camPos = heda.toUserCoord(input.coord, heda.config.camera_radius);
   double heightOffset0 = heightOffset(heda, input);
   Vector2d imgOffset = imageOffset(input);
 

@@ -65,6 +65,8 @@ class UserCoord {
     double z;
 };
 
+double distanceSquare(const UserCoord& c1, const UserCoord& c2);
+
 class Movement {
   public:
     Movement(char axis, double destination, std::function<void()> callback) : axis(axis), destination(destination), callback(callback) {}
