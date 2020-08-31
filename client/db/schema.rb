@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_29_163507) do
+ActiveRecord::Schema.define(version: 2020_08_31_140202) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 2020_08_29_163507) do
     t.float "quantity"
     t.string "unit_name"
     t.float "density"
+    t.boolean "is_external"
     t.index ["aliment_id"], name: "index_ingredients_on_aliment_id"
   end
 
