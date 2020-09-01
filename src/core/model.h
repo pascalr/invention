@@ -13,7 +13,6 @@ class WrongModelTypeException : public exception {};
 
 // TODO: Validate column names indexes
 
-
 template <class T>
 string byName(const T& t) {
   return t.name;
@@ -23,8 +22,8 @@ double byHeight(const T& t) {
   return t.height;
 }
 template <class T>
-double byLidZ(const T& t) {
-  return t.lid_coord.z;
+double byLidY(const T& t) {
+  return t.lid_coord.y;
 }
 //double byLidZ(const DetectedHRCode& t) {
 //  return t.lid_coord.z;
@@ -264,6 +263,9 @@ class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}
     DetectedHRCode(const HRCode& code, PolarCoord coord) : coord(coord), centerX(code.x), centerY(code.y), scale(code.scale), imgFilename(code.imgFilename) {
+    }
+    DetectedHRCode(const DetectedHRCode& c) : coord(c.coord), centerX(c.centerX), centerY(c.centerY), scale(c.scale), imgFilename(c.imgFilename), jar_id(c.jar_id), weight(c.weight),
+                                              content_name(c.content_name), content_id(c.content_id), lid_coord(c.lid_coord) {
     }
     PolarCoord coord;
     double centerX;

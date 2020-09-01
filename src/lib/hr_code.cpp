@@ -115,22 +115,22 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     bool correctSize = abs(radius[child] - insideDiameter)/insideDiameter < 0.2;
     if (!correctSize) continue;
     
-    //BOOST_LOG_TRIVIAL(debug) << "Child correct size.";
+    //cout << "HRCode Perimeter found." << endl;
 
     int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (firstMarker < 0) continue;
     
-    //BOOST_LOG_TRIVIAL(debug) << "First inner circle found.";
+    //cout << "HRCode first marker found." << endl;
 
     int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (secondMarker < 0) continue;
     
-    //BOOST_LOG_TRIVIAL(debug) << "Second inner circle found.";
+    //cout << "HRCode second marker found." << endl;
 
     int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
     
-    BOOST_LOG_TRIVIAL(debug) << "Detected HRCode!!!";
+    //cout << "Detected HRCode!" << endl;
     // Calculate angle
     double rise = centers[secondMarker].y - centers[firstMarker].y;
     double run = centers[secondMarker].x - centers[firstMarker].x;

@@ -71,8 +71,8 @@ void parseJarCode(DetectedHRCode& code) {
   cvtColor(gray, mat, COLOR_GRAY2BGR);
 
   //BOOST_LOG_TRIVIAL(debug) << "Mat cols: " << gray.cols;
-  //double scale = gray.cols/110.0;
-  double scale = code.scale * 0.2799;
+  double scale = gray.cols/110.0;
+  //double scale = code.scale * 0.2799; // FIXME: This scale is not working
   double topOffset = 10.0 * scale;
   double charWidth = 12 * scale;
   double charHeight = 26 * scale;
@@ -99,8 +99,8 @@ void parseJarCode(DetectedHRCode& code) {
     Mat lineMat(gray, lineRect);
     rawHRCode[i] = parseLineTesseract(lineMat);
   }
-  imshow("show_rectangles",mat);
-  waitKey(0);
+  //imshow("show_rectangles",mat);
+  //waitKey(0);
 
   code.jar_id = rawHRCode[0];
   code.weight = rawHRCode[1];
