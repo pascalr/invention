@@ -6,6 +6,7 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>Category</th>
       <th>Rating</th>
       <th colspan="3"></th>
     </tr>
@@ -15,6 +16,7 @@
     <% @recettes.each do |recette| %>
       <tr>
         <td><%= link_to recette.name, recette %></td>
+        <td><%= recette.recipe_category ? recette.recipe_category.name : nil %></td>
         <td><%= recette.rating %></td>
         <td><%= link_to 'Cuisiner', heda_run_recette_path(recette_id: recette.id), method: :post %></td>
         <td><%= link_to 'Éditer', edit_recette_path(recette) %></td>

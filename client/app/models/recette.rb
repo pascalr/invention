@@ -1,4 +1,5 @@
 class Recette < ApplicationRecord
+  belongs_to :recipe_category, optional: true
   has_many :ingredient_quantities
 
   def cost
