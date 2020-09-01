@@ -1,23 +1,14 @@
-Ok I need to prioritize what I am working on. This will be an ordered list.
-
 ----------
 Good TODO list:
 
-- Plan d'affaire
+- Plan d'affaires
 - Perfectionner les HRCode et relâcher.
 - Gérer les dates correctement des pots. Comme ça je vais pouvoir faire un inventaire et des suggestions de trucs qui devrait être manger bientôt.
+- Un calendrier de recettes avec une liste d'épicerie générée automatiquement
 - Combien est-ce que ça coûterait avec un atelier?
 - Send error messages back to client.
 
 ----------
-
-
----------
-Feature list:
-
-Ne gaspillez plus de nourriture! Gestion automatique des dates des ingrédients. Recommandation des ingrédients dû à être manger bientôt.
-Tu te lève et ton café et ton pain frais t'attends!
---------
 
 Draw all the detected codes to see where they are. This will help with writing the removeNearDuplicates code.
 Also write the code to manually enter the sticker values.

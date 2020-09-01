@@ -32,7 +32,7 @@
         <td><%= '%.2f' % detected_code.centerX %></td>
         <td><%= '%.2f' % detected_code.centerY %></td>
         <td><%= '%.2f' % detected_code.scale %></td>
-        <td><%= image_tag(image_show_path(name: "detected_code_001.jpg")) %></td>
+        <td><%= image_tag(image_show_path(name: detected_code.img)) %></td>
         <td><%= detected_code.jar_id %></td>
         <td><%= detected_code.weight %></td>
         <td><%= detected_code.content_name %></td>

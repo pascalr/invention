@@ -78,19 +78,28 @@ function toggleMenuOn(e, id) {
     if (jars[i]) {
       circle.fill = loc.is_storage ? '#FF8000' : '#7777FF';
       
-      var text = new Two.Text(ingredients[i], loc.x, z);
-      two.makeGroup(text);
+      two.makeText(ingredients[i], loc.x, z);
     } else {
       circle.fill = '#FFFFFF';
 
-      var text = new Two.Text(loc.name, loc.x, z);
-      two.makeGroup(text);
+      two.makeText(loc.name, loc.x, z);
     }
+
     circle.stroke = loc.is_storage ? 'orangered' : 'blue'; // Accepts all valid css color
     circle.linewidth = LINE_THICKNESS;
 
     ids = [...ids, circle.id]
   });
+
+  if (locations[0] && !locations[0].is_storage) {
+    var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
+    detected_codes.forEach((code, i) => {
+      console.log("image/show?name=" + code.img)
+      var texture = new Two.Texture("image/show?name=" + code.img) // FIXME: This is not working...
+      var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, 20);
+      circle.fill = texture
+    })
+  }
   
   two.update();
   
