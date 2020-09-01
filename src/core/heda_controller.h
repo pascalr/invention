@@ -3,19 +3,11 @@
 
 #include "heda.h"
 
-class EnsureException : public exception {};
 class UnitConversionException : public exception {};
 
 class HedaController {
   public:
 
-    void ensure(bool statement, const char* errorMessage) {
-      if (!statement) {
-        cerr << "\033[31mController error\033[0m: " << errorMessage << endl;
-        throw EnsureException();
-      }
-    }
-    
     bool is_processing_recipe = false;
     Recipe recipe_being_process;
 
@@ -71,6 +63,9 @@ class HedaController {
         ensure(heda.jar_formats.ifind(format, byName, jarFormatName), "calibrate must have a valid jar format name");
         heda.calibrate(format);
       };
+      m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
+        closeup(heda);
+      };
       //m_commands["moveover"] = [&](ParseResult tokens) {
       //  moveOver(Heda& heda);
       //};
@@ -79,16 +74,11 @@ class HedaController {
       
       // hover command => Move on top of the thing in x and z, at the moving height of the shelf.
       m_commands["hover"] = [&](ParseResult tokens) {
-
         double x = tokens.popScalaire();
         double z = tokens.popScalaire();
-
-        Shelf shelf;
-        ensure(heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v))), "hover must have a valid shelf to hover unto");
-
-        UserCoord c(x, shelf.moving_height, z);
-        return make_shared<GotoCommand>(heda.toPolarCoord(c, heda.config.gripper_radius));
+        heda.pushCommand(make_shared<HoverCommand>(x,z,heda.config.gripper_radius));
       };
+      
       
       m_commands["ajouter"] = [&](ParseResult tokens) {
 

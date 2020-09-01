@@ -21,6 +21,7 @@ class Heda;
 #include "database.h"
 
 class HedaException : public exception {};
+class EnsureException : public exception {};
 
 class InitVideoException : public HedaException {};
 class InitArduinoException : public HedaException {};
@@ -29,6 +30,8 @@ class FrameCaptureException : public HedaException {};
 class MissingConfigException : public exception {};
 class NoWorkingShelfException : public exception {};
 
+void ensure(bool statement, const char* errorMessage);
+
 #include <mutex>
 
 // TODO: Rename x and y to h and v at some point.
@@ -36,6 +39,8 @@ class NoWorkingShelfException : public exception {};
 #define AXIS_V 'y'
 #define AXIS_T 't'
 #define AXIS_R 'r'
+
+void closeup(Heda& heda);
 
 class Axis {
   public:
@@ -199,6 +204,19 @@ class PickupCommand : public MetaCommand {
     Location loc;
 };
 
+class HoverCommand : public MetaCommand {
+  public:
+    HoverCommand(double x, double z, double reference) : x(x), z(z), reference(reference) {} 
+
+    string str() {return "hover " + to_string(x) + " " + to_string(z);}
+
+  protected:
+    void setup(Heda& heda);
+    double x;
+    double z;
+    double reference;
+};
+
 class GotoCommand : public MetaCommand {
   public:
     GotoCommand(PolarCoord destination) : destination(destination) {}
@@ -256,6 +274,7 @@ class Heda {
     
       loadDb();
     }
+
 
     void loadDb() {
 
@@ -462,7 +481,7 @@ class Heda {
     // Returns the id of the self
     int shelfByHeight(double userHeight) {
     
-      shelves.orderBy(shelfHeightCmp);
+      shelves.order(byHeight);
       auto previousIt = shelves.begin();
       for (auto it = shelves.begin(); it != shelves.end(); ++it) {
     

@@ -13,6 +13,23 @@ class WrongModelTypeException : public exception {};
 
 // TODO: Validate column names indexes
 
+
+template <class T>
+string byName(const T& t) {
+  return t.name;
+}
+template <class T>
+double byHeight(const T& t) {
+  return t.height;
+}
+template <class T>
+double byLidZ(const T& t) {
+  return t.lid_coord.z;
+}
+//double byLidZ(const DetectedHRCode& t) {
+//  return t.lid_coord.z;
+//}
+
 template<class T>
 class Table {
   public:
@@ -77,11 +94,11 @@ class Table {
     T& back() {
       return items.back();
     }
-    void orderBy(bool (*cmp)(const T&, const T&), bool ascending=true) {
+    void order(double (*func)(const T&), bool ascending=true) {
       if (ascending) {
-        std::sort(items.begin(), items.end(), cmp);
+        std::sort(items.begin(), items.end(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
       } else {
-        std::sort(items.rbegin(), items.rend(), cmp);
+        std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
       }
     }
     // TODO: operator[]
@@ -95,10 +112,6 @@ class Table {
 
 };
 
-template <class T>
-string byName(T t) {
-  return t.name;
-}
 
 class Model {
   public:
@@ -566,6 +579,7 @@ class ShelfTable : public Table<Shelf> {
 
 };
 
-bool shelfHeightCmp(const Shelf& arg0, const Shelf& arg1);
+//bool shelfHeightCmp(const Shelf& arg0, const Shelf& arg1);
+
 
 #endif

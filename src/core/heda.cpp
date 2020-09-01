@@ -16,9 +16,31 @@ class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 class InvalidGrippedJarFormatException : public exception {};
 
+void ensure(bool statement, const char* errorMessage) {
+  if (!statement) {
+    cerr << "\033[31mError\033[0m: " << errorMessage << endl;
+    throw EnsureException();
+  }
+}
+
 double computeFocalPoint(double perceivedWidth, double distanceFromCamera, double actualWidth) {
 
   return perceivedWidth * distanceFromCamera / actualWidth;
+}
+
+// closesup muste be done to the tallest jars first, then store them.
+// then close up the next tallest, etc.
+void closeup(Heda& heda) {
+  heda.codes.order(byLidZ, false);
+  //pushCommand(make_shared<HoverCommand>(heda.config.camera_radius));
+}
+    
+void HoverCommand::setup(Heda& heda) {
+  Shelf shelf;
+  ensure(heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v))), "hover must have a valid shelf to hover unto");
+
+  UserCoord c(x, shelf.moving_height, z);
+  commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c, reference)));
 }
 
 // TODO: Check previous to make sure it improves and not doing an infinite loop.

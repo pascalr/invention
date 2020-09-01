@@ -35,7 +35,7 @@ void NaiveJarPacker::generateLocations(Heda& heda) {
   //for (auto it = shelves.items.begin(); it != shelves.items.end(); it++) {
   heda.db.clear(heda.locations);
   double dia = 148.0; // mm
-  heda.shelves.orderBy(shelfHeightCmp, false); // start with highest shelf (fastest)
+  heda.shelves.order(byHeight, false); // start with highest shelf (fastest)
 
   char shelfLetter = 'A';
   for (const Shelf& shelf : heda.shelves.items) {
