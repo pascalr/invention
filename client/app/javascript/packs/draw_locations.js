@@ -95,9 +95,23 @@ function toggleMenuOn(e, id) {
     var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
     detected_codes.forEach((code, i) => {
       console.log("image/show?name=" + code.img)
-      var texture = new Two.Texture("image/show?name=" + code.img) // FIXME: This is not working...
-      var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, 20);
+     
+      var HRCODE_DIAMETER = 31 // mm FIXME HARDCODED
+
+      var texture = two.makeTexture("image/show?name=" + code.img, () => {
+        two.update();
+      })
+      
+      // texture.scale = HRCODE_DIAMETER / texture.width // FIXME: texture.width is undefined
+      //texture.scale = 0.5
+
+      var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
       circle.fill = texture
+      
+      //texture.scale = HRCODE_DIAMETER / texture.width
+
+      //var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
+      //circle.fill = texture
     })
   }
   
