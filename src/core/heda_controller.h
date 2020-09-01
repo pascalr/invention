@@ -66,6 +66,9 @@ class HedaController {
       m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
         closeup(heda);
       };
+      m_commands["nodup"] = [&](ParseResult tokens) {
+        removeNearDuplicates(heda);
+      };
       //m_commands["moveover"] = [&](ParseResult tokens) {
       //  moveOver(Heda& heda);
       //};

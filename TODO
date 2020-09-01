@@ -10,6 +10,8 @@ Good TODO list:
 
 ----------
 
+Fixer le bug que quand je fais un référencement, si je l'arrête il est tout perdu et ne veux pas repartir apres un stop.
+
 Acheter Ruban lumineux à DEL blanc https://www.canac.ca/en/4011486, au dollorama ou au rossy probablement.
 
 Draw all the detected codes to see where they are. This will help with writing the removeNearDuplicates code.

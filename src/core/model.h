@@ -100,6 +100,9 @@ class Table {
         std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
       }
     }
+    /*void erase(std::vector<T>::iterator it) {
+      items.erase(it);
+    }*/
     // TODO: operator[]
 
     //bool exists = false;
@@ -266,6 +269,7 @@ class DetectedHRCode : public Model {
     }
     DetectedHRCode(const DetectedHRCode& c) : coord(c.coord), centerX(c.centerX), centerY(c.centerY), scale(c.scale), imgFilename(c.imgFilename), jar_id(c.jar_id), weight(c.weight),
                                               content_name(c.content_name), content_id(c.content_id), lid_coord(c.lid_coord) {
+      id = c.id;
     }
     PolarCoord coord;
     double centerX;

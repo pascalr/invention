@@ -41,13 +41,16 @@ bool linuxInputAvailable() {
   return false;
 }
 
-std::string nextFilename(std::string base, std::string ext) {
+std::string nextFilename(std::string dir, std::string base, std::string ext) {
   std::string outfile_name = base;
   for (int i = 1; i < 1000; i++) {
     std::stringstream ss;
     ss << base << "_" << std::setw(3) << std::setfill('0') << i << ext;
 
-    if (!boost::filesystem::exists(ss.str())) {return ss.str();}
+    std::stringstream toCheck;
+    toCheck << dir << ss.str();
+
+    if (!boost::filesystem::exists(toCheck.str())) {return ss.str();}
   }
   return base + "_moreThan1000" + ext;
 }

@@ -6,6 +6,6 @@
 
 void signalHandler( int signum );
 bool linuxInputAvailable();
-std::string nextFilename(std::string base, std::string ext);
+std::string nextFilename(std::string dir, std::string base, std::string ext);
 
 #endif

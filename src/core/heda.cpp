@@ -23,6 +23,42 @@ void ensure(bool statement, const char* errorMessage) {
   }
 }
 
+double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
+  Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;
+  Vector2f lid2; lid2 << c2.lid_coord.x, c2.lid_coord.z;
+  return (lid1 - lid2).squaredNorm();
+}
+
+// Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
+template <class T>
+void removeNearDuplicates(vector<T> list, double (*func)(const T&, const T&), double epsilon) {
+  for (typename vector<T>::iterator it = list.begin(); it != list.end(); it++) {
+    for (auto nested : list) {
+      if (it->id != nested.id && func(*it, nested) < epsilon) {
+        list.erase(it--);
+        goto next;
+      }
+    }
+next:;
+  }
+}
+
+void removeNearDuplicates(Heda& heda) {
+  double epsilon = pow(HR_CODE_WIDTH/2, 2);
+  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
+  for (vector<DetectedHRCode>::iterator it = heda.codes.items.begin(); it != heda.codes.items.end(); it++) {
+    for (auto nested : heda.codes.items) {
+      if (it->id != nested.id && detectedDistanceSquared(*it, nested) < epsilon) {
+        int id = it->id;
+        it--;
+        heda.db.removeItem(heda.codes, id);
+        goto next;
+      }
+    }
+next:;
+  }
+}
+
 double computeFocalPoint(double perceivedWidth, double distanceFromCamera, double actualWidth) {
 
   return perceivedWidth * distanceFromCamera / actualWidth;
@@ -185,7 +221,7 @@ void SweepCommand::setup(Heda& heda) {
   
   PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
 
-  int nStepX = 5;
+  int nStepX = 9;
   int nStepZ = 5;
 
   bool zUp = true;

@@ -41,6 +41,7 @@ void ensure(bool statement, const char* errorMessage);
 #define AXIS_R 'r'
 
 void closeup(Heda& heda);
+void removeNearDuplicates(Heda& heda);
 
 class Axis {
   public:

@@ -156,7 +156,7 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     double pixelsPerMm = radius[i]*2 / HR_CODE_WIDTH;
-    string filename = nextFilename("detected_code", ".jpg");
+    string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
     string imgFilename = DETECTED_CODES_BASE_PATH + filename;
     imwrite(imgFilename, rotatedHRCode);
     HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, pixelsPerMm); 
