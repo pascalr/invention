@@ -42,8 +42,8 @@
 #define BASE_X_MAX 680.0 // mm
 #define BASE_X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
 
-#define CHANGE_LEVEL_ANGLE_LOW 0
-#define CHANGE_LEVEL_ANGLE_HIGH 180
+#define CHANGE_LEVEL_ANGLE_LOW 0.0
+#define CHANGE_LEVEL_ANGLE_HIGH 180.0
 
 #define X_MIN 0.0 // mm
 #define X_MAX 640.0 // mm
@@ -119,6 +119,6 @@
 // Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12
 
-#define HR_CODE_WIDTH 31 // mm
+#define HR_CODE_WIDTH 31.0 // mm
 
 #endif

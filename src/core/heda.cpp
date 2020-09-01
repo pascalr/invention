@@ -44,7 +44,7 @@ next:;
 }
 
 void removeNearDuplicates(Heda& heda) {
-  double epsilon = pow(HR_CODE_WIDTH/2, 2);
+  double epsilon = pow(HR_CODE_WIDTH*0.8, 2);
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
   for (vector<DetectedHRCode>::iterator it = heda.codes.items.begin(); it != heda.codes.items.end(); it++) {
     for (auto nested : heda.codes.items) {
@@ -221,7 +221,7 @@ void SweepCommand::setup(Heda& heda) {
   
   PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
 
-  int nStepX = 9;
+  int nStepX = 15;
   int nStepZ = 5;
 
   bool zUp = true;
