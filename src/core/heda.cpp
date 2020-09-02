@@ -187,7 +187,11 @@ void Heda::calibrate(JarFormat& format) {
 void ParseCodesCommand::start(Heda& heda) {
   for (size_t i = 0; i < heda.codes.items.size(); i++) {
     DetectedHRCode& code = heda.codes.items[i];
-    parseJarCode(code);
+    //parseJarCode(code);
+    cout << "Loading image: " << code.imgFilename << endl;
+    Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
+    vector<string> lines;
+    parseText(lines, gray);
     heda.db.update(heda.codes, code);
   }
 }

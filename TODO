@@ -1,20 +1,34 @@
 ----------
 Good TODO list:
 
+Heda company:
+
 - Plan d'affaires
+- Combien est-ce que ça coûterait avec un atelier?
+
+Heda:
+
 - Perfectionner les HRCode et relâcher.
+- Acheter Ruban lumineux à DEL blanc https://www.canac.ca/en/4011486, au dollorama ou au rossy probablement.
+
+Heda Client:
+
 - Gérer les dates correctement des pots. Comme ça je vais pouvoir faire un inventaire et des suggestions de trucs qui devrait être manger bientôt.
 - Un calendrier de recettes avec une liste d'épicerie générée automatiquement
-- Combien est-ce que ça coûterait avec un atelier?
 - Send error messages back to client.
+
+FIXME:
+
+- Write infinite number of nextFilename, more and more digits to be added. This will be a bug soon otherwise I think.
+- Fixer le bug que quand je fais un référencement, si je l'arrête il est tout perdu et ne veux pas repartir apres un stop.
 
 ----------
 
-Write infinite number of nextFilename, more and more digits to be added. This will be a bug soon otherwise I think.
+Ok c'est peut-être correct que le robot utilise seulement la lumière ambiante, parce que la seule utilisation principale pour l'instant
+c'est de ranger les pots. Et quand tu viens de fais ranger les pots, ben tu es encore dans la pièce. En tout cas ne plus retravailler
+sur ça pour l'instant. C'est vraiment difficile. Le métal reflète la lumière. Je n'ai vraiment pas des bons résultats.
 
-Fixer le bug que quand je fais un référencement, si je l'arrête il est tout perdu et ne veux pas repartir apres un stop.
-
-Acheter Ruban lumineux à DEL blanc https://www.canac.ca/en/4011486, au dollorama ou au rossy probablement.
+Si je suis capable de lire l'étiquette, l'ordinateur aussi devrait être capable de lire l'étiquette.
 
 Draw all the detected codes to see where they are. This will help with writing the removeNearDuplicates code.
 Write removeNearDuplicates

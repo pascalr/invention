@@ -19,6 +19,8 @@
 #include "../lib/opencv.h"
 #include "../utils/io_common.h"
 
+#include "../core/jar_parser.h" // tmp
+
 #include "../utils/constants.h"
 
 #include <opencv2/opencv.hpp>
@@ -34,6 +36,96 @@ using namespace cv;
 ostream &operator<<(std::ostream &os, const HRCode &c) {
   os << "(" << c.x << ", " << c.y << ")";
   return os << "{" << c.scale << "}";
+}
+
+
+void extractChars(vector<Mat>& chars, Mat& src) {
+
+  double scale = src.cols/110.0;
+  double topOffset = 10.0 * scale;
+  double charWidth = 11 * scale;
+  double charHeight = 26 * scale;
+  double lineInterspace = 24 * scale;
+
+  int nbLines = 4;
+  int pattern[nbLines] = {3,7,8,4}; // number of char per line
+  string rawHRCode[nbLines];
+
+  // Get the sub-matrices (minors) for every character.
+  for (int i = 0; i < nbLines; i++) {
+    int nbChar = pattern[i];
+    double y = i*lineInterspace + topOffset;
+    double x = nbChar/-2.0*charWidth + src.cols/2.0;
+    for (int j = 0; j < nbChar; j++) {
+      double x = (0.0+j-1.0*nbChar/2.0)*charWidth + src.cols/2;
+      Rect r = Rect(x, y, charWidth*1.2, charHeight);
+      Mat charMat(src, Rect(x, y, charWidth, charHeight));
+      chars.push_back(charMat);
+      rectangle(src, r, Scalar(0,255,0), 1, LINE_8);
+    }
+  }
+}
+
+
+void extractLines(vector<Mat>& lines, Mat& src) {
+
+  double scale = src.cols/110.0;
+  double topOffset = 10.0 * scale;
+  double charWidth = 13 * scale;
+  double charHeight = 28 * scale;
+  double lineInterspace = 24 * scale;
+
+  int nbLines = 4;
+  int pattern[nbLines] = {3,7,8,4}; // number of char per line
+  string rawHRCode[nbLines];
+
+  // Get the sub-matrices (minors) for every character.
+  for (int i = 0; i < nbLines; i++) {
+    int nbChar = pattern[i];
+    double y = i*lineInterspace + topOffset;
+    double x = nbChar/-2.0*charWidth + src.cols/2.0;
+    Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
+    Mat lineMat(src, lineRect);
+    lines.push_back(lineMat);
+  }
+}
+
+void parseText(vector<string>& parsedLines, Mat gray) {
+
+  blur( gray, gray, Size(3,3) ); // Remove noise
+
+  vector<Mat> chars;
+  extractChars(chars, gray);
+
+  Mat zoom;
+  resize(gray, zoom, Size(gray.rows*4, gray.cols*4), 0, 0, INTER_AREA);
+  imshow("show_im",zoom);
+  waitKey(0);
+
+  /*for (const Mat& ch : chars) {
+
+    string parsed = parseCharTesseract(ch);
+    cout << "Detected code: " << parsed << endl;
+    
+    // namedWindow( "Components", 1 );
+    imshow("show_char",ch);
+    waitKey(0);
+  }*/
+
+  /*RNG rng(12345);
+  vector<vector<Point>> contours;
+  vector<cv::Vec4i> hierarchy;
+  findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+
+  Mat dst = Mat::zeros(gray.rows, gray.cols, CV_8UC3);
+
+  int idx = 0;
+  for(; idx >= 0; idx = hierarchy[idx][0] )
+  {
+      Scalar color( rand()&255, rand()&255, rand()&255 );
+      drawContours( dst, contours, idx, color, FILLED, 8, hierarchy );
+  }*/
+
 }
 
 int HRCodeParser::findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {

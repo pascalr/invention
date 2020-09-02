@@ -20,7 +20,7 @@
 // And the contours gives me the side limits.
 // then recognize the characters with a dnn.
 
-string parseCharTesseract(Mat& im) {
+string parseCharTesseract(const Mat& im) {
   tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
   char config_name[] = "chars";
   char* config_ptr = config_name;
@@ -41,7 +41,7 @@ string parseCharTesseract(Mat& im) {
   return outText;
 }
 
-string parseLineTesseract(Mat& im) {
+string parseLineTesseract(const Mat& im) {
   tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
   char config_name[] = "chars";
   char* config_ptr = config_name;

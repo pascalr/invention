@@ -4,5 +4,7 @@
 #include "model.h"
 
 void parseJarCode(DetectedHRCode& p);
+string parseCharTesseract(const Mat& im);
+string parseLineTesseract(const Mat& im);
 
 #endif

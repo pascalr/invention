@@ -42,6 +42,10 @@ class HRCode {
     double scale;
 };
 
+void extractChars(vector<Mat>& lines, Mat& src);
+void extractLines(vector<Mat>& lines, Mat& src);
+void parseText(vector<string>& parsedLines, Mat mat);
+
 ostream &operator<<(std::ostream &os, const HRCode &c);
 
 class HRCodeParser {
