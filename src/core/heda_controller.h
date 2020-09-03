@@ -64,7 +64,13 @@ class HedaController {
         heda.calibrate(format);
       };
       m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
-        closeup(heda);
+        DetectedHRCode code;
+        unsigned long id = tokens.popPositiveInteger();
+        ensure(heda.codes.get(code, id), "closeup must have a valid code id");
+        closeup(heda, code);
+      };
+      m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
+        storeAll(heda);
       };
       m_commands["nodup"] = [&](ParseResult tokens) {
         removeNearDuplicates(heda);

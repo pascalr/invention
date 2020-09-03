@@ -37,7 +37,8 @@ class NoWorkingShelfException : public exception {};
 #define AXIS_T 't'
 #define AXIS_R 'r'
 
-void closeup(Heda& heda);
+void storeAll(Heda& heda);
+void closeup(Heda& heda, DetectedHRCode& code);
 void removeNearDuplicates(Heda& heda);
 
 class Axis {
@@ -128,7 +129,7 @@ class MoveCommand : public SlaveCommand {
     }
     
     string str() {
-      return "move " + string(1, axis.id) + to_string(destination);
+      return "move " + string(1, axis.id) + " " + to_string(destination);
     }
 
     void doneCallback(Heda& heda);
@@ -393,8 +394,13 @@ class Heda {
     // The offset is the offset between the two zeroes.
     PolarCoord toPolarCoord(const UserCoord c, double reference) {
 
-      double z = -c.z + config.user_coord_offset_z;
-      double t = (asin(z / reference) * 180.0 / PI);
+      double robotZ = -c.z + config.user_coord_offset_z;
+
+      stringstream errorMsg; errorMsg << "toPolarCoord, wrong params, impossible to the given UserCoord, reference is too small. robotZ = ";
+      errorMsg << robotZ << ", reference = " << reference;
+      ensure(robotZ <= reference, errorMsg.str().c_str());
+      
+      double t = (asin(robotZ / reference) * 180.0 / PI);
       if (c.x > X_MIDDLE) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
         t = 180.0 - t;
       }

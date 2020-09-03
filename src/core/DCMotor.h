@@ -64,6 +64,7 @@ class DCMotor : public Motor {
 
     void stop() {
       setDutyCycle(0);
+      isReferencing = false;
     }
 
 

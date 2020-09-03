@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_01_194926) do
+ActiveRecord::Schema.define(version: 2020_09_03_190015) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_194926) do
     t.float "max_h"
     t.float "max_v"
     t.float "max_t"
+    t.float "closeup_distance"
     t.index ["shelf_id"], name: "index_hedas_on_shelf_id"
   end
 

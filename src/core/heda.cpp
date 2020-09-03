@@ -74,46 +74,68 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
   return perceivedWidth * distanceFromCamera / actualWidth;
 }
 
-// closesup muste be done to the tallest jars first, then store them.
-// then close up the next tallest, etc.
-void closeup(Heda& heda) {
+void debug() {}
+
+// Store all jars, starting with the tallest.
+// Make a clesup picture before storing it.
+void storeAll(Heda& heda) {
   heda.codes.order(byLidY, false);
   for (DetectedHRCode& code : heda.codes) {
-
-    double z = code.lid_coord.z > heda.config.camera_radius ? heda.config.camera_radius : code.lid_coord.z;
-    heda.pushCommand(make_shared<HoverCommand>(code.lid_coord.x, z, heda.config.camera_radius));
-
-    heda.pushCommand(make_shared<MoveCommand>(heda.axisV, heda.unitV(code.lid_coord.y + 100))); // FIXME: Hardcoded CAMERA_CLOSUP_DISTANCE 
-
-    heda.pushCommand(make_shared<LambdaCommand>([&code](Heda& heda) {
-      Mat frame;
-      heda.captureFrame(frame);
-      vector<DetectedHRCode> detected;
-      detectCodes(heda, detected, frame, heda.getPosition());
-      ensure(detected.size() < 1, "There must be a detected code in a closup.");
-      ensure(detected.size() > 1, "There must be only one detected code in a closup.");
-
-      // Ugly, but I don't know how else to do this easily.
-      const DetectedHRCode& recent = detected[0];
-      code.coord = recent.coord;
-      code.centerX = recent.centerX;
-      code.centerY = recent.centerY;
-      code.scale = recent.scale;
-      code.imgFilename = recent.imgFilename;
-      code.jar_id = recent.jar_id;
-      code.weight = recent.weight;
-      code.content_name = recent.content_name;
-      code.content_id = recent.content_id;
-      code.lid_coord = recent.lid_coord;
-
-      heda.db.update(heda.codes, code);
-    }));
+    closeup(heda,code);
   }
+}
+
+// closesup muste be done to the tallest jars first, then store them.
+// then close up the next tallest, etc.
+void closeup(Heda& heda, DetectedHRCode& code) {
+
+  double robotZ = heda.config.user_coord_offset_z - code.lid_coord.z;
+
+  if (robotZ > heda.config.camera_radius) {
+    robotZ = heda.config.camera_radius;
+  }
+
+  double userZ = heda.config.user_coord_offset_z - robotZ;
+ 
+  heda.pushCommand(make_shared<HoverCommand>(code.lid_coord.x, userZ, heda.config.camera_radius));
+
+  heda.pushCommand(make_shared<MoveCommand>(heda.axisV, heda.unitV(code.lid_coord.y + heda.config.closeup_distance)));
+
+  heda.pushCommand(make_shared<LambdaCommand>([&code](Heda& heda) {
+
+    Mat frame;
+    heda.captureFrame(frame);
+    vector<DetectedHRCode> detected;
+    detectCodes(heda, detected, frame, heda.getPosition());
+    ensure(detected.size() >= 1, "There must be a detected code in a closup.");
+    ensure(detected.size() <= 1, "There must be only one detected code in a closup.");
+
+    DetectedHRCode& recent = detected[0];
+    recent.id = code.id;
+
+    // Ugly, but I don't know how else to do this easily.
+    /*const DetectedHRCode& recent = detected[0];
+    code.coord = recent.coord;
+    code.centerX = recent.centerX;
+    code.centerY = recent.centerY;
+    code.scale = recent.scale;
+    code.imgFilename = recent.imgFilename;
+    code.jar_id = recent.jar_id;
+    code.weight = recent.weight;
+    code.content_name = recent.content_name;
+    code.content_id = recent.content_id;
+    code.lid_coord = recent.lid_coord;
+    */
+
+    heda.db.update(heda.codes, recent);
+  }));
 }
     
 void HoverCommand::setup(Heda& heda) {
   Shelf shelf;
   ensure(heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v))), "hover must have a valid shelf to hover unto");
+
+  debug();
 
   UserCoord c(x, shelf.moving_height, z);
   commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c, reference)));
@@ -260,7 +282,7 @@ void SweepCommand::setup(Heda& heda) {
       }
       double deltaX = cosd(t) * heda.config.gripper_radius;
 
-      PolarCoord p = PolarCoord(x+deltaX, heda.unitV(heda.working_shelf.moving_height), t);
+      PolarCoord p = PolarCoord(x+deltaX, heda.unitV(heda.config.detect_height), t);
       commands.push_back(make_shared<GotoCommand>(p));
       commands.push_back(make_shared<DetectCommand>());
     }

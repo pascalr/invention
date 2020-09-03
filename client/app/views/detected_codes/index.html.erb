@@ -5,6 +5,7 @@
 <table>
   <thead>
     <tr>
+      <th>id</th>
       <th>X</th>
       <th>Y</th>
       <th>T</th>
@@ -26,6 +27,7 @@
   <tbody>
     <% @detected_codes.each do |detected_code| %>
       <tr>
+        <td><%= detected_code.id %></td>
         <td><%= '%.2f' % detected_code.x %></td>
         <td><%= '%.2f' % detected_code.y %></td>
         <td><%= '%.2f' % detected_code.t %></td>

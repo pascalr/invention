@@ -60,11 +60,13 @@
     <%= form.number_field :max_t , step: 0.01 %>
   </div>
 
+  FIXME: This should be x, not h
   <div class="field">
     <%= form.label :home_position_x %>
     <%= form.number_field :home_position_x, step: 0.01 %>
   </div>
 
+  FIXME: This should be y, not v
   <div class="field">
     <%= form.label :home_position_y %>
     <%= form.number_field :home_position_y, step: 0.01 %>
@@ -87,6 +89,11 @@
   <div class="field">
     <%= form.label :camera_radius %>
     <%= form.number_field :camera_radius, step: 0.01 %>
+  </div>
+  
+  <div class="field">
+    <%= form.label :closeup_distance %>
+    <%= form.number_field :closeup_distance, step: 0.01 %>
   </div>
 
   <p>

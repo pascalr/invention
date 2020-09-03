@@ -91,6 +91,7 @@ class StepperMotor : public Motor {
       //setMotorsEnabled(false);
       setDestination(getPosition());
       forceRotation = false;
+      isReferencing = false;
     }
 
     void setPosition(double pos) {
