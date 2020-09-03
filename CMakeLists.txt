@@ -63,7 +63,6 @@ ADD_LIBRARY(MyLibsModule
   src/core/reader/reader.cpp
   src/core/tess_parser.cpp
   src/core/heda.cpp
-  src/core/sweep.cpp
   src/core/position.cpp
   src/lib/lib.cpp
   src/lib/hr_code.cpp

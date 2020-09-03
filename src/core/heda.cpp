@@ -1,6 +1,5 @@
 #include "heda.h"
 #include "position.h"
-#include "sweep.h"
 #include "client_http.hpp"
 #include "pinpoint.h"
 #include "../lib/opencv.h"
@@ -15,6 +14,24 @@ class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 class InvalidGrippedJarFormatException : public exception {};
+
+void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
+
+  cout << "Running detect code." << endl;
+  HRCodeParser parser(0.2, 0.2);
+  vector<HRCode> positions;
+  parser.findHRCodes(frame, positions, 100);
+
+  if (!positions.empty()) {
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
+      cout << "Detected one HRCode!!!" << endl;
+      DetectedHRCode d(*it, c);
+      detected.push_back(d);
+    }
+    return;
+  }
+  cout << "No codes were detected..." << endl;
+}
 
 double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
   Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;

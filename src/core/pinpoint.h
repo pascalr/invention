@@ -4,7 +4,6 @@
 // Maybe rename to pinpoint
 
 #include "position.h"
-#include "sweep.h"
 #include <vector>
 #include "model.h"
  
