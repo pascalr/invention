@@ -28,6 +28,9 @@ data/ingredients/
 # Ignore bundler config.
 client/.bundle
 
+tessinput.tif
+tessout.txt
+
 client/Gemfile.lock
 
 # Ignore the default SQLite database.

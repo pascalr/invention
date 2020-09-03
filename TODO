@@ -24,6 +24,8 @@ FIXME:
 
 ----------
 
+LED: 45 mA, 4.45 V => 5V/0.045A = 111 ohm, 5V * 0.045A = 0.225 Watt, Certaines résitances ne résiste seulement qu'à 0.125 Watt..
+
 Ok c'est peut-être correct que le robot utilise seulement la lumière ambiante, parce que la seule utilisation principale pour l'instant
 c'est de ranger les pots. Et quand tu viens de fais ranger les pots, ben tu es encore dans la pièce. En tout cas ne plus retravailler
 sur ça pour l'instant. C'est vraiment difficile. Le métal reflète la lumière. Je n'ai vraiment pas des bons résultats.

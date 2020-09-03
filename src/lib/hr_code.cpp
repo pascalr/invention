@@ -19,7 +19,7 @@
 #include "../lib/opencv.h"
 #include "../utils/io_common.h"
 
-#include "../core/jar_parser.h" // tmp
+#include "../core/tess_parser.h" // tmp
 
 #include "../utils/constants.h"
 
@@ -38,12 +38,12 @@ ostream &operator<<(std::ostream &os, const HRCode &c) {
   return os << "{" << c.scale << "}";
 }
 
-
-void extractChars(vector<Mat>& chars, Mat& src) {
+// Extract chars this way does not work, because sometimes there is an even nb of chars, sometimes there is an odd.
+void extractLines(vector<Mat>& lines, Mat& src) {
 
   double scale = src.cols/110.0;
   double topOffset = 10.0 * scale;
-  double charWidth = 11 * scale;
+  double charWidth = 12 * scale;
   double charHeight = 26 * scale;
   double lineInterspace = 24 * scale;
 
@@ -56,61 +56,132 @@ void extractChars(vector<Mat>& chars, Mat& src) {
     int nbChar = pattern[i];
     double y = i*lineInterspace + topOffset;
     double x = nbChar/-2.0*charWidth + src.cols/2.0;
-    for (int j = 0; j < nbChar; j++) {
-      double x = (0.0+j-1.0*nbChar/2.0)*charWidth + src.cols/2;
-      Rect r = Rect(x, y, charWidth*1.2, charHeight);
-      Mat charMat(src, Rect(x, y, charWidth, charHeight));
-      chars.push_back(charMat);
-      rectangle(src, r, Scalar(0,255,0), 1, LINE_8);
-    }
-  }
-}
-
-
-void extractLines(vector<Mat>& lines, Mat& src) {
-
-  double scale = src.cols/110.0;
-  double topOffset = 10.0 * scale;
-  double charWidth = 13 * scale;
-  double charHeight = 28 * scale;
-  double lineInterspace = 24 * scale;
-
-  int nbLines = 4;
-  int pattern[nbLines] = {3,7,8,4}; // number of char per line
-  string rawHRCode[nbLines];
-
-  // Get the sub-matrices (minors) for every character.
-  for (int i = 0; i < nbLines; i++) {
-    int nbChar = pattern[i];
-    double y = i*lineInterspace + topOffset;
-    double x = nbChar/-2.0*charWidth + src.cols/2.0;
     Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
+    //rectangle(src, lineRect, Scalar(0,255,0), 2, LINE_8);
     Mat lineMat(src, lineRect);
     lines.push_back(lineMat);
   }
 }
 
+class ImageProcess {
+  public:
+    virtual void process(Mat& src, Mat& dest) = 0;
+};
+
+class Scorer {
+  public:
+    double score(string expected, string actual) {
+      // +5 per good character, -1 per bad character
+      return 1.0;
+    }
+};
+
+// Automatically detect the best combination of process to get the best accuracy.
+class Optimiser {
+  public:
+    vector<ImageProcess> processes;
+    Scorer scorer;
+};
+
+class DilateProcess : public ImageProcess {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      int dilateSize = 2; // TODO: Make this a param
+      Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
+      dilate(src, dest, kernel );
+    }
+
+};
+
+class ErodeProcess : public ImageProcess  {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      int erosionSize = 2; // TODO: Make this a param
+      Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*erosionSize + 1, 2*erosionSize+1 ), Point( erosionSize, erosionSize ) );
+      erode(src, dest, kernel );
+    }
+
+};
+
+class ThresholdBinaryProcess : public ImageProcess  {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      threshold(src, dest, 255/2.0, 255, THRESH_BINARY);
+    }
+
+};
+
+// Make everything below the threshold black
+class ThresholdBlackProcess : public ImageProcess  {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      threshold(src, dest, 80, 255, THRESH_TOZERO);
+    }
+
+};
+
+// Make everything above (255-threshold) white
+class ThresholdWhiteProcess : public ImageProcess  {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      threshold(src, dest, 80, 255, THRESH_TOZERO);
+    }
+
+};
+
+class ContrastProcess : public ImageProcess  {
+  public:
+    void process(Mat& src, Mat& dest) {
+      double contrast = 1.1;
+      dest = src * contrast;
+    }
+};
+
+
+class BlurProcess : public ImageProcess  {
+  public:
+    void process(Mat& src, Mat& dest) {
+      blur(src, dest, Size(3,3)); // Remove noise
+    }
+};
+
+class CannyProcess : public ImageProcess  {
+  public:
+    void process(Mat& src, Mat& dest) {
+      int thresh = 100;
+      Canny(src, dest, thresh, thresh*2 );
+    }
+};
+
+// Given a point, I want everything above to get brighter, and everything below to get darker, and more the farther it gets.
+/*class MyContrastProcess {
+  public:
+    void process(Mat& src, Mat& dest) {
+      double midPoint = 0.5;
+      for( int y = 0; y < src.rows; y++ ) {
+          for( int x = 0; x < src.cols; x++ ) {
+              for( int c = 0; c < src.channels(); c++ ) {
+                  dest.at<Vec3b>(y,x)[c] =
+                    saturate_cast<uchar>( (image.at<Vec3b>(y,x)[c] / 255.0) );
+                    //saturate_cast<uchar>( alpha*image.at<Vec3b>(y,x)[c] + beta );
+              }
+          }
+      }
+    }
+};
+*/
+
+// TODO Contours process
+
+// Find characters with contours does not work because they are too close together
 void parseText(vector<string>& parsedLines, Mat gray) {
-
-  blur( gray, gray, Size(3,3) ); // Remove noise
-
-  vector<Mat> chars;
-  extractChars(chars, gray);
-
-  Mat zoom;
-  resize(gray, zoom, Size(gray.rows*4, gray.cols*4), 0, 0, INTER_AREA);
-  imshow("show_im",zoom);
-  waitKey(0);
-
-  /*for (const Mat& ch : chars) {
-
-    string parsed = parseCharTesseract(ch);
-    cout << "Detected code: " << parsed << endl;
-    
-    // namedWindow( "Components", 1 );
-    imshow("show_char",ch);
-    waitKey(0);
-  }*/
+  
+  resize(gray, gray, Size(gray.cols*4, gray.rows*4), 0, 0, INTER_AREA);
 
   /*RNG rng(12345);
   vector<vector<Point>> contours;
@@ -125,6 +196,35 @@ void parseText(vector<string>& parsedLines, Mat gray) {
       Scalar color( rand()&255, rand()&255, rand()&255 );
       drawContours( dst, contours, idx, color, FILLED, 8, hierarchy );
   }*/
+ 
+  Mat dst = gray.clone(); 
+
+  vector<shared_ptr<ImageProcess>> processes;
+  //processes.push_back(make_shared<BlurProcess>());
+  //processes.push_back(make_shared<ErodeProcess>());
+  //processes.push_back(make_shared<DilateProcess>());
+  //processes.push_back(make_shared<ErodeProcess>());
+  //processes.push_back(make_shared<DilateProcess>());
+  //processes.push_back(make_shared<ThresholdBinaryProcess>());
+  
+  Mat sideBySide = gray.clone();
+
+  for (shared_ptr<ImageProcess>& process : processes) {
+    process->process(dst, dst);
+    hconcat(sideBySide, dst, sideBySide);
+  }
+
+  vector<Mat> lines;
+  extractLines(lines, dst);
+
+  for (const Mat& line : lines) {
+
+    string parsed = parseLineTesseract(line);
+    cout << "Detected code: " << parsed << endl;
+  }
+
+  imshow("show_side_by_side",sideBySide);
+  waitKey(0);
 
 }
 

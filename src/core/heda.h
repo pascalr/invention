@@ -14,7 +14,7 @@ class Heda;
 
 #include "parser.h"
 
-#include "jar_parser.h"
+#include "tess_parser.h"
 
 #include "calibrate.h"
 
