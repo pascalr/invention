@@ -17,7 +17,6 @@ class TessParser {
 
     tesseract::TessBaseAPI ocr;
     tesseract::TessBaseAPI digitOcr;
-    tesseract::TessBaseAPI defaultOcr;
 };
 
 string parseLineTesseract(const Mat& im);

@@ -185,6 +185,11 @@ void ParseCodesCommand::start(Heda& heda) {
     Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
     vector<string> lines;
     parseText(lines, gray);
+    ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
+    code.jar_id = lines[0];
+    code.weight = lines[1];
+    code.content_name = lines[2];
+    code.content_id = lines[3];
     heda.db.update(heda.codes, code);
   }
 }

@@ -253,19 +253,18 @@ void parseText(vector<string>& parsedLines, Mat gray) {
     hconcat(sideBySide, dst, sideBySide);
   }
 
+
   vector<Mat> lines;
   extractLines(lines, dst);
 
   TessParser parser;
-  cout << "Detected code jar id: " << parser.parseDigitLine(lines[0]) << endl;
-  cout << "Detected code jar weight: " << parser.parseLine(lines[1]) << endl;
-  cout << "Detected code content name: " << parser.parseLine(lines[2]) << endl;
-  cout << "Detected code content id: " << parser.parseDigitLine(lines[3]) << endl;
-  /*for (const Mat& line : lines) {
-
-    string parsed = parseLineTesseract(line);
-    cout << "Detected code: " << parsed << endl;
-  }*/
+  parsedLines.push_back(parser.parseDigitLine(lines[0]));
+  parsedLines.push_back(parser.parseLine(lines[1]));
+  parsedLines.push_back(parser.parseLine(lines[2]));
+  parsedLines.push_back(parser.parseDigitLine(lines[3]));
+  for (const string& line : parsedLines) {
+    cout << "Detected code: " << line << endl;
+  }
 
   imshow("show_side_by_side",sideBySide);
   waitKey(0);

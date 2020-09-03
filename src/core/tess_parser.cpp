@@ -31,21 +31,8 @@ TessParser::TessParser() {
   ensure(digitOcr.SetVariable("user_defined_dpi", "300"), "user_defined_dpi");
   ensure(digitOcr.SetVariable("tessedit_write_images", "true"), "tessedit_write_images");
   digitOcr.SetPageSegMode(tesseract::PSM_SINGLE_LINE);
-
-  defaultOcr.Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY);
-  ensure(defaultOcr.SetVariable("load_system_dawg", "false"), "load_system_dawg");
-  ensure(defaultOcr.SetVariable("load_freq_dawg", "false"), "load_freq_dawg");
-  ensure(defaultOcr.SetVariable("user_defined_dpi", "300"), "user_defined_dpi");
-  ensure(defaultOcr.SetVariable("tessedit_write_images", "true"), "tessedit_write_images");
-  defaultOcr.SetPageSegMode(tesseract::PSM_AUTO);
 }
 
-std::string TessParser::parseDefault(const Mat& im) {
-  defaultOcr.SetImage(im.data, im.cols, im.rows, 1, im.step);
-  string outText = string(defaultOcr.GetUTF8Text());
-  trim(outText);
-  return outText;
-}
 std::string TessParser::parseLine(const Mat& im) {
   ocr.SetImage(im.data, im.cols, im.rows, 1, im.step);
   string outText = string(ocr.GetUTF8Text());
