@@ -7,6 +7,10 @@
 #include <fstream> // ?
 
 #include <string>
+#include <exception>
+
+class EnsureException : public std::exception {};
+void ensure(bool statement, const char* errorMessage);
 
 // trim from start (in place)
 void ltrim(std::string &s);

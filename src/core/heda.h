@@ -21,7 +21,6 @@ class Heda;
 #include "database.h"
 
 class HedaException : public exception {};
-class EnsureException : public exception {};
 
 class InitVideoException : public HedaException {};
 class InitArduinoException : public HedaException {};
@@ -29,8 +28,6 @@ class FrameCaptureException : public HedaException {};
 
 class MissingConfigException : public exception {};
 class NoWorkingShelfException : public exception {};
-
-void ensure(bool statement, const char* errorMessage);
 
 #include <mutex>
 

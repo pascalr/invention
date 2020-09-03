@@ -9,7 +9,16 @@
 #include "../utils/utils.h"
 #include "../utils/io_common.h"
 
+#include <iostream>
+
 using namespace std;
+
+void ensure(bool statement, const char* errorMessage) {
+  if (!statement) {
+    cerr << "\033[31mError\033[0m: " << errorMessage << endl;
+    throw EnsureException();
+  }
+}
 
 // trim from start (in place)
 void ltrim(std::string &s) {

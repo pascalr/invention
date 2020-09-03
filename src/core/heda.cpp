@@ -16,13 +16,6 @@ class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 class InvalidGrippedJarFormatException : public exception {};
 
-void ensure(bool statement, const char* errorMessage) {
-  if (!statement) {
-    cerr << "\033[31mError\033[0m: " << errorMessage << endl;
-    throw EnsureException();
-  }
-}
-
 double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
   Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;
   Vector2f lid2; lid2 << c2.lid_coord.x, c2.lid_coord.z;

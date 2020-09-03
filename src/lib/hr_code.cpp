@@ -94,6 +94,37 @@ class DilateProcess : public ImageProcess {
 
 };
 
+class AdaptiveThresholdProcess : public ImageProcess {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      adaptiveThreshold(src, dest, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 3, 5 );
+    }
+
+};
+
+// Adjusts contrast. Darkens too white images and whitens too dark images.
+class BrightnessProcess : public ImageProcess {
+  public:
+
+    void process(Mat& src, Mat& dest) {
+      double averageBrightness = 0;
+      for(int i=0; i<src.rows; i++) {
+        for(int j=0; j<src.cols; j++) {
+          averageBrightness += src.at<uchar>(i,j);
+        }
+      }
+      averageBrightness /= src.rows*src.cols;
+      std::cout << "Avg brightness: " << averageBrightness << std::endl;
+
+      double requiredBrightness = 255.0 / 2.0;
+      double factor = requiredBrightness / averageBrightness;
+
+      dest = src*factor;
+    }
+
+};
+
 class ErodeProcess : public ImageProcess  {
   public:
 
@@ -153,8 +184,26 @@ class BlurProcess : public ImageProcess  {
 class CannyProcess : public ImageProcess  {
   public:
     void process(Mat& src, Mat& dest) {
-      int thresh = 100;
+      int thresh = 20;
       Canny(src, dest, thresh, thresh*2 );
+    }
+};
+
+// CannyProcess should be run just before
+class DrawContoursProcess : public ImageProcess  {
+  public:
+    void process(Mat& src, Mat& dest) {
+      RNG rng(12345);
+      vector<vector<Point>> contours;
+      vector<cv::Vec4i> hierarchy;
+      findContours( src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+
+      int idx = 0;
+      for(; idx >= 0; idx = hierarchy[idx][0] )
+      {
+          Scalar color( rand()&255, rand()&255, rand()&255 );
+          drawContours( dest, contours, idx, color, FILLED, 8, hierarchy );
+      }
     }
 };
 
@@ -181,29 +230,19 @@ class CannyProcess : public ImageProcess  {
 // Find characters with contours does not work because they are too close together
 void parseText(vector<string>& parsedLines, Mat gray) {
   
-  resize(gray, gray, Size(gray.cols*4, gray.rows*4), 0, 0, INTER_AREA);
+  resize(gray, gray, Size(gray.cols*2, gray.rows*2), 0, 0, INTER_AREA);
 
-  /*RNG rng(12345);
-  vector<vector<Point>> contours;
-  vector<cv::Vec4i> hierarchy;
-  findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
-
-  Mat dst = Mat::zeros(gray.rows, gray.cols, CV_8UC3);
-
-  int idx = 0;
-  for(; idx >= 0; idx = hierarchy[idx][0] )
-  {
-      Scalar color( rand()&255, rand()&255, rand()&255 );
-      drawContours( dst, contours, idx, color, FILLED, 8, hierarchy );
-  }*/
  
   Mat dst = gray.clone(); 
 
   vector<shared_ptr<ImageProcess>> processes;
-  //processes.push_back(make_shared<BlurProcess>());
+  processes.push_back(make_shared<BlurProcess>());
+  processes.push_back(make_shared<BrightnessProcess>());
   //processes.push_back(make_shared<ErodeProcess>());
+  //processes.push_back(make_shared<CannyProcess>());
+  //processes.push_back(make_shared<DrawContoursProcess>());
+  //processes.push_back(make_shared<AdaptiveThresholdProcess>());
   //processes.push_back(make_shared<DilateProcess>());
-  //processes.push_back(make_shared<ErodeProcess>());
   //processes.push_back(make_shared<DilateProcess>());
   //processes.push_back(make_shared<ThresholdBinaryProcess>());
   
@@ -217,11 +256,16 @@ void parseText(vector<string>& parsedLines, Mat gray) {
   vector<Mat> lines;
   extractLines(lines, dst);
 
-  for (const Mat& line : lines) {
+  TessParser parser;
+  cout << "Detected code jar id: " << parser.parseDigitLine(lines[0]) << endl;
+  cout << "Detected code jar weight: " << parser.parseLine(lines[1]) << endl;
+  cout << "Detected code content name: " << parser.parseLine(lines[2]) << endl;
+  cout << "Detected code content id: " << parser.parseDigitLine(lines[3]) << endl;
+  /*for (const Mat& line : lines) {
 
     string parsed = parseLineTesseract(line);
     cout << "Detected code: " << parsed << endl;
-  }
+  }*/
 
   imshow("show_side_by_side",sideBySide);
   waitKey(0);
