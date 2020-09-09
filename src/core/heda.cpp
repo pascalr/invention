@@ -74,8 +74,6 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
   return perceivedWidth * distanceFromCamera / actualWidth;
 }
 
-void debug() {}
-
 // Store all jars, starting with the tallest.
 // Make a clesup picture before storing it.
 void storeAll(Heda& heda) {
@@ -101,7 +99,7 @@ void closeup(Heda& heda, DetectedHRCode& code) {
 
   heda.pushCommand(make_shared<MoveCommand>(heda.axisV, heda.unitV(code.lid_coord.y + heda.config.closeup_distance)));
 
-  heda.pushCommand(make_shared<LambdaCommand>([&code](Heda& heda) {
+  heda.pushCommand(make_shared<LambdaCommand>([code](Heda& heda) {
 
     Mat frame;
     heda.captureFrame(frame);
@@ -134,8 +132,6 @@ void closeup(Heda& heda, DetectedHRCode& code) {
 void HoverCommand::setup(Heda& heda) {
   Shelf shelf;
   ensure(heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v))), "hover must have a valid shelf to hover unto");
-
-  debug();
 
   UserCoord c(x, shelf.moving_height, z);
   commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c, reference)));

@@ -9,6 +9,8 @@
 #include <string>
 #include <exception>
 
+void debug();
+
 class EnsureException : public std::exception {};
 void ensure(bool statement, const char* errorMessage);
 

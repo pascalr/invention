@@ -270,10 +270,10 @@ class DetectedHRCode : public Model {
     DetectedHRCode() {}
     DetectedHRCode(const HRCode& code, PolarCoord coord) : coord(coord), centerX(code.x), centerY(code.y), scale(code.scale), imgFilename(code.imgFilename) {
     }
-    DetectedHRCode(const DetectedHRCode& c) : coord(c.coord), centerX(c.centerX), centerY(c.centerY), scale(c.scale), imgFilename(c.imgFilename), jar_id(c.jar_id), weight(c.weight),
+    /*DetectedHRCode(const DetectedHRCode& c) : coord(c.coord), centerX(c.centerX), centerY(c.centerY), scale(c.scale), imgFilename(c.imgFilename), jar_id(c.jar_id), weight(c.weight),
                                               content_name(c.content_name), content_id(c.content_id), lid_coord(c.lid_coord) {
       id = c.id;
-    }
+    }*/
     PolarCoord coord;
     double centerX;
     double centerY;

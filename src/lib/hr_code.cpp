@@ -266,8 +266,8 @@ void parseText(vector<string>& parsedLines, Mat gray) {
     cout << "Detected code: " << line << endl;
   }
 
-  imshow("show_side_by_side",sideBySide);
-  waitKey(0);
+  //imshow("show_side_by_side",sideBySide);
+  //waitKey(0);
 
 }
 

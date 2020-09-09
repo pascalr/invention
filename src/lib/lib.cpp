@@ -13,6 +13,8 @@
 
 using namespace std;
 
+void debug(){}
+
 void ensure(bool statement, const char* errorMessage) {
   if (!statement) {
     cerr << "\033[31mError\033[0m: " << errorMessage << endl;

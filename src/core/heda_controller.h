@@ -64,6 +64,7 @@ class HedaController {
         heda.calibrate(format);
       };
       m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
+        debug();
         DetectedHRCode code;
         unsigned long id = tokens.popPositiveInteger();
         ensure(heda.codes.get(code, id), "closeup must have a valid code id");
