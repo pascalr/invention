@@ -19,6 +19,7 @@ class RecettesController < ApplicationController
 
   # GET /recettes/1/edit
   def edit
+    @tags = Tag.all
   end
 
   # POST /recettes
@@ -40,6 +41,9 @@ class RecettesController < ApplicationController
   # PATCH/PUT /recettes/1
   # PATCH/PUT /recettes/1.json
   def update
+
+    puts recette_params
+
     respond_to do |format|
       if @recette.update(recette_params)
         format.html { redirect_to @recette, notice: 'Recette was successfully updated.' }

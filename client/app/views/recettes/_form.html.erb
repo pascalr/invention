@@ -17,8 +17,14 @@
   </div>
   
   <div class="field">
-    <%= form.label :recipe_category_id %>
-    <%= form.text_field :recipe_category_id %>
+    <% for tag in @tags  %>
+      <label class="inline_label">
+        <span class="tag" onclick="toggle(this)">
+          <%= tag.name %>
+        </span>
+        <input type="checkbox" name="tag_<%= tag.id %>" hidden>
+      </label>
+    <% end %>
   </div>
 
   <div class="field">
