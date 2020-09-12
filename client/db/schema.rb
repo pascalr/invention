@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_03_190015) do
+ActiveRecord::Schema.define(version: 2020_09_12_131421) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -167,6 +167,15 @@ ActiveRecord::Schema.define(version: 2020_09_03_190015) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "recipe_tags", force: :cascade do |t|
+    t.integer "recette_id", null: false
+    t.integer "tag_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["recette_id"], name: "index_recipe_tags_on_recette_id"
+    t.index ["tag_id"], name: "index_recipe_tags_on_tag_id"
+  end
+
   create_table "shelves", force: :cascade do |t|
     t.float "height"
     t.float "width"
@@ -176,6 +185,12 @@ ActiveRecord::Schema.define(version: 2020_09_03_190015) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.float "moving_height"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "units", force: :cascade do |t|
@@ -194,4 +209,6 @@ ActiveRecord::Schema.define(version: 2020_09_03_190015) do
   add_foreign_key "ingredient_quantities", "units"
   add_foreign_key "ingredients", "aliments"
   add_foreign_key "locations", "shelves"
+  add_foreign_key "recipe_tags", "recettes"
+  add_foreign_key "recipe_tags", "tags"
 end
