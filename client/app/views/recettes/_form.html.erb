@@ -17,15 +17,14 @@
   </div>
   
   <div class="field">
-    <% for tag in @tags  %>
-      <label class="inline_label">
-        <span class="tag" onclick="toggle(this)">
-          <%= tag.name %>
-        </span>
-        <input type="checkbox" name="recette[tags[<%= tag.id %>]" hidden>
-        <%= form.check_box "tag_ids[]", tag.id, @tags.include?(city) %>
-      </label>
-    <% end %>
+    <%= form.label :tags %>
+    <%= collection_check_boxes(:recette, :tag_ids, Tag.all, :id, :name) do |b|
+      b.label(:"data-value" => b.value, class: "inline_label") { b.check_box + b.text }
+    end %>
+    <%# collection_check_boxes(:recette, :tag_ids, Tag.all, :id, :name) do |b|
+      #   b.label(:"data-value" => b.value, class: "inline_label tag", onclick: "toggle(this)") { b.check_box(hidden: true) + b.text }
+      # end
+      %>
   </div>
 
   <div class="field">
