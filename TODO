@@ -1,44 +1,3 @@
-Faire un calendrier pour planifier les repas.
-
-----------
-Good TODO list:
-
-Heda company:
-
-- Plan d'affaires
-- Combien est-ce que ça coûterait avec un atelier?
-
-Heda:
-
-- Acheter des câbles électriques multi-brins pour les moteurs.
-- RAJOUTER DES FLANGES AUX POULIES ET AUX DRUMS!
-- Perfectionner les HRCode et relâcher.
-- Acheter Ruban lumineux à DEL blanc https://www.canac.ca/en/4011486, au dollorama ou au rossy probablement.
-
-Heda Client:
-
-- Gérer les dates correctement des pots. Comme ça je vais pouvoir faire un inventaire et des suggestions de trucs qui devrait être manger bientôt.
-- Un calendrier de recettes avec une liste d'épicerie générée automatiquement
-- Send error messages back to client.
-
-FIXME:
-
-- Write infinite number of nextFilename, more and more digits to be added. This will be a bug soon otherwise I think.
-- Fixer le bug que quand je fais un référencement, si je l'arrête il est tout perdu et ne veux pas repartir apres un stop. (FIX STOP, STOPS EVERYTHING)
-- Don't keep any model in memory, this just gives errors because out of sync with db.
-
-Safety:
-
-- Switches sur les portes. Bouton appuyer requis pour valider redémarrage de la machine.
-- Crimper les câbles d'acier avec le bon outils.
-- Valider la résistances des pièces (surtout le contrepoids et 
-- Un accotoir derrière pour ne pas que les pots tombent à l'arrière.
-
-----------
-
-Au lieu de des catégories pour les recettes, faire des tags. Parce que à 
-mettons, salade de patate, c'est une salade, et c'est un repas, et c'est un accompagnement.
-
 Jig pour plier l'acier:
 Faire comme ma petite sandwich plieuse de rebord, mais en super long. Mais bon cela ça serait plus tard?
 
@@ -52,9 +11,6 @@ Installer les chaînes de câbles.
 Souder les fils au lieu du bornier.
 Rallonger les fils si requis.
 
-Contrepoids.
-Axe vertical.
-Nouveau axe.
 Un raspberry pi sur le robot. Pas cette semaine, j'ai dis pas de caméra cette semaine. De tout façon je crois que je vais rajouter
 l'axe avant de checker pour la caméra.
 
@@ -170,7 +126,6 @@ https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sh
 
 Dough hook?
 https://www.amazon.ca/Spiral-Coated-Metal-Dough-Hook/dp/B07WBZQGRL/ref=sr_1_2?dchild=1&keywords=knead+dough+hook&qid=1596200815&sr=8-2
-
 
 Actions:
 - Glisser les pots

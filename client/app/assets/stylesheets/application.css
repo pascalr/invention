@@ -18,6 +18,9 @@ body {
   margin-top: 0px;
 }
 
+tr:nth-child(even) {background: #DDD}
+tr:nth-child(odd) {background: #FFF}
+
 .tag {
   border: 1px solid black;
   border-radius: 5px;

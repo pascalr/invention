@@ -4,7 +4,13 @@ class RecettesController < ApplicationController
   # GET /recettes
   # GET /recettes.json
   def index
-    @recettes = Recette.all
+    @tags = Tag.all
+    @tags_filter = params[:tags_filter] || []
+    if @tags_filter.empty?
+      @recettes = Recette.all
+    else
+      @recettes = Recette.joins(:recipe_tags).where(recipe_tags: {tag_id: @tags_filter}).all
+    end
   end
 
   # GET /recettes/1
@@ -19,7 +25,6 @@ class RecettesController < ApplicationController
 
   # GET /recettes/1/edit
   def edit
-    @tags = Tag.all
   end
 
   # POST /recettes

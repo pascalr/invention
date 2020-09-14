@@ -1,6 +1,13 @@
 <p id="notice"><%= notice %></p>
 
+<%= link_to 'Nouvelle recette', new_recette_path %>
+
 <h1>Recettes</h1>
+
+<%= link_to "clear", recettes_path %>
+<% @tags.each do |tag|  %>
+  <%= link_to tag.name, recettes_path(tags_filter: @tags_filter + [tag.id]) %>
+<% end %>
 
 <table>
   <thead>
@@ -27,5 +34,3 @@
 </table>
 
 <br>
-
-<%= link_to 'Nouvelle recette', new_recette_path %>
