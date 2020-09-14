@@ -39,8 +39,6 @@ Safety:
 Au lieu de des catégories pour les recettes, faire des tags. Parce que à 
 mettons, salade de patate, c'est une salade, et c'est un repas, et c'est un accompagnement.
 
-Imprimer des tracks les unes dans les autres pour sauver du soutien?
-
 Jig pour plier l'acier:
 Faire comme ma petite sandwich plieuse de rebord, mais en super long. Mais bon cela ça serait plus tard?
 
@@ -49,28 +47,16 @@ La jig que ça prendrait c'est avec deux rouleaux peut-être, un creux v et un b
 Ça me prendrait des tasks avec des dates avec un calendrier. Comme chez Hopper. Trouver une application pour ça.
 
 Mardi:
-Imprimer des chaines de câbles.
 Un raspberry pi temporairement en bas juste à côté de l'arduino.
 Installer les chaînes de câbles.
 Souder les fils au lieu du bornier.
 Rallonger les fils si requis.
 
-Mercredi:
 Contrepoids.
-
-Jeudi:
 Axe vertical.
-
-Vendredi:
-Ménage pour fête.
-
-Semaine prochaine:
-Sortir la machine de l'armoire.
 Nouveau axe.
 Un raspberry pi sur le robot. Pas cette semaine, j'ai dis pas de caméra cette semaine. De tout façon je crois que je vais rajouter
 l'axe avant de checker pour la caméra.
-
-
 
 Mettre le raspberry seulement sur le robot. Il communique par wifi avec l'arduino. Essayer.
 Garder la caméra sur le bras. C'est une perte de temps sinon.

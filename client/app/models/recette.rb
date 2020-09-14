@@ -3,6 +3,7 @@ class Recette < ApplicationRecord
   has_many :ingredient_quantities
   has_many :recipe_tags
   has_many :tags, through: :recipe_tags
+  accepts_nested_attributes_for :recipe_tags
 
   def cost
     ingredient_quantities.inject(0){|sum,qty| sum + qty.cost }

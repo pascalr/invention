@@ -22,7 +22,8 @@
         <span class="tag" onclick="toggle(this)">
           <%= tag.name %>
         </span>
-        <input type="checkbox" name="tag_<%= tag.id %>" hidden>
+        <input type="checkbox" name="recette[tags[<%= tag.id %>]" hidden>
+        <%= form.check_box "tag_ids[]", tag.id, @tags.include?(city) %>
       </label>
     <% end %>
   </div>

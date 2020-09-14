@@ -25,8 +25,9 @@ class RecettesController < ApplicationController
   # POST /recettes
   # POST /recettes.json
   def create
+  
     @recette = Recette.new(recette_params)
-
+    
     respond_to do |format|
       if @recette.save
         format.html { redirect_to @recette, notice: 'Recette was successfully created.' }
@@ -41,8 +42,6 @@ class RecettesController < ApplicationController
   # PATCH/PUT /recettes/1
   # PATCH/PUT /recettes/1.json
   def update
-
-    puts recette_params
 
     respond_to do |format|
       if @recette.update(recette_params)
@@ -73,6 +72,6 @@ class RecettesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def recette_params
-      params.require(:recette).permit(:name, :instructions, :rating, :recipe_category_id)
+      params.require(:recette).permit(:name, :instructions, :rating, :recipe_category_id, tag_ids: [])
     end
 end
