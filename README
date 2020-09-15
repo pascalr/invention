@@ -234,3 +234,38 @@ set tabstop=2
 set softtabstop=2
 " when indenting with '>', use 2 spaces width
 set shiftwidth=2
+
+
+Jig pour plier l'acier:
+Faire comme ma petite sandwich plieuse de rebord, mais en super long. Mais bon cela ça serait plus tard?
+
+La jig que ça prendrait c'est avec deux rouleaux peut-être, un creux v et un boss v.
+
+Je tiens à ce que la boite électronique soit à part du robot. C'est le plus clean. Soit une boite en dessous. Sois une boite au dessus.
+La seule chose chiante est le câble USB pour la caméra... Il faut que je convertisse USB en ethernet probablement.
+
+
+Si le cable tray en avant pose, problème, simplement faire un 180 à la machine pour qu'il se retrouve à l'arrière.
+
+Aye, peux être faire un petit rack sur le côté que Heda va se déposer dedans quand il a terminé son boulot. Ça serait ça son home.
+Il y aurait simplement besoin de un seul capteur pour valider que Heda est dans son home. Mécaniquement, il saurait précisemment où
+il se situe par rapport à ses axes (un tapper pour guider). Si jamais il manque d'électricité, l'utilisateur devra prendre le bras
+manuellement et l'emporter justqu'à sa maison.
+Avantages: Moins de limit switch (moins de câble électrique), référencement de l'axe thêta aussi. Safe de ne pas faire de référencement n'importe où et briser quoi que ce soit.
+Inconvénients: Moins grande précision probablement parce que ne prends pas en compte le backlash.
+
+
+Idéalement, pour installer le robot, prendre une armoire existante (ou une acheter par le client), défaire
+la paroie du fond, installer mes côtés, installer la machine et réinstaller la paroi du fond après ma machine.
+
+
+Une pince comme un peigne pour soulever les pots lourds.
+
+DCMotor avec un encodeur pour l'axe vertical. Comme ça je vais pouvoir à côté les pots sur les tablettes?
+
+Use interupts to read rotary encoder.
+https://playground.arduino.cc/Main/RotaryEncoders/
+
+Upload with a single command to the arduino the new code with the arduino-cli:
+https://blog.arduino.cc/2018/08/24/announcing-the-arduino-command-line-interface-cli/
+https://arduino.github.io/arduino-cli/getting-started/
