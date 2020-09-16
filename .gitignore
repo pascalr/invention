@@ -38,6 +38,7 @@ client/db/*.sqlite3
 client/db/*.sqlite3.backup
 client/db/*.sqlite3-journal
 client/db/*.sqlite3-*
+!client/db/production.sqlite3
 
 # Ignore all logfiles and tempfiles.
 client/log/*
