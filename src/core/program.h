@@ -21,8 +21,8 @@
 class Program {
   public:
     Program(Writer& writer, Reader& reader) :
-        axisT(writer, 'T'), baseAxisX(writer, 'X'),
-        axisY(writer, 'Y'), axisR(writer, 'R') {
+        axisT(writer, 'T'), axisH(writer, 'H'),
+        axisV(writer, 'V'), axisR(writer, 'R') {
     }
 
     virtual Writer& getWriter() = 0;
@@ -37,13 +37,13 @@ class Program {
     void stopMoving();
     
     MotorT axisT;
-    StepperMotor baseAxisX;
-    StepperMotor axisY;
+    StepperMotor axisH;
+    StepperMotor axisV;
 
     DCMotor axisR;
      
     // These axes actually moves the motors. 
-    Motor* motors[NUMBER_OF_MOTORS+1] = {&baseAxisX, &axisY, &axisT, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    Motor* motors[NUMBER_OF_MOTORS+1] = {&axisH, &axisV, &axisT, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
 
     bool isWorking = false;
     

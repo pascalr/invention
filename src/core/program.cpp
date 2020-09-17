@@ -60,29 +60,29 @@ void setupAxes(Program& p) {
   p.axisT.setDefaultMaxSpeed(0.2);
   p.axisT.setAcceleration(0.2);
 
-  p.baseAxisX.setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
-  p.baseAxisX.setStepsPerTurn(200 * 2 * 8);
-  //p.baseAxisX.limitSwitchPin = 12;
-  p.baseAxisX.setupPins(8,2,3);
-  p.baseAxisX.setMaxPosition(900); // FIXME
-  //p.baseAxisX.setMinPosition(0);
-  p.baseAxisX.setMinPosition(-900); // FIXME
-  p.baseAxisX.setDefaultMaxSpeed(1.5);
-  p.baseAxisX.setAcceleration(1.5);
-  p.baseAxisX.setReverseMotorDirection(true);
-  p.baseAxisX.referencer = LimitSwitchReferencer(4);
+  p.axisH.setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
+  p.axisH.setStepsPerTurn(200 * 2 * 8);
+  //p.axisH.limitSwitchPin = 12;
+  p.axisH.setupPins(8,2,3);
+  p.axisH.setMaxPosition(900); // FIXME
+  //p.axisH.setMinPosition(0);
+  p.axisH.setMinPosition(-900); // FIXME
+  p.axisH.setDefaultMaxSpeed(1.5);
+  p.axisH.setAcceleration(1.5);
+  p.axisH.setReverseMotorDirection(true);
+  p.axisH.referencer = LimitSwitchReferencer(4);
 
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
-  p.axisY.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
-  p.axisY.setStepsPerTurn(200 * 2 * 16);
-  //p.axisY.limitSwitchPin = 12;
-  p.axisY.setupPins(8,7,6);
-  //p.axisY.setMaxPosition(AXIS_Y_MAX_POS);
-  p.axisY.setMaxPosition(900); // FIXME: stepsPerUnit is not OK
-  p.axisY.setMinPosition(-900); // tmp
-  p.axisY.setDefaultMaxSpeed(1.5);
-  p.axisY.setAcceleration(1.5);
-  p.axisY.setReverseMotorDirection(true);
-  p.axisY.referencer = LimitSwitchReferencer(12);
+  p.axisV.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
+  p.axisV.setStepsPerTurn(200 * 2 * 16);
+  //p.axisV.limitSwitchPin = 12;
+  p.axisV.setupPins(8,7,6);
+  //p.axisV.setMaxPosition(AXIS_Y_MAX_POS);
+  p.axisV.setMaxPosition(900); // FIXME: stepsPerUnit is not OK
+  p.axisV.setMinPosition(-900); // tmp
+  p.axisV.setDefaultMaxSpeed(1.5);
+  p.axisV.setAcceleration(1.5);
+  p.axisV.setReverseMotorDirection(true);
+  p.axisV.referencer = LimitSwitchReferencer(12);
 
 }

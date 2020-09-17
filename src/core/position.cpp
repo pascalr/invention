@@ -100,18 +100,18 @@ void doNothing() {}
 //    movements.push_back(Movement('t', positionT));
 //  }
 // 
-//  addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
+//  addMovementIfDifferent(movements, Movement('v', destination.v), position.v); 
 //
 //  // If moving theta would colide, move x first
 //  double deltaX = cosd(destination.t) * config.gripper_radius;
 //  double xIfTurnsFirst = position.h + deltaX;
 //
 //  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
-//    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+//    addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
 //    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
 //  } else {
 //    addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-//    addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+//    addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
 //  }
 //
 //  if (callback && movements.size() != size) {
@@ -143,7 +143,7 @@ void Heda::calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination
   }
 
   mvts.push_back(MoveCommand(axisV, destination.v)); 
-  //addMovementIfDifferent(movements, Movement('y', destination.v), position.v); 
+  //addMovementIfDifferent(movements, Movement('v', destination.v), position.v); 
 
   // If moving theta would colide, move x first
   double deltaX = cosd(destination.t) * config.gripper_radius;
@@ -152,13 +152,13 @@ void Heda::calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination
   if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
     mvts.push_back(MoveCommand(axisH, destination.h)); 
     mvts.push_back(MoveCommand(axisT, destination.t)); 
-    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
     //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
   } else {
     mvts.push_back(MoveCommand(axisT, destination.t)); 
     mvts.push_back(MoveCommand(axisH, destination.h)); 
     //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
   }
 }
 

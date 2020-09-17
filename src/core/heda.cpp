@@ -356,13 +356,13 @@ void GotoCommand::setup(Heda& heda) {
 
     commands.push_back(make_shared<MoveCommand>(heda.axisH, destination.h)); 
     commands.push_back(make_shared<MoveCommand>(heda.axisT, destination.t)); 
-    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
     //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
   } else {
     commands.push_back(make_shared<MoveCommand>(heda.axisT, destination.t)); 
     commands.push_back(make_shared<MoveCommand>(heda.axisH, destination.h)); 
     //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-    //addMovementIfDifferent(movements, Movement('x', destination.h), position.h); 
+    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
   }
 }
 

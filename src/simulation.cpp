@@ -24,8 +24,8 @@ void drawArm(Heda& heda, Program& p) {
   vector<double> x(2);
   vector<double> z(2);
 
-  UserCoord basePos = heda.toUserCoord(PolarCoord(p.baseAxisX.getPosition(),0,0), 0.0);
-  UserCoord toolPosition = heda.toUserCoord(PolarCoord(p.baseAxisX.getPosition(),0,p.axisT.getPosition()), heda.config.gripper_radius);
+  UserCoord basePos = heda.toUserCoord(PolarCoord(p.axisH.getPosition(),0,0), 0.0);
+  UserCoord toolPosition = heda.toUserCoord(PolarCoord(p.axisH.getPosition(),0,p.axisT.getPosition()), heda.config.gripper_radius);
 
   x[0] = basePos.x;
   x[1] = toolPosition.x;
@@ -52,7 +52,7 @@ void draw(Program& p, Heda& heda) {
   
   drawArm(heda, p);
   
-  UserCoord toolPosition = heda.toUserCoord(PolarCoord(p.baseAxisX.getPosition(),0,p.axisT.getPosition()), heda.config.gripper_radius);
+  UserCoord toolPosition = heda.toUserCoord(PolarCoord(p.axisH.getPosition(),0,p.axisT.getPosition()), heda.config.gripper_radius);
   drawPoint(toolPosition.x, toolPosition.z);
 
   //drawToolPosition(p.baseAxisX.getPosition(),p.axisZ.getPosition());

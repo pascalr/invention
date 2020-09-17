@@ -129,7 +129,7 @@ void testHomeCommand() {
   assertEqual("toUserPosition", UserCoord(0.0, 0.0, 0.0), u);
   assertEqual("toUserPositionToPolarCoord", pos, heda.toPolarCoord(u, heda.config.gripper_radius));
 
-  heda.move(Movement('x', 100.0));
+  heda.move(Movement('h', 100.0));
   executeAllPending(heda, reader);
   pos = PolarCoord(100.0, HOME_POSITION_Y, HOME_POSITION_T);
   assertEqual("x 100", pos, heda.getPosition());

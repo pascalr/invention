@@ -111,8 +111,8 @@ void myLoop(Program& p) {
     // position (faster than info)
     } else if (cmd == '@') {
       p.getWriter() << "\n" << MESSAGE_POSITION << "\n";
-      p.getWriter() << p.baseAxisX.getPosition() << " "
-                    << p.axisY.getPosition() << " "
+      p.getWriter() << p.axisH.getPosition() << " "
+                    << p.axisV.getPosition() << " "
                     << p.axisT.getPosition() << "\n";
       
     // ignore

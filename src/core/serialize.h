@@ -78,7 +78,7 @@ void serialize(StepperMotor* axis, T& out) {
   writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
   writeJson(out, PROPERTY_MOTOR_ENABLED, axis->isMotorEnabled);
   writeJson(out, PROPERTY_FORCE_ROTATION, axis->forceRotation);
-  if (axis->name == 'x') {
+  if (axis->name == 'h') {
     writeJson(out, PROPERTY_DELTA_POSITION, ((HorizontalAxis*)axis)->getDeltaPosition());
   } else if (axis->name == 'z') {
     writeJson(out, PROPERTY_DESTINATION_ANGLE, ((ZAxis*)axis)->getDestinationAngle());
@@ -100,7 +100,7 @@ void serialize(Motor* axis, T& out) {
   writeJson(out, PROPERTY_REFERENCED, axis->isReferenced);
   writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
   char name = axis->getName();
-  if (name == 'x' || name == 'X' || name == 'y' || name == 'Y' || name == 't' || name == 'T') {
+  if (name == 'h' || name == 'H' || name == 'v' || name == 'V' || name == 't' || name == 'T') {
     StepperMotor* stepper = (StepperMotor*)axis;
     writeJson(out, "m_speed", stepper->m_speed);
     writeJson(out, "m_next_step_time", stepper->m_next_step_time);

@@ -32,8 +32,8 @@ class NoWorkingShelfException : public exception {};
 #include <mutex>
 
 // TODO: Rename x and y to h and v at some point.
-#define AXIS_H 'x'
-#define AXIS_V 'y'
+#define AXIS_H 'h'
+#define AXIS_V 'v'
 #define AXIS_T 't'
 #define AXIS_R 'r'
 
@@ -316,9 +316,9 @@ class Heda {
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
       Axis* axis = 0;
-      if (mvt.axis == 'x' || mvt.axis == 'X') {
+      if (mvt.axis == 'h' || mvt.axis == 'H') {
         axis = &axisH;
-      } else if (mvt.axis == 'y' || mvt.axis == 'Y') {
+      } else if (mvt.axis == 'v' || mvt.axis == 'V') {
         axis = &axisV;
       } else if (mvt.axis == 't' || mvt.axis == 'T') {
         axis = &axisT;
