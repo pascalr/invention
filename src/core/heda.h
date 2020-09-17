@@ -312,6 +312,18 @@ class Heda {
       }
     }
 
+    Axis* axisByName(char name) {
+      Axis* axis = 0;
+      if (name == 'h' || name == 'H') {
+        axis = &axisH;
+      } else if (name == 'v' || name == 'V') {
+        axis = &axisV;
+      } else if (name == 't' || name == 'T') {
+        axis = &axisT;
+      }
+      return axis;
+    }
+
     void move(const Movement& mvt) { // Deprecated, movement is deprecated, superseded by MoveCommand
 
       cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";

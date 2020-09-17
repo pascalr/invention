@@ -139,7 +139,7 @@ bool Parser::parsePositiveInteger(ParseResult &result, const string &word) {
 
 bool Parser::parseAxis(ParseResult &result, const string &word) {
 
-  if (word == "x" || word == "y" || word == "z" || word == "t") {
+  if (word == "h" || word == "v" || word == "t") {
 
     shared_ptr<Token> tok = make_shared<AxisToken>(word[0]);
     result.addToken(tok);

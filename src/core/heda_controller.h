@@ -113,6 +113,13 @@ class HedaController {
         qty.unit_id = unit.id;
         heda.db.insert(heda.ingredient_quantities, qty);
       };
+      
+      m_commands["ref"] = [&](ParseResult tokens) {
+        char axisName = tokens.popAxis();
+        Axis* axis = heda.axisByName(axisName);
+        ensure(axis != 0, "ref command expects a valid axis name");
+        heda.pushCommand(make_shared<ReferencingCommand>(*axis));
+      };
 
       m_commands["home"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<ReferencingCommand>(heda.axisR));
