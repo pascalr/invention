@@ -132,7 +132,7 @@ class HedaController {
       };
 
       m_commands["gohome"] = [&](ParseResult tokens) {
-        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.config.home_position_x, heda.config.home_position_y, heda.config.home_position_t)));
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
       };
 
       m_commands["store"] = [&](ParseResult tokens) {
