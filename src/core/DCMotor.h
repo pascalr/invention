@@ -79,7 +79,7 @@ class DCMotor : public Motor {
     EncoderReferencer referencer;
 
     virtual void doStartReferencing() {
-      setDutyCycle(25);
+      setDutyCycle(50);
     }
 
     void prepare(unsigned long time) {
