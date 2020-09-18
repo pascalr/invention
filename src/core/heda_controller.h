@@ -164,9 +164,11 @@ class HedaController {
         cout << "Oups. No jar were found with this id." << endl;
       };
       m_commands["move"] = [&](ParseResult tokens) {
-        char axis = tokens.popAxis();
+        char axisName = tokens.popAxis();
         double dest = tokens.popScalaire();
-        heda.move(Movement(axis,dest));
+       
+        ensure(axis != 0, "ref command expects a valid axis name");
+        heda.pushCommand(make_shared<MoveCommand>(*axis, dest));
       };
       m_commands["sweep"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<SweepCommand>());

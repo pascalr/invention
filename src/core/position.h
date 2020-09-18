@@ -35,6 +35,23 @@ Y: Y0 est la tablette la plus basse.
 Z: Z0 est à partir du devant.
 */
 
+/*
+ * I don't have the courage to go through with this and change everything...
+class Unit {
+  Unit(double v) : value(v) {}
+  Unit(const Unit& u) : value(u.value) {}
+  double value;
+};
+
+class UnitX : public Unit {};
+class UnitY : public Unit {};
+class UnitZ : public Unit {};
+
+class UnitH : public Unit {};
+class UnitV : public Unit {};
+class UnitT : public Unit {};
+*/
+
 class PolarCoord {
   public:
     PolarCoord() {}
@@ -67,15 +84,15 @@ class UserCoord {
 
 double distanceSquare(const UserCoord& c1, const UserCoord& c2);
 
-class Movement {
-  public:
-    Movement(char axis, double destination, std::function<void()> callback) : axis(axis), destination(destination), callback(callback) {}
-    Movement(char axis, double destination) : axis(axis), destination(destination) {}
-    string str() const;
-    char axis;
-    double destination;
-    std::function<void()> callback;
-};
+//class Movement {
+//  public:
+//    Movement(char axis, double destination, std::function<void()> callback) : axis(axis), destination(destination), callback(callback) {}
+//    Movement(char axis, double destination) : axis(axis), destination(destination) {}
+//    string str() const;
+//    char axis;
+//    double destination;
+//    std::function<void()> callback;
+//};
 
 std::string to_string(const PolarCoord& c);
 std::string to_string(const UserCoord& c);
@@ -83,7 +100,7 @@ std::string to_string(const UserCoord& c);
 std::ostream& operator<<(std::ostream &os, const PolarCoord& c);
 std::ostream& operator<<(std::ostream &os, const UserCoord& c);
 
-void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);
+//void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition);
 
 void doNothing();
 

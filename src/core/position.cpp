@@ -39,10 +39,10 @@ double distanceSquare(const UserCoord& c1, const UserCoord& c2) {
   return (c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) + (c1.z-c2.z)*(c1.z-c2.z); 
 }
 
-string Movement::str() const {
-  stringstream ss; ss << "m" << axis << destination;
-  return ss.str();
-}
+//string Movement::str() const {
+//  stringstream ss; ss << "m" << axis << destination;
+//  return ss.str();
+//}
 
 
 /*PolarCoord toolCartesianToPolar(const CartesianCoord c) {
@@ -73,11 +73,11 @@ std::ostream& operator<<(std::ostream &os, const UserCoord& c) {
   return os << "(" << c.x << ", " << c.y << ", " << c.z << ")";
 }
 
-void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition) {
-  if (abs(mvt.destination - currentPosition) > 0.001) {
-    movements.push_back(mvt);
-  }
-}
+//void addMovementIfDifferent(vector<Movement> &movements, Movement mvt, double currentPosition) {
+//  if (abs(mvt.destination - currentPosition) > 0.001) {
+//    movements.push_back(mvt);
+//  }
+//}
 
 void doNothing() {}
 

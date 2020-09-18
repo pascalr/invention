@@ -306,11 +306,11 @@ class Heda {
 
     void captureFrame(Mat& frame);
     void capture();
-    void move(const std::vector<Movement>& mvts) {
-      for (const Movement& mvt : mvts) {
-        move(mvt);
-      }
-    }
+    //void move(const std::vector<Movement>& mvts) {
+    //  for (const Movement& mvt : mvts) {
+    //    move(mvt);
+    //  }
+    //}
 
     Axis* axisByName(char name) {
       Axis* axis = 0;
@@ -324,20 +324,20 @@ class Heda {
       return axis;
     }
 
-    void move(const Movement& mvt) { // Deprecated, movement is deprecated, superseded by MoveCommand
+    //void move(const Movement& mvt) { // Deprecated, movement is deprecated, superseded by MoveCommand
 
-      cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
-      Axis* axis = 0;
-      if (mvt.axis == 'h' || mvt.axis == 'H') {
-        axis = &axisH;
-      } else if (mvt.axis == 'v' || mvt.axis == 'V') {
-        axis = &axisV;
-      } else if (mvt.axis == 't' || mvt.axis == 'T') {
-        axis = &axisT;
-      }
-      if (axis == 0) {return;}
-      pushCommand(make_shared<MoveCommand>(*axis, mvt.destination));
-    }
+    //  cerr << "Moving axis " << mvt.axis << " to " << mvt.destination << ".\n";
+    //  Axis* axis = 0;
+    //  if (mvt.axis == 'h' || mvt.axis == 'H') {
+    //    axis = &axisH;
+    //  } else if (mvt.axis == 'v' || mvt.axis == 'V') {
+    //    axis = &axisV;
+    //  } else if (mvt.axis == 't' || mvt.axis == 'T') {
+    //    axis = &axisT;
+    //  }
+    //  if (axis == 0) {return;}
+    //  pushCommand(make_shared<MoveCommand>(*axis, mvt.destination));
+    //}
 
     void moveTo(PolarCoord destination) {
       pushCommand(make_shared<GotoCommand>(destination));
@@ -393,11 +393,11 @@ class Heda {
     }
     
     double unitV(double unitY) {
-      return unitY - config.user_coord_offset_y;
+      return config.user_coord_offset_y - unitY;
     }
 
     double unitY(double unitV) {
-      return unitV + config.user_coord_offset_y;
+      return config.user_coord_offset_y - unitV;
     }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc
@@ -418,7 +418,7 @@ class Heda {
       }
       double x = c.x - config.user_coord_offset_x + (cosd(t) * reference);
 
-      double y = c.y - config.user_coord_offset_y;
+      double y = config.user_coord_offset_y - c.y;
       return PolarCoord(x, y, t);
     }
 
@@ -430,7 +430,7 @@ class Heda {
       double offsetZ = config.user_coord_offset_z;
       // The x axis and the z axis are reverse (hence * -1)
       return UserCoord(p.h - (cosd(p.t) * reference) + offsetX,
-                  p.v+offsetY,
+                  offsetY-p.v,
                   ((sind(p.t) * reference)*-1)+offsetZ);
     }
 
