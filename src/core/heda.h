@@ -392,6 +392,10 @@ class Heda {
       return m_pending_commands;
     }
     
+    double unitH(double unitX, double unitT, double reference) {
+      return unitX - config.user_coord_offset_x + (cosd(unitT) * reference);
+    }
+    
     double unitV(double unitY) {
       return config.user_coord_offset_y - unitY;
     }

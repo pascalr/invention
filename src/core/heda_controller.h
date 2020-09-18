@@ -127,7 +127,7 @@ class HedaController {
         heda.pushCommand(make_shared<ReferencingCommand>(heda.axisH));
         heda.pushCommand(make_shared<MoveCommand>(heda.axisT, CHANGE_LEVEL_ANGLE_HIGH));
         heda.pushCommand(make_shared<ReferencingCommand>(heda.axisV));
-        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.config.home_position_x, heda.config.home_position_y, heda.config.home_position_t)));
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
         heda.pushCommand(make_shared<OpenGripCommand>());
       };
 
@@ -167,6 +167,7 @@ class HedaController {
         char axisName = tokens.popAxis();
         double dest = tokens.popScalaire();
        
+        Axis* axis = heda.axisByName(axisName);
         ensure(axis != 0, "ref command expects a valid axis name");
         heda.pushCommand(make_shared<MoveCommand>(*axis, dest));
       };

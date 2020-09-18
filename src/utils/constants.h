@@ -12,10 +12,6 @@
 #define REFERENCE_POSITION_T 90.0 // degrees
 #define REFERENCE_POSITION_R 0.0
 
-#define HOME_POSITION_X REFERENCE_POSITION_H // deprecated home_position refers to the config value now 
-#define HOME_POSITION_Y REFERENCE_POSITION_V // deprecated home_position refers to the config value now 
-#define HOME_POSITION_T REFERENCE_POSITION_T // deprecated home_position refers to the config value now 
-
 #define DETECTED_CODES_BASE_PATH "client/storage/detected_codes/"
 
 #ifndef PI

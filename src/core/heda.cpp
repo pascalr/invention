@@ -173,7 +173,6 @@ void HoverCommand::setup(Heda& heda) {
 //  JarFormat format; 
 //  if (!jar_formats.get(format, gripped_jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
 //
-//  //pushCommand(make_shared<GotoCommand>(PolarCoord(config.home_position_x, config.home_position_y, config.home_position_t)));
 //  pushCommand(make_shared<StoreCommand>("a8"));
 //  //pushCommand(make_shared<MoveCommand>(axisV, unitV(config.detect_height)));
 //  pushCommand(make_shared<DetectCommand>());

@@ -64,9 +64,8 @@ void setupAxes(Program& p) {
   p.axisH.setStepsPerTurn(200 * 2 * 8);
   //p.axisH.limitSwitchPin = 12;
   p.axisH.setupPins(8,2,3);
-  p.axisH.setMaxPosition(900); // FIXME
-  //p.axisH.setMinPosition(0);
-  p.axisH.setMinPosition(-900); // FIXME
+  p.axisH.setMinPosition(-DBL_MAX);
+  p.axisH.setMaxPosition(DBL_MAX);
   p.axisH.setDefaultMaxSpeed(1.5);
   p.axisH.setAcceleration(1.5);
   p.axisH.setReverseMotorDirection(true);
@@ -77,9 +76,8 @@ void setupAxes(Program& p) {
   p.axisV.setStepsPerTurn(200 * 2 * 16);
   //p.axisV.limitSwitchPin = 12;
   p.axisV.setupPins(8,7,6);
-  //p.axisV.setMaxPosition(AXIS_Y_MAX_POS);
-  p.axisV.setMaxPosition(900); // FIXME: stepsPerUnit is not OK
-  p.axisV.setMinPosition(-900); // tmp
+  p.axisV.setMinPosition(-DBL_MAX);
+  p.axisV.setMaxPosition(DBL_MAX);
   p.axisV.setDefaultMaxSpeed(1.5);
   p.axisV.setAcceleration(1.5);
   p.axisV.setReverseMotorDirection(true);
