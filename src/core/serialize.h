@@ -74,8 +74,8 @@ void serialize(StepperMotor* axis, T& out) {
   writeJson(out, "m_acceleration", axis->m_acceleration);
   writeJson(out, "m_max_speed", axis->m_max_speed);
   /*writeJson(out, PROPERTY_FORWARD, axis->isForward);
-  writeJson(out, PROPERTY_REFERENCED, axis->isReferenced);
-  writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
+  writeJson(out, PROPERTY_REFERENCED, axis->is_referenced);
+  writeJson(out, PROPERTY_REFERENCING, axis->is_referencing);
   writeJson(out, PROPERTY_MOTOR_ENABLED, axis->isMotorEnabled);
   writeJson(out, PROPERTY_FORCE_ROTATION, axis->forceRotation);
   if (axis->name == 'h') {
@@ -97,8 +97,8 @@ void serialize(Motor* axis, T& out) {
   writeJson(out, PROPERTY_NAME, axis->getName());
   writeJson(out, PROPERTY_POSITION, axis->getPosition());
   writeJson(out, PROPERTY_FORWARD, axis->isForward);
-  writeJson(out, PROPERTY_REFERENCED, axis->isReferenced);
-  writeJson(out, PROPERTY_REFERENCING, axis->isReferencing);
+  writeJson(out, PROPERTY_REFERENCED, axis->is_referenced);
+  writeJson(out, PROPERTY_REFERENCING, axis->is_referencing);
   char name = axis->getName();
   if (name == 'h' || name == 'H' || name == 'v' || name == 'V' || name == 't' || name == 'T') {
     StepperMotor* stepper = (StepperMotor*)axis;

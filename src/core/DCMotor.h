@@ -18,7 +18,7 @@ using namespace std;
 class DCMotor : public Motor {
   public:
 
-    DCMotor(Writer& writer, char name) : Motor(writer, name) {
+    DCMotor(Writer& writer, char name) : Motor(writer, name), referencer(m_encoder) {
       m_duty_cycle = 0;
     }
 
@@ -43,6 +43,9 @@ class DCMotor : public Motor {
       setMotorDirection(direction);
       setDutyCycle(40);
     }
+   
+    // already running, nothing to do here
+    void run(unsigned long currentTime, double speedRPM) {}
 
     void setupPins(uint8_t dirPin, uint8_t pwmPin, uint8_t stepPin) {
       m_pwm_pin = pwmPin;
@@ -64,12 +67,16 @@ class DCMotor : public Motor {
 
     void stop() {
       setDutyCycle(0);
-      isReferencing = false;
+      is_referencing = false;
     }
 
-
+    Referencer& getReferencer() {
+      return referencer;
+    }
 
   protected:
+
+    EncoderReferencer referencer;
 
     virtual void doStartReferencing() {
       setDutyCycle(25);
@@ -88,22 +95,14 @@ class DCMotor : public Motor {
       if (m_duty_cycle == 0) {return false;}
       
       m_encoder.checkPosition(currentTime, isForward);
-      bool isNotMoving = m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01;
 
-      if (isReferencing) {
-        if (isNotMoving) {
-          referenceReached();
-      	  return false;
-      	}
-      	return true;
-      }
-
+      if (handleReferencing(currentTime)) {return true;}
 
       if (isDestinationReached()) {
         setDutyCycle(0);
       }
       
-      return isNotMoving ? false : true;
+      return !(m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01);
     }
 
     Encoder m_encoder;

@@ -91,7 +91,7 @@ class StepperMotor : public Motor {
       //setMotorsEnabled(false);
       setDestination(getPosition());
       forceRotation = false;
-      isReferencing = false;
+      is_referencing = false;
     }
 
     void setPosition(double pos) {
@@ -124,13 +124,13 @@ class StepperMotor : public Motor {
       isMotorEnabled = value;
     }
 
-    void setIsReferenced(bool isRef) {
-      isReferenced = isRef;
+    /*void setIsReferenced(bool isRef) {
+      is_referenced = isRef;
     }
 
     void setIsReferencing(bool isRef) {
-      isReferencing = isRef;
-    }
+      is_referencing = isRef;
+    }*/
 
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.
@@ -197,7 +197,7 @@ class StepperMotor : public Motor {
     }
 
     int setDestination(double dest) {
-      if (isReferenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
+      if (is_referenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
 
       int status = Motor::setDestination(dest);
       if (status < 0) {return status;}
@@ -239,7 +239,7 @@ class StepperMotor : public Motor {
 
     virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
-      if (forceRotation || isReferencing) {return MAX_STEP_DELAY;}
+      if (forceRotation) {return MAX_STEP_DELAY;}
 
       // Time to accelerate
       // Accelerate or go top speed
@@ -287,6 +287,9 @@ class StepperMotor : public Motor {
     double m_speed;
 
     LimitSwitchReferencer referencer;
+    Referencer& getReferencer() {
+      return referencer;
+    }
 
     // TODO:
     // bool m_jog_forward; No more forceRotation.
@@ -304,17 +307,22 @@ class StepperMotor : public Motor {
       m_speed = 0;
       m_max_speed = m_default_max_speed;
     }
+    
+    virtual void run(unsigned long currentTime, double speedRPM) {
+      m_next_step_time = ((unsigned long)(1000000.0 / (speedRPM / 60.0 * m_steps_per_turn))); // us
+      unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
+      if (currentTime >= m_next_step_time) {
+        turnOneStep(timeSinceStart);
+      }
+    }
 
     // Returns true if the axis is still working.
     virtual bool handleAxis(unsigned long currentTime) {
       //unsigned int delay = getDelay();
 
-      if (isReferencing && referencer.isReferenceReached()) {
-        referenceReached();
-        return false;
-      }
+      if (handleReferencing(currentTime)) {return true;}
       
-      if (isReferencing || forceRotation || !isDestinationReached()) {
+      if (forceRotation || !isDestinationReached()) {
         unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
         if (currentTime >= m_next_step_time) {
           turnOneStep(timeSinceStart);

@@ -1,6 +1,8 @@
 #ifndef _REFERENCER_H
 #define _REFERENCER_H
 
+#include "Encoder.h"
+
 // There are many ways to do a reference:
 // With a potentiometer
 // With a limit switch
@@ -39,10 +41,15 @@ class ReferencingMotor : public Motor {
 // Close gripper as much as possible and set default value.
 //class GripperReferencer : public Referencer {
 //};
+//
 
+class Referencer {
+  public:
+    virtual bool isReferenceReached() = 0;
+};
 
 // Close gripper as much as possible and set default value.
-class LimitSwitchReferencer {
+class LimitSwitchReferencer : public Referencer {
   public:
     LimitSwitchReferencer() {}
     LimitSwitchReferencer(int pin) : m_pin(pin) {}
@@ -55,6 +62,17 @@ class LimitSwitchReferencer {
     }
   protected:
     int m_pin = -1;
+};
+
+// Moves until it cannot move anymore
+class EncoderReferencer : public Referencer {
+  public:
+    EncoderReferencer(Encoder& encoder) : m_encoder(encoder) {}
+    bool isReferenceReached() {
+      return m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01;
+    }
+  protected:
+    Encoder& m_encoder;
 };
 
 // class PotentiometerReferencer analogRead(pot)

@@ -6,6 +6,7 @@
 #include "../utils/utils.h"
 #include <math.h>
 #include "../lib/ArduinoMock.h"
+#include "referencer.h"
 
 #ifndef ARDUINO
 #include <iostream>
@@ -49,8 +50,8 @@ class Motor {
 
     virtual void referenceReached() {
       stop();
-      isReferenced = true;
-      isReferencing = false;
+      is_referenced = true;
+      is_referencing = false;
       setPosition(0);
       setDestination(0);
       //setMotorEnabled(true);
@@ -59,10 +60,27 @@ class Motor {
 
     virtual void stop() = 0;
 
+    virtual Referencer& getReferencer() = 0;
+
+    virtual void run(unsigned long currentTime, double speedRPM) = 0;
+
+    bool handleReferencing(unsigned long currentTime) {
+
+      if (!is_referencing) {return false;}
+
+      if (getReferencer().isReferenceReached()) {
+        referenceReached();
+        return false;
+      }
+
+      run(currentTime, REFERENCE_SPEED_RPM);
+      return true;
+    }
+
     void startReferencing() {
       isWorking = true;
-      isReferenced = false;
-      isReferencing = true;
+      is_referenced = false;
+      is_referencing = true;
       setMotorDirection(REVERSE);
       doStartReferencing();
     }
@@ -78,7 +96,7 @@ class Motor {
     }
 
     bool isDestinationReached() {
-      if (!isReferenced) {return true;}
+      if (!is_referenced) {return true;} // ???
       return (isForward && getPosition() >= getDestination()) ||
              (!isForward && getPosition() <= getDestination());
     }
@@ -88,8 +106,8 @@ class Motor {
       prepare(time);
     }
 
-    bool isReferenced = false;
-    bool isReferencing = false;
+    bool is_referenced = false;
+    bool is_referencing = false;
     bool isForward = false;
     bool isWorking = false;
 

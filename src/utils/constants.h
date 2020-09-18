@@ -5,6 +5,8 @@
 #define CAMERA_HEIGHT 480
 #define CAMERA_FOCAL_POINT 568.214
 
+#define REFERENCE_SPEED_RPM 60.0 // tr/min
+
 #define REFERENCE_POSITION_H 0.0 // mm
 #define REFERENCE_POSITION_V 0.0 // mm
 #define REFERENCE_POSITION_T 90.0 // degrees
