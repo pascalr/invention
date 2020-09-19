@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  shelf: one
+  width: 1.5
+  center_x: 1.5
+
+two:
+  name: MyString
+  shelf: two
+  width: 1.5
+  center_x: 1.5

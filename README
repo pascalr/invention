@@ -1,3 +1,37 @@
+Purée de courge à l'érable
+Tofu général tao
+Tofu magique selon Loonie
+
+Les petits pots, comme les pots à épices sont soulevé par dessus les autres. Les gros pots, ah peut-être seulement sur
+la tablette du bas! pour safety! sont différents
+
+Là je m'occupe des petits pots soulever par le dessus n'importe où. Hypothèse, les petits pots ont tous la même grandeur à peu près dans une même tablette.
+Ranger dans des colonnes de même largeur.
+
+Exemple:
+
+J'ai déjà:
+- 4 petit plein qui forme une première colonne pleine
+- 1 petit pot large dans une 2e colonne (peut avoir un 2e)
+- 1 petit pot dans une 3e colonne
+
+Je détecte:
+- 2 petit pots
+- 3 petit pot large
+
+Prendre les pots détecter un par un (en commançant par le plus haut)
+Voir s'il y a déjà des colonnes dans lequel il pourrait rentrer.
+Sinon créer une nouvelle colonne et le ranger dedans.
+
+Donc créer une modèle colonne.
+
+Garder le modèle Location, mais il n'est pas généré au départ parce que tu ne sais pas quelle
+grandeur de pot que tu vas insérer.
+
+Utiliser le mot français colonne pour la table pour ne pas que ce soit confu avec columns in a database.
+
+Ajouter colonne_id to locations??? Sure whatever de toute façon il n'y en aura jamais beaucoup.
+
 Les coordonées polaires et les coordonées cartésiennes sont vraiment différentes.
 
 Les coordonées polaire:

@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @colonne.name %>
+</p>
+
+<p>
+  <strong>Shelf:</strong>
+  <%= @colonne.shelf_id %>
+</p>
+
+<p>
+  <strong>Width:</strong>
+  <%= @colonne.width %>
+</p>
+
+<p>
+  <strong>Center x:</strong>
+  <%= @colonne.center_x %>
+</p>
+
+<%= link_to 'Edit', edit_colonne_path(@colonne) %> |
+<%= link_to 'Back', colonnes_path %>

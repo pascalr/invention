@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :colonnes
   resources :tags
   resources :recipe_categories
   resources :units

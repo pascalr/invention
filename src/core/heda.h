@@ -251,6 +251,12 @@ class DetectCommand : public HedaCommand {
     void start(Heda& heda);
 };
 
+class CalculateStoreCommand : public HedaCommand { // Set detected_codes to store position
+  public:
+    string str() {return "calcstore";}
+    void start(Heda& heda);
+};
+
 class SweepCommand : public MetaCommand {
   public:
     string str() {return "sweep";}

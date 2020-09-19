@@ -10,12 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_12_131421) do
+ActiveRecord::Schema.define(version: 2020_09_19_212135) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "colonnes", force: :cascade do |t|
+    t.string "name"
+    t.integer "shelf_id", null: false
+    t.float "width"
+    t.float "center_x"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["shelf_id"], name: "index_colonnes_on_shelf_id"
   end
 
   create_table "detected_codes", force: :cascade do |t|
@@ -133,6 +143,8 @@ ActiveRecord::Schema.define(version: 2020_09_12_131421) do
     t.float "diameter"
     t.boolean "is_storage"
     t.string "name"
+    t.integer "colonne_id"
+    t.index ["colonne_id"], name: "index_locations_on_colonne_id"
     t.index ["shelf_id"], name: "index_locations_on_shelf_id"
   end
 
@@ -201,6 +213,7 @@ ActiveRecord::Schema.define(version: 2020_09_12_131421) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "colonnes", "shelves"
   add_foreign_key "fdc_nutrients", "fdcs"
   add_foreign_key "fdc_nutrients", "nutrients"
   add_foreign_key "hedas", "shelves"
@@ -208,6 +221,7 @@ ActiveRecord::Schema.define(version: 2020_09_12_131421) do
   add_foreign_key "ingredient_quantities", "recettes"
   add_foreign_key "ingredient_quantities", "units"
   add_foreign_key "ingredients", "aliments"
+  add_foreign_key "locations", "colonnes"
   add_foreign_key "locations", "shelves"
   add_foreign_key "recipe_tags", "recettes"
   add_foreign_key "recipe_tags", "tags"

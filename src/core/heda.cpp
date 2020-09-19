@@ -507,6 +507,14 @@ void PinpointCommand::start(Heda& heda) {
   }
 }
 
+void CalculateStoreCommand::start(Heda& heda) {
+  heda.db.load(heda.codes);
+  vector<DetectedHRCode> detected;
+  for (DetectedHRCode& it : heda.codes) {
+    //heda.db.update(heda.codes, code);
+  }
+}
+
 void DetectCommand::start(Heda& heda) {
   Mat frame;
   heda.captureFrame(frame);

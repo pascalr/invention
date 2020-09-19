@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Colonnes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Shelf</th>
+      <th>Width</th>
+      <th>Center x</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @colonnes.each do |colonne| %>
+      <tr>
+        <td><%= colonne.name %></td>
+        <td><%= colonne.shelf_id %></td>
+        <td><%= colonne.width %></td>
+        <td><%= colonne.center_x %></td>
+        <td><%= link_to 'Show', colonne %></td>
+        <td><%= link_to 'Edit', edit_colonne_path(colonne) %></td>
+        <td><%= link_to 'Destroy', colonne, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Colonne', new_colonne_path %>
