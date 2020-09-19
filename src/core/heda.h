@@ -37,8 +37,6 @@ class NoWorkingShelfException : public exception {};
 #define AXIS_T 't'
 #define AXIS_R 'r'
 
-void storeAll(Heda& heda);
-void closeup(Heda& heda, DetectedHRCode& code);
 void removeNearDuplicates(Heda& heda);
 
 class Axis {
@@ -175,6 +173,14 @@ class GripCommand : public MetaCommand {
     Jar jar;
 };
 
+class CloseupCommand : public MetaCommand {
+  public:
+    CloseupCommand(DetectedHRCode code) : detected(code) {}
+    string str() {return "closeup " + to_string(detected.id);}
+    void setup(Heda& heda);
+    DetectedHRCode detected;
+};
+
 class LowerForGripCommand : public MetaCommand {
   public:
     LowerForGripCommand(Jar jar) : jar(jar) {}
@@ -251,10 +257,12 @@ class DetectCommand : public HedaCommand {
     void start(Heda& heda);
 };
 
-class CalculateStoreCommand : public HedaCommand { // Set detected_codes to store position
+class StoreDetectedCommand : public MetaCommand {
   public:
-    string str() {return "calcstore";}
-    void start(Heda& heda);
+    StoreDetectedCommand(DetectedHRCode code) : detected(code) {}
+    string str() {return "stored " + to_string(detected.id);}
+    void setup(Heda& heda);
+    DetectedHRCode detected;
 };
 
 class SweepCommand : public MetaCommand {

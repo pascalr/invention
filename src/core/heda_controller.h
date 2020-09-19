@@ -68,10 +68,13 @@ class HedaController {
         DetectedHRCode code;
         unsigned long id = tokens.popPositiveInteger();
         ensure(heda.codes.get(code, id), "closeup must have a valid code id");
-        closeup(heda, code);
+        heda.pushCommand(make_shared<CloseupCommand>(code));
       };
       m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
-        storeAll(heda);
+        heda.codes.order(byLidY, false);
+        for (DetectedHRCode& code : heda.codes) {
+          heda.pushCommand(make_shared<StoreDetectedCommand>(code));
+        }
       };
       m_commands["nodup"] = [&](ParseResult tokens) {
         removeNearDuplicates(heda);

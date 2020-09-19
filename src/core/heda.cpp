@@ -74,20 +74,15 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
   return perceivedWidth * distanceFromCamera / actualWidth;
 }
 
-// Store all jars, starting with the tallest.
-// Make a clesup picture before storing it.
-void storeAll(Heda& heda) {
-  heda.codes.order(byLidY, false);
-  for (DetectedHRCode& code : heda.codes) {
-    closeup(heda,code);
-  }
+void getColonneToStore() {
 }
+
 
 // closesup muste be done to the tallest jars first, then store them.
 // then close up the next tallest, etc.
-void closeup(Heda& heda, DetectedHRCode& code) {
+void CloseupCommand::setup(Heda& heda) {
 
-  double robotZ = heda.config.user_coord_offset_z - code.lid_coord.z;
+  double robotZ = heda.config.user_coord_offset_z - detected.lid_coord.z;
 
   if (robotZ > heda.config.camera_radius) {
     robotZ = heda.config.camera_radius;
@@ -95,11 +90,12 @@ void closeup(Heda& heda, DetectedHRCode& code) {
 
   double userZ = heda.config.user_coord_offset_z - robotZ;
  
-  heda.pushCommand(make_shared<HoverCommand>(code.lid_coord.x, userZ, heda.config.camera_radius));
+  commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, userZ, heda.config.camera_radius));
 
-  heda.pushCommand(make_shared<MoveCommand>(heda.axisV, heda.unitV(code.lid_coord.y + heda.config.closeup_distance)));
+  commands.push_back(make_shared<MoveCommand>(heda.axisV, heda.unitV(detected.lid_coord.y + heda.config.closeup_distance)));
 
-  heda.pushCommand(make_shared<LambdaCommand>([code](Heda& heda) {
+  DetectedHRCode code = detected;
+  commands.push_back(make_shared<LambdaCommand>([code](Heda& heda) {
 
     Mat frame;
     heda.captureFrame(frame);
@@ -507,12 +503,19 @@ void PinpointCommand::start(Heda& heda) {
   }
 }
 
-void CalculateStoreCommand::start(Heda& heda) {
-  heda.db.load(heda.codes);
-  vector<DetectedHRCode> detected;
-  for (DetectedHRCode& it : heda.codes) {
-    //heda.db.update(heda.codes, code);
-  }
+void StoreDetectedCommand::setup(Heda& heda) {
+  commands.push_back(make_shared<CloseupCommand>(detected));
+  // Transform the detected code into a jar
+  // Get or create a column if needed
+  // Create a location
+  // Move the jar to the location
+  Jar jar;
+  
+  DetectedHRCode code = detected;
+  commands.push_back(make_shared<LambdaCommand>([code](Heda& heda) {
+    // Get the closeup detected
+
+  }));
 }
 
 void DetectCommand::start(Heda& heda) {
