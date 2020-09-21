@@ -504,16 +504,23 @@ void PinpointCommand::start(Heda& heda) {
 }
 
 void StoreDetectedCommand::setup(Heda& heda) {
-  commands.push_back(make_shared<CloseupCommand>(detected));
+  // Do a closeup first
+  //commands.push_back(make_shared<CloseupCommand>(detected));
+  //
   // Transform the detected code into a jar
   // Get or create a column if needed
   // Create a location
   // Move the jar to the location
-  Jar jar;
-  
+ 
+  // TODO: How to get the updated code from the closeup???
+
   DetectedHRCode code = detected;
   commands.push_back(make_shared<LambdaCommand>([code](Heda& heda) {
-    // Get the closeup detected
+    Jar jar;
+    //jar.jar_format_id = ???;
+    //jar.ingredient_id = ???;
+    //
+    //jar.location_id = new location created for it.
 
   }));
 }

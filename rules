@@ -1,0 +1,20 @@
+Code can always be improved. But you have to be careful to not get stuck into an endless improvement loop.
+So never refactor existing code unless you have a really really good reason to do so.
+It is easy to see in what way a method is better than another one, but it is hard to see in what way it is worse.
+There are always tradeoff. At least you know what is wrong with what you already have.
+
+Naming:
+
+Filenames:
+All lowercases. Underscore instead of spaces.
+this_is_a_filename.something
+
+Variables:
+this_is_a_variable_name
+
+Classes:
+ThisIsAClassName
+
+Functions:
+thisIsAFunctionName()
+

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_19_212135) do
+ActiveRecord::Schema.define(version: 2020_09_21_130616) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 2020_09_19_212135) do
     t.string "unit_name"
     t.float "density"
     t.boolean "is_external"
+    t.string "code"
     t.index ["aliment_id"], name: "index_ingredients_on_aliment_id"
   end
 
@@ -131,6 +132,7 @@ ActiveRecord::Schema.define(version: 2020_09_19_212135) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "location_id"
+    t.integer "jar_id"
   end
 
   create_table "locations", force: :cascade do |t|

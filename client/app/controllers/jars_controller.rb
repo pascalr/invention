@@ -4,7 +4,7 @@ class JarsController < ApplicationController
   # GET /jars
   # GET /jars.json
   def index
-    @jars = Jar.all
+    @jars = Jar.order(:jar_id).all
   end
 
   # GET /jars/1
@@ -69,6 +69,6 @@ class JarsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def jar_params
-      params.require(:jar).permit(:jar_format_id, :ingredient_id, :location_id)
+      params.require(:jar).permit(:jar_format_id, :ingredient_id, :location_id, :jar_id)
     end
 end

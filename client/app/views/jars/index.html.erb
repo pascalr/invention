@@ -5,7 +5,7 @@
 <table>
   <thead>
     <tr>
-      <th>Id</th>
+      <th>Jar id</th>
       <th>Jar format</th>
       <th>Ingredient</th>
       <th>Location</th>
@@ -16,7 +16,7 @@
   <tbody>
     <% @jars.each do |jar| %>
       <tr>
-        <td><%= jar.id %></td>
+        <td><%= jar.jar_id %></td>
         <td><%= jar.jar_format_id %></td>
         <td><%= jar.ingredient_id && jar.ingredient ? jar.ingredient.name : jar.ingredient_id %></td>
         <td><%= jar.location_id %></td>

@@ -10,15 +10,20 @@
       </ul>
     </div>
   <% end %>
+  
+  <div class="field">
+    <%= form.label :jar_id %>
+    <%= form.number_field :jar_id %>
+  </div>
 
   <div class="field">
     <%= form.label :jar_format_id %>
-    <%= form.number_field :jar_format_id %>
+    <%= form.collection_select(:jar_format_id, JarFormat.order('name ASC').all, :id, :name) %>
   </div>
 
   <div class="field">
     <%= form.label :ingredient_id %>
-    <%= form.number_field :ingredient_id %>
+    <%= form.collection_select(:ingredient_id, Ingredient.order('name ASC').all, :id, :name) %>
   </div>
 
   <div class="field">
