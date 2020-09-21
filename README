@@ -1,3 +1,24 @@
+At a very later point, you can set preferences of what kind of ingredients on which part of the shelves.
+
+Ok, tu dois faire l'épicerie, qu'est-ce qui se passe? Tu prends toi même les pots en bas? Tu risque de les accrocher...
+
+Je dois être capable de détecter les pots dans les tablettes du bas aussi. Parce que ça va être accrocher c'est sûr,
+et une personne peut venir prendre un pot n'importe quand.
+
+Une personne va foutre le bordel en prenant des pots en bas, mais c'est quand même un must. Prendre le pot de beurre de peanut rapidement
+au petit déjeuner. Tu ne veux pas attendre après la machine qu'elle te l'apportes. Mais ça va être le bordel dans les pots...
+
+Mais c'est mieux si c'est la machine qui range les pots. Tu arrives avec ta boite de pots, et tu ne les sors même pas de la boîte.
+Il les prends de la boite et les rangent.
+
+Si la porte du bas a été ouvert, le bras doit sweeper les tablettes du bas. Est-ce qu'il redéplace tout? Non, il doit être capable de prendre des pots dans peu d'espace.
+
+Ah! Maybe simply rename all the Table to collections! It's ok to create a new collection everytime.
+
+Pour chaque milestone, faire les features en premier, ensuite fixer les buger, ensuite faire les improvements.
+Parce que faire des features peut faire changer la structure du code plus que le reste, ça doit
+être la première chose à faire.
+
 Priorité 1.0: Je dois avoir une très bonne raison avant de faire ce changement!
 
 Instead of Table, simplement overloader les methods avec les arguments différents.

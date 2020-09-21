@@ -14,6 +14,10 @@ class WrongModelTypeException : public exception {};
 // TODO: Validate column names indexes
 
 template <class T>
+int byJarId(const T& t) {
+  return t.jar_id;
+}
+template <class T>
 string byName(const T& t) {
   return t.name;
 }
@@ -221,6 +225,7 @@ class Location : public Model {
     double diameter;
     bool is_storage;
     string name;
+    int jar_format_id;
 };
 
 class LocationTable : public Table<Location> {
@@ -239,6 +244,7 @@ class LocationTable : public Table<Location> {
       item.diameter = query.getColumn(7);
       item.is_storage = (int)query.getColumn(8);
       item.name = (const char*)query.getColumn(9);
+      item.jar_format_id = query.getColumn(11);
       return item;
     }
 
@@ -252,6 +258,7 @@ class LocationTable : public Table<Location> {
       query.bind(7, item.diameter);
       query.bind(8, item.is_storage);
       query.bind(9, item.name);
+      query.bind(11, item.jar_format_id);
     }
 
     int byName(Location& loc, const string& name) {
@@ -377,7 +384,7 @@ class Jar : public Model {
     int jar_format_id = -1;
     int ingredient_id = -1;
     int location_id = -1;
-    //PolarCoord position;
+    int jar_id = -1;
 };
 
 class JarTable : public Table<Jar> {
@@ -391,9 +398,7 @@ class JarTable : public Table<Jar> {
       query.bind(3, item.created_at);
       query.bind(4, item.updated_at);
       query.bind(5, item.location_id);
-      //query.bind(1, item.position(0));
-      //query.bind(2, item.position(1));
-      //query.bind(3, item.position(2));
+      query.bind(6, item.jar_id);
     }
 
     Jar parseItem(SQLite::Statement& query) {
@@ -403,9 +408,7 @@ class JarTable : public Table<Jar> {
       jar.created_at = query.getColumn(3);
       jar.updated_at = query.getColumn(4);
       jar.location_id = query.getColumn(5);
-      //double x = query.getColumn(1);
-      //double y = query.getColumn(2);
-      //double t = query.getColumn(3);
+      jar.jar_id = query.getColumn(6);
       return jar;
     }
 
@@ -587,6 +590,41 @@ class ShelfTable : public Table<Shelf> {
     }
 
 };
+
+//class Colonne : public Model {
+//  public:
+//    string name;
+//    int shelf_id;
+//    double width;
+//    double center_x;
+//};
+//
+//class ColonneTable : public Table<Colonne> {
+//  public:
+//    const char* TABLE_NAME = "colonnes";
+//    string getTableName() { return TABLE_NAME; };
+//    
+//    void bindQuery(SQLite::Statement& query, const Colonne& item) {
+//      query.bind(1, item.name);
+//      query.bind(2, item.shelf_id);
+//      query.bind(3, item.width);
+//      query.bind(4, item.center_x);
+//      query.bind(5, item.created_at);
+//      query.bind(6, item.updated_at);
+//    }
+//    
+//    Colonne parseItem(SQLite::Statement& query) {
+//      Colonne i;
+//      i.name = (const char*) query.getColumn(1);
+//      i.shelf_id = query.getColumn(2);
+//      i.width = query.getColumn(3);
+//      i.center_x = query.getColumn(4);
+//      i.created_at = query.getColumn(5);
+//      i.updated_at = query.getColumn(6);
+//      return i;
+//    }
+//
+//};
 
 //bool shelfHeightCmp(const Shelf& arg0, const Shelf& arg1);
 

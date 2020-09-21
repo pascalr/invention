@@ -177,6 +177,9 @@ class HedaController {
       m_commands["sweep"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<SweepCommand>());
       };
+      m_commands["loadcfg"] = [&](ParseResult tokens) {
+        heda.loadConfig();
+      };
       m_commands["grab"] = [&](ParseResult tokens) {
         double strength = tokens.popScalaire();
         cout << "Executing grab with strength = " << strength << endl;

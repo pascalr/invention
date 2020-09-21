@@ -9,12 +9,14 @@ Filenames:
 All lowercases. Underscore instead of spaces.
 this_is_a_filename.something
 
-Variables:
-this_is_a_variable_name
-
 Classes:
 ThisIsAClassName
 
 Functions:
 thisIsAFunctionName()
 
+Member variables:
+this_is_a_member_variable
+
+Local variables:
+thisIsALocalVariable

@@ -38,6 +38,7 @@ class NoWorkingShelfException : public exception {};
 #define AXIS_R 'r'
 
 void removeNearDuplicates(Heda& heda);
+void parseCode(Heda& heda, DetectedHRCode& code);
 
 class Axis {
   public:
@@ -71,7 +72,7 @@ class LambdaCommand : public HedaCommand {
   public:
     LambdaCommand(std::function<void(Heda& heda)> func) : func(func) {}
     string str() {return "lambda";}
-    virtual void start(Heda& heda) {
+    void start(Heda& heda) {
       func(heda);
     }
 
@@ -175,10 +176,10 @@ class GripCommand : public MetaCommand {
 
 class CloseupCommand : public MetaCommand {
   public:
-    CloseupCommand(DetectedHRCode code) : detected(code) {}
+    CloseupCommand(DetectedHRCode& code) : detected(code) {}
     string str() {return "closeup " + to_string(detected.id);}
     void setup(Heda& heda);
-    DetectedHRCode detected;
+    DetectedHRCode& detected;
 };
 
 class LowerForGripCommand : public MetaCommand {
@@ -259,10 +260,12 @@ class DetectCommand : public HedaCommand {
 
 class StoreDetectedCommand : public MetaCommand {
   public:
-    StoreDetectedCommand(DetectedHRCode code) : detected(code) {}
+    StoreDetectedCommand(DetectedHRCode& code) : detected(code) {}
     string str() {return "stored " + to_string(detected.id);}
     void setup(Heda& heda);
-    DetectedHRCode detected;
+    DetectedHRCode& detected;
+    Jar jar;
+    Location loc;
 };
 
 class SweepCommand : public MetaCommand {
@@ -288,12 +291,15 @@ class Heda {
       loadDb();
     }
 
-
-    void loadDb() {
-
+    void loadConfig() {
       db.load(configs);
       if (configs.empty()) {throw MissingConfigException();}
       config = *configs.begin();
+    }
+
+    void loadDb() {
+
+      loadConfig();
 
       db.load(shelves);
       if (!shelves.get(working_shelf, config.working_shelf_id)) {

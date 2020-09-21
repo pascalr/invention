@@ -54,7 +54,9 @@ class Database {
       }
       table.update_query += " WHERE id = ?";
       table.insert_query += ")";
-      
+     
+      table.items.clear(); 
+
       log("DB LOAD", queryStr.str());
       while (query.executeStep()) {
         T item = table.parseItem(query);

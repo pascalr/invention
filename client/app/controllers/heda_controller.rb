@@ -25,7 +25,12 @@ class HedaController < ApplicationController
   def update
     @heda ||= Heda.find(params[:id])
     #render 'edit', status: if @heda.update(heda_params) then :ok else :unprocessable_entity end
-    redirect_to action: 'edit', status: if @heda.update(heda_params) then :ok else :unprocessable_entity end
+    if @heda.update(heda_params)
+      execute('loadcfg')
+      redirect_to action: 'edit', status: :ok
+    else
+      redirect_to action: 'edit', status: :unprocessable_entity
+    end
   end
 
   def status

@@ -74,9 +74,6 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
   return perceivedWidth * distanceFromCamera / actualWidth;
 }
 
-void getColonneToStore() {
-}
-
 
 // closesup muste be done to the tallest jars first, then store them.
 // then close up the next tallest, etc.
@@ -94,34 +91,27 @@ void CloseupCommand::setup(Heda& heda) {
 
   commands.push_back(make_shared<MoveCommand>(heda.axisV, heda.unitV(detected.lid_coord.y + heda.config.closeup_distance)));
 
-  DetectedHRCode code = detected;
-  commands.push_back(make_shared<LambdaCommand>([code](Heda& heda) {
+  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
 
     Mat frame;
     heda.captureFrame(frame);
-    vector<DetectedHRCode> detected;
-    detectCodes(heda, detected, frame, heda.getPosition());
-    ensure(detected.size() >= 1, "There must be a detected code in a closup.");
-    ensure(detected.size() <= 1, "There must be only one detected code in a closup.");
+    vector<DetectedHRCode> allDetected;
+    detectCodes(heda, allDetected, frame, heda.getPosition());
+    ensure(allDetected.size() >= 1, "There must be a detected code in a closup.");
+    ensure(allDetected.size() <= 1, "There must be only one detected code in a closup.");
+    
+    DetectedHRCode recent = allDetected[0];
 
-    DetectedHRCode& recent = detected[0];
-    recent.id = code.id;
+    detected.coord = recent.coord;
+    detected.centerX = recent.centerX;
+    detected.centerY = recent.centerY;
+    detected.scale = recent.scale;
+    detected.imgFilename = recent.imgFilename;
 
-    // Ugly, but I don't know how else to do this easily.
-    /*const DetectedHRCode& recent = detected[0];
-    code.coord = recent.coord;
-    code.centerX = recent.centerX;
-    code.centerY = recent.centerY;
-    code.scale = recent.scale;
-    code.imgFilename = recent.imgFilename;
-    code.jar_id = recent.jar_id;
-    code.weight = recent.weight;
-    code.content_name = recent.content_name;
-    code.content_id = recent.content_id;
-    code.lid_coord = recent.lid_coord;
-    */
-
-    heda.db.update(heda.codes, recent);
+    pinpointCode(heda, detected);
+    parseCode(heda, detected);
+  
+    heda.db.update(heda.codes, detected);
   }));
 }
     
@@ -207,19 +197,23 @@ void Heda::calibrate(JarFormat& format) {
   db.update(configs, config);
 }
 
+void parseCode(Heda& heda, DetectedHRCode& code) {
+  //parseJarCode(code);
+  cout << "Loading image: " << code.imgFilename << endl;
+  Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
+  vector<string> lines;
+  parseText(lines, gray);
+  ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
+  code.jar_id = lines[0];
+  code.weight = lines[1];
+  code.content_name = lines[2];
+  code.content_id = lines[3];
+}
+
 void ParseCodesCommand::start(Heda& heda) {
   for (size_t i = 0; i < heda.codes.items.size(); i++) {
     DetectedHRCode& code = heda.codes.items[i];
-    //parseJarCode(code);
-    cout << "Loading image: " << code.imgFilename << endl;
-    Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
-    vector<string> lines;
-    parseText(lines, gray);
-    ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
-    code.jar_id = lines[0];
-    code.weight = lines[1];
-    code.content_name = lines[2];
-    code.content_id = lines[3];
+    parseCode(heda, code);
     heda.db.update(heda.codes, code);
   }
 }
@@ -503,9 +497,56 @@ void PinpointCommand::start(Heda& heda) {
   }
 }
 
+Location getNewLocation(Heda& heda, Jar& jar) {
+    
+  JarFormatTable formats; heda.db.load(formats);
+  JarFormat format;
+  ensure(formats.get(format, jar.jar_format_id), "Existing jar must refer to an existing jar format");
+
+  double widthNeeded = max(format.diameter, format.lid_diameter) + 32; // mm, FIXME: Hardcoded
+
+  heda.shelves.order(byHeight);
+  for (const Shelf& shelf : heda.shelves.items) {
+
+    LocationTable locations;
+    heda.db.load(locations, "WHERE shelf_id = " + to_string(shelf.id));
+
+    for (double z = 0; z < shelf.depth - widthNeeded; z += 10) {
+      for (double x = 0; x < shelf.width - widthNeeded; x += 10) {
+
+        Vector2f wantedMin; wantedMin << x, z;
+        Vector2f wantedMax; wantedMax << x+widthNeeded, z+widthNeeded;
+        AlignedBox2f wanted(wantedMin, wantedMax);
+
+        bool doesNotIntersect = true;
+        for (const Location& loc : locations) {
+        
+          Vector2f locMin; locMin << loc.x-loc.diameter/2.0, loc.z-loc.diameter/2.0;
+          Vector2f locMax; locMax << loc.x+loc.diameter/2.0, loc.z+loc.diameter/2.0;
+          AlignedBox2f locBox(locMin, locMax);
+          if (wanted.intersects(locBox)) {doesNotIntersect = false; break;}
+        }
+
+        if (doesNotIntersect) { // Good create new location
+          Location loc;
+          loc.x = x+widthNeeded/2.0;
+          loc.z = z+widthNeeded/2.0;
+          loc.diameter = widthNeeded;
+          loc.shelf_id = shelf.id;
+          loc.jar_format_id = format.id;
+          heda.db.insert(locations, loc);
+          return loc;
+        }
+      }
+    }
+  }
+
+  return Location();
+}
+
 void StoreDetectedCommand::setup(Heda& heda) {
   // Do a closeup first
-  //commands.push_back(make_shared<CloseupCommand>(detected));
+  commands.push_back(make_shared<CloseupCommand>(detected));
   //
   // Transform the detected code into a jar
   // Get or create a column if needed
@@ -514,15 +555,23 @@ void StoreDetectedCommand::setup(Heda& heda) {
  
   // TODO: How to get the updated code from the closeup???
 
-  DetectedHRCode code = detected;
-  commands.push_back(make_shared<LambdaCommand>([code](Heda& heda) {
-    Jar jar;
-    //jar.jar_format_id = ???;
-    //jar.ingredient_id = ???;
-    //
-    //jar.location_id = new location created for it.
+  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+        
+    ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits");
+    int id = atoi(detected.jar_id.c_str());
 
+    ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar");
+
+    loc = getNewLocation(heda, jar); 
+    ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
+
+    commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
+    commands.push_back(make_shared<PickupCommand>(jar, loc));
+    commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
+    commands.push_back(make_shared<PutdownCommand>());
+    commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
   }));
+      
 }
 
 void DetectCommand::start(Heda& heda) {
