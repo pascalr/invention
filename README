@@ -1,3 +1,46 @@
+Priorité 1.0: Je dois avoir une très bonne raison avant de faire ce changement!
+
+Instead of Table, simplement overloader les methods avec les arguments différents.
+Déplacer le getTableName dans le model.
+Vive les templates.
+Global variable DB.
+Objectif: Imiter rails.
+https://stackoverflow.com/questions/4665117/c-virtual-function-return-type
+is a vector<Model&> covariant with a vector<Jar&>?
+class Model {
+  virtual static string getTableName();
+  static vector<Model> all() {
+    DB.load()
+  }
+}
+class Jar : public Model {
+  static string getTableName() {return "jars";}
+};
+Si je veux du caching, implémenter MyCollection<T>, au lieu de vector<T>
+
+
+Prendre le numéro de pot du DetectedHRCode et that's it.
+Trouver le jar avec cette id là.
+Pickup this jar.
+Store this jar.
+
+bon Colonne:
+
+for colonne in colonnes:
+
+  if (colonne.jar_format_id != jar.jar_format_id) {continue;}
+
+  etagere = colonne.etagere
+  nb_spots = shelf.depth / colonne.width;
+  nb_spots = colonne.locations.size;
+  if (nb_occupied < nb_spots) {
+    location = createLocation();
+  }
+end
+
+colonne = createColonne();    
+location = createLocation();
+
 Purée de courge à l'érable
 Tofu général tao
 Tofu magique selon Loonie
