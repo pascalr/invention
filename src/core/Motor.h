@@ -27,8 +27,6 @@ class Motor {
     Motor(Writer& writer, char name) : m_writer(writer) {
       m_name = name;
       m_destination = -1;
-      m_max_position = 999999;
-      m_min_position = 0;
     }
 
     virtual void rotate(bool direction) = 0;
@@ -111,9 +109,6 @@ class Motor {
 
     virtual int setDestination(double dest) {
 
-      if (dest >= m_max_position + 0.1) {return ERROR_DESTINATION_TOO_HIGH;}
-      if (dest <= m_min_position - 0.1) {return ERROR_DESTINATION_TOO_LOW;}
-
       m_destination = dest;
       updateDirection();
 
@@ -122,30 +117,12 @@ class Motor {
     
     virtual void updateDirection() {}
 
-    void setMaxPosition(double maxP) {
-      m_max_position = maxP;
-    }
-
-    double getMaxPosition() {
-      return m_max_position;
-    }
-    
-    double getMinPosition() {
-      return m_min_position;
-    }
-
-    void setMinPosition(double pos) {
-      m_min_position = pos;
-    }
-    
     virtual bool handleAxis(unsigned long currentTime) = 0;
 
   protected:
     Writer& m_writer;
     char m_name;
     double m_destination;
-    double m_max_position;
-    double m_min_position;
 
     virtual void doStartReferencing() = 0;
     

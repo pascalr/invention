@@ -47,16 +47,12 @@ void setupAxes(Program& p) {
   p.axisR.setupPins(8,9,5);
   p.axisR.setReverseMotorDirection(true);
   // min and max positions depends on the tool, sometimes no limits (mixer), sometimes yes (gripper)
-  p.axisR.setMinPosition(-DBL_MAX);
-  p.axisR.setMaxPosition(DBL_MAX);
 
   p.axisT.setStepsPerUnit(200 * 2 * 16 / (360*12/61));
   p.axisT.setStepsPerTurn(200 * 2 * 16);
   //p.axisT.limitSwitchPin = 12;
   p.axisT.setupPins(8,10,11);
   p.axisT.setReverseMotorDirection(true);
-  p.axisT.setMinPosition(-45);
-  p.axisT.setMaxPosition(225);
   p.axisT.setDefaultMaxSpeed(0.2);
   p.axisT.setAcceleration(0.2);
 
@@ -64,8 +60,6 @@ void setupAxes(Program& p) {
   p.axisH.setStepsPerTurn(200 * 2 * 8);
   //p.axisH.limitSwitchPin = 12;
   p.axisH.setupPins(8,2,3);
-  p.axisH.setMinPosition(-DBL_MAX);
-  p.axisH.setMaxPosition(DBL_MAX);
   p.axisH.setDefaultMaxSpeed(1.5);
   p.axisH.setAcceleration(1.5);
   p.axisH.setReverseMotorDirection(true);
@@ -76,8 +70,6 @@ void setupAxes(Program& p) {
   p.axisV.setStepsPerTurn(200 * 2 * 16);
   //p.axisV.limitSwitchPin = 12;
   p.axisV.setupPins(8,7,6);
-  p.axisV.setMinPosition(-DBL_MAX);
-  p.axisV.setMaxPosition(DBL_MAX);
   p.axisV.setDefaultMaxSpeed(1.5);
   p.axisV.setAcceleration(1.5);
   p.axisV.setReverseMotorDirection(true);
