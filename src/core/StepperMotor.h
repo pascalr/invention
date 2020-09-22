@@ -1,9 +1,17 @@
 #ifndef STEPPER_MOTOR_H
 #define STEPPER_MOTOR_H
 
+// Pour le mouvement: voir thirdparty/mathematics-of-motion-control-profiles-article
+// Plus tard déplacer en courbe S. Pour l'instant en courbe trapézoïdale.
+// Le vitesse initiale et finale (pas zéro pour un stepper motor) est
+// déterminé par la variable MAX_STEP_DELAY
+
 #include "Motor.h"
 #include "../lib/ArduinoMock.h"
 #include "referencer.h"
+
+#define MAX_STEP_DELAY 5000 // us
+#define US_PER_S 1000000.0
 
 class StepperMotor : public Motor {
   public:
@@ -124,14 +132,6 @@ class StepperMotor : public Motor {
       isMotorEnabled = value;
     }
 
-    /*void setIsReferenced(bool isRef) {
-      is_referenced = isRef;
-    }
-
-    void setIsReferencing(bool isRef) {
-      is_referencing = isRef;
-    }*/
-
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.
     double stepsPerUnit;
@@ -143,20 +143,6 @@ class StepperMotor : public Motor {
     
     bool isMotorEnabled;
     bool forceRotation;
-
-    // Get the delay untill the next step
-    /*virtual double getDelay() {
-      // TODO: The speed is not fixed.
-      return speed;
-    }*/
-
-    /*double getSpeed() {
-      double frequency = 1 / getDelay() * 1000000;
-      double theSpeed = frequency / stepsPerUnit;
-      return theSpeed;
-    }*/
-
-    // distance: steps, time: microseconds
 
     // TODO: All the units should simply be steps... NOOOOOOOOOO All units are in turns!
     // WARNING: THIS ONLY WORKS AT THE BEGINNING, DOES NOT COMPUTE ALL THE TIME
@@ -174,23 +160,24 @@ class StepperMotor : public Motor {
     void calculateMovement() {
 
       double halfDistance = distanceToReachDestination() / 2;
+      double v0 = US_PER_S / MAX_STEP_DELAY / m_steps_per_turn;
 
-      m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance); // tr/s
+      m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance + v0*v0); // tr/s
       
       if (m_max_speed_reached > m_max_speed) {m_max_speed_reached = m_max_speed;} // s
 
       double timeToAccelerate = m_max_speed_reached / m_acceleration; // s
-      m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * 1000000.0)); // us
+      m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * US_PER_S)); // us
 
       if (m_max_speed_reached == m_max_speed) {
 
-        double distanceAccelerating = 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
+        double distanceAccelerating = v0*timeToAccelerate + 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
         double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
 
-        m_time_to_reach_middle_us += ((unsigned long) ((halfDistanceLeft / m_max_speed) * 1000000.0)); // us
+        m_time_to_reach_middle_us += ((unsigned long) ((halfDistanceLeft / m_max_speed) * US_PER_S)); // us
       }
      
-      m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - ((unsigned long)(timeToAccelerate * 1000000.0)); // us
+      m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - ((unsigned long)(timeToAccelerate * US_PER_S)); // us
       //std::cout << "m_time_to_start_decelerating_us: " << m_time_to_start_decelerating_us << std::endl;
       //std::cout << "m_time_to_reach_middle_us : " << m_time_to_reach_middle_us << std::endl;
       //std::cout << "timeToAccelerate : " << timeToAccelerate << std::endl;
@@ -237,7 +224,7 @@ class StepperMotor : public Motor {
 
     //unsigned int microsteps = 16;
 
-    virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
+    unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
       if (forceRotation) {return MAX_STEP_DELAY;}
 
@@ -245,31 +232,33 @@ class StepperMotor : public Motor {
       // Accelerate or go top speed
       if (timeSinceStart <= m_time_to_reach_middle_us) {
         
-        m_speed = m_acceleration * (timeSinceStart / 1000000.0); // tr/s
+        m_speed = m_acceleration * (timeSinceStart / US_PER_S); // tr/s
         if (m_speed > m_max_speed) {m_speed = m_max_speed;} // tr/s
 
       // Decelerate
       } else if (timeSinceStart > m_time_to_start_decelerating_us) {
 
         //std::cout << "Decelerating.\n";
-        double t_s = (timeSinceStart - m_time_to_start_decelerating_us) / 1000000.0; // s
+        double t_s = (timeSinceStart - m_time_to_start_decelerating_us) / US_PER_S; // s
         m_speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
       }
 
-      unsigned long stepDelay = ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
+      unsigned long stepDelay = ((unsigned long)(US_PER_S / (m_speed * m_steps_per_turn))); // us
 
       return stepDelay > MAX_STEP_DELAY ? MAX_STEP_DELAY : stepDelay;
     }
 
     unsigned long next_step_delay = 0;
+    unsigned long lost_time = 0;
 
     void turnOneStep(unsigned long timeSinceStart) {
       digitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
+      lost_time = timeSinceStart - next_step_time;
       next_step_delay = calculateNextStepDelay(timeSinceStart); 
-      next_step_time = timeSinceStart + next_step_delay;
+      next_step_time = timeSinceStart + next_step_delay - lost_time;
     }
 
     bool m_is_step_high;
@@ -308,8 +297,8 @@ class StepperMotor : public Motor {
           turnOneStep(timeSinceStart);
         }
         return true;
-      //} else {
-      //  m_speed = 0;
+      } else {
+        m_speed = 0;
       }
       return false;
     }
@@ -329,7 +318,7 @@ class StepperMotor : public Motor {
    
     // Pretty sure this does not work... 
     virtual void run(unsigned long currentTime, double speedRPM) {
-      next_step_time = ((unsigned long)(1000000.0 / (speedRPM / 60.0 * m_steps_per_turn))); // us
+      next_step_time = ((unsigned long)(US_PER_S / (speedRPM / 60.0 * m_steps_per_turn))); // us
       unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
       if (currentTime >= next_step_time) {
         turnOneStep(timeSinceStart);

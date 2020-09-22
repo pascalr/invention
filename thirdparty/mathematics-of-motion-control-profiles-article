@@ -1,0 +1,715 @@
+<!doctype html><!-- start coded_template: id:10650494445 path:generated_layouts/10650494444.html --><!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en" > <![endif]--><!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en" >        <![endif]--><!--[if IE 8]>    <html class="no-js lt-ie9" lang="en" >               <![endif]--><!--[if gt IE 8]><!--><html class="no-js" lang="en"><!--<![endif]--><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="author" content="Chuck Lewin">
+    <meta name="description" content="To tune motion profiles for maximum performance, understand the mathematics of motion profiles and which profiles are best for your step motor application.">
+    <meta name="generator" content="HubSpot">
+    <title>Mathematics of Motion Control Profiles</title>
+    <link rel="shortcut icon" href="https://www.pmdcorp.com/hubfs/favicon.ico">
+    
+
+    
+    <meta property="og:description" content="To tune motion profiles for maximum performance, understand the mathematics of motion profiles and which profiles are best for your step motor application.">
+    <meta property="og:title" content="Mathematics of Motion Control Profiles">
+    <meta name="twitter:description" content="To tune motion profiles for maximum performance, understand the mathematics of motion profiles and which profiles are best for your step motor application.">
+    <meta name="twitter:title" content="Mathematics of Motion Control Profiles">
+
+    
+
+    
+    <style>
+a.cta_button{-moz-box-sizing:content-box !important;-webkit-box-sizing:content-box !important;box-sizing:content-box !important;vertical-align:middle}.hs-breadcrumb-menu{list-style-type:none;margin:0px 0px 0px 0px;padding:0px 0px 0px 0px}.hs-breadcrumb-menu-item{float:left;padding:10px 0px 10px 10px}.hs-breadcrumb-menu-divider:before{content:'›';padding-left:10px}.hs-featured-image-link{border:0}.hs-featured-image{float:right;margin:0 0 20px 20px;max-width:50%}@media (max-width: 568px){.hs-featured-image{float:none;margin:0;width:100%;max-width:100%}}.hs-screen-reader-text{clip:rect(1px, 1px, 1px, 1px);height:1px;overflow:hidden;position:absolute !important;width:1px}
+</style>
+
+<link rel="stylesheet" href="https://cdn2.hubspot.net/hub/-1/hub_generated/module_assets/-2712622/1600518962197/module_-2712622_Site_Search_Input.min.css">
+    
+
+    
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google Tag Manager -->
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+
+})(window,document,'script','dataLayer','GTM-M8BPCB5');</script>
+
+<!-- End Google Tag Manager -->
+<link rel="amphtml" href="https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article?hs_amp=true">
+
+<meta property="og:url" content="https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article">
+
+<meta property="og:type" content="article">
+<link rel="alternate" type="application/rss+xml" href="https://www.pmdcorp.com/resources/type/articles/rss.xml">
+<meta name="twitter:domain" content="www.pmdcorp.com">
+<meta name="twitter:site" content="@MotionControl">
+<script src="//platform.linkedin.com/in.js" type="text/javascript">
+    lang: en_US
+</script>
+
+<meta http-equiv="content-language" content="en">
+<link rel="stylesheet" href="//cdn2.hubspot.net/hub/-1/hub_generated/template_assets/1495141902003/hubspot_default/shared/responsive/layout.min.css">
+
+
+<link rel="stylesheet" href="https://www.pmdcorp.com/hs-fs/hub/5524801/hub_generated/template_assets/8151111859/1594842692659/Performance_Motion_Devices_March2019_Theme/Coded_Files/Performance_Motion_Devices_March2019-style.css">
+<link rel="stylesheet" href="https://www.pmdcorp.com/hs-fs/hub/5524801/hub_generated/template_assets/10639124921/1574278596887/PMD_Resources/Files/pmd19.min.css">
+
+
+    
+
+
+
+
+
+
+
+    
+
+</head>
+<body class="blog article-blog   hs-content-id-8841505289 hs-blog-post hs-blog-id-8833486035" style="">
+<!--  Added by AdRoll integration -->
+<script type="text/javascript">
+  adroll_adv_id = "PSVOJ3OFNZFP5HWG2WZU6K";
+  adroll_pix_id = "RDATQFYNVFFPHKYMJ2TZEI";
+  var _hsp = window._hsp = window._hsp || [];
+  (function () {
+      var _onload = function(){
+          if (document.readyState && !/loaded|complete/.test(document.readyState)){setTimeout(_onload, 10);return}
+          if (!window.__adroll_loaded){__adroll_loaded=true;setTimeout(_onload, 50);return}
+          _hsp.push(['addPrivacyConsentListener', function(consent) { if (consent.allowed || (consent.categories && consent.categories.advertisement)) {
+            var scr = document.createElement("script");
+            var host = (("https:" == document.location.protocol) ? "https://s.adroll.com" : "http://a.adroll.com");
+            scr.setAttribute('async', 'true');
+            scr.type = "text/javascript";
+            scr.src = host + "/j/roundtrip.js";
+            ((document.getElementsByTagName('head') || [null])[0] ||
+                document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
+          }}]);
+      };
+      if (window.addEventListener) {window.addEventListener('load', _onload, false);}
+      else {window.attachEvent('onload', _onload)}
+  }());
+</script>
+
+<!-- /Added by AdRoll integration -->
+
+    <div class="header-container-wrapper">
+    <div class="header-container container-fluid">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-global_group " style="" data-widget-type="global_group" data-x="0" data-w="12">
+<!-- start coded_template: id:8151038147 path:generated_global_groups/8151038146.html -->
+<div class="" data-global-widget-path="generated_global_groups/8151038146.html"><div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="display: none;" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_157125208699780" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><!-- Google Tag Manager (noscript) -->
+
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M8BPCB5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- End Google Tag Manager (noscript) --></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+<div class="row-fluid-wrapper row-depth-1 row-number-2 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell custom-header" style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-3 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell " style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-4 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell " style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-5 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell page-center" style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-2 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget custom-top-nav" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_1552547110012122" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module">
+<span id="hs_cos_wrapper_module_1552547110012122_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="menu"><div id="hs_menu_wrapper_module_1552547110012122_" class="hs-menu-wrapper active-branch flyouts hs-menu-flow-horizontal" role="navigation" data-sitemap-name="default" data-menu-id="8152096476" aria-label="Navigation Menu">
+ <ul>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="https://store.pmdcorp.com/" role="menuitem">Buy Now</a></li>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="https://www.pmdcorp.com/company/request-a-quote" role="menuitem">Request A Quote</a></li>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="https://info.pmdcorp.com/cmp/subscribe-newsletter" role="menuitem">Sign Up</a></li>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="javascript:;" role="menuitem">Search</a></li>
+ </ul>
+</div></span></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+<div class="row-fluid-wrapper row-depth-2 row-number-2 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget search-box" style="min-height: 0px;" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_156336978007757" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module">
+
+<div class="hs-search-field"> 
+    <div class="hs-search-field__bar"> 
+      <form action="/hs-search-results">
+        
+        <input type="text" class="hs-search-field__input" name="term" autocomplete="off" aria-label="Search" placeholder="Search">
+        
+        
+          <input type="hidden" name="type" value="SITE_PAGE">
+        
+        
+        
+          <input type="hidden" name="type" value="BLOG_POST">
+          <input type="hidden" name="type" value="LISTING_PAGE">
+        
+        
+
+        
+          <button aria-label="Search"><span id="hs_cos_wrapper_module_156336978007757_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_icon" style="" data-hs-cos-general-type="widget" data-hs-cos-type="icon"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" aria-hidden="true"><g id="layer1"><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z" /></g></svg></span></button>
+        
+      </form>
+    </div>
+    <ul class="hs-search-field__suggestions"></ul>
+</div></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+<div class="row-fluid-wrapper row-depth-2 row-number-3 ">
+<div class="row-fluid ">
+<div class="span4 widget-span widget-type-cell cm-logo-wrap" style="" data-widget-type="cell" data-x="0" data-w="4">
+
+<div class="row-fluid-wrapper row-depth-2 row-number-4 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_15560156321462382" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><div class="custom-logo">
+  
+  <a href="/"><img src="https://www.pmdcorp.com/hubfs/Performance_Motion_Devices_March2019/image/logo-nav-041eb51711c08838f2dc3510f23f00a3b614a35b35cc004b37e59580b725f137.png" alt="Performance Motion Devices"></a>
+  
+</div> </div>
+
+   </div><!--end widget-span -->
+    </div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+<div class="span8 widget-span widget-type-custom_widget custom-menu-primary desktop" style="" data-widget-type="custom_widget" data-x="4" data-w="8">
+<div id="hs_cos_wrapper_module_151811933987828" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module">
+<span id="hs_cos_wrapper_module_151811933987828_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="menu"><div id="hs_menu_wrapper_module_151811933987828_" class="hs-menu-wrapper active-branch flyouts hs-menu-flow-horizontal" role="navigation" data-sitemap-name="default" data-menu-id="8151881534" aria-label="Navigation Menu">
+ <ul>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Core Advantages</a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages" role="menuitem">Motion Control At Its Core</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#products" role="menuitem">Range of Products</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#performance" role="menuitem">Uncompromising Performance</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#safety" role="menuitem">FDA Approval and Safety</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#availability" role="menuitem">Long-term Availability</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#devtools" role="menuitem">Development Tools</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#partner" role="menuitem">A Partner In Motion Control</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Products </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products" role="menuitem">Overview</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/ics" role="menuitem">Integrated Circuits (ICs)</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/modules" role="menuitem">Digital Amplifiers</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/digital-drives" role="menuitem">Digital Drives</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/boards" role="menuitem">Motion Control Boards</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/developer-kits" role="menuitem">Developer Kits</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/development-software" role="menuitem">C-Motion Language &amp; Related Tools</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Industries </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/overview" role="menuitem">Overview</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/healthcare" role="menuitem">Healthcare</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/life-sciences" role="menuitem">Life Sciences</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/packaging" role="menuitem">Packaging</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/semiconductor" role="menuitem">Semiconductor</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/robotics" role="menuitem">Robotics</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/3d-printing" role="menuitem">3D Printing</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Resources </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources" role="menuitem">Resource Center</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://info.pmdcorp.com/cmp/subscribe-newsletter" role="menuitem">Motion Control News</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/faq" role="menuitem">FAQs</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources/software" role="menuitem">Software Downloads</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/pmd-distributors-and-sales-partners" role="menuitem">Sales Partners</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources/support" role="menuitem">Service and Support</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Company </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/about" role="menuitem">About Us</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/event-calendar" role="menuitem">Events</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/certifications" role="menuitem">Certifications</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/contact" role="menuitem">Contact Us</a></li>
+   </ul></li>
+ </ul>
+</div></span></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell custom-menu-primary mobile-menu" style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-2 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget mobile-sitemap" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_155262207568961" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module">
+<span id="hs_cos_wrapper_module_155262207568961_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="menu"><div id="hs_menu_wrapper_module_155262207568961_" class="hs-menu-wrapper active-branch flyouts hs-menu-flow-horizontal" role="navigation" data-sitemap-name="default" data-menu-id="8152426343" aria-label="Navigation Menu">
+ <ul>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="javascript:;" role="menuitem">Main Menu</a></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Core Advantages</a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages" role="menuitem">Motion Control At Its Core</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#products" role="menuitem">Range of Products</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#performance" role="menuitem">Uncompromising Performance</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#safety" role="menuitem">FDA Approval and Safety</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#availability" role="menuitem">Long-term Availability</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#development" role="menuitem">Development Tools</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/core-advantages#partner" role="menuitem">A Partner In Motion Control</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Products </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products" role="menuitem">Overview</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/ics" role="menuitem">Integrated Circuits (IC)</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/modules" role="menuitem">Digital Amplifiers</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/digital-drives" role="menuitem">Digital Drives</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/boards" role="menuitem">Motion Control Boards</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/developer-kits" role="menuitem">Developer Kits</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/products/development-software" role="menuitem">C-Motion Language &amp; Related Tools</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Industries </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/overview" role="menuitem">Overview</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/healthcare" role="menuitem">Healthcare</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/life-sciences" role="menuitem">Life Sciences</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/packaging" role="menuitem">Packaging</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/semiconductor" role="menuitem">Semiconductor</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/robotics" role="menuitem">Robotics</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/industries/3d-printing" role="menuitem">3D Printing</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Resources </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources" role="menuitem">Resource Center</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/faq" role="menuitem">FAQs</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources/software" role="menuitem">Software Downloads</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources/support" role="menuitem">Service and Support</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/resources/support" role="menuitem">Service and Support</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="menu"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Company </a>
+   <ul class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/about" role="menuitem">About Us</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/certifications" role="menuitem">Certifications</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/event-calendar" role="menuitem">Events</a></li>
+    <li class="hs-menu-item hs-menu-depth-2"><a href="https://www.pmdcorp.com/company/contact" role="menuitem">Contact Us</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="https://www.pmdcorp.com/users/sign_in" role="menuitem" target="_blank">Buy</a></li>
+  <li class="hs-menu-item hs-menu-depth-1"><a href="https://www.pmdcorp.com/company/contact" role="menuitem">Contact</a></li>
+ </ul>
+</div></span></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+<div class="row-fluid-wrapper row-depth-1 row-number-3 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_1552636111416301" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><p class="menu-address">
+      <strong>Performance Motion <br> Devices, Inc.</strong> <br>
+      1 Technology Park Dr.<br>
+      Westford, MA 01886 <br>
+      P: 978.266.1210 <br>
+      F: 978.266.1211 <br>
+      <a href="https://www.facebook.com/Performance-Motion-Devices-335206493333706/" target="_blank"><i class="fa fa-facebook fa-lg"></i></a>
+      <a href="http://www.linkedin.com/company/performance-motion-devices" target="_blank"><i class="fa fa-linkedin fa-lg"></i></a>
+    </p></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+</div><!-- end coded_template: id:8151038147 path:generated_global_groups/8151038146.html -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+    </div><!--end header -->
+</div><!--end header wrapper -->
+
+<div class="body-container-wrapper">
+    <div class="body-container container-fluid">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell page-center content-wrapper" style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-2 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell blog-content" style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-3 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_1523032069834331" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-blog_content" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module">
+    <div class="topic-post-mod">
+<div class="page-center">
+<div class="topic-bar">
+<h5><a href="/resources">Resources</a> / <a href="/resources?filter=articles">Articles</a> / <span id="hs_cos_wrapper_name" class="hs_cos_wrapper hs_cos_wrapper_meta_field hs_cos_wrapper_type_text" style="" data-hs-cos-general-type="meta_field" data-hs-cos-type="text">Mathematics of Motion Control Profiles</span></h5>
+</div>
+</div>
+</div>
+<div class="blog-detail-sec">
+<div class="page-center">
+<div class="blog-post-box">
+<div class="post-featured-image">
+<img src="" alt="">
+</div>
+<div class="post-category">
+<h4>
+<img src="https://www.pmdcorp.com/hubfs/PMD%20Resources/Icons/Article.svg" alt="article"> Articles
+</h4>
+</div>
+<div class="post-title">
+<h1><span id="hs_cos_wrapper_name" class="hs_cos_wrapper hs_cos_wrapper_meta_field hs_cos_wrapper_type_text" style="" data-hs-cos-general-type="meta_field" data-hs-cos-type="text">Mathematics of Motion Control Profiles</span></h1>
+</div>
+<div class="author-info">
+<p><em></em>
+<a class="author-link" href="https://www.pmdcorp.com/resources/type/articles/author/chuck-lewin">~ Chuck Lewin</a></p>      
+</div>
+<div class="post-body-content">
+<span id="hs_cos_wrapper_post_body" class="hs_cos_wrapper hs_cos_wrapper_meta_field hs_cos_wrapper_type_rich_text" style="" data-hs-cos-general-type="meta_field" data-hs-cos-type="rich_text"><p>Motion control engineers spend hours optimizing tuning parameters for their servo-based motion controllers. But what if they are using step motors? And what if, no matter how much time they spend on tuning, they can’t get the performance they want?</p>
+<!--more-->
+<p>The answer, for many motor and control systems, is to focus on the motion profile instead. Advanced profiling features such as asymmetric acceleration and deceleration, 7-segment S-curve profiling, change-on-the-fly, and electronic camming are now widely available, providing engineers with new tools that make machines work faster and more efficiently. This article will take you through the mathematics of motion profiles, discuss which profiles work best for which applications. It will also provide insights into how to “tune” your motion profile for maximum performance.</p>
+<h2>S-curve and Trapezoidal Motion Control Profiles</h2>
+<p>While there are a lot of different motion profiles in use today, a good starting point is the point-to-point move. For a large number of applications including medical automation, scientific instrumentation, pointing systems, and many types of general automation, the point-to-point move is used more frequently than any other motion control profile. Because of this, optimization of this profile will have the largest overall impact on system performance. Point-to-point means that from a stop, the load is accelerated to a constant velocity, and then decelerated such that the final acceleration, and velocity, are zero at the moment the load arrives at the programmed destination.</p>
+<p>The two profiles commonly used for point-to-point profiling are the S-curve profile, and its simpler cousin the trapezoidal profile. They are shown in Figure 1.</p>
+<p style="text-align: center;"><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=740&amp;name=fig1-s-curve-trapezoidal-profiles.png" alt="S-curve and Trapezoidal Motion Profiles" width="740" style="display: block; margin-left: auto; margin-right: auto; width: 740px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=370&amp;name=fig1-s-curve-trapezoidal-profiles.png 370w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=740&amp;name=fig1-s-curve-trapezoidal-profiles.png 740w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=1110&amp;name=fig1-s-curve-trapezoidal-profiles.png 1110w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=1480&amp;name=fig1-s-curve-trapezoidal-profiles.png 1480w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=1850&amp;name=fig1-s-curve-trapezoidal-profiles.png 1850w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig1-s-curve-trapezoidal-profiles.png?width=2220&amp;name=fig1-s-curve-trapezoidal-profiles.png 2220w" sizes="(max-width: 740px) 100vw, 740px"><br><strong>Figure 1: S-curve profile and trapezoidal profile<br><br></strong></p>
+<p>In the context of a point-to-point move, a full <a href="/resources/type/articles/get/s-curve-profiles-deep-dive-article" rel=" noopener"><strong>S-curve motion profile</strong></a> consists of 7 distinct phases of motion. Phase I starts moving the load from rest at a linearly increasing acceleration until it reaches the maximum acceleration. In Phase II, the profile accelerates at its maximum acceleration rate until it must start decreasing as it approaches the maximum velocity. This occurs in Phase III when the acceleration linearly decreases until it reaches zero. In Phase IV, the control velocity is constant until deceleration begins, at which point the profiles decelerates in a manner symmetric to Phases I, II and III.</p>
+<p>A trapezoidal profile, on the other hand, has 3 phases. It is a subset of an S-curve profile, having only the phases corresponding to #2 of the S-curve profile (constant acceleration), #4 (constant velocity), and #6 (constant deceleration). This reduced number of phases underscores the difference between these two profiles: The S-curve profile has extra motion phases which transition between periods of acceleration, and periods of non-acceleration. The trapezoidal profile has instantaneous transitions between these phases. This can be seen in the acceleration graphs of the corresponding velocity profiles for these two profile types. The motion characteristic that defines the change in acceleration, or transitional period, is known as jerk. Jerk is defined as the rate of change of acceleration with time. In a trapezoidal profile, the jerk (change in acceleration) is infinite at the phase transitions, while in the S-curve profile the "jerk" is a constant value—spreading the change in acceleration over a period of time.</p>
+<h2>What a Jerk</h2>
+<p>That an S-curve profile is smoother than a trapezoidal profile is evident from the above graphs. <em>Why, however, do the S-curve profile result in less load oscillation?</em> The answer to this has to do with the fact that for a given load, the higher the jerk, the greater the amount of unwanted vibration energy will be generated, and the broader the frequency spectrum of the vibration’s energy will be.</p>
+<p>This means that the more rapid the change in acceleration, the more powerful the vibrations will be, and the larger the number of vibrational modes will be excited. This is shown in Figure 2. And because vibrational energy is absorbed in the system mechanics, it may cause an increase in settling time or reduced accuracy if the vibration frequency matches resonances in the mechanical and control system.</p>
+<p><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=420&amp;name=fig2-vibrations-s-curve-trapezoidal.png" alt="Induced Vibrations for S-curve and Trapezoidal" width="420" style="width: 420px; margin: 0px auto; display: block;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=210&amp;name=fig2-vibrations-s-curve-trapezoidal.png 210w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=420&amp;name=fig2-vibrations-s-curve-trapezoidal.png 420w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=630&amp;name=fig2-vibrations-s-curve-trapezoidal.png 630w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=840&amp;name=fig2-vibrations-s-curve-trapezoidal.png 840w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=1050&amp;name=fig2-vibrations-s-curve-trapezoidal.png 1050w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig2-vibrations-s-curve-trapezoidal.png?width=1260&amp;name=fig2-vibrations-s-curve-trapezoidal.png 1260w" sizes="(max-width: 420px) 100vw, 420px"></p>
+<p style="text-align: center;"><strong>Figure 2: Induced vibrations for (2A) S-curve profile and (2B) trapezoidal profile</strong><br><br></p>
+<h2>I Wanna Go Fast</h2>
+<p>Since trapezoidal profiles spend their time at full acceleration or full deceleration, they are, from the standpoint of profile execution, faster than S-curve profiles. But if this 'all on'/'all off' approach causes an increase in settling time, the advantage is lost. Often, only a small amount of "S" (transition between acceleration and no acceleration) can substantially reduce induced vibration. And so to optimize throughput the S-curve profile must be 'tuned' for each a given load and given desired transfer speed.</p>
+<p><em>What S-curve form is right for a given system?</em> On an application by application basis, the specific choice of the form of the S-curve will depend on the mechanical nature of the system, and the desired performance specifications. For example in medical applications which involve liquid transfers that should not be jostled, it would be appropriate to choose a profile with no Phase II &amp; VI segment at all, instead spreading the acceleration transitions out as far as possible, thereby maximizing smoothness.</p>
+<p>In other applications involving high speed <a href="/resources/type/case-studies/get/pick-and-place-machine-case-study" rel=" noopener"><strong>pick and place</strong></a>, overall transfer speed is most important so a good choice might be an S-curve with transition phases (Phases I, III, V, and VII) that are 5-15 % of Phase II &amp; VI. In this case the S-curve profile will add a small amount of time to the overall transfer time, but because of reduced load oscillation at the end of the move, the total effective transfer time can be considerably decreased. Trial and error using a motion measurement system is generally the best way to determine the right amount of "S", because modelling the response to vibrations is complicated, and not always accurate.</p>
+<h3><em>Trapezoidal Profile Equations</em></h3>
+<p>The basic math required to execute trapezoidal profiles is straightforward. There are, however, two forms that can be used; the Continuous Form, that will be familiar from High School Physics, and the Discrete Time Form, which is used in most motion control solutions that utilize microprocessors or DSPs (Digital Signal Processor) to generate a new set of motion parameters at each tick of the motion 'clock'.</p>
+<p><strong><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=340&amp;name=trapezoidal-equation-1.png" alt="Trapezoidal Profile Equation" width="340" style="width: 340px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=170&amp;name=trapezoidal-equation-1.png 170w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=340&amp;name=trapezoidal-equation-1.png 340w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=510&amp;name=trapezoidal-equation-1.png 510w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=680&amp;name=trapezoidal-equation-1.png 680w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=850&amp;name=trapezoidal-equation-1.png 850w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/trapezoidal-equation-1.png?width=1020&amp;name=trapezoidal-equation-1.png 1020w" sizes="(max-width: 340px) 100vw, 340px"><br><br></strong></p>
+<h3><em>S-Curve Profile Equations</em></h3>
+<p>Because they are third versus second-order curves, and because there are seven versus three separate motion segments, point-to-point S-curves are more complicated then Trapezoids. In particular it is not simple to calculate the stopping distance for a given set of profile values. Accordingly, many S-curve profiling systems restrict changes-on-the-fly, or do not allow asymmetric profiles. These restrictions allow information about how long, and over what distance, the motion control profile previously took to accelerate to determine when to start decelerating.</p>
+<p><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=470&amp;name=s-curve-equation-1.png" alt="S-curve profile equation" width="470" style="width: 470px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=235&amp;name=s-curve-equation-1.png 235w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=470&amp;name=s-curve-equation-1.png 470w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=705&amp;name=s-curve-equation-1.png 705w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=940&amp;name=s-curve-equation-1.png 940w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=1175&amp;name=s-curve-equation-1.png 1175w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/s-curve-equation-1.png?width=1410&amp;name=s-curve-equation-1.png 1410w" sizes="(max-width: 470px) 100vw, 470px"></p>
+<h2>Making Your Point-to-Point</h2>
+<p>The ultimate goal of any profile is to match the motion system characteristics to the desired application. Trapezoidal and S-curve profiles work well when the motion system's torque response curve is fairly flat. In other words, when the output torque does not vary that much over the range of velocities the system will be experiencing. This is true for most servo motor systems, whether DC Brush or Brushless DC.</p>
+<p>Step motors, however, do not have flat torque and speed curves. Torque output is non-linear, sometimes having a large drop at a location called the 'mid-range instability', and generally having drop-off at higher velocities. Figure 3 gives examples of typical torque and speed curves for servo and step-motor systems.</p>
+<p><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=420&amp;name=fig3-typical-torque-servo-step-motors.png" alt="Torque/Speed Curves for Servo and Step Motors" width="420" style="width: 420px; margin: 0px auto; display: block;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=210&amp;name=fig3-typical-torque-servo-step-motors.png 210w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=420&amp;name=fig3-typical-torque-servo-step-motors.png 420w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=630&amp;name=fig3-typical-torque-servo-step-motors.png 630w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=840&amp;name=fig3-typical-torque-servo-step-motors.png 840w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=1050&amp;name=fig3-typical-torque-servo-step-motors.png 1050w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig3-typical-torque-servo-step-motors.png?width=1260&amp;name=fig3-typical-torque-servo-step-motors.png 1260w" sizes="(max-width: 420px) 100vw, 420px"></p>
+<p style="text-align: center;"><strong>Figure 3: Typical torque/speed curves for (3A) servo and (3B) step motor systems<br><br></strong></p>
+<p>Mid-range instability occurs at the step frequency when the motor's natural resonance frequency matches the current step rate. To address mid-range instability, the most common technique is to use a non-zero starting velocity. This means that the profile instantly 'jumps' to a programmed velocity upon initial acceleration, and while decelerating. This is shown in Figure 4. While crude, this technique sometimes provides better results than a smooth ramp for zero, particularly for systems that do not use a microstepping drive technique.</p>
+<p><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=600&amp;name=fig4-non-zero-starting-velocity.png" alt="Non-zero starting velocity" width="600" style="display: block; margin-left: auto; margin-right: auto; width: 600px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=300&amp;name=fig4-non-zero-starting-velocity.png 300w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=600&amp;name=fig4-non-zero-starting-velocity.png 600w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=900&amp;name=fig4-non-zero-starting-velocity.png 900w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=1200&amp;name=fig4-non-zero-starting-velocity.png 1200w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=1500&amp;name=fig4-non-zero-starting-velocity.png 1500w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig4-non-zero-starting-velocity.png?width=1800&amp;name=fig4-non-zero-starting-velocity.png 1800w" sizes="(max-width: 600px) 100vw, 600px"></p>
+<p style="text-align: center;"><strong>Figure 4: Non-zero starting velocity<br><br></strong></p>
+<p>To address drop-off of torque at higher velocities, a Parabolic profile, shown in figure 5 can be used. The corresponding acceleration curve has the characteristic that the acceleration is smallest when the velocity is highest. This is a good match for step-motor systems, because there is less torque available at higher speeds. But notice that starting and ending accelerations are very high, and there is no "S" phase where the acceleration smoothly transitions to zero. So if load oscillation is a problem, parabolic profiles may not work as well as an S-curve, despite the fact that a standard S-curve profile is not optimized for a step motor from the standpoint of the torque/speed curve.</p>
+<p><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=420&amp;name=fig5-parabolic-motion-profile.png" alt="Parabolic Motion Profile" width="420" style="width: 420px; margin: 0px auto; display: block;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=210&amp;name=fig5-parabolic-motion-profile.png 210w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=420&amp;name=fig5-parabolic-motion-profile.png 420w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=630&amp;name=fig5-parabolic-motion-profile.png 630w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=840&amp;name=fig5-parabolic-motion-profile.png 840w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=1050&amp;name=fig5-parabolic-motion-profile.png 1050w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig5-parabolic-motion-profile.png?width=1260&amp;name=fig5-parabolic-motion-profile.png 1260w" sizes="(max-width: 420px) 100vw, 420px"></p>
+<p style="text-align: center;"><strong>Figure 5: Parabolic profile</strong><br><br></p>
+<h3><em>Parabolic Profile Equations</em></h3>
+<p>Parabolic profiles are closely related to S-curves because they are third-order moves. And as was the case for S-curve profiles, calculating the distance to deceleration is complicated, particularly if profile changes-on-the-fly are allowed.</p>
+<p><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=500&amp;name=parabolic-equation-1.png" alt="Parabolic Motion Equation" width="500" style="width: 500px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=250&amp;name=parabolic-equation-1.png 250w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=500&amp;name=parabolic-equation-1.png 500w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=750&amp;name=parabolic-equation-1.png 750w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=1000&amp;name=parabolic-equation-1.png 1000w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=1250&amp;name=parabolic-equation-1.png 1250w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/parabolic-equation-1.png?width=1500&amp;name=parabolic-equation-1.png 1500w" sizes="(max-width: 500px) 100vw, 500px"></p>
+<h2>Table for 65,536 Please</h2>
+<p>The ultimate in point-to-point profile generation, or in fact for other types of profiles including continuous path generation such as is used in CNC (Computer Numerical Control) machine tools, is to construct a custom profile that compensates for the exact load and motor characteristics of the system. Such a profile would accelerate the motor, taking into account the available motor torque at each velocity point, the mechanical resonances at each velocity point, and the actuator or arm <a href="/resources/type/articles/resources/get/motion-kinematics-article" rel=" noopener"><strong>kinematics</strong></a> in the mechanism.</p>
+<p>Since motor torque curves do not follow simple mathematical principles, and because the equations for kinematic compensation are complex, these calculations are generally calculated in advance, and stored in a table of motion 'vectors'. This table is generally set up as an array of position or time vectors, with a corresponding entry for velocity and acceleration at each point of the curve.</p>
+<p>In this configuration the motion engine is merely providing a generic capability to download and execute a list of vectors, and the responsibility of the calculations falls to the user. Despite this extra work, if special conditions exist, such as when motors or mechanisms are highly non-linear, table-driven point-to-point profiles can provide a meaningful performance increase, and may be worth the effort.</p>
+<h2>Cam We Talk?</h2>
+<p>Beyond point-to-point moves, there is a broad range of motion applications that require repetitive motion, indexed by a timer, or encoder, or master rate envelop profile. Such applications fall under the category of electronic cams, which includes the related but simpler approach known as electronic gearing.</p>
+<p>Cams typically also use downloadable tables. In this case, the tables are used to define a target position for each location of the encoder or tick of the master clock. The user can download a trapezoidal profile, an S-curve profile, or more commonly, a custom profile that replicates the function of a specially-shaped mechanical cam.</p>
+<p style="text-align: center;"><img src="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=600&amp;name=fig6-camming-profile-mode.png" alt="CAMming Profile Mode" width="600" style="width: 600px; margin: 0px auto;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=300&amp;name=fig6-camming-profile-mode.png 300w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=600&amp;name=fig6-camming-profile-mode.png 600w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=900&amp;name=fig6-camming-profile-mode.png 900w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=1200&amp;name=fig6-camming-profile-mode.png 1200w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=1500&amp;name=fig6-camming-profile-mode.png 1500w, https://www.pmdcorp.com/hs-fs/hubfs/Diagrams/fig6-camming-profile-mode.png?width=1800&amp;name=fig6-camming-profile-mode.png 1800w" sizes="(max-width: 600px) 100vw, 600px"></p>
+<p style="text-align: center;"><strong>Figure 6: Camming Profile Mode<br><br></strong></p>
+<p>There are a number of ways to specify the relationship between the master clock and the controlled axis. The most common is to define the number of encoder counts that make up a 360 degree 'rotation' of the master encoder, and then allow one or more output points to be defined at each degree position of the table. When executing the table, after reading the last location of the table the motion controller will 'wrap' back, and restart from the first. Because of this, the beginning and ending position targets must be the same, or very similar, to avoid a discontinuous jump in motion.</p>
+<p>A variation on this approach is to treat each table entry as a relative distance to move rather than as an absolute desired axis location. Using this approach there is no requirement that the first and last entries in the table match up.</p>
+<p>Electronic Gearing is a simpler version of camming where the relationship between the master can be expressed as a fixed ratio to the driven axis. Gear ratios can be positive or negative, and can be greater or less than one, meaning that the driven axis can amplify, or reduce, the motion specified by the master encoder.</p>
+<h2>Summary</h2>
+<p>Choosing the right motion control profile can improve smoothness, reduce wear, and lower transfer times for a broad range of motion control applications. Trapezoidal profiles are useful, but limited, because there is no way to define transitions between acceleration regions. S-curves solve this problem, but are correspondingly more complex mathematically. Another important profile for point-to-point moves is the parabolic profile, generally used only for step-motor based systems. Table-based approaches to motion profiling are also popular, and in particular, downloadable electronic cams are widely used in a number of industries.</p>
+<p>Written by:<br>Chuck Lewin<br>Founder and CEO<br>Performance Motion Devices, Inc.</p>
+<p style="text-align: center;"><!--HubSpot Call-to-Action Code --><span class="hs-cta-wrapper" id="hs-cta-wrapper-7706abba-999d-45cc-87a2-d33cb9f49687"><span class="hs-cta-node hs-cta-7706abba-999d-45cc-87a2-d33cb9f49687" id="hs-cta-7706abba-999d-45cc-87a2-d33cb9f49687"><!--[if lte IE 8]><div id="hs-cta-ie-element"></div><![endif]--><a href="https://cta-redirect.hubspot.com/cta/redirect/5524801/7706abba-999d-45cc-87a2-d33cb9f49687" target="_blank"><img class="hs-cta-img" id="hs-cta-img-7706abba-999d-45cc-87a2-d33cb9f49687" style="border-width:0px;" src="https://no-cache.hubspot.com/cta/default/5524801/7706abba-999d-45cc-87a2-d33cb9f49687.png" alt="Download PDF of Paper"></a></span><script charset="utf-8" src="/hs/cta/cta/current.js"></script><script type="text/javascript"> hbspt.cta._relativeUrls=true;hbspt.cta.load(5524801, '7706abba-999d-45cc-87a2-d33cb9f49687', {}); </script></span><!-- end HubSpot Call-to-Action Code --></p>
+<p>&nbsp;</p>
+<h2>PMD Products with Advanced Profiling Capabilities</h2>
+<p>PMD has three product groups that provide advanced S-curve and trapezoidal profiles, programmable start velocity, and cam capability. While different in packaging, all are controlled by C-Motion, PMD's easy to use motion control language and are ideal for use in a wide variety of <a href="/industries/healthcare" rel=" noopener"><strong>medical</strong></a>, <a href="/industries/life-sciences" rel=" noopener"><strong>laboratory</strong></a>, <a href="/industries/semiconductor" rel=" noopener"><strong>semiconductor</strong></a>, <a href="/industries/robotics" rel=" noopener"><strong>robotic</strong></a>, and industrial motion control applications.</p>
+<div class="row" style="background-color: #f6f6f6; padding: 18px;">
+<div class="col-xs-4" style="background-color: #f6f6f6;"><a href="https://www.pmdcorp.com/products/ics" rel=" noopener"><img src="https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=200&amp;name=pmd-motion-control-ics-1.png" alt="Motion Control ICs" width="200" style="width: 200px; margin: 10px 0px 10px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=100&amp;name=pmd-motion-control-ics-1.png 100w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=200&amp;name=pmd-motion-control-ics-1.png 200w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=300&amp;name=pmd-motion-control-ics-1.png 300w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=400&amp;name=pmd-motion-control-ics-1.png 400w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=500&amp;name=pmd-motion-control-ics-1.png 500w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-ics-1.png?width=600&amp;name=pmd-motion-control-ics-1.png 600w" sizes="(max-width: 200px) 100vw, 200px"></a></div>
+<div class="col-xs-7">
+<h3 style="background-color: #f6f6f6;"><a href="/products/ics" rel=" noopener">Magellan Family of ICs</a></h3>
+<p><strong style="background-color: #f6f6f6;">Magellan Single and Multi-Axis Motion Control ICs</strong><span style="background-color: #f6f6f6;"> are perfect for building your own machine control board from the ground up. They feature the latest in profile generation, servo loop closure, current control, profile synchronization, event management, and PWM (Pulse Width Modulation) signal output generation. These low cost and easy to use ICs also are available in versions that support camming and synchronized multi-axis contouring via User Defined Profile Mode option.</span></p>
+<h6 style="background-color: #f6f6f6;"><a href="/products/ics" rel=" noopener"><strong>Learn more &gt;&gt;</strong></a></h6>
+</div>
+</div>
+<p>&nbsp;</p>
+<div class="row" style="background-color: #f6f6f6; padding: 18px;">
+<div class="col-xs-4"><a href="https://www.pmdcorp.com/products/digital-drives" rel=" noopener"><img src="https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=200&amp;name=pmd-motion-control-drives-1.png" alt="Motion Control Digital Drives" width="200" style="width: 200px; margin: 10px 0px 10px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=100&amp;name=pmd-motion-control-drives-1.png 100w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=200&amp;name=pmd-motion-control-drives-1.png 200w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=300&amp;name=pmd-motion-control-drives-1.png 300w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=400&amp;name=pmd-motion-control-drives-1.png 400w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=500&amp;name=pmd-motion-control-drives-1.png 500w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-drives-1.png?width=600&amp;name=pmd-motion-control-drives-1.png 600w" sizes="(max-width: 200px) 100vw, 200px"></a></div>
+<div class="col-xs-7">
+<h3><a href="/products/digital-drives" rel=" noopener">ION Digital Drives</a></h3>
+<p><strong>ION Digital Drives</strong> have a Magellan IC at their core and combine this with a high power digital amplifier to create a compact rugged cable-connected module. Whether used for S-curve point to point moves, high speed spindle control, or your latest robotic design challenge, IONs are cost effective plug and play devices that will get your application up and running in a snap.</p>
+<h6><a href="/products/digital-drives" rel=" noopener"><strong>Learn more &gt;&gt;</strong></a></h6>
+</div>
+</div>
+<p>&nbsp;</p>
+<div class="row" style="background-color: #f6f6f6; padding: 18px;">
+<div class="col-xs-4"><a href="https://www.pmdcorp.com/products/boards" rel=" noopener"><img src="https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=200&amp;name=pmd-motion-control-boards-1.png" alt="Motion Control Boards" width="200" style="width: 200px; margin: 10px 0px 10px;" srcset="https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=100&amp;name=pmd-motion-control-boards-1.png 100w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=200&amp;name=pmd-motion-control-boards-1.png 200w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=300&amp;name=pmd-motion-control-boards-1.png 300w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=400&amp;name=pmd-motion-control-boards-1.png 400w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=500&amp;name=pmd-motion-control-boards-1.png 500w, https://www.pmdcorp.com/hs-fs/hubfs/Product/pmd-motion-control-boards-1.png?width=600&amp;name=pmd-motion-control-boards-1.png 600w" sizes="(max-width: 200px) 100vw, 200px"></a></div>
+<div class="col-xs-7">
+<h3><a href="/products/boards" rel=" noopener">Prodigy Motion Control Boards</a></h3>
+<p><strong>Prodigy Motion Control Boards</strong> have a multi-axis Magellan IC at their core and come in various form factors including PC-104, standalone, and standalone with built in Atlas Amplifiers (Prodigy/CME Machine Controller). In addition to supporting the sophisticated profiling modes described in this article, these cards provide multi-dimensional synchronized contouring via PMD's User Defined Profile Mode to solve all the challenges of your next machine design project.</p>
+<h6><a href="/products/boards" rel=" noopener"><strong>Learn more &gt;&gt;</strong></a></h6>
+</div>
+</div>
+<p>&nbsp;</p>
+<h3>You may also be interested in:</h3>
+<ul>
+<li><a href="/resources/type/articles/get/s-curve-profiles-deep-dive-article">S-Curve Motion Profiles - Vital For Optimizing Machine Performance</a></li>
+<li><a href="/resources/type/articles/resources/get/motion-kinematics-article" rel=" noopener">Motion Kinematics</a></li>
+<li><a href="/resources/type/articles/keep-your-step-motor-position-with-a-closed-loop-motion-control-system" rel=" noopener">Keep Your Step Motor Position with A Closed Loop Motion Control System</a></li>
+<li><a href="/resources/type/articles/get/motion-controller-design-deep-dive-see-the-forest-through-the-trees-with-this-overview-of-motion-controller-design-architectures-article">Motion Controller Design Architectures - A Deep Dive</a><br><br></li>
+</ul>
+<p>&nbsp;</p></span>
+</div>
+</div>
+<div class="blog-social-share">
+<h3>Share: </h3>
+<ul>
+<li><a class="bloglisting-twitter" href="https://twitter.com/intent/tweet?original_referer=https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article" target="_blank" title="Tweet"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+<li> <a class="bloglisting-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.pmdcorp.com%2Fresources%2Ftype%2Farticles%2Fget%2Fmathematics-of-motion-control-profiles-article" title="Share on Facebook" target="_blank"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+<li><a class="bloglisting-linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fwww.pmdcorp.com%2Fresources%2Ftype%2Farticles%2Fget%2Fmathematics-of-motion-control-profiles-article" target="_blank" title="Share on LinkedIn"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+</ul>
+</div>
+<div class="blog-topics-box">   
+<h3>Tags:</h3>
+<a class="topic-link" href="/resources?filter=motion-control-techniques">Motion Control Techniques</a>
+<a class="topic-link" href="/resources?filter=step-motors">Step Motors</a>
+<a class="topic-link" href="/resources?filter=motion-profiles">Motion Profiles</a>
+</div>
+</div>
+</div>
+
+</div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+    </div><!--end body -->
+</div><!--end body wrapper -->
+
+<div class="footer-container-wrapper">
+    <div class="footer-container container-fluid">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-global_group " style="" data-widget-type="global_group" data-x="0" data-w="12">
+<!-- start coded_template: id:8151114078 path:generated_global_groups/8151114077.html -->
+<div class="" data-global-widget-path="generated_global_groups/8151114077.html"><div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell custom-footer" style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-2 ">
+<div class="row-fluid ">
+<div class="span8 widget-span widget-type-custom_widget footer-address" style="" data-widget-type="custom_widget" data-x="0" data-w="8">
+<div id="hs_cos_wrapper_module_151811918217345" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-rich_text" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><span id="hs_cos_wrapper_module_151811918217345_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"><p>Performance Motion Devices, Inc. <br>1 Technology Park Dr | Westford, MA 01886 | P: 978.266.1210 F: 978.266.1211 | <a href="mailto:info@pmdcorp.com">info@pmdcorp.com</a> | <a href="https://www.pmdcorp.com/privacy-policy" rel=" noopener">Privacy Policy</a></p>
+<p>© 2020 Performance Motion Devices, Inc. All rights reserved. View our <a href="https://www.pmdcorp.com/privacy-policy" rel="noopener" target="_blank">Privacy Policy</a>.</p></span></div>
+
+</div><!--end widget-span -->
+<div class="span4 widget-span widget-type-cell social-share-wrapper" style="" data-widget-type="cell" data-x="8" data-w="4">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-3 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_1552549233754296" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><ul class="social-icon">
+    <li><a href="https://www.facebook.com/Performance-Motion-Devices-335206493333706/" target="_blank"><i class="fa fa-facebook fa-lg"></i></a></li>
+    <li><a href="http://www.linkedin.com/company/performance-motion-devices" target="_blank"><i class="fa fa-linkedin fa-lg"></i></a></li>
+    <li><a href="https://twitter.com/MotionControl" target="_blank"><i class="fa fa-twitter fa-lg"></i></a></li>
+  </ul></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+</div><!-- end coded_template: id:8151114078 path:generated_global_groups/8151114077.html -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+    </div><!--end footer -->
+</div><!--end footer wrapper -->
+
+    <script src="/hs/hsstatic/jquery-libs/static-1.4/jquery/jquery-1.11.2.js"></script>
+<script>hsjQuery = window['jQuery'];</script>
+<script>
+(function () {
+    window.addEventListener('load', function () {
+        setTimeout(function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/_hcms/perf', true /*async*/);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                // do nothing.
+            };
+            var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            function populateNetworkInfo(name, connection, info) {
+                if (name in connection) {
+                    info[name] = connection[name];
+                }
+            }
+            var networkInfo = {};
+            if (connection) {
+                ['type', 'effectiveType', 'downlink', 'rtt'].forEach(function(name) {
+                    populateNetworkInfo(name, connection, networkInfo);
+                });
+            }
+            var perfData = {
+                url: location.href,
+                portal: 5524801,
+                content: 8841505289,
+                group: -1,
+                connection: networkInfo,
+                timing: performance.timing
+            };
+            xhr.send(JSON.stringify(perfData));
+        }, 3000);  // Execute this 3 seconds after onload.
+    });
+})();
+</script>
+
+<script src="https://www.pmdcorp.com/hs-fs/hub/5524801/hub_generated/template_assets/10639114331/1584381833982/PMD_Resources/Files/pmd2019.min.js"></script>
+<script src="https://www.pmdcorp.com/hs-fs/hub/5524801/hub_generated/template_assets/8151038144/1587648957849/Performance_Motion_Devices_March2019_Theme/Coded_Files/Performance_Motion_Devices_March2019-main.min.js"></script>
+<script>
+if (typeof hsVars !== 'undefined') { hsVars['language'] = 'en'; }
+</script>
+
+<script src="/hs/hsstatic/cos-i18n/static-1.27/bundles/project.js"></script>
+<script src="/hs/hsstatic/keyboard-accessible-menu-flyouts/static-1.17/bundles/project.js"></script>
+<script src="https://cdn2.hubspot.net/hub/-1/hub_generated/module_assets/-2712622/1600518962049/module_-2712622_Site_Search_Input.min.js"></script>
+
+<!-- Start of HubSpot Analytics Code -->
+<script type="text/javascript">
+var _hsq = _hsq || [];
+_hsq.push(["setContentType", "blog-post"]);
+_hsq.push(["setCanonicalUrl", "https:\/\/www.pmdcorp.com\/resources\/type\/articles\/get\/mathematics-of-motion-control-profiles-article"]);
+_hsq.push(["setPageId", "8841505289"]);
+_hsq.push(["setContentMetadata", {
+    "contentPageId": 8841505289,
+    "legacyPageId": "8841505289",
+    "contentFolderId": null,
+    "contentGroupId": 8833486035,
+    "abTestId": null,
+    "languageVariantId": 8841505289,
+    "languageCode": "en",
+    
+}]);
+</script>
+
+<script type="text/javascript" id="hs-script-loader" async defer src="/hs/scriptloader/5524801.js"></script>
+<!-- End of HubSpot Analytics Code -->
+
+
+<script type="text/javascript">
+var hsVars = {
+    ticks: 1600519080705,
+    page_id: 8841505289,
+
+    content_group_id: 8833486035,
+    portal_id: 5524801,
+    app_hs_base_url: "https://app.hubspot.com",
+    cp_hs_base_url: "https://cp.hubspot.com",
+    language: "en",
+    analytics_page_type: "blog-post",
+    category_id: 3,
+    folder_id: 0,
+    is_hubspot_user: false
+}
+</script>
+
+
+<script defer src="/hs/hsstatic/HubspotToolsMenu/static-1.79/js/index.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
+<script>
+  $(function() {
+    $('.lazy').Lazy({
+      scrollDirection: 'vertical',
+      effect: 'fadeIn',
+      visibleOnly: false,
+      onError: function(element) {
+        console.log('error loading ' + element.data('src'));
+      }
+    });
+  });
+</script>
+
+
+<div id="fb-root"></div>
+ <script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&status=0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+ <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+ 
+
+
+    
+    <!-- Generated by the HubSpot Template Builder - template version 1.03 -->
+
+
+<!-- end coded_template: id:10650494445 path:generated_layouts/10650494444.html -->
+</body></html>

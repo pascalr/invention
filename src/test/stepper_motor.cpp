@@ -9,14 +9,19 @@ void testAcceleration() {
   title("Testing Axis::timeToReachDestination");
 
   unsigned long moveTimeUs = 10 * 1000 * 1000; // 10 seconds
-  double destination = 180.0;
-  double maxSpeed = 2.0;
-  double acceleration = 10.0;
+  double destination = 142.0;
+  double maxSpeed = 1.5;
+  double acceleration = 1.5;
+  
+  //p.axisV.limitSwitchPin = 12;
  
   StreamWriter writer;
   StepperMotor axis(writer, 'G');
-  axis.setStepsPerUnit(200 * 2 * 16 / (360*12/61));
+  
+  double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
+  axis.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
   axis.setStepsPerTurn(200 * 2 * 16);
+
   axis.setupPins(8,10,11);
   axis.setReverseMotorDirection(true);
   axis.setDefaultMaxSpeed(maxSpeed);
@@ -36,7 +41,7 @@ void testAcceleration() {
   unsigned long captureInterval = moveTimeUs / nbPoints;
   unsigned long lastCapture = 0;
 
-  for (unsigned long time = 0; time < moveTimeUs; time += 5) {
+  for (unsigned long time = 0; time < moveTimeUs; time += 50) {
     axis.handleAxis(time);
     if ((time - lastCapture) > captureInterval) {
       t.push_back(time / 1000000.0);
@@ -46,7 +51,9 @@ void testAcceleration() {
       lastCapture = time;
     }
   }
-  
+
+  beforeRenderScene();
+
   drawLines(t,v,"b-");
   drawLines(t,p,"r-");
   show();

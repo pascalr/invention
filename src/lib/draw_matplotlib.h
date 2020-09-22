@@ -13,6 +13,7 @@ vector<double> toVect(double x) {
 
 void beforeRenderScene() {
   plt::clf();
+  plt::figure_size(1200, 780);
 }
 
 void renderScene(double xMin, double xMax, double yMin, double yMax, const char* title) {
