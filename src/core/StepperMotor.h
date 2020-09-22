@@ -166,18 +166,19 @@ class StepperMotor : public Motor {
       
       if (m_max_speed_reached > m_max_speed) {m_max_speed_reached = m_max_speed;} // s
 
-      double timeToAccelerate = m_max_speed_reached / m_acceleration; // s
+      double timeToAccelerate = (m_max_speed_reached - v0) / m_acceleration; // s
       m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * US_PER_S)); // us
+      double timeConstantSpeed = 0;
 
       if (m_max_speed_reached == m_max_speed) {
 
         double distanceAccelerating = v0*timeToAccelerate + 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
         double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
-
-        m_time_to_reach_middle_us += ((unsigned long) ((halfDistanceLeft / m_max_speed) * US_PER_S)); // us
+        timeConstantSpeed = halfDistanceLeft / m_max_speed; // s
+        m_time_to_reach_middle_us += ((unsigned long) (timeConstantSpeed * US_PER_S)); // us
       }
      
-      m_time_to_start_decelerating_us = (m_time_to_reach_middle_us * 2) - ((unsigned long)(timeToAccelerate * US_PER_S)); // us
+      m_time_to_start_decelerating_us = ((unsigned long)((timeConstantSpeed*2.0 + timeToAccelerate) * US_PER_S)); // us
       //std::cout << "m_time_to_start_decelerating_us: " << m_time_to_start_decelerating_us << std::endl;
       //std::cout << "m_time_to_reach_middle_us : " << m_time_to_reach_middle_us << std::endl;
       //std::cout << "timeToAccelerate : " << timeToAccelerate << std::endl;
