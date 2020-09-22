@@ -48,6 +48,7 @@ void setupAxes(Program& p) {
   p.axisR.setReverseMotorDirection(true);
   // min and max positions depends on the tool, sometimes no limits (mixer), sometimes yes (gripper)
 
+  //p.axisT.microsteps = 16;
   p.axisT.setStepsPerUnit(200 * 2 * 16 / (360*12/61));
   p.axisT.setStepsPerTurn(200 * 2 * 16);
   //p.axisT.limitSwitchPin = 12;
@@ -56,6 +57,7 @@ void setupAxes(Program& p) {
   p.axisT.setDefaultMaxSpeed(0.2);
   p.axisT.setAcceleration(0.2);
 
+  //p.axisH.microsteps = 8;
   p.axisH.setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
   p.axisH.setStepsPerTurn(200 * 2 * 8);
   //p.axisH.limitSwitchPin = 12;

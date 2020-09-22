@@ -67,7 +67,7 @@ void serialize(StepperMotor* axis, T& out) {
   writeJson(out, PROPERTY_NAME, axis->getName());
   writeJson(out, PROPERTY_POSITION, axis->getPosition());
   writeJson(out, "m_max_speed_reached", axis->m_max_speed_reached);
-  writeJson(out, "m_next_step_time", axis->m_next_step_time);
+  writeJson(out, "next_step_time", axis->next_step_time);
   writeJson(out, "m_start_time", axis->m_start_time);
   writeJson(out, "m_time_to_reach_middle_us", axis->m_time_to_reach_middle_us);
   writeJson(out, "m_time_ot_start_decelerating_us", axis->m_time_to_start_decelerating_us);
@@ -103,7 +103,7 @@ void serialize(Motor* axis, T& out) {
   if (name == 'h' || name == 'H' || name == 'v' || name == 'V' || name == 't' || name == 'T') {
     StepperMotor* stepper = (StepperMotor*)axis;
     writeJson(out, "m_speed", stepper->m_speed);
-    writeJson(out, "m_next_step_time", stepper->m_next_step_time);
+    writeJson(out, "next_step_time", stepper->next_step_time);
     writeJson(out, "m_acceleration", stepper->m_acceleration);
     writeJson(out, "m_max_speed", stepper->m_max_speed);
     writeJson(out, "m_default_max_speed", stepper->m_default_max_speed);

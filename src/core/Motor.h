@@ -13,7 +13,7 @@
 using namespace std;
 #endif
 
-#define MAX_STEP_DELAY 10000 // us (5 ms)
+#define MAX_STEP_DELAY 5000 // us
 
 // TODO: The referencing method should be independant of the motor.
 // This should be in another class.

@@ -210,32 +210,32 @@ class StepperMotor : public Motor {
       return m_speed;
     }
 
-    /*virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
+    //virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
-      double distanceDecelerating = 0.5 * m_speed * m_speed / m_acceleration; // tr
-      double position = getPosition();
-      double distanceToGo = abs(getDestination() - position);
-      double distanceToCollision = isForward ? getMaxPosition() - position : position - getMinPosition();
+    //  double distanceDecelerating = 0.5 * m_speed * m_speed / m_acceleration; // tr
+    //  double position = getPosition();
+    //  double distanceToGo = abs(getDestination() - position);
+    //  double distanceToCollision = isForward ? getMaxPosition() - position : position - getMinPosition();
 
-      // decelerate
-      if (distanceDecelerating > distanceToGo || distanceDecelerating > distanceToCollision) {
-       
-        cout << "Decelerating!" << endl;
-        m_speed -= m_acceleration * (m_next_step_time / 1000000.0); // tr/s
+    //  // decelerate
+    //  if (distanceDecelerating > distanceToGo || distanceDecelerating > distanceToCollision) {
+    //   
+    //    cout << "Decelerating!" << endl;
+    //    m_speed -= m_acceleration * (m_next_step_time / 1000000.0); // tr/s
 
-      // accelerate
-      } else if (m_speed < getMaxSpeed()) {
+    //  // accelerate
+    //  } else if (m_speed < getMaxSpeed()) {
 
-        cout << "Accelerating!" << endl;
-        m_speed += m_acceleration * (m_next_step_time / 1000000.0); // tr/s
-      }
-      
-      if (m_speed <= 0.001) {
-        return MAX_STEP_DELAY; // us
-      }
+    //    cout << "Accelerating!" << endl;
+    //    m_speed += m_acceleration * (m_next_step_time / 1000000.0); // tr/s
+    //  }
+    //  
+    //  unsigned long stepDelay = ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
 
-      return ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
-    }*/
+    //  return stepDelay > MAX_STEP_DELAY ? MAX_STEP_DELAY : stepDelay;
+    //}
+
+    //unsigned int microsteps = 16;
 
     virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
@@ -256,19 +256,20 @@ class StepperMotor : public Motor {
         m_speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
       }
 
-      if (m_speed <= 0.001) {
-        return MAX_STEP_DELAY; // us
-      }
+      unsigned long stepDelay = ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
 
-      return ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
+      return stepDelay > MAX_STEP_DELAY ? MAX_STEP_DELAY : stepDelay;
     }
 
-    void turnOneStep(unsigned long currentTime) {
+    unsigned long next_step_delay = 0;
+
+    void turnOneStep(unsigned long timeSinceStart) {
       digitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
-      m_next_step_time = currentTime + calculateNextStepDelay(currentTime); 
+      next_step_delay = calculateNextStepDelay(timeSinceStart); 
+      next_step_time = timeSinceStart + next_step_delay;
     }
 
     bool m_is_step_high;
@@ -276,7 +277,7 @@ class StepperMotor : public Motor {
     long m_position_steps;
 
     double m_max_speed_reached;
-    unsigned long m_next_step_time; // us
+    unsigned long next_step_time; // us
     unsigned long m_start_time; // us
     unsigned long m_time_to_reach_middle_us; // us
     unsigned long m_time_to_start_decelerating_us; // us
@@ -303,12 +304,12 @@ class StepperMotor : public Motor {
       
       if (forceRotation || !isDestinationReached()) {
         unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
-        if (currentTime >= m_next_step_time) {
+        if (timeSinceStart >= next_step_time) {
           turnOneStep(timeSinceStart);
         }
         return true;
-      } else {
-        m_speed = 0;
+      //} else {
+      //  m_speed = 0;
       }
       return false;
     }
@@ -321,15 +322,16 @@ class StepperMotor : public Motor {
     // Resets some stuff.
     virtual void prepare(unsigned long time) {
       m_start_time = time;
-      m_next_step_time = time;
+      next_step_time = 0;
       m_speed = 0;
       m_max_speed = m_default_max_speed;
     }
-    
+   
+    // Pretty sure this does not work... 
     virtual void run(unsigned long currentTime, double speedRPM) {
-      m_next_step_time = ((unsigned long)(1000000.0 / (speedRPM / 60.0 * m_steps_per_turn))); // us
+      next_step_time = ((unsigned long)(1000000.0 / (speedRPM / 60.0 * m_steps_per_turn))); // us
       unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
-      if (currentTime >= m_next_step_time) {
+      if (currentTime >= next_step_time) {
         turnOneStep(timeSinceStart);
       }
     }

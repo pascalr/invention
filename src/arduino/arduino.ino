@@ -91,8 +91,20 @@ void setup() {
   Serial.println(MESSAGE_READY);
 }
 
+unsigned long printIntervalUs = 0.1 * 1000 * 1000;
+unsigned long lastPrintUs = 0;
+
 void loop() {
   //Serial.println(analogRead(4));
   //delay(1000);
+
+  //if (timeDifference(lastPrintUs, micros()) > printIntervalUs) {
+  //  Serial.println("-----");
+  //  Serial.println(timeDifference(p.axisT.m_start_time, micros()));
+  //  Serial.println(p.axisT.next_step_delay);
+  //  Serial.println(p.axisT.next_step_time);
+  //  lastPrintUs = micros();
+  //}
+
   myLoop(p);
 }
