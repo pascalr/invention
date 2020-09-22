@@ -9,6 +9,8 @@
 #include "lib/linux.h"
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -77,6 +79,27 @@ int main(int argc, char** argv) {
     response->write(buf, ss);
     
     cout << "THere" << endl;
+  };
+
+  // Sleeps for 250 ms then captures.
+  server.resource["^/slow_capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    //cout << "GET /cam_capture" << endl;
+    
+    this_thread::sleep_for(chrono::milliseconds(250));
+   
+    Mat frame;
+    cap.read(frame);
+    vector<uchar> encodeBuf(131072);
+    imencode(".jpg",frame,encodeBuf);
+    char* buf = reinterpret_cast<char*>(encodeBuf.data());
+    streamsize ss = static_cast<streamsize>(encodeBuf.size());
+
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Content-Length", to_string(encodeBuf.size()));
+    header.emplace("Content-Type", "image/jpeg");
+    //response->write(header, encodeBuf.size());
+    response->write(SimpleWeb::StatusCode::success_ok, header);
+    response->write(buf, ss);
   };
 
   server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
