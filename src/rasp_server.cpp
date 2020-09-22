@@ -5,6 +5,7 @@
 
 #include <vector>
 #include "lib/opencv.h"
+#include "lib/hr_code.h"
 #include <opencv2/imgcodecs.hpp>
 
 using namespace std;
@@ -16,6 +17,43 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.address = "192.168.0.19";
   server.config.port = 8889;
+
+  server.resource["^/detect.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+    Mat frame;
+    captureVideoImage(frame);
+    HRCodeParser parser(0.2, 0.2);
+    vector<HRCode> positions;
+    parser.findHRCodes(frame, positions, 100);
+
+    if (positions.empty()) {
+      response->write(SimpleWeb::StatusCode::client_error_bad_request, "No codes detected");
+      return;
+    }
+
+    string detectedWidths;
+    Mat sideBySide;
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
+      cout << "Detected one HRCode!!!" << endl;
+      hconcat(sideBySide, it->img, sideBySide);
+      detectedWidths += to_string(it->img.cols);
+      if (it+1 != positions.end()) {detectedWidths += ",";}
+    }
+
+    vector<uchar> encodeBuf(131072);
+    imencode(".jpg",sideBySide,encodeBuf);
+    char* buf = reinterpret_cast<char*>(encodeBuf.data());
+    streamsize ss = static_cast<streamsize>(encodeBuf.size());
+    
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Content-Length", to_string(encodeBuf.size()));
+    header.emplace("Content-Type", "image/jpeg");
+    header.emplace("Nb-Detectd", to_string(detectedWidths.size()));
+    header.emplace("Detected-Widths", detectedWidths);
+
+    response->write(SimpleWeb::StatusCode::success_ok, header);
+    response->write(buf, ss);
+  };
 
   server.resource["^/capture.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
