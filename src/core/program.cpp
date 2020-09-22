@@ -54,7 +54,7 @@ void setupAxes(Program& p) {
   //p.axisT.limitSwitchPin = 12;
   p.axisT.setupPins(8,10,11);
   p.axisT.setReverseMotorDirection(true);
-  p.axisT.setDefaultMaxSpeed(0.2);
+  p.axisT.setDefaultMaxSpeed(0.5);
   p.axisT.setAcceleration(0.2);
 
   //p.axisH.microsteps = 8;
@@ -62,7 +62,7 @@ void setupAxes(Program& p) {
   p.axisH.setStepsPerTurn(200 * 2 * 8);
   //p.axisH.limitSwitchPin = 12;
   p.axisH.setupPins(8,2,3);
-  p.axisH.setDefaultMaxSpeed(1.5);
+  p.axisH.setDefaultMaxSpeed(2.5);
   p.axisH.setAcceleration(1.5);
   p.axisH.setReverseMotorDirection(true);
   p.axisH.referencer = LimitSwitchReferencer(4);

@@ -10,8 +10,6 @@
 #include "../lib/ArduinoMock.h"
 #include "referencer.h"
 
-void debug();
-
 #define MAX_STEP_DELAY 5000 // us
 #define US_PER_S 1000000.0
 
@@ -33,8 +31,16 @@ class StepperMotor : public Motor {
       m_acceleration = accel;
     }
 
+    double max_step_delay = MAX_STEP_DELAY;
+
     void setDefaultMaxSpeed(double s) {
       m_default_max_speed = s;
+      max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
+    }
+
+    void setStepsPerTurn(double ratio) {
+      m_steps_per_turn = ratio;
+      max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
     }
 
     void setMaxSpeed(double s) {
@@ -63,10 +69,6 @@ class StepperMotor : public Motor {
     // The value is multiplied by two because we have to write LOW then HIGH for one step
     void setStepsPerUnit(double ratio) {
       stepsPerUnit = ratio;
-    }
-
-    void setStepsPerTurn(double ratio) {
-      m_steps_per_turn = ratio;
     }
 
     double getStepsPerTurn() {
@@ -165,7 +167,7 @@ class StepperMotor : public Motor {
     void calculateMovement() {
 
       double halfDistance = distanceToReachDestination() / 2;
-      v_0 = US_PER_S / MAX_STEP_DELAY / m_steps_per_turn;
+      v_0 = US_PER_S / max_step_delay / m_steps_per_turn;
 
       m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance + v_0*v_0); // tr/s
       
@@ -187,13 +189,13 @@ class StepperMotor : public Motor {
      
       m_time_to_start_decelerating_us = ((unsigned long)((timeConstantSpeed*2.0 + timeToAccelerate) * US_PER_S)); // us
 
-      std::cout << "position: " << getPosition() << std::endl;
-      std::cout << "destination: " << getDestination() << std::endl;
-      std::cout << "distanceAccelerating: " << distanceAccelerating << std::endl;
-      std::cout << "position_to_decelerate: " << position_to_decelerate << std::endl;
-      std::cout << "timeToAccelerate: " << timeToAccelerate << std::endl;
-      std::cout << "v_0: " << v_0 << std::endl;
-      std::cout << "acceleration: " << m_acceleration << std::endl;
+      //std::cout << "position: " << getPosition() << std::endl;
+      //std::cout << "destination: " << getDestination() << std::endl;
+      //std::cout << "distanceAccelerating: " << distanceAccelerating << std::endl;
+      //std::cout << "position_to_decelerate: " << position_to_decelerate << std::endl;
+      //std::cout << "timeToAccelerate: " << timeToAccelerate << std::endl;
+      //std::cout << "v_0: " << v_0 << std::endl;
+      //std::cout << "acceleration: " << m_acceleration << std::endl;
     }
 
     int setDestination(double dest) {
@@ -232,20 +234,18 @@ class StepperMotor : public Motor {
     //  
     //  unsigned long stepDelay = ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
 
-    //  return stepDelay > MAX_STEP_DELAY ? MAX_STEP_DELAY : stepDelay;
+    //  return stepDelay > max_step_delay ? max_step_delay : stepDelay;
     //}
 
     //unsigned int microsteps = 16;
     
     unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
-      if (forceRotation) {return MAX_STEP_DELAY;}
+      if (forceRotation) {return max_step_delay;}
 
       // Decelerate
-      //if (timeSinceStart > m_time_to_start_decelerating_us) {
-      if (getPosition() > position_to_decelerate) {
-
-        debug();
+      if (timeSinceStart > m_time_to_start_decelerating_us) {
+      //if (getPosition() > position_to_decelerate) {
 
         //std::cout << "Decelerating.\n";
         double t_s = (timeSinceStart - m_time_to_start_decelerating_us) / US_PER_S; // s
@@ -260,7 +260,7 @@ class StepperMotor : public Motor {
 
       unsigned long stepDelay = ((unsigned long)(US_PER_S / (m_speed * m_steps_per_turn))); // us
 
-      return stepDelay > MAX_STEP_DELAY ? MAX_STEP_DELAY : stepDelay;
+      return stepDelay > max_step_delay ? max_step_delay : stepDelay;
     }
 
     unsigned long next_step_delay = 0;
