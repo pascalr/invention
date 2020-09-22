@@ -9,7 +9,7 @@ void testAcceleration() {
   title("Testing Axis::timeToReachDestination");
 
   unsigned long moveTimeUs = 10 * 1000 * 1000; // 10 seconds
-  //double destination = 80.0;
+  //double destination = 42.0;
   double destination = 142.0;
   double maxSpeed = 1.5;
   double acceleration = 1.5;

@@ -1,6 +1,7 @@
 #ifndef _TEST_H
 #define _TEST_H
 
+#include "../lib/lib.h"
 #include "../utils/io_common.h"
 #include <iostream>
 #include <functional>
