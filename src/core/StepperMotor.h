@@ -307,6 +307,8 @@ class StepperMotor : public Motor {
           turnOneStep(timeSinceStart);
         }
         return true;
+      } else {
+        m_speed = 0;
       }
       return false;
     }

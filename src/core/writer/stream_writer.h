@@ -1,6 +1,7 @@
 #ifndef STREAM_WRITER
 #define STREAM_WRITER
 
+#include <sstream>
 #include "std_writer.h"
 
 using namespace std;

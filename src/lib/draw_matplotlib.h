@@ -25,6 +25,10 @@ void renderScene(double xMin, double xMax, double yMin, double yMax, const char*
   plt::pause(0.01);
 }
 
+void show() {
+  plt::show();
+}
+
 void drawPoint(double x, double y, const char* style="ro") {
   plt::plot(toVect(x),toVect(y),style);
 }

@@ -80,6 +80,8 @@ link_libraries(MyLibsModule)
 
 #add_executable( run_tests src/test/test.cpp )
 
+add_executable( test_stepper_motor src/test/stepper_motor.cpp )
+
 add_executable( heda src/heda.cpp )
 
 #add_executable( test_db src/test/db.cpp )
