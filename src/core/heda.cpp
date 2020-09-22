@@ -220,9 +220,10 @@ void ParseCodesCommand::start(Heda& heda) {
     
 void MetaCommand::start(Heda& heda) {
   setup(heda);
-  currentCommand = commands.begin();
-  (*currentCommand)->start(heda);
-  heda.stack_writer << "Sub: Starting command: " + (*currentCommand)->str();
+  if (commands.size() > 0) {
+    commands[index]->start(heda);
+    heda.stack_writer << "Sub: Starting command: " + commands[index]->str();
+  }
 }
 
 void OpenGripCommand::doneCallback(Heda& heda) {
@@ -357,15 +358,15 @@ void GotoCommand::setup(Heda& heda) {
 
 bool MetaCommand::isDone(Heda& heda) {
 
-  if (currentCommand == commands.end()) {return true;}
+  if (index == commands.size()) {return true;}
 
-  if ((*currentCommand)->isDone(heda)) {
-    heda.stack_writer << "Sub: Finished command: " + (*currentCommand)->str();
-    (*currentCommand)->doneCallback(heda);
-    currentCommand++;
-    if (currentCommand == commands.end()) {return true;}
-    (*currentCommand)->start(heda);
-    heda.stack_writer << "Sub: Starting command: " + (*currentCommand)->str();
+  if (commands[index]->isDone(heda)) {
+    heda.stack_writer << "Sub: Finished command: " + commands[index]->str();
+    commands[index]->doneCallback(heda);
+    index++;
+    if (index == commands.size()) {return true;}
+    commands[index]->start(heda);
+    heda.stack_writer << "Sub: Starting command: " + commands[index]->str();
   }
 
   return false;
@@ -497,22 +498,29 @@ void PinpointCommand::start(Heda& heda) {
   }
 }
 
-Location getNewLocation(Heda& heda, Jar& jar) {
+Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
     
   JarFormatTable formats; heda.db.load(formats);
   JarFormat format;
   ensure(formats.get(format, jar.jar_format_id), "Existing jar must refer to an existing jar format");
 
-  double widthNeeded = max(format.diameter, format.lid_diameter) + 32; // mm, FIXME: Hardcoded
+  double widthNeeded = max(format.diameter, format.lid_diameter) + 32; // mm, FIXME: Hardcoded, 32mm
 
-  heda.shelves.order(byHeight);
-  for (const Shelf& shelf : heda.shelves.items) {
+  double minZAccessible = std::max(heda.config.user_coord_offset_z - heda.config.gripper_radius + widthNeeded / 2.0 + 2.0, 0.0);
+  double minXAccessible = 100.0; // FIXME hardcoded. Too close to 0 and the arm will collide with the wall.
+
+  heda.shelves.order(byHeight, false);
+  //for (shelf = heda.shelves.items.begin(); shelf != heda.shelves.items.end(); shelf++) {
+  for (Shelf& s : heda.shelves.items) {
+    shelf = s;
+
+    if (shelf.id == heda.config.working_shelf_id) {continue;}
 
     LocationTable locations;
     heda.db.load(locations, "WHERE shelf_id = " + to_string(shelf.id));
 
-    for (double z = 0; z < shelf.depth - widthNeeded; z += 10) {
-      for (double x = 0; x < shelf.width - widthNeeded; x += 10) {
+    for (double z = minZAccessible; z < shelf.depth - widthNeeded; z += 10) {
+      for (double x = minXAccessible; x < shelf.width - widthNeeded - minXAccessible; x += 10) {
 
         Vector2f wantedMin; wantedMin << x, z;
         Vector2f wantedMax; wantedMax << x+widthNeeded, z+widthNeeded;
@@ -562,12 +570,14 @@ void StoreDetectedCommand::setup(Heda& heda) {
 
     ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar");
 
-    loc = getNewLocation(heda, jar); 
+    Shelf shelf;
+    loc = getNewLocation(heda, jar, shelf); 
     ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
     commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
-    commands.push_back(make_shared<PickupCommand>(jar, loc));
-    commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
+    commands.push_back(make_shared<LowerForGripCommand>(jar));
+    commands.push_back(make_shared<GripCommand>(jar));
+    commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
     commands.push_back(make_shared<PutdownCommand>());
     commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
   }));

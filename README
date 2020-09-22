@@ -1,3 +1,13 @@
+La tablette du bas a les pots les plus haut et les plus gros. Il n'y a rien derrière pour les bloquer.
+Mettre la boite eletrique au même niveau donc il ne peuvent pas tomber derrière.
+
+
+The stack is complicated because there are many possible ways of a command.
+It can be a simple function to execute.
+It can be a function that has to wait for something (you don't want to freeze)
+It can be a function that will call other functions at a later point.
+It want to do something when the function is done.
+
 At a very later point, you can set preferences of what kind of ingredients on which part of the shelves.
 
 Ok, tu dois faire l'épicerie, qu'est-ce qui se passe? Tu prends toi même les pots en bas? Tu risque de les accrocher...

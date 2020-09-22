@@ -10,7 +10,7 @@ class Heda;
 #include "writer/writer.h"
 #include "writer/log_writer.h"
 
-#include "command_stack.h"
+//#include "stack.h"
 
 #include "parser.h"
 
@@ -161,8 +161,8 @@ class MetaCommand : public HedaCommand {
 
   protected:
 
+    unsigned int index = 0;
     vector<shared_ptr<HedaCommand>> commands;
-    vector<shared_ptr<HedaCommand>>::iterator currentCommand;
 };
 
 class GripCommand : public MetaCommand {
