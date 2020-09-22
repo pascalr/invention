@@ -270,6 +270,7 @@ void SweepCommand::setup(Heda& heda) {
 
       PolarCoord p = PolarCoord(x+deltaX, heda.unitV(heda.config.detect_height), t);
       commands.push_back(make_shared<GotoCommand>(p));
+      //commands.push_back(make_shared<WaitCommand>(500)); // FIXME: Fix deceleration to remove this delay
       commands.push_back(make_shared<DetectCommand>());
     }
     zUp = !zUp;

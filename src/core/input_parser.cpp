@@ -143,7 +143,7 @@ void myLoop(Program& p) {
 
   bool stillWorking = false;
   for (int i = 0; p.motors[i] != 0; i++) {
-    bool isWorking = p.motors[i]->work(p, p.getCurrentTime());
+    bool isWorking = p.motors[i]->handleAxis(p.getCurrentTime());
     stillWorking = isWorking || stillWorking;
   }
 

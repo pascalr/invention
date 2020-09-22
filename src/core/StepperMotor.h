@@ -294,6 +294,22 @@ class StepperMotor : public Motor {
     // TODO:
     // bool m_jog_forward; No more forceRotation.
     // bool m_jog_reverse; No more isForward.
+    
+    // Returns true if the axis is still working.
+    virtual bool handleAxis(unsigned long currentTime) {
+      //unsigned int delay = getDelay();
+
+      if (handleReferencing(currentTime)) {return true;}
+      
+      if (forceRotation || !isDestinationReached()) {
+        unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
+        if (currentTime >= m_next_step_time) {
+          turnOneStep(timeSinceStart);
+        }
+        return true;
+      }
+      return false;
+    }
 
   protected:
 
@@ -316,21 +332,6 @@ class StepperMotor : public Motor {
       }
     }
 
-    // Returns true if the axis is still working.
-    virtual bool handleAxis(unsigned long currentTime) {
-      //unsigned int delay = getDelay();
-
-      if (handleReferencing(currentTime)) {return true;}
-      
-      if (forceRotation || !isDestinationReached()) {
-        unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
-        if (currentTime >= m_next_step_time) {
-          turnOneStep(timeSinceStart);
-        }
-        return true;
-      }
-      return false;
-    }
 };
 
 class MotorT : public StepperMotor {

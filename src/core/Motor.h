@@ -15,8 +15,6 @@ using namespace std;
 
 #define MAX_STEP_DELAY 10000 // us (5 ms)
 
-class Program;
-
 // TODO: The referencing method should be independant of the motor.
 // This should be in another class.
 // class ReferenceMethod
@@ -85,16 +83,6 @@ class Motor {
       doStartReferencing();
     }
     
-    bool work(Program& p, unsigned long currentTime) {
-      bool isCurrentlyWorking = handleAxis(currentTime);
-      if (isWorking && !isCurrentlyWorking && doneWorkingCallback) {
-        doneWorkingCallback(p);
-        doneWorkingCallback = 0;
-      }
-      isWorking = isCurrentlyWorking;
-      return isWorking;
-    }
-
     bool isDestinationReached() {
       if (!is_referenced) {return true;} // ???
       return (isForward && getPosition() >= getDestination()) ||
@@ -110,9 +98,6 @@ class Motor {
     bool is_referencing = false;
     bool isForward = false;
     bool isWorking = false;
-
-    void (*doneWorkingCallback)(Program& p) = 0;
-
 
     char getName() {
       return m_name;
@@ -152,6 +137,8 @@ class Motor {
     void setMinPosition(double pos) {
       m_min_position = pos;
     }
+    
+    virtual bool handleAxis(unsigned long currentTime) = 0;
 
   protected:
     Writer& m_writer;
@@ -163,8 +150,6 @@ class Motor {
     virtual void doStartReferencing() = 0;
     
     virtual void prepare(unsigned long time) = 0;
-    
-    virtual bool handleAxis(unsigned long currentTime) = 0;
 
     int m_dir_pin;
     bool m_reverse_motor_direction = false;

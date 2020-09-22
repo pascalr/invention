@@ -73,19 +73,7 @@ class DCMotor : public Motor {
     Referencer& getReferencer() {
       return referencer;
     }
-
-  protected:
-
-    EncoderReferencer referencer;
-
-    virtual void doStartReferencing() {
-      setDutyCycle(50);
-    }
-
-    void prepare(unsigned long time) {
-      m_encoder.prepare(time);
-    }
-
+    
     bool handleAxis(unsigned long currentTime) {
 
 #ifndef ARDUINO
@@ -103,6 +91,18 @@ class DCMotor : public Motor {
       }
       
       return !(m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01);
+    }
+
+  protected:
+
+    EncoderReferencer referencer;
+
+    virtual void doStartReferencing() {
+      setDutyCycle(50);
+    }
+
+    void prepare(unsigned long time) {
+      m_encoder.prepare(time);
     }
 
     Encoder m_encoder;
