@@ -22,7 +22,6 @@ class Heda;
 
 class HedaException : public exception {};
 
-class InitVideoException : public HedaException {};
 class InitArduinoException : public HedaException {};
 class FrameCaptureException : public HedaException {};
 

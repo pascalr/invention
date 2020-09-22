@@ -5,6 +5,16 @@
 
 #include <regex>
 
+#include <sys/time.h>
+
+long long currentTimestampMs() {
+    struct timeval te;
+    gettimeofday(&te, NULL); // get current time
+    long long milliseconds = te.tv_sec*1000LL + te.tv_usec/1000; // calculate milliseconds
+    // printf("milliseconds: %lld\n", milliseconds);
+    return milliseconds;
+}
+
 // https://stackoverflow.com/questions/4656824/get-lan-ip-and-print-it
 int getLanAddress(std::string& retAddress) {
     struct ifaddrs *iflist, *iface;

@@ -6,39 +6,60 @@
 #include <vector>
 #include "lib/opencv.h"
 #include "lib/hr_code.h"
+#include "lib/linux.h"
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 
 using namespace std;
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+
+void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
+
+  Mat frame;
+  captureVideoImage(frame);
+  HRCodeParser parser(0.2, 0.2);
+  parser.findHRCodes(frame, positions, 100);
+
+  if (attemptsLeft >= 1 && positions.empty()) {tryDetectCodes(positions, attemptsLeft-1);}
+}
   
 int main(int argc, char** argv) {
 
   HttpServer server;
   server.config.address = "192.168.0.19";
   server.config.port = 8889;
+    
+  VideoCapture cap;
+  initVideo(cap);
+  if (!cap.isOpened()) {
+    throw InitVideoException();
+  }
 
   server.resource["^/detect.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-    Mat frame;
-    captureVideoImage(frame);
-    HRCodeParser parser(0.2, 0.2);
     vector<HRCode> positions;
-    parser.findHRCodes(frame, positions, 100);
+    tryDetectCodes(positions);
 
     if (positions.empty()) {
+      cout << "No codes detected..." << endl;
       response->write(SimpleWeb::StatusCode::client_error_bad_request, "No codes detected");
       return;
     }
 
-    string detectedWidths;
-    Mat sideBySide;
-    for (auto it = positions.begin(); it != positions.end(); ++it) {
-      cout << "Detected one HRCode!!!" << endl;
+    cout << "Detected one HRCode!!!" << endl;
+    Mat sideBySide = positions.begin()->img.clone();
+    string detectedWidths = to_string(sideBySide.cols);
+    for (auto it = next(positions.begin()); it != positions.end(); ++it) {
+      cout << "Detected another HRCode!!!" << endl;
       hconcat(sideBySide, it->img, sideBySide);
-      detectedWidths += to_string(it->img.cols);
-      if (it+1 != positions.end()) {detectedWidths += ",";}
+      detectedWidths += "," + to_string(it->img.cols);
     }
+
+    cout << "Here" << endl;
+
+    //imshow("test", sideBySide);
+    //waitKey(0);
 
     vector<uchar> encodeBuf(131072);
     imencode(".jpg",sideBySide,encodeBuf);
@@ -48,17 +69,20 @@ int main(int argc, char** argv) {
     SimpleWeb::CaseInsensitiveMultimap header;
     header.emplace("Content-Length", to_string(encodeBuf.size()));
     header.emplace("Content-Type", "image/jpeg");
-    header.emplace("Nb-Detectd", to_string(detectedWidths.size()));
-    header.emplace("Detected-Widths", detectedWidths);
+    //header.emplace("Nb-Detectd", to_string(detectedWidths.size()));
+    //header.emplace("Detected-Widths", detectedWidths);
 
     response->write(SimpleWeb::StatusCode::success_ok, header);
+    
     response->write(buf, ss);
+    
+    cout << "THere" << endl;
   };
 
-  server.resource["^/capture.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
     Mat frame;
-    captureVideoImage(frame);
+    cap.read(frame);
     vector<uchar> encodeBuf(131072);
     imencode(".jpg",frame,encodeBuf);
     char* buf = reinterpret_cast<char*>(encodeBuf.data());
