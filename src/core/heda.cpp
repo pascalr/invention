@@ -278,6 +278,7 @@ void SweepCommand::setup(Heda& heda) {
 
   commands.push_back(make_shared<PinpointCommand>());
   commands.push_back(make_shared<ParseCodesCommand>());
+  commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
 }
 
 // Get lower, either to pickup, or to putdown
