@@ -9,6 +9,7 @@
     <th>Diameter</th>
     <th>Lid diameter</th>
     <th>Lid weight</th>
+    <th>Grip force</th>
     <th></th>
   </tr>
  
@@ -20,6 +21,7 @@
     <td>(mm)</td>
     <td>(mm)</td>
     <td>(kg)</td>
+    <td>(0-255)</td>
     <td></td>
   </tr>
   <% (@jar_formats || []).each do |jar_format| %>
@@ -31,6 +33,7 @@
       <td><%= jar_format.diameter %></td>
       <td><%= jar_format.lid_diameter %></td>
       <td><%= jar_format.lid_weight %></td>
+      <td><%= jar_format.grip_force %></td>
       <td><%= link_to 'edit', edit_jar_format_path(jar_format) %></td>
     </tr>
   <% end %>

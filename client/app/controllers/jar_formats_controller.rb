@@ -40,6 +40,6 @@ class JarFormatsController < ApplicationController
 
   private
     def jar_format_params
-      params.require(:jar_format).permit(:name, :empty_weight, :height, :diameter, :lid_diameter, :lid_weight)
+      params.require(:jar_format).permit(:name, :empty_weight, :height, :diameter, :lid_diameter, :lid_weight, :grip_force)
     end
 end
