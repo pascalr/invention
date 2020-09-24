@@ -20,6 +20,7 @@
 #include "../lib/opencv.h"
 
 #include "../utils/constants.h"
+#include "hrcode_constants.h"
 
 #include <vector>
 

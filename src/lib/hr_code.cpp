@@ -282,16 +282,18 @@ int HRCodeParser::findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool
 
 bool HRCodeParser::contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
 
-  float expected = 26.8 * scale; // mm
-  float markerDia = 4.86 * scale; // mm
+  float expectedDist = sqrt(MARKERS_DIST_FROM_MIDDLE_SQ); // mm
+  float markerRadius = radius[i] / scale; // mm
 
-  bool correctSize = abs(radius[i] - markerDia)/markerDia < 0.2;
-  if (!correctSize) return false;
+  bool correctSize = abs(markerRadius - MARKER_RADIUS)/MARKER_RADIUS < 0.2;
+  if (!correctSize) { std::cout << "Expected marker dia to be " << MARKER_RADIUS << ", but was: " << markerRadius << std::endl; return false; }
 
-  float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2));
+  float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2))/scale;
   //BOOST_LOG_TRIVIAL(debug) << "expectedMarkerDistance: " << expected;
   //BOOST_LOG_TRIVIAL(debug) << "actualMarkerDistance: " << distFromCenter;
-  return abs(distFromCenter - expected)/expected < 0.2;
+  bool correctDist = abs(distFromCenter - expectedDist)/expectedDist < (0.2);
+  if (!correctDist) { std::cout << "Expected marker dist to be " << expectedDist << ", but was: " << distFromCenter << std::endl; return false; }
+  return true;
 }
 
 int HRCodeParser::findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale) {
@@ -344,26 +346,22 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     
     //BOOST_LOG_TRIVIAL(debug) << "Child found.";
    
-    float scale = radius[i] / 36.0; // mm
-    float insideDiameter = 30 * scale; // mm
+    float scale = radius[i] / OUTER_RADIUS; // mm
+    std::cout << "Detected a circle with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
 
-    bool correctSize = abs(radius[child] - insideDiameter)/insideDiameter < 0.2;
-    if (!correctSize) continue;
+    float insideRadius = radius[child] / scale; // mm
+
+    bool correctSize = abs(insideRadius - INNER_RADIUS)/INNER_RADIUS < 0.2;
+    if (!correctSize) { std::cout << "Expected inner dia to be " << INNER_RADIUS << ", but was: " << insideRadius << std::endl; continue; }
     
-    //cout << "HRCode Perimeter found." << endl;
-
     int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (firstMarker < 0) continue;
+    if (firstMarker < 0) { std::cout << "Did not find a first marker" << std::endl; continue; }
     
-    //cout << "HRCode first marker found." << endl;
-
     int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (secondMarker < 0) continue;
+    if (secondMarker < 0) { std::cout << "Did not find a second marker" << std::endl; continue; }
     
-    //cout << "HRCode second marker found." << endl;
-
     int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (thirdInnerCircle >= 0) continue; // No third expected... maybe do better than that latter to remove false positives..
+    if (thirdInnerCircle >= 0) { std::cout << "Should not have detected a third inner circle. Aborting..." << std::endl; continue; }
     
     //cout << "Detected HRCode!" << endl;
     // Calculate angle
@@ -397,5 +395,7 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, pixelsPerMm); 
     detectedCodes.push_back(codePos);
   }
+  //resize(drawing, drawing, Size(drawing.cols*2, drawing.rows*2), 0, 0, INTER_AREA);
   //imshow( "Contours", drawing );
+  //waitKey(0);
 }
