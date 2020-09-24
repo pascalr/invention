@@ -38,31 +38,38 @@ ostream &operator<<(std::ostream &os, const HRCode &c) {
   return os << "{" << c.scale << "}";
 }
 
+void extractLine(Mat& mat, int lineNb, const Mat& src, double lineWidthMm) {
+  
+  double scale = src.cols/HRCODE_OUTER_DIA; // px per mm
+
+  double lineInterspace = HRCODE_LINE_INTERSPACE * scale; // px
+  double lineWidth = lineWidthMm * 1.11 * scale; // px
+  double charHeight = HRCODE_CHAR_HEIGHT * 1.75 * scale; // px
+ 
+  double firstLineY = HRCODE_MARKERS_DIST_Y_FROM_MIDDLE * scale; // px
+  double x = src.cols/2.0 - lineWidth/2.0; // px
+  double y = src.rows/2.0 - firstLineY - charHeight/2.0 + lineNb*lineInterspace; // px
+
+  Rect lineRect = Rect(x, y, lineWidth, charHeight);
+  //rectangle(src, lineRect, Scalar(0,255,0), 2, LINE_8);
+  Mat lineMat(src, lineRect);
+  mat = lineMat.clone();
+}
+
 // Extract chars this way does not work, because sometimes there is an even nb of chars, sometimes there is an odd.
 void extractLines(vector<Mat>& lines, Mat& src) {
-  
-  double scale = src.cols/110.0; // pixels per mm
-  double topOffset = 10.0 * scale;
-  double charWidth = 12 * scale;
-  double charHeight = HRCODE_CHAR_HEIGHT * 1.2 * scale;
-  double lineInterspace = 24 * scale;
 
-  int nbLines = 4;
-  int pattern[nbLines] = {3,7,8,4}; // number of char per line
-  string rawHRCode[nbLines];
+  Mat jarId;
+  extractLine(jarId, 0, src, HRCODE_LINE_0_WIDTH);
+  lines.push_back(jarId);
+  imshow("jarId", jarId);
+  waitKey(0);
+    
+ // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1), centerX+mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1));
+ // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2), centerX+mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2));
+ // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3), centerX+mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3));
 
   // Get the sub-matrices (minors) for every character.
-  for (int i = 0; i < nbLines; i++) {
-    int nbChar = pattern[i];
-    double y = i*lineInterspace + topOffset;
-    double x = nbChar/-2.0*charWidth + src.cols/2.0;
-    Rect lineRect = Rect(x, y, nbChar*charWidth, charHeight);
-    //rectangle(src, lineRect, Scalar(0,255,0), 2, LINE_8);
-    Mat lineMat(src, lineRect);
-    lines.push_back(lineMat);
-    imshow("line", lineMat);
-    waitKey(0);
-  }
 }
 
 class ImageProcess {

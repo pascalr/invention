@@ -37,6 +37,7 @@
 
 #define HRCODE_CHAR_HEIGHT 4.0 // mm
 
+#define HRCODE_LINE_0_WIDTH 11.11 // mm
 #define HRCODE_LINE_1_WIDTH 25.0 // mm
 #define HRCODE_LINE_2_WIDTH 25.0 // mm
 #define HRCODE_LINE_3_WIDTH 15.0 // mm
