@@ -149,8 +149,8 @@ void CloseupCommand::setup(Heda& heda) {
 }
     
 void HoverCommand::setup(Heda& heda) {
-  Shelf shelf;
-  ensure(heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v))), "hover must have a valid shelf to hover unto");
+
+  Shelf shelf; heda.shelfByHeight(shelf, heda.unitY(heda.m_position.v));
 
   UserCoord c(x, shelf.moving_height, z);
   commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c, reference)));
@@ -316,8 +316,8 @@ void SweepCommand::setup(Heda& heda) {
 
 // Get lower, either to pickup, or to putdown
 void LowerForGripCommand::setup(Heda& heda) {
-  Shelf shelf;
-  if (!heda.shelves.get(shelf, heda.shelfByHeight(heda.unitY(heda.m_position.v)))) {throw InvalidShelfException();}
+
+  Shelf shelf; heda.shelfByHeight(shelf, heda.unitY(heda.m_position.v));
 
   JarFormat format; 
   if (!heda.jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
@@ -332,7 +332,11 @@ void GripCommand::doneCallback(Heda& heda) {
 }
 
 void GripCommand::setup(Heda& heda) {
-  commands.push_back(make_shared<GrabCommand>(40.0)); // TODO: Read the grab strength from the jar_format model
+
+  JarFormat format; 
+  if (!heda.jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+
+  commands.push_back(make_shared<GrabCommand>(format.grip_force));
 }
 
 void PutdownCommand::setup(Heda& heda) {
@@ -347,13 +351,15 @@ void GotoCommand::setup(Heda& heda) {
 
   PolarCoord position = heda.getPosition();
 
-  int currentLevel = heda.shelfByHeight(heda.unitY(position.v));
-  int destinationLevel = heda.shelfByHeight(heda.unitY(destination.v));
+  Shelf currentShelf; heda.shelfByHeight(currentShelf, heda.unitY(position.v));
+  Shelf destinationShelf; heda.shelfByHeight(destinationShelf, heda.unitY(destination.v));
     
   double positionT = position.t;
 
   // must change level
-  if (currentLevel != destinationLevel) {
+  if (currentShelf.id != destinationShelf.id) {
+
+    commands.push_back(make_shared<MoveCommand>(heda.axisV, heda.unitV(currentShelf.moving_height))); 
 
     positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     commands.push_back(make_shared<MoveCommand>(heda.axisT, positionT));

@@ -346,6 +346,7 @@ class JarFormat : public Model {
     string name;
     double lid_diameter;
     double lid_weight;
+    double grip_force;
 };
 
 class JarFormatTable : public Table<JarFormat> {
@@ -362,6 +363,7 @@ class JarFormatTable : public Table<JarFormat> {
       query.bind(6, item.name);
       query.bind(7, item.lid_diameter);
       query.bind(8, item.lid_weight);
+      query.bind(9, item.grip_force);
     }
 
     JarFormat parseItem(SQLite::Statement& query) {
@@ -374,6 +376,7 @@ class JarFormatTable : public Table<JarFormat> {
       item.name = (const char*)query.getColumn(6);
       item.lid_diameter = query.getColumn(7);
       item.lid_weight = query.getColumn(8);
+      item.grip_force = query.getColumn(9);
       return item;
     }
 

@@ -517,19 +517,20 @@ class Heda {
 
     void generateLocations();
 
-    // Returns the id of the self
-    int shelfByHeight(double userHeight) {
+    void shelfByHeight(Shelf& shelf, double userHeight) {
+
+      if (shelves.empty()) {throw NoWorkingShelfException();}
     
       shelves.order(byHeight);
       auto previousIt = shelves.begin();
       for (auto it = shelves.begin(); it != shelves.end(); ++it) {
     
-        if (userHeight < it->height) {return previousIt->id;}
+        if (userHeight < it->height) {shelf = *previousIt; return;}
         previousIt = it;
       }
      
-      if (shelves.empty()) {return -1;}
-      return shelves.back().id;
+      shelf = shelves.back();
+      return;
     }
 
     void runAllCommandStack() {

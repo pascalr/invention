@@ -126,41 +126,41 @@ void doNothing() {}
 
 // From the current position
 // TODO: Collision detection
-void Heda::calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination) {
-
-  PolarCoord position = getPosition();
-
-  int currentLevel = shelfByHeight(unitY(position.v));
-  int destinationLevel = shelfByHeight(unitY(destination.v));
-    
-  double positionT = position.t;
-
-  // must change level
-  if (currentLevel != destinationLevel) {
-
-    positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
-    mvts.push_back(MoveCommand(axisT, positionT));
-  }
-
-  mvts.push_back(MoveCommand(axisV, destination.v)); 
-  //addMovementIfDifferent(movements, Movement('v', destination.v), position.v); 
-
-  // If moving theta would colide, move x first
-  double deltaX = cosd(destination.t) * config.gripper_radius;
-  double xIfTurnsFirst = position.h + deltaX;
-
-  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
-    mvts.push_back(MoveCommand(axisH, destination.h)); 
-    mvts.push_back(MoveCommand(axisT, destination.t)); 
-    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
-    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-  } else {
-    mvts.push_back(MoveCommand(axisT, destination.t)); 
-    mvts.push_back(MoveCommand(axisH, destination.h)); 
-    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
-    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
-  }
-}
+//void Heda::calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination) {
+//
+//  PolarCoord position = getPosition();
+//
+//  int currentLevel = shelfByHeight(unitY(position.v));
+//  int destinationLevel = shelfByHeight(unitY(destination.v));
+//    
+//  double positionT = position.t;
+//
+//  // must change level
+//  if (currentLevel != destinationLevel) {
+//
+//    positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+//    mvts.push_back(MoveCommand(axisT, positionT));
+//  }
+//
+//  mvts.push_back(MoveCommand(axisV, destination.v)); 
+//  //addMovementIfDifferent(movements, Movement('v', destination.v), position.v); 
+//
+//  // If moving theta would colide, move x first
+//  double deltaX = cosd(destination.t) * config.gripper_radius;
+//  double xIfTurnsFirst = position.h + deltaX;
+//
+//  if (xIfTurnsFirst < X_MIN || xIfTurnsFirst > X_MAX) {
+//    mvts.push_back(MoveCommand(axisH, destination.h)); 
+//    mvts.push_back(MoveCommand(axisT, destination.t)); 
+//    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
+//    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+//  } else {
+//    mvts.push_back(MoveCommand(axisT, destination.t)); 
+//    mvts.push_back(MoveCommand(axisH, destination.h)); 
+//    //addMovementIfDifferent(movements, Movement('t', destination.t), positionT); 
+//    //addMovementIfDifferent(movements, Movement('h', destination.h), position.h); 
+//  }
+//}
 
 //void calculateMoveCommands(vector<Movement> &movements, const PolarCoord position, const CartesianCoord destination) {
 
