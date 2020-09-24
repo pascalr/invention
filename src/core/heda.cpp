@@ -40,34 +40,64 @@ double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c
 }
 
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
-template <class T>
-void removeNearDuplicates(vector<T> list, double (*func)(const T&, const T&), double epsilon) {
-  for (typename vector<T>::iterator it = list.begin(); it != list.end(); it++) {
-    for (auto nested : list) {
-      if (it->id != nested.id && func(*it, nested) < epsilon) {
-        list.erase(it--);
-        goto next;
-      }
-    }
-next:;
-  }
-}
-
 void removeNearDuplicates(Heda& heda) {
-  double epsilon = pow(HR_CODE_WIDTH*0.8, 2);
+  double epsilon = pow(HRCODE_OUTER_DIA*0.8, 2);
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
-  for (vector<DetectedHRCode>::iterator it = heda.codes.items.begin(); it != heda.codes.items.end(); it++) {
-    for (auto nested : heda.codes.items) {
-      if (it->id != nested.id && detectedDistanceSquared(*it, nested) < epsilon) {
-        int id = it->id;
-        it--;
-        heda.db.removeItem(heda.codes, id);
-        goto next;
+  DetectedHRCodeTable codes;
+  heda.db.load(codes);
+  vector<int> ids;
+  for (unsigned int i = 0; i < codes.items.size(); i++) {
+
+    DetectedHRCode& code = codes.items[i];
+    if (count(ids.begin(), ids.end(), code.id) > 0) continue;
+
+    for (unsigned int j = i+1; j < codes.items.size(); j++) {
+      DetectedHRCode& other = codes.items[j];
+      if (detectedDistanceSquared(code, other) < epsilon) {
+        ids.push_back(other.id);
       }
     }
-next:;
+  }
+  for (int &id : ids) {
+    heda.db.removeItem(codes, id);
   }
 }
+//void removeNearDuplicates(Heda& heda) {
+//  double epsilon = pow(HRCODE_OUTER_DIA*0.8, 2);
+//  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
+//  DetectedHRCodeTable codes;
+//  heda.db.load(codes);
+//  vector<int> ids;
+//  for (const DetectedHRCode& code : codes.items) {
+//
+//    if (find(ids.begin(), ids.end(), code.id)) continue;
+//
+//    for (const DetectedHRCode& other : codes.items) {
+//      if (code.id != other.id && detectedDistanceSquared(code, other) < epsilon) {
+//        ids.push_back(other.id);
+//      }
+//    }
+//  }
+//  for (int &id : ids) {
+//    heda.db.removeItem(codes, id);
+//  }
+//}
+//// Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
+//void removeNearDuplicates(Heda& heda) {
+//  double epsilon = pow(HRCODE_OUTER_DIA*0.8, 2);
+//  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
+//  for (vector<DetectedHRCode>::iterator it = heda.codes.items.begin(); it != heda.codes.items.end(); it++) {
+//    for (auto nested : heda.codes.items) {
+//      if (it->id != nested.id && detectedDistanceSquared(*it, nested) < epsilon) {
+//        int id = it->id;
+//        it--;
+//        heda.db.removeItem(heda.codes, id);
+//        goto next;
+//      }
+//    }
+//next:;
+//  }
+//}
 
 double computeFocalPoint(double perceivedWidth, double distanceFromCamera, double actualWidth) {
 
@@ -203,11 +233,11 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
   Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
   vector<string> lines;
   parseText(lines, gray);
-  ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
+  //ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
   code.jar_id = lines[0];
-  code.weight = lines[1];
-  code.content_name = lines[2];
-  code.content_id = lines[3];
+  //code.weight = lines[1];
+  //code.content_name = lines[2];
+  //code.content_id = lines[3];
 }
 
 void ParseCodesCommand::start(Heda& heda) {

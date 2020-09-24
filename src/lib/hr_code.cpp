@@ -40,11 +40,11 @@ ostream &operator<<(std::ostream &os, const HRCode &c) {
 
 // Extract chars this way does not work, because sometimes there is an even nb of chars, sometimes there is an odd.
 void extractLines(vector<Mat>& lines, Mat& src) {
-
-  double scale = src.cols/110.0;
+  
+  double scale = src.cols/110.0; // pixels per mm
   double topOffset = 10.0 * scale;
   double charWidth = 12 * scale;
-  double charHeight = 26 * scale;
+  double charHeight = HRCODE_CHAR_HEIGHT * 1.2 * scale;
   double lineInterspace = 24 * scale;
 
   int nbLines = 4;
@@ -60,7 +60,7 @@ void extractLines(vector<Mat>& lines, Mat& src) {
     //rectangle(src, lineRect, Scalar(0,255,0), 2, LINE_8);
     Mat lineMat(src, lineRect);
     lines.push_back(lineMat);
-    imshow(lineMat);
+    imshow("line", lineMat);
     waitKey(0);
   }
 }
@@ -282,11 +282,11 @@ int HRCodeParser::findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool
 
 bool HRCodeParser::contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
 
-  float expectedDist = sqrt(MARKERS_DIST_FROM_MIDDLE_SQ); // mm
+  float expectedDist = sqrt(HRCODE_MARKERS_DIST_FROM_MIDDLE_SQ); // mm
   float markerRadius = radius[i] / scale; // mm
 
-  bool correctSize = abs(markerRadius - MARKER_RADIUS)/MARKER_RADIUS < 0.2;
-  if (!correctSize) { std::cout << "Expected marker dia to be " << MARKER_RADIUS << ", but was: " << markerRadius << std::endl; return false; }
+  bool correctSize = abs(markerRadius - HRCODE_MARKER_RADIUS)/HRCODE_MARKER_RADIUS < 0.2;
+  if (!correctSize) { std::cout << "Expected marker dia to be " << HRCODE_MARKER_RADIUS << ", but was: " << markerRadius << std::endl; return false; }
 
   float distFromCenter = sqrt(pow(centers[i].y - centers[center].y, 2)+pow(centers[i].x - centers[center].x, 2))/scale;
   //BOOST_LOG_TRIVIAL(debug) << "expectedMarkerDistance: " << expected;
@@ -346,13 +346,13 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     
     //BOOST_LOG_TRIVIAL(debug) << "Child found.";
    
-    float scale = radius[i] / OUTER_RADIUS; // mm
+    float scale = radius[i] / HRCODE_OUTER_RADIUS; // pixels per mm
     std::cout << "Detected a circle with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
 
     float insideRadius = radius[child] / scale; // mm
 
-    bool correctSize = abs(insideRadius - INNER_RADIUS)/INNER_RADIUS < 0.2;
-    if (!correctSize) { std::cout << "Expected inner dia to be " << INNER_RADIUS << ", but was: " << insideRadius << std::endl; continue; }
+    bool correctSize = abs(insideRadius - HRCODE_INNER_RADIUS)/HRCODE_INNER_RADIUS < 0.2;
+    if (!correctSize) { std::cout << "Expected inner dia to be " << HRCODE_INNER_RADIUS << ", but was: " << insideRadius << std::endl; continue; }
     
     int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
     if (firstMarker < 0) { std::cout << "Did not find a first marker" << std::endl; continue; }
@@ -388,11 +388,10 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
     Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
-    double pixelsPerMm = radius[i]*2 / HR_CODE_WIDTH;
     string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
     string imgFilename = DETECTED_CODES_BASE_PATH + filename;
     imwrite(imgFilename, rotatedHRCode);
-    HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, pixelsPerMm); 
+    HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, scale); 
     detectedCodes.push_back(codePos);
   }
   //resize(drawing, drawing, Size(drawing.cols*2, drawing.rows*2), 0, 0, INTER_AREA);

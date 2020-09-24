@@ -117,6 +117,4 @@
 // Maximum number of characters to represent a number in an input.
 #define MAX_NUMBER_CHAR 12
 
-#define HR_CODE_WIDTH 31.0 // mm
-
 #endif
