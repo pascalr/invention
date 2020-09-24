@@ -41,7 +41,7 @@ double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c
 
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
 void removeNearDuplicates(Heda& heda) {
-  double epsilon = pow(HRCODE_OUTER_DIA*0.8, 2);
+  double epsilon = pow(HRCODE_OUTER_DIA, 2);
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
   DetectedHRCodeTable codes;
   heda.db.load(codes);
@@ -260,7 +260,6 @@ void MetaCommand::start(Heda& heda) {
 }
 
 void OpenGripCommand::doneCallback(Heda& heda) {
-  heda.gripped_jar.id = -1;
   heda.is_gripping = false;
 }
     
@@ -312,6 +311,9 @@ void SweepCommand::setup(Heda& heda) {
   commands.push_back(make_shared<PinpointCommand>());
   commands.push_back(make_shared<ParseCodesCommand>());
   commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
+  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+    removeNearDuplicates(heda);
+  }));
 }
 
 // Get lower, either to pickup, or to putdown
@@ -609,21 +611,34 @@ void StoreDetectedCommand::setup(Heda& heda) {
     ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits");
     int id = atoi(detected.jar_id.c_str());
 
-    ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
+    if (heda.jars.find(jar, byJarId, id)) {
+      Shelf shelf;
+      loc = getNewLocation(heda, jar, shelf); 
+      ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
-    Shelf shelf;
-    loc = getNewLocation(heda, jar, shelf); 
-    ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
+      commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
+      commands.push_back(make_shared<LowerForGripCommand>(jar));
+      commands.push_back(make_shared<GripCommand>(jar));
+      commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
+      commands.push_back(make_shared<PutdownCommand>());
+      commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
+    } else {
+      ensure(attempts_left >= 1, "No attempts left. Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
+      commands.push_back(make_shared<StoreDetectedCommand>(detected, attempts_left-1));
+    }
 
-    commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
-    commands.push_back(make_shared<LowerForGripCommand>(jar));
-    commands.push_back(make_shared<GripCommand>(jar));
-    commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
-    commands.push_back(make_shared<PutdownCommand>());
-    commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
   }));
       
 }
+
+void StoreDetectedCommand::doneCallback(Heda& heda) {
+
+  jar.location_id = loc.id;
+  heda.db.update(heda.jars, jar);
+  heda.db.removeItem(heda.codes, detected.id);
+  heda.gripped_jar.id = -1;
+}
+
 
 void DetectCommand::start(Heda& heda) {
   Mat frame;

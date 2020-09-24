@@ -334,6 +334,7 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
   {
       minEnclosingCircle( contours[i], centers[i], radius[i] );
       Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
+      // FIXME: Minimum circle is 6 pixels wide, is that ok?
       if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
         contourIsCircle[i] = true;
         circle( drawing, centers[i], (int)radius[i], color, 2 );
@@ -342,20 +343,20 @@ void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thre
 
   // OPTIMIZE: Follow the three instead of going through all the leaves    
   for( size_t i = 0; i < hierarchy.size(); i++ ) {
+    
+    float scale = radius[i] / HRCODE_OUTER_RADIUS; // pixels per mm
+    std::cout << "Detected a contour with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
 
-    if (!contourIsCircle[i]) continue;
+    if (!contourIsCircle[i]) { std::cout << "The contour is not a circle." << std::endl; continue; }
     
     // TODO: Return an error message with the reason why it did not detect instead of logging stuff like this.
     //BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
 
     int child = hierarchy[i][2];
-    if (child < 0) continue;
+    if (child < 0) { std::cout << "Found a circle but it has no children..." << std::endl; continue; }
     
     //BOOST_LOG_TRIVIAL(debug) << "Child found.";
    
-    float scale = radius[i] / HRCODE_OUTER_RADIUS; // pixels per mm
-    std::cout << "Detected a circle with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
-
     float insideRadius = radius[child] / scale; // mm
 
     bool correctSize = abs(insideRadius - HRCODE_INNER_RADIUS)/HRCODE_INNER_RADIUS < 0.2;
