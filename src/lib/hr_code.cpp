@@ -60,6 +60,8 @@ void extractLines(vector<Mat>& lines, Mat& src) {
     //rectangle(src, lineRect, Scalar(0,255,0), 2, LINE_8);
     Mat lineMat(src, lineRect);
     lines.push_back(lineMat);
+    imshow(lineMat);
+    waitKey(0);
   }
 }
 
@@ -231,7 +233,6 @@ class DrawContoursProcess : public ImageProcess  {
 void parseText(vector<string>& parsedLines, Mat gray) {
   
   resize(gray, gray, Size(gray.cols*2, gray.rows*2), 0, 0, INTER_AREA);
-
  
   Mat dst = gray.clone(); 
 
@@ -253,15 +254,14 @@ void parseText(vector<string>& parsedLines, Mat gray) {
     hconcat(sideBySide, dst, sideBySide);
   }
 
-
   vector<Mat> lines;
   extractLines(lines, dst);
 
   TessParser parser;
   parsedLines.push_back(parser.parseDigitLine(lines[0]));
-  parsedLines.push_back(parser.parseLine(lines[1]));
-  parsedLines.push_back(parser.parseLine(lines[2]));
-  parsedLines.push_back(parser.parseDigitLine(lines[3]));
+  //parsedLines.push_back(parser.parseLine(lines[1]));
+  //parsedLines.push_back(parser.parseLine(lines[2]));
+  //parsedLines.push_back(parser.parseDigitLine(lines[3]));
   for (const string& line : parsedLines) {
     cout << "Detected code: " << line << endl;
   }

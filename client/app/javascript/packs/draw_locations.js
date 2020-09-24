@@ -51,15 +51,15 @@ function positionMenu(menu, e) {
 }
 
 function toggleMenuOff() {
-  let menu = document.querySelector("#location-context-menu");
-  menu.style.display = "none";
+  //let menu = document.querySelector("#location-context-menu");
+  //menu.style.display = "none";
 }
 
 function toggleMenuOn(e, id) {
-  let menu = document.querySelector("#location-context-menu");
-  menu.dataset["location_id"] = id
-  positionMenu(menu, e);
-  menu.style.display = "block";
+  //let menu = document.querySelector("#location-context-menu");
+  //menu.dataset["location_id"] = id
+  //positionMenu(menu, e);
+  //menu.style.display = "block";
 }
 
 [].forEach.call(elems, elem => {
@@ -91,40 +91,40 @@ function toggleMenuOn(e, id) {
     ids = [...ids, circle.id]
   });
 
-  if (locations[0] && !locations[0].is_storage) {
-    var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
-    detected_codes.forEach((code, i) => {
-      console.log("image/show?name=" + code.img)
-     
-      var HRCODE_DIAMETER = 31 // mm FIXME HARDCODED
+  //ids.forEach((id, i) => {
+  //  var el = document.getElementById(id);
+  //  el.addEventListener('contextmenu', function(ev) {
+  //    ev.preventDefault();
+  //    toggleMenuOn(ev, locations[i].id);
+  //    return false;
+  //  }, false);
+  //});
 
-      var texture = two.makeTexture("image/show?name=" + code.img, () => {
-        two.update();
-      })
-      
-      // texture.scale = HRCODE_DIAMETER / texture.width // FIXME: texture.width is undefined
-      //texture.scale = 0.5
+  var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
+  detected_codes.forEach((code, i) => {
+    console.log("image/show?name=" + code.img)
+   
+    var HRCODE_DIAMETER = 36 // mm FIXME HARDCODED
 
-      var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
-      circle.fill = texture
-      
-      //texture.scale = HRCODE_DIAMETER / texture.width
-
-      //var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
-      //circle.fill = texture
+    var texture = two.makeTexture("image/show?name=" + code.img, () => {
+      two.update();
     })
-  }
+    
+    // texture.scale = HRCODE_DIAMETER / texture.width // FIXME: texture.width is undefined
+    //texture.scale = 0.5
+
+    var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
+    //circle.fill = '#FF8000';
+    circle.fill = texture
+    
+    //texture.scale = HRCODE_DIAMETER / texture.width
+
+    //var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
+    //circle.fill = texture
+  })
   
   two.update();
-  
-  ids.forEach((id, i) => {
-    var el = document.getElementById(id);
-    el.addEventListener('contextmenu', function(ev) {
-      ev.preventDefault();
-      toggleMenuOn(ev, locations[i].id);
-      return false;
-    }, false);
-  });
+
   // The object returned has many stylable properties:
   
   //var rect = two.makeRectangle(213, 100, 100, 100);
