@@ -39,27 +39,54 @@ double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c
   return (lid1 - lid2).squaredNorm();
 }
 
+class Cluster {
+  public:
+    int idxKept;
+    vector<int> indicesRemoved;
+};
+
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
 void removeNearDuplicates(Heda& heda) {
+
   double epsilon = pow(HRCODE_OUTER_DIA, 2);
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
   DetectedHRCodeTable codes;
   heda.db.load(codes);
   vector<int> ids;
+  vector<Cluster> clusters;
   for (unsigned int i = 0; i < codes.items.size(); i++) {
 
     DetectedHRCode& code = codes.items[i];
+    // An item can only belong to one cluster. So discard if already belongs to one.
     if (count(ids.begin(), ids.end(), code.id) > 0) continue;
 
+    Cluster cluster;
+    cluster.idxKept = i;
     for (unsigned int j = i+1; j < codes.items.size(); j++) {
       DetectedHRCode& other = codes.items[j];
       if (detectedDistanceSquared(code, other) < epsilon) {
         ids.push_back(other.id);
+        cluster.indicesRemoved.push_back(j);
       }
     }
+    clusters.push_back(cluster);
   }
+  for (Cluster& cluster : clusters) {
+
+    double sumX = codes.items[cluster.idxKept].lid_coord.x;
+    double sumZ = codes.items[cluster.idxKept].lid_coord.z;
+    for (int &idx : cluster.indicesRemoved) {
+      sumX += codes.items[idx].lid_coord.x;
+      sumZ += codes.items[idx].lid_coord.z;
+    }
+    DetectedHRCode& code = codes.items[cluster.idxKept];
+    code.lid_coord.x = sumX / (cluster.indicesRemoved.size() + 1);
+    code.lid_coord.z = sumZ / (cluster.indicesRemoved.size() + 1);
+    heda.db.update(heda.codes, code);
+  }
+
   for (int &id : ids) {
-    heda.db.removeItem(codes, id);
+    heda.db.removeItem(heda.codes, id);
   }
 }
 //void removeNearDuplicates(Heda& heda) {
@@ -311,9 +338,9 @@ void SweepCommand::setup(Heda& heda) {
   commands.push_back(make_shared<PinpointCommand>());
   commands.push_back(make_shared<ParseCodesCommand>());
   commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
-  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-    removeNearDuplicates(heda);
-  }));
+  //commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+  //  removeNearDuplicates(heda);
+  //}));
 }
 
 // Get lower, either to pickup, or to putdown
