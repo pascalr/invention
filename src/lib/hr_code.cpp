@@ -62,8 +62,8 @@ void extractLines(vector<Mat>& lines, Mat& src) {
   Mat jarId;
   extractLine(jarId, 0, src, HRCODE_LINE_0_WIDTH);
   lines.push_back(jarId);
-  imshow("jarId", jarId);
-  waitKey(0);
+  //imshow("jarId", jarId);
+  //waitKey(0);
     
  // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1), centerX+mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1));
  // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2), centerX+mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2));

@@ -117,16 +117,19 @@ void CloseupCommand::setup(Heda& heda) {
 
   double userZ = heda.config.user_coord_offset_z - robotZ;
  
-  commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, userZ, heda.config.camera_radius));
-
-  commands.push_back(make_shared<MoveCommand>(heda.axisV, heda.unitV(detected.lid_coord.y + heda.config.closeup_distance)));
+  commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(detected.lid_coord.x, detected.lid_coord.y + heda.config.closeup_distance, userZ), heda.config.camera_radius)));
 
   commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
 
-    Mat frame;
-    heda.captureFrame(frame);
+    int maxAttempts = 10;
     vector<DetectedHRCode> allDetected;
-    detectCodes(heda, allDetected, frame, heda.getPosition());
+    for (int i = 0; i < maxAttempts; i++) {
+      Mat frame;
+      heda.captureFrame(frame);
+      allDetected.clear();
+      detectCodes(heda, allDetected, frame, heda.getPosition());
+      if (allDetected.size() == 1) break;
+    }
     ensure(allDetected.size() >= 1, "There must be a detected code in a closup.");
     ensure(allDetected.size() <= 1, "There must be only one detected code in a closup.");
     
@@ -600,7 +603,7 @@ void StoreDetectedCommand::setup(Heda& heda) {
     ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits");
     int id = atoi(detected.jar_id.c_str());
 
-    ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar");
+    ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
 
     Shelf shelf;
     loc = getNewLocation(heda, jar, shelf); 

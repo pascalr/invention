@@ -8,11 +8,23 @@
 
 #include <string>
 #include <exception>
+#include <iostream>
 
 void debug();
 
 class EnsureException : public std::exception {};
-void ensure(bool statement, const char* errorMessage);
+
+//template<typename T>
+//void ensure(bool statement, T errorMessage);
+
+template<typename T>
+void ensure(bool statement, T errorMessage) {
+  if (!statement) {
+    std::cerr << "\033[31mError\033[0m: " << errorMessage << std::endl;
+    throw EnsureException();
+  }
+}
+
 
 // trim from start (in place)
 void ltrim(std::string &s);
