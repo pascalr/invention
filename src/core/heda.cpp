@@ -48,7 +48,7 @@ class Cluster {
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
 void removeNearDuplicates(Heda& heda) {
 
-  double epsilon = pow(HRCODE_OUTER_DIA, 2);
+  double epsilon = pow(HRCODE_OUTER_DIA * 1.5, 2);
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
   DetectedHRCodeTable codes;
   heda.db.load(codes);
@@ -131,7 +131,6 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
   return perceivedWidth * distanceFromCamera / actualWidth;
 }
 
-
 // closesup muste be done to the tallest jars first, then store them.
 // then close up the next tallest, etc.
 void CloseupCommand::setup(Heda& heda) {
@@ -148,30 +147,38 @@ void CloseupCommand::setup(Heda& heda) {
 
   commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
 
+    string errorMsg;
     int maxAttempts = 10;
-    vector<DetectedHRCode> allDetected;
     for (int i = 0; i < maxAttempts; i++) {
       Mat frame;
       heda.captureFrame(frame);
-      allDetected.clear();
+      vector<DetectedHRCode> allDetected;
       detectCodes(heda, allDetected, frame, heda.getPosition());
-      if (allDetected.size() == 1) break;
-    }
-    ensure(allDetected.size() >= 1, "There must be a detected code in a closup.");
-    ensure(allDetected.size() <= 1, "There must be only one detected code in a closup.");
-    
-    DetectedHRCode recent = allDetected[0];
 
-    detected.coord = recent.coord;
-    detected.centerX = recent.centerX;
-    detected.centerY = recent.centerY;
-    detected.scale = recent.scale;
-    detected.imgFilename = recent.imgFilename;
+      if (allDetected.size() < 1) {errorMsg = "There must be a detected code in a closup."; continue;}
+      if (allDetected.size() > 1) {errorMsg = "There must be only one detected code in a closup."; continue;}
+      
+      DetectedHRCode recent = allDetected[0];
 
-    pinpointCode(heda, detected);
-    parseCode(heda, detected);
+      detected.coord = recent.coord;
+      detected.centerX = recent.centerX;
+      detected.centerY = recent.centerY;
+      detected.scale = recent.scale;
+      detected.imgFilename = recent.imgFilename;
+
+      pinpointCode(heda, detected);
+      parseCode(heda, detected);
+
+      if (detected.jar_id.size() == 3) {errorMsg = "Jar id must have 3 digits"; continue;}
+
+      Jar jar;
+      int id = atoi(detected.jar_id.c_str());
+      if (!heda.jars.find(jar, byJarId, id)) {errorMsg = "Detected jar id must refer to an existing jar, but was: "+ detected.jar_id; continue;}
   
-    heda.db.update(heda.codes, detected);
+      heda.db.update(heda.codes, detected);
+      return;
+    }
+    ensure(false, errorMsg);
   }));
 }
     
@@ -338,9 +345,9 @@ void SweepCommand::setup(Heda& heda) {
   commands.push_back(make_shared<PinpointCommand>());
   commands.push_back(make_shared<ParseCodesCommand>());
   commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
-  //commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-  //  removeNearDuplicates(heda);
-  //}));
+  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+    removeNearDuplicates(heda);
+  }));
 }
 
 // Get lower, either to pickup, or to putdown
@@ -376,7 +383,15 @@ void PutdownCommand::setup(Heda& heda) {
   }
 }
 
+void validateGoto(Heda& heda, PolarCoord c) {
+  ensure(c.h >= heda.config.minH(), "The goto destination h must be higher than the minimum.");
+  ensure(c.v >= heda.config.minV(), "The goto destination v must be higher than the minimum.");
+  ensure(c.t >= heda.config.minT(), "The goto destination t must be higher than the minimum.");
+}
+
 void GotoCommand::setup(Heda& heda) {
+
+  validateGoto(heda, destination);
 
   PolarCoord position = heda.getPosition();
 
@@ -390,7 +405,7 @@ void GotoCommand::setup(Heda& heda) {
 
     commands.push_back(make_shared<MoveCommand>(heda.axisV, heda.unitV(currentShelf.moving_height))); 
 
-    positionT = (position.h < X_MIDDLE) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    positionT = (position.h < heda.config.middleH()) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     commands.push_back(make_shared<MoveCommand>(heda.axisT, positionT));
   }
 
@@ -637,23 +652,17 @@ void StoreDetectedCommand::setup(Heda& heda) {
         
     ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits");
     int id = atoi(detected.jar_id.c_str());
+    ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
 
-    if (heda.jars.find(jar, byJarId, id)) {
-      Shelf shelf;
-      loc = getNewLocation(heda, jar, shelf); 
-      ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
+    Shelf shelf;
+    loc = getNewLocation(heda, jar, shelf); 
+    ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
-      commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
-      commands.push_back(make_shared<LowerForGripCommand>(jar));
-      commands.push_back(make_shared<GripCommand>(jar));
-      commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
-      commands.push_back(make_shared<PutdownCommand>());
-      commands.push_back(make_shared<HoverCommand>(loc.x, loc.z, heda.config.gripper_radius));
-    } else {
-      ensure(attempts_left >= 1, "No attempts left. Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
-      commands.push_back(make_shared<StoreDetectedCommand>(detected, attempts_left-1));
-    }
-
+    commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
+    commands.push_back(make_shared<LowerForGripCommand>(jar));
+    commands.push_back(make_shared<GripCommand>(jar));
+    commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
+    commands.push_back(make_shared<PutdownCommand>());
   }));
       
 }

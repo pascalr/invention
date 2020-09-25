@@ -35,10 +35,15 @@ class HedaController < ApplicationController
 
   def status
 
-    puts "before"
-
     url = URI(heda_uri('poll'))
-    response = Net::HTTP.get(url)
+    begin
+      response = Net::HTTP.get(url)
+    rescue => e
+      @message = "An error of type #{e.class} happened, message is #{e.message}"
+      render partial: "bad_connection"
+      return
+    end
+
     vals = JSON.parse(response)
     @output = vals["output"]
     @pending = vals["pending"]

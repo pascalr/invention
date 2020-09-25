@@ -164,8 +164,29 @@ class HedaConfig : public Model {
     double max_y;
     double max_z;
 
+    double minX() {
+      return 0.0;
+    }
+    double minY() {
+      return 0.0;
+    }
+    double minZ() {
+      return 0.0;
+    }
+    double minH() {
+      return 0.0;
+    }
+    double minV() {
+      return 0.0;
+    }
+    double minT() {
+      return 0.0;
+    }
     double middleX() {
       return max_x / 2.0;
+    }
+    double middleH() {
+      return max_h / 2.0;
     }
 };
 

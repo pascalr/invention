@@ -1,23 +1,27 @@
-<h1>Mode manuel</h1>
-
 <%= link_to "🏠", heda_run_path(cmd: "home"), method: "post", remote: true %>
 <%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
 <%= link_to "Configure", edit_heda_path(@heda) %>
 
-<%= label_tag(:recette)  %>
-<%= text_field_tag :recette, if @recette then @recette.name end, readonly: true %>
+<%# label_tag(:recette)  %>
+<%# text_field_tag :recette, if @recette then @recette.name end, readonly: true %>
 
 <%= form_with(url: heda_run_path, method: "post", id: 'inputcommandform') do %>
-  <%= label_tag(:cmd, "Commande:") %>
+  <%= label_tag(:cmd, "Commande:", class: "inline_label") %>
   <%= text_field_tag(:cmd, nil, id: 'inputcommand') %>
   <%= submit_tag("Executer") %>
 <% end %>
+
+<h2>Statut</h2>
 
 <div id="async-container"></div>
 
 <%= render_async heda_status_path, interval: 1000, event_name: "logoutput-loaded", container_id: 'async-container'  %>
 
-<%= label_tag(:output)  %>
-<%= text_area_tag :output, nil, :size =>"100x20", :id => "logoutput", :readonly => true %>
+<h2>Action requise</h2>
+
+<% if @action_requise.blank? %>
+  Aucune
+<% else %>
+<% end %>
 
 <%= javascript_pack_tag 'heda_index' %>

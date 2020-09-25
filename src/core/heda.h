@@ -259,13 +259,12 @@ class DetectCommand : public HedaCommand {
 
 class StoreDetectedCommand : public MetaCommand {
   public:
-    StoreDetectedCommand(DetectedHRCode& code, int attemptsLeft=5) : detected(code), attempts_left(attemptsLeft) {}
+    StoreDetectedCommand(DetectedHRCode& code) : detected(code) {}
     string str() {return "stored " + to_string(detected.id);}
     void setup(Heda& heda);
     DetectedHRCode& detected;
     Jar jar;
     Location loc;
-    int attempts_left;
     void doneCallback(Heda& heda);
 };
 

@@ -3,7 +3,6 @@
 
 #define CAMERA_WIDTH 640
 #define CAMERA_HEIGHT 480
-#define CAMERA_FOCAL_POINT 568.214
 
 #define REFERENCE_SPEED_RPM 60.0 // tr/min
 
@@ -22,34 +21,11 @@
 #define sind(x) (sin(fmod((x),360) * M_PI / 180))
 #define cosd(x) (cos(fmod((x),360) * M_PI / 180))
 
-#define RAYON 340.0
-
 #define FORWARD true
 #define REVERSE false
 
-#define Y_MIN LOWEST_SHELF_TO_UNDER_ARM // mm (Y 0 is the lowest shelf)
-
-#define TOOL_X_MIN 0.0 // mm
-#define TOOL_X_MAX 640.0 // mm
-#define TOOL_X_MIDDLE ((TOOL_X_MAX + TOOL_X_MIN)/2)
-#define TOOL_Z_MIN -10.0 // mm
-#define TOOL_Z_MAX RAYON
-#define TOOL_Z_MIDDLE ((TOOL_Z_MAX + TOOL_Z_MIN)/2)
-
-#define BASE_X_MIN 0.0 // mm
-#define BASE_X_MAX 680.0 // mm
-#define BASE_X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
-
 #define CHANGE_LEVEL_ANGLE_LOW 0.0
 #define CHANGE_LEVEL_ANGLE_HIGH 180.0
-
-#define X_MIN 0.0 // mm
-#define X_MAX 640.0 // mm
-#define X_MIDDLE ((BASE_X_MAX + BASE_X_MIN)/2)
-
-#define AXIS_X_MAX_POS BASE_X_MAX
-#define AXIS_Z_MAX_POS RAYON
-#define AXIS_Y_MAX_POS 670.0 // mm
 
 #define ARM_WIDTH 111.0 // mm
 #define ARM_LENGTH 370.0 // mm
@@ -58,15 +34,13 @@
 #define ARMOIRE_DEPTH 609.6 // mm
 #define ARMOIRE_HEIGHT 1905.0 // mm
 
-#define DISTANCE_CAMERA_SHELF 1234
+//#define CAMERA_TOOL_DISTANCE 62.0 // mm
+//#define BASE_TOOL_DISTANCE RAYON
 
-#define CAMERA_TOOL_DISTANCE 62.0 // mm
-#define BASE_TOOL_DISTANCE RAYON
+//#define BASE_CAMERA_DISTANCE (BASE_TOOL_DISTANCE - CAMERA_TOOL_DISTANCE)
 
-#define BASE_CAMERA_DISTANCE (BASE_TOOL_DISTANCE - CAMERA_TOOL_DISTANCE)
-
-#define OFFSET_X 164.0 // mm, the distance between the sidewall and x = 0
-#define OFFSET_Z 160.0 // mm, the distance between the back and z = 0
+//#define OFFSET_X 164.0 // mm, the distance between the sidewall and x = 0
+//#define OFFSET_Z 160.0 // mm, the distance between the back and z = 0
 
 #define MESSAGE_RECEIVED "ok"
 #define MESSAGE_DONE "done"
