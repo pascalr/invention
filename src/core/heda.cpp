@@ -15,6 +15,22 @@ class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 class InvalidGrippedJarFormatException : public exception {};
 
+void UserAction::start(Heda& heda) {
+  heda.waiting_message = getWaitingMessage();
+}
+bool UserAction::isDone(Heda& heda) {
+
+  if (heda.user_response.empty()) return false;
+
+  return isResponseOk(heda);
+}
+void UserAction::doneCallback(Heda& heda) {
+  heda.waiting_message = "";
+}
+bool ActionNewJar::isResponseOk(Heda& heda) {
+  return heda.user_response == "coolcoolcool";
+}
+
 void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
 
   cout << "Running detect code." << endl;
@@ -170,12 +186,15 @@ void CloseupCommand::setup(Heda& heda) {
       parseCode(heda, detected);
 
       if (detected.jar_id.size() != 3) {errorMsg = "Jar id must have 3 digits, but was '" + detected.jar_id + "'"; continue;}
+      
+      heda.db.update(heda.codes, detected);
 
       Jar jar;
       int id = atoi(detected.jar_id.c_str());
-      if (!heda.jars.find(jar, byJarId, id)) {errorMsg = "Detected jar id must refer to an existing jar, but was: "+ detected.jar_id; continue;}
+      if (!heda.jars.find(jar, byJarId, id)) {
+        commands.push_back(make_shared<ActionNewJar>(id)); 
+      }
   
-      heda.db.update(heda.codes, detected);
       return;
     }
     ensure(false, errorMsg);
@@ -288,8 +307,8 @@ void ParseCodesCommand::start(Heda& heda) {
 void MetaCommand::start(Heda& heda) {
   setup(heda);
   if (commands.size() > 0) {
-    commands[index]->start(heda);
     heda.stack_writer << "Sub: Starting command: " + commands[index]->str();
+    commands[index]->start(heda);
   }
 }
 
@@ -450,8 +469,8 @@ bool MetaCommand::isDone(Heda& heda) {
     commands[index]->doneCallback(heda);
     index++;
     if (index == commands.size()) {return true;}
-    commands[index]->start(heda);
     heda.stack_writer << "Sub: Starting command: " + commands[index]->str();
+    commands[index]->start(heda);
   }
 
   return false;
@@ -649,10 +668,6 @@ void StoreDetectedCommand::setup(Heda& heda) {
   // TODO: How to get the updated code from the closeup???
 
   commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-        
-    ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits, but was '" + detected.jar_id + "'");
-    int id = atoi(detected.jar_id.c_str());
-    ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
 
     Shelf shelf;
     loc = getNewLocation(heda, jar, shelf); 

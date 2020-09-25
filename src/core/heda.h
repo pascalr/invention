@@ -274,6 +274,27 @@ class SweepCommand : public MetaCommand {
     void setup(Heda& heda);
 };
 
+class UserAction : public HedaCommand {
+  public:
+    void start(Heda& heda);
+    bool isDone(Heda& heda);
+    virtual const char* getWaitingMessage() = 0;
+    virtual bool isResponseOk(Heda& heda) = 0;
+    virtual void doneCallback(Heda& heda);
+};
+
+class ActionNewJar : public UserAction {
+  public:
+    ActionNewJar(int id) : id(id) {
+    }
+    string str() {return "actionNewJar";}
+    const char* getWaitingMessage() {
+      return "Un nouveau pot a été détecté. Pouvez-vous svp déterminer ses caractéristiques?";
+    }
+    bool isResponseOk(Heda& heda);
+    int id;
+};
+
 // Heda is the source of truth. It is the only class that should read the arduino serial and write to it.
 // It has a stack of commands to execute.
 // It keeps a copy of the serial it has read if it required at some point.
@@ -572,6 +593,8 @@ class Heda {
 
     string waiting_message;
     string fatal_message;
+
+    string user_response;
     
   protected:
 
