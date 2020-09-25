@@ -72,8 +72,8 @@ void setupAxes(Program& p) {
   p.axisV.setStepsPerTurn(200 * 2 * 16);
   //p.axisV.limitSwitchPin = 12;
   p.axisV.setupPins(8,7,6);
-  p.axisV.setDefaultMaxSpeed(5);
-  p.axisV.setAcceleration(1.5);
+  p.axisV.setDefaultMaxSpeed(500); // FIXME: Doesn't work... Anyway fix this when I change the algorithm to use delays only.
+  p.axisV.setAcceleration(200);
   p.axisV.setReverseMotorDirection(true);
   p.axisV.referencer = LimitSwitchReferencer(12);
 
