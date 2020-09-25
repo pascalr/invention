@@ -438,13 +438,12 @@ class Heda {
       ensure(robotZ <= reference, errorMsg.str().c_str());
       
       double t = (asin(robotZ / reference) * 180.0 / PI);
-      if (c.x > X_MIDDLE) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
+      if (c.x > config.middleX()) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
         t = 180.0 - t;
       }
-      double x = c.x - config.user_coord_offset_x + (cosd(t) * reference);
+      double h = c.x - config.user_coord_offset_x + (cosd(t) * reference);
 
-      double y = config.user_coord_offset_y - c.y;
-      return PolarCoord(x, y, t);
+      return PolarCoord(h, unitV(c.y), t);
     }
 
     // reference: What part of the arm is wanted to get the position? The tool? Which tool? The camera? etc

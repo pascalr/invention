@@ -160,6 +160,13 @@ class HedaConfig : public Model {
     double max_v;
     double max_t;
     double closeup_distance;
+    double max_x;
+    double max_y;
+    double max_z;
+
+    double middleX() {
+      return max_x / 2.0;
+    }
 };
 
 class HedaConfigTable : public Table<HedaConfig> {
@@ -187,6 +194,9 @@ class HedaConfigTable : public Table<HedaConfig> {
       c.max_v = query.getColumn(16);
       c.max_t = query.getColumn(17);
       c.closeup_distance = query.getColumn(18);
+      c.max_x = query.getColumn(19);
+      c.max_y = query.getColumn(20);
+      c.max_z = query.getColumn(21);
       return c;
     }
 
@@ -209,6 +219,9 @@ class HedaConfigTable : public Table<HedaConfig> {
       query.bind(16, item.max_v);
       query.bind(17, item.max_t);
       query.bind(18, item.closeup_distance);
+      query.bind(19, item.max_x);
+      query.bind(20, item.max_y);
+      query.bind(21, item.max_z);
     }
 };
 
