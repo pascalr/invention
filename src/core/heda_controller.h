@@ -76,6 +76,7 @@ class HedaController {
         for (DetectedHRCode& code : heda.codes) {
           heda.pushCommand(make_shared<StoreDetectedCommand>(code));
         }
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
       };
       m_commands["nodup"] = [&](ParseResult tokens) {
         removeNearDuplicates(heda);
