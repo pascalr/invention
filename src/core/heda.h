@@ -569,6 +569,9 @@ class Heda {
     Shelf working_shelf;
 
     bool is_paused = false;
+
+    string waiting_message;
+    string fatal_message;
     
   protected:
 

@@ -1,17 +1,20 @@
 
-<%= label_tag(:is_paused)  %>
-<%= text_field_tag :is_paused, @is_paused, readonly: true %><br/>
+<%# @is_paused ? "▶️"  : "⏸️"  %>
 
-<%= label_tag(:tool_position)  %>
-<%= text_field_tag :tool_position, @tool_position, readonly: true %><br/>
+<div id="heda_status" class="heda_status_<%= @status_code %>">
+  <%= @status %>
+</div>
 
-<%= label_tag(:position)  %>
-<%= text_field_tag :position, @position, readonly: true %><br/>
+<%# label_tag(:tool_position)  %>
+<%# text_field_tag :tool_position, @tool_position, readonly: true %>
 
-<%= label_tag(:gripped_jar_format_id)  %>
-<%= text_field_tag :gripped_jar_format_id, @gripped_jar_format_id, readonly: true %><br/>
+<%# label_tag(:position)  %>
+<%# text_field_tag :position, @position, readonly: true %>
 
-<%= label_tag(:pending)  %>
-<%= text_area_tag :pending, @pending || 'aucun', id: "pending_commands", size: "100x40", readonly: true %><br/>
+<%# label_tag(:gripped_jar_format_id)  %>
+<%# text_field_tag :gripped_jar_format_id, @gripped_jar_format_id, readonly: true %>
 
-<span id="logoutputdata" hidden><%= @output %></span>
+<%# label_tag(:pending)  %>
+<%# text_area_tag :pending, @pending || 'aucun', id: "pending_commands", size: "100x40", readonly: true %>
+
+<!--<span id="logoutputdata" hidden><%= @output %></span>-->

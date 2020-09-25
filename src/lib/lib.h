@@ -12,7 +12,19 @@
 
 void debug();
 
-class EnsureException : public std::exception {};
+class StringMessageException : public std::exception {
+  public:
+    StringMessageException(std::string msg) : message(msg) {}
+    virtual const char* what() const throw() {
+      return message.c_str();
+    }
+    std::string message;
+};
+
+class EnsureException : public StringMessageException {
+  public:
+    EnsureException(std::string msg) : StringMessageException(msg) {}
+};
 
 //template<typename T>
 //void ensure(bool statement, T errorMessage);
@@ -21,7 +33,7 @@ template<typename T>
 void ensure(bool statement, T errorMessage) {
   if (!statement) {
     std::cerr << "\033[31mError\033[0m: " << errorMessage << std::endl;
-    throw EnsureException();
+    throw EnsureException(errorMessage);
   }
 }
 

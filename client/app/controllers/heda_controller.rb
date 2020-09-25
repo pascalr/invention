@@ -9,6 +9,7 @@ class HedaController < ApplicationController
   end
 
   def show
+    expires_now()
     @heda = get_heda
     if params[:recette_id]
       @recette = Recette.find(params[:recette_id])
@@ -51,6 +52,8 @@ class HedaController < ApplicationController
     @tool_position = vals["toolPos"]
     @is_paused = vals["isPaused"]
     @gripped_jar_format_id = vals["gripped_jar_format_id"]
+    @status = vals["status"]
+    @status_code = vals["status_code"]
 
     render partial: "status"
   end

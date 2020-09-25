@@ -169,7 +169,7 @@ void CloseupCommand::setup(Heda& heda) {
       pinpointCode(heda, detected);
       parseCode(heda, detected);
 
-      if (detected.jar_id.size() == 3) {errorMsg = "Jar id must have 3 digits"; continue;}
+      if (detected.jar_id.size() != 3) {errorMsg = "Jar id must have 3 digits, but was '" + detected.jar_id + "'"; continue;}
 
       Jar jar;
       int id = atoi(detected.jar_id.c_str());
@@ -650,7 +650,7 @@ void StoreDetectedCommand::setup(Heda& heda) {
 
   commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
         
-    ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits");
+    ensure(detected.jar_id.size() == 3, "Jar id must have 3 digits, but was '" + detected.jar_id + "'");
     int id = atoi(detected.jar_id.c_str());
     ensure(heda.jars.find(jar, byJarId, id), "Detected jar id must refer to an existing jar, but was: " + detected.jar_id);
 

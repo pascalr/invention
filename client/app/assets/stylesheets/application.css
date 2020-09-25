@@ -64,3 +64,21 @@ tr:nth-child(odd) {background: #FFF}
 ul.context-menu__items {
   list-style-type: none;
 }
+
+#heda_status {
+  padding: 5px;
+  border: solid 1px black;
+  border-radius: 5px;
+}
+#heda_status.heda_status_ok {
+  background-color: rgb(200, 255, 200);
+  border: solid 3px green;
+}
+#heda_status.heda_status_fatal {
+  background-color: rgb(255, 100, 100);
+  border: solid 3px red;
+}
+#heda_status.heda_status_waiting {
+  background-color: rgb(255, 198, 66);
+  border: solid 3px rgb(255, 160, 0);
+}

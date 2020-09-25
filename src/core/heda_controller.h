@@ -47,6 +47,7 @@ class HedaController {
      
       // at throws a out of range exception 
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
+      m_commands["dismiss"] = [&](ParseResult tokens) {heda.waiting_message = ""; heda.fatal_message = "";};
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
       m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee
@@ -248,6 +249,7 @@ class HedaController {
         try {
           func(result);
         } catch (const EnsureException& e) {
+          // Return a bad request to the server when an exception like this occur. This is different thant Heda. This is HedaController.
         } catch (const MissingArgumentException& e) {cerr << "Caught a missing argument exception" << endl;}
       } else {cerr << "Error unkown command: " << result.getCommand() << "\n"; return;}
 
@@ -260,7 +262,12 @@ class HedaController {
           string cmd = getInputLine(reader);
           execute(cmd);
         }
-        this_thread::sleep_for(chrono::milliseconds(m_heda.handleCommandStack()));
+        try {
+          this_thread::sleep_for(chrono::milliseconds(m_heda.handleCommandStack()));
+        } catch (const EnsureException& e) {
+          m_heda.fatal_message = e.message;
+          m_heda.stop();
+        }
       }
     }
 

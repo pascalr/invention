@@ -1,12 +1,18 @@
-<%= link_to "🏠", heda_run_path(cmd: "home"), method: "post", remote: true %>
-<%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
-<%= link_to "Configure", edit_heda_path(@heda) %>
+<div style="font-size: 1.5em;">
+  <%= link_to "🏠", heda_run_path(cmd: "home"), method: "post", remote: true %>
+  <%= link_to "⏸️", heda_run_path(cmd: "pause"), method: "post", remote: true %>
+  <%= link_to "▶️", heda_run_path(cmd: "unpause"), method: "post", remote: true %>
+  <%= link_to "stop", heda_run_path(cmd: "stop"), method: "post", remote: true %>
+  <%= link_to "Configure", edit_heda_path(@heda) %>
+</div>
 
 <%# label_tag(:recette)  %>
 <%# text_field_tag :recette, if @recette then @recette.name end, readonly: true %>
 
+<h2>Commande</h2>
+
 <%= form_with(url: heda_run_path, method: "post", id: 'inputcommandform') do %>
-  <%= label_tag(:cmd, "Commande:", class: "inline_label") %>
+  <%# label_tag(:cmd, "Commande:", class: "inline_label") %>
   <%= text_field_tag(:cmd, nil, id: 'inputcommand') %>
   <%= submit_tag("Executer") %>
 <% end %>

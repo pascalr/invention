@@ -163,6 +163,22 @@ int main(int argc, char** argv) {
     pt.put("output", getAllAvailable(serverReader));
     pt.put("isPaused", heda.is_paused);
     pt.put("gripped_jar_format_id", heda.gripped_jar.jar_format_id);
+
+    // TODO: Two types of errors: Error aborted and error waiting for user input
+
+    if (!heda.fatal_message.empty()) {
+      pt.put("status_code", "fatal");
+      pt.put("status", heda.fatal_message);
+    } else if (!heda.waiting_message.empty()) {
+      pt.put("status_code", "waiting");
+      pt.put("status", heda.waiting_message);
+    } else if (heda.is_paused) {
+      pt.put("status_code", "waiting");
+      pt.put("status", "Paused");
+    } else {
+      pt.put("status_code", "ok");
+      pt.put("status", "OK!");
+    }
     stringstream ss;
     json_parser::write_json(ss, pt);
 
