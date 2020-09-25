@@ -89,3 +89,9 @@ sudo apt update && sudo apt install yarn
 
 sudo gem install rails
 (cd client && bundle install)
+
+
+sudo apt install tilda
+# windows + click + move pour déplacer la fenêtre
+# F1 pour faire apparaître ou disparaître.
+# F11 pour fullscreen
