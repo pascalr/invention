@@ -17,7 +17,7 @@
     <% @jars.each do |jar| %>
       <tr>
         <td><%= jar.jar_id %></td>
-        <td><%= jar.jar_format_id %></td>
+        <td><%= jar.jar_format.name %></td>
         <td><%= jar.ingredient_id && jar.ingredient ? jar.ingredient.name : jar.ingredient_id %></td>
         <td><%= jar.location_id %></td>
         <td><%= link_to 'Show', jar %></td>

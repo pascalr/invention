@@ -175,10 +175,11 @@ class GripCommand : public MetaCommand {
 
 class CloseupCommand : public MetaCommand {
   public:
-    CloseupCommand(DetectedHRCode& code) : detected(code) {}
+    CloseupCommand(DetectedHRCode& code, Jar& jar) : detected(code), jar(jar) {}
     string str() {return "closeup " + to_string(detected.id);}
     void setup(Heda& heda);
     DetectedHRCode& detected;
+    Jar& jar;
 };
 
 class LowerForGripCommand : public MetaCommand {

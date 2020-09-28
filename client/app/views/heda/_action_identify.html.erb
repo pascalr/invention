@@ -1,38 +1,24 @@
 <h3>Identifier le code</h3>
-        
+
 <%= image_tag(image_show_path(name: detected_code.img)) %>
 
-<%= form_with(model: detected_code, local: true, method: :post, url: heda_run_path(cmd: "done")) do |form| %>
-  <% if detected_code.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(detected_code.errors.count, "error") %> prohibited this detected_code from being saved:</h2>
+<%= form_with(model: Jar.new, local: true) do |form| %>
 
-      <ul>
-        <% detected_code.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
+  <%= hidden_field_tag(:detected_id, detected_code.id) %>
+  
   <div class="field">
-    <%= form.label :jar_id %>
+    <%= form.label :jar_id, "Numéro de pot" %>
     <%= form.text_field :jar_id %>
   </div>
 
   <div class="field">
-    <%= form.label :weight %>
-    <%= form.text_field :weight %>
+    <%= form.label :jar_format_id %>
+    <%= form.collection_select(:jar_format_id, JarFormat.order('name ASC').all, :id, :name) %>
   </div>
 
   <div class="field">
-    <%= form.label :content_name %>
-    <%= form.text_field :content_name %>
-  </div>
-
-  <div class="field">
-    <%= form.label :content_id %>
-    <%= form.text_field :content_id %>
+    <%= form.label :ingredient_id %>
+    <%= form.collection_select(:ingredient_id, Ingredient.order('name ASC').all, :id, :name) %>
   </div>
 
   <div class="actions">

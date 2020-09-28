@@ -5,11 +5,14 @@ $("#inputcommandform").bind('ajax:success', function(data, status, xhr) {
 })
 
 document.addEventListener("logoutput-loaded", function(event) {
-  let data = document.getElementById("logoutputdata");
-  let log = document.getElementById("logoutput");
-  let pending = document.getElementById("pending_commands");
-  log.value += data.textContent;
-  log.scrollTop = log.scrollHeight;
-  // pending.scrollTop =  TODO...
+  let action_required_div = document.getElementById('actionrequired');
+  if (action_required_div) {
+    action_required = action_required_div.getAttribute('data-val');
+    if (action_required && action_required.startsWith("identify")) {
+      console.log('Stopping async poll during identify action');
+      let container = document.getElementById('async-container')
+      container.dispatchEvent(new Event('async-stop'));
+    }
+  }
   document.getElementById('inputcommand').focus();
 });

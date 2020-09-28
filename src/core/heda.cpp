@@ -23,7 +23,13 @@ bool UserAction::isDone(Heda& heda) {
 
   if (heda.user_response.empty()) return false;
 
-  return heda.user_response == "done";
+  cout << "User_response: " << heda.user_response << endl;
+  if (iequals(heda.user_response, "done")) {
+    cout << "Equal!!!" << endl;
+  }
+  
+
+  return iequals(heda.user_response, "done");
 }
 void UserAction::doneCallback(Heda& heda) {
   heda.waiting_message = "";
@@ -191,7 +197,6 @@ void CloseupCommand::setup(Heda& heda) {
 
       JarTable jarsBefore;
       heda.db.load(jarsBefore);
-      Jar jar;
       int id = atoi(detected.jar_id.c_str());
       if (!jarsBefore.find(jar, byJarId, id)) {
         commands.push_back(make_shared<ActionIdentify>(detected.id)); 
@@ -660,7 +665,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 
 void StoreDetectedCommand::setup(Heda& heda) {
   // Do a closeup first
-  commands.push_back(make_shared<CloseupCommand>(detected));
+  commands.push_back(make_shared<CloseupCommand>(detected, jar));
   //
   // Transform the detected code into a jar
   // Get or create a column if needed

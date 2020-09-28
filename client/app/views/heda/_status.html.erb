@@ -7,6 +7,8 @@
 
 <h2>Action requise</h2>
 
+<div id="actionrequired" data-val="<%= @action_required %>" hidden ></div>
+
 <% if @action_required.blank? %>
   Aucune
 <% elsif @action_required.starts_with? "identify" %>

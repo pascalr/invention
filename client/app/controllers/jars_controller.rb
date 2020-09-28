@@ -26,15 +26,24 @@ class JarsController < ApplicationController
   def create
     @jar = Jar.new(jar_params)
 
-    respond_to do |format|
+    if params[:detected_id]
       if @jar.save
-        format.html { redirect_to @jar, notice: 'Jar was successfully created.' }
-        format.json { render :show, status: :created, location: @jar }
+        redirect_to controller: 'heda', action: 'run', cmd: 'done'
       else
-        format.html { render :new }
-        format.json { render json: @jar.errors, status: :unprocessable_entity }
+        render :new
+      end
+    else
+      respond_to do |format|
+        if @jar.save
+          format.html { redirect_to @jar, notice: 'Jar was successfully created.' }
+          format.json { render :show, status: :created, location: @jar }
+        else
+          format.html { render :new }
+          format.json { render json: @jar.errors, status: :unprocessable_entity }
+        end
       end
     end
+
   end
 
   # PATCH/PUT /jars/1
