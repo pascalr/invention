@@ -331,7 +331,9 @@ class DetectedHRCode : public Model {
 
 void bindQuery(SQLite::Statement& query, const DetectedHRCode& item);
 void parseItem(SQLite::Statement& query, DetectedHRCode& code);
-string getTableName(DetectedHRCode* code = NULL);
+//string getTableName(DetectedHRCode* code = NULL);
+template<typename T>
+string getTableName();
 
 class DetectedHRCodeTable : public Table<DetectedHRCode> {
   public:
@@ -430,7 +432,7 @@ class Jar : public Model {
     int jar_id = -1;
 };
 
-string getTableName(Jar* code = NULL);
+//string getTableName(Jar* code = NULL);
 void bindQuery(SQLite::Statement& query, const Jar& item);
 void parseItem(SQLite::Statement& query, Jar& item);
 

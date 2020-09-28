@@ -52,8 +52,10 @@ void parseItem(SQLite::Statement& query, Jar& jar) {
   jar.jar_id = query.getColumn(6);
 }
 
-string getTableName(DetectedHRCode* code) { return "detected_codes"; };
-string getTableName(Jar* i) { return "jars"; };
+template <> string getTableName<DetectedHRCode>() { return "detected_codes"; }
+template <> string getTableName<Jar>() { return "jars"; }
+//string getTableName(DetectedHRCode* code) { return "detected_codes"; }
+//string getTableName(Jar* i) { return "jars"; }
 
 //bool shelfHeightCmp(const Shelf& arg0, const Shelf& arg1) {
 //  return arg0.height < arg1.height;

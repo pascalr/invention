@@ -73,7 +73,8 @@ class Database {
     //void all(std::vector<T> result, std::string optional = "") {
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL);
+      //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL);
+      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>();
       queryStr << " " << optional;
 
       std::vector<T> result;
@@ -95,7 +96,8 @@ class Database {
 
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
+      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " LIMIT 1";
+      //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
       queryStr << " " << optional;
 
       SQLite::Statement query(db, queryStr.str());
