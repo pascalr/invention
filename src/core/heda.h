@@ -278,8 +278,8 @@ class UserAction : public HedaCommand {
   public:
     void start(Heda& heda);
     bool isDone(Heda& heda);
-    virtual const char* getWaitingMessage() = 0;
-    virtual bool isResponseOk(Heda& heda) = 0;
+    virtual std::string getWaitingMessage() = 0;
+    virtual std::string getActionRequired() = 0;
     virtual void doneCallback(Heda& heda);
 };
 
@@ -288,10 +288,12 @@ class ActionNewJar : public UserAction {
     ActionNewJar(int id) : id(id) {
     }
     string str() {return "actionNewJar";}
-    const char* getWaitingMessage() {
+    string getWaitingMessage() {
       return "Un nouveau pot a été détecté. Pouvez-vous svp déterminer ses caractéristiques?";
     }
-    bool isResponseOk(Heda& heda);
+    string getActionRequired() {
+      return "identify " + to_string(id);
+    }
     int id;
 };
 
@@ -593,6 +595,7 @@ class Heda {
 
     string waiting_message;
     string fatal_message;
+    string action_required;
 
     string user_response;
     

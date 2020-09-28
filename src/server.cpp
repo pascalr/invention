@@ -102,7 +102,6 @@ int main(int argc, char** argv) {
   Database db(DB_PROD);
   Heda heda(hedaLogWriter, hedaLogReader, db, hedaToServerStream); 
 
-  // THIS SHOULD BE THE ONLY RESSOURCE. LATER DELETE ALL OTHERS. EHH, ALSO POLL!!
   server.resource["^/run$"]["POST"] = [&heda,&serverStream](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "POST /run" << endl;
 
@@ -144,7 +143,7 @@ int main(int argc, char** argv) {
     response->write(SimpleWeb::StatusCode::success_ok, header);
     response->write(buf, ss);
   };*/
-
+  
   server.resource["^/poll$"]["GET"] = [&heda,&serverReader](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
     /*stringstream ss;
@@ -172,6 +171,7 @@ int main(int argc, char** argv) {
     } else if (!heda.waiting_message.empty()) {
       pt.put("status_code", "waiting");
       pt.put("status", heda.waiting_message);
+      pt.put("action_required", heda.action_required);
     } else if (heda.is_paused) {
       pt.put("status_code", "waiting");
       pt.put("status", "Paused");

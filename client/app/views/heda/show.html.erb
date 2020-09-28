@@ -25,9 +25,9 @@
 
 <h2>Action requise</h2>
 
-<% if @action_requise.blank? %>
-  Aucune
-<% else %>
+<% if @action_required.blank? %>
+<% elsif @action_required.starts_with? "identify" %>
+  <%= render partial: 'action_identify', locals: {detected_code: DetectedCode.find(@action_required.split(' ')[1])} %>
 <% end %>
 
 <%= javascript_pack_tag 'heda_index' %>

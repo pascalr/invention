@@ -17,18 +17,17 @@ class InvalidGrippedJarFormatException : public exception {};
 
 void UserAction::start(Heda& heda) {
   heda.waiting_message = getWaitingMessage();
+  heda.action_required = getActionRequired();
 }
 bool UserAction::isDone(Heda& heda) {
 
   if (heda.user_response.empty()) return false;
 
-  return isResponseOk(heda);
+  return heda.user_response == "done";
 }
 void UserAction::doneCallback(Heda& heda) {
   heda.waiting_message = "";
-}
-bool ActionNewJar::isResponseOk(Heda& heda) {
-  return heda.user_response == "coolcoolcool";
+  heda.action_required = "";
 }
 
 void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {

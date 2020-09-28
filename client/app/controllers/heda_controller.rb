@@ -54,6 +54,7 @@ class HedaController < ApplicationController
     @gripped_jar_format_id = vals["gripped_jar_format_id"]
     @status = vals["status"]
     @status_code = vals["status_code"]
+    @action_required = vals["action_required"]
 
     render partial: "status"
   end
