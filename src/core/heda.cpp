@@ -686,9 +686,15 @@ void StoreDetectedCommand::setup(Heda& heda) {
   // TODO: How to get the updated code from the closeup???
 
   commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-    // The previous command sets the jar id, but we must refresh if the user has created a new jar.
-    Jar freshJar = heda.db.find<Jar>(jar.id); 
+
+    // We must refresh the detected code because it was updated by the closeup and maybe by the action identify too.
+    DetectedHRCode updated = heda.db.find<DetectedHRCode>(detected.id);
+    ensure(updated.exists(), "Error the previously existing detected hr code was not found anymore. Aborting stored...");
+    int jarId = atoi(updated.jar_id.c_str());
+
+    Jar freshJar = heda.db.find<Jar>(jarId); 
     ensure(freshJar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
+
     Shelf shelf;
     loc = getNewLocation(heda, jar, shelf); 
     ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");

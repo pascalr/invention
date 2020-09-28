@@ -27,7 +27,10 @@ class JarsController < ApplicationController
     @jar = Jar.new(jar_params)
 
     if params[:detected_id]
+      code = DetectedCode.find(params[:detected_id])
       if @jar.save
+        code.jar_id = @jar.jar_id.to_s
+        code.save
         redirect_to controller: 'heda', action: 'run', cmd: 'done'
       else
         render :new
