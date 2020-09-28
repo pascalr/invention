@@ -351,7 +351,7 @@ void SweepCommand::setup(Heda& heda) {
   double zMax = heda.working_shelf.depth;
   double zDiff = zMax - zMin;
  
-  bool zUp = true;
+  bool xUp = true;
   for (int j = 0; j <= nStepZ; j++) {
     for (int i = 0; i <= nStepX; i++) {
 
@@ -372,11 +372,14 @@ void SweepCommand::setup(Heda& heda) {
       commands.push_back(make_shared<GotoCommand>(p));*/
       double x = (i*1.0*xDiff/nStepX)+xMin;
       double z = (j*1.0*zDiff/nStepZ)+zMin;
+
+      if (!xUp) {x = xMax - x;}
+
       UserCoord c(x, heda.config.detect_height, z);
       commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c,heda.config.gripper_radius)));
       commands.push_back(make_shared<DetectCommand>());
     }
-    zUp = !zUp;
+    xUp = !xUp;
   }
 
   commands.push_back(make_shared<PinpointCommand>());
@@ -692,7 +695,7 @@ void StoreDetectedCommand::setup(Heda& heda) {
     ensure(updated.exists(), "Error the previously existing detected hr code was not found anymore. Aborting stored...");
     int jarId = atoi(updated.jar_id.c_str());
 
-    Jar freshJar = heda.db.find<Jar>(jarId); 
+    Jar freshJar = heda.db.findBy<Jar>("jar_id", jarId); 
     ensure(freshJar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
 
     Shelf shelf;
