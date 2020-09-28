@@ -74,8 +74,10 @@ class HedaController {
         heda.pushCommand(make_shared<CloseupCommand>(code, jar));
       };
       m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
-        heda.codes.order(byLidY, false);
-        for (DetectedHRCode& code : heda.codes) {
+
+        vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>("ORDER BY lid_y DESC");
+        //heda.codes.order(byLidY, false);
+        for (DetectedHRCode& code : codes) {
           heda.pushCommand(make_shared<StoreDetectedCommand>(code));
         }
         heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));

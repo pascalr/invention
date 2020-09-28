@@ -133,7 +133,7 @@ class Model {
     bool exists() {
       return id != -1;
     }
-
+    
     // This could be bad because of implicit conversion to other types from what I've read.
     //operator bool() const {
     //  return id == -1;
@@ -306,6 +306,7 @@ class LocationTable : public Table<Location> {
     }
 };
 
+
 class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}
@@ -315,6 +316,7 @@ class DetectedHRCode : public Model {
                                               content_name(c.content_name), content_id(c.content_id), lid_coord(c.lid_coord) {
       id = c.id;
     }*/
+
     PolarCoord coord;
     double centerX;
     double centerY;
@@ -326,6 +328,10 @@ class DetectedHRCode : public Model {
     string content_id;
     UserCoord lid_coord;
 };
+
+void bindQuery(SQLite::Statement& query, const DetectedHRCode& item);
+void parseItem(SQLite::Statement& query, DetectedHRCode& code);
+string getTableName(DetectedHRCode* code = NULL);
 
 class DetectedHRCodeTable : public Table<DetectedHRCode> {
   public:
@@ -423,6 +429,10 @@ class Jar : public Model {
     int location_id = -1;
     int jar_id = -1;
 };
+
+string getTableName(Jar* code = NULL);
+void bindQuery(SQLite::Statement& query, const Jar& item);
+void parseItem(SQLite::Statement& query, Jar& item);
 
 class JarTable : public Table<Jar> {
   public:

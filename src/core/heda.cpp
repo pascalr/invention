@@ -340,14 +340,22 @@ void SweepCommand::setup(Heda& heda) {
   
   PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
 
-  int nStepX = 15;
-  int nStepZ = 5;
+  int nStepX = 10;
+  int nStepZ = 4;
 
+  double xMin = heda.unitX(heda.config.minH(), 0.0, 0.0);
+  double xMax = heda.unitX(heda.config.max_h, 0.0, 0.0);
+  double xDiff = xMax - xMin;
+
+  double zMin = heda.unitZ(90.0, heda.config.gripper_radius);
+  double zMax = heda.working_shelf.depth;
+  double zDiff = zMax - zMin;
+ 
   bool zUp = true;
-  for (int i = 0; i <= nStepX; i++) {
-    for (int j = 0; j <= nStepZ; j++) {
+  for (int j = 0; j <= nStepZ; j++) {
+    for (int i = 0; i <= nStepX; i++) {
 
-      // These are the cartesian coordinates of the polar coordinate system. (Not UserCoord)
+      /*// These are the cartesian coordinates of the polar coordinate system. (Not UserCoord)
       double x = i*1.0*max.h/nStepX;
       double z = j*1.0*heda.config.gripper_radius/nStepZ;
 
@@ -361,8 +369,11 @@ void SweepCommand::setup(Heda& heda) {
       double deltaX = cosd(t) * heda.config.gripper_radius;
 
       PolarCoord p = PolarCoord(x+deltaX, heda.unitV(heda.config.detect_height), t);
-      commands.push_back(make_shared<GotoCommand>(p));
-      //commands.push_back(make_shared<WaitCommand>(500)); // FIXME: Fix deceleration to remove this delay
+      commands.push_back(make_shared<GotoCommand>(p));*/
+      double x = (i*1.0*xDiff/nStepX)+xMin;
+      double z = (j*1.0*zDiff/nStepZ)+zMin;
+      UserCoord c(x, heda.config.detect_height, z);
+      commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c,heda.config.gripper_radius)));
       commands.push_back(make_shared<DetectCommand>());
     }
     zUp = !zUp;
@@ -675,7 +686,9 @@ void StoreDetectedCommand::setup(Heda& heda) {
   // TODO: How to get the updated code from the closeup???
 
   commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-
+    // The previous command sets the jar id, but we must refresh if the user has created a new jar.
+    Jar freshJar = heda.db.find<Jar>(jar.id); 
+    ensure(freshJar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
     Shelf shelf;
     loc = getNewLocation(heda, jar, shelf); 
     ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");

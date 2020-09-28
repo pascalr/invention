@@ -260,10 +260,10 @@ class DetectCommand : public HedaCommand {
 
 class StoreDetectedCommand : public MetaCommand {
   public:
-    StoreDetectedCommand(DetectedHRCode& code) : detected(code) {}
+    StoreDetectedCommand(DetectedHRCode code) : detected(code) {}
     string str() {return "stored " + to_string(detected.id);}
     void setup(Heda& heda);
-    DetectedHRCode& detected;
+    DetectedHRCode detected;
     Jar jar;
     Location loc;
     void doneCallback(Heda& heda);
@@ -438,6 +438,14 @@ class Heda {
     
     double unitH(double unitX, double unitT, double reference) {
       return unitX - config.user_coord_offset_x + (cosd(unitT) * reference);
+    }
+    
+    double unitX(double unitH, double unitT, double reference) {
+      return unitH + config.user_coord_offset_x - (cosd(unitT) * reference); // Not tested
+    }
+    
+    double unitZ(double unitT, double reference) {
+      return config.user_coord_offset_z-(sind(unitT) * reference);
     }
     
     double unitV(double unitY) {
