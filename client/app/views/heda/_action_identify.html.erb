@@ -2,7 +2,7 @@
         
 <%= image_tag(image_show_path(name: detected_code.img)) %>
 
-<%= form_with(model: detected_code, local: true) do |form| %>
+<%= form_with(model: detected_code, local: true, method: :post, url: heda_run_path(cmd: "done")) do |form| %>
   <% if detected_code.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(detected_code.errors.count, "error") %> prohibited this detected_code from being saved:</h2>
@@ -36,6 +36,6 @@
   </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit "Valider" %>
   </div>
 <% end %>

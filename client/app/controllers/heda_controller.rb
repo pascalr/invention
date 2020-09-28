@@ -56,6 +56,8 @@ class HedaController < ApplicationController
     @status_code = vals["status_code"]
     @action_required = vals["action_required"]
 
+    logger.info "Vals: " + vals.to_s
+    
     render partial: "status"
   end
 

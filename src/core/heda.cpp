@@ -28,6 +28,7 @@ bool UserAction::isDone(Heda& heda) {
 void UserAction::doneCallback(Heda& heda) {
   heda.waiting_message = "";
   heda.action_required = "";
+  heda.user_response = "";
 }
 
 void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
@@ -188,10 +189,12 @@ void CloseupCommand::setup(Heda& heda) {
       
       heda.db.update(heda.codes, detected);
 
+      JarTable jarsBefore;
+      heda.db.load(jarsBefore);
       Jar jar;
       int id = atoi(detected.jar_id.c_str());
-      if (!heda.jars.find(jar, byJarId, id)) {
-        commands.push_back(make_shared<ActionNewJar>(id)); 
+      if (!jarsBefore.find(jar, byJarId, id)) {
+        commands.push_back(make_shared<ActionIdentify>(detected.id)); 
       }
   
       return;

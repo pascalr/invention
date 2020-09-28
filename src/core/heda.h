@@ -280,12 +280,12 @@ class UserAction : public HedaCommand {
     bool isDone(Heda& heda);
     virtual std::string getWaitingMessage() = 0;
     virtual std::string getActionRequired() = 0;
-    virtual void doneCallback(Heda& heda);
+    void doneCallback(Heda& heda);
 };
 
-class ActionNewJar : public UserAction {
+class ActionIdentify : public UserAction {
   public:
-    ActionNewJar(int id) : id(id) {
+    ActionIdentify(int id) : id(id) {
     }
     string str() {return "actionNewJar";}
     string getWaitingMessage() {
