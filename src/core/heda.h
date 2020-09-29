@@ -173,6 +173,12 @@ class GripCommand : public MetaCommand {
     Jar jar;
 };
 
+class TestCommand : public MetaCommand {
+  public:
+    string str() {return "test";}
+    void setup(Heda& heda);
+};
+
 class FetchCommand : public MetaCommand {
   public:
     FetchCommand(Jar jar) : jar(jar) {}

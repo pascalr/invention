@@ -213,7 +213,7 @@ class Database {
     void update(T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
    
-      SQLite::Statement infoQuery(db, "SELECT 0 FROM " + getTableName<T>() + " WHERE 0");
+      SQLite::Statement infoQuery(db, "SELECT * FROM " + getTableName<T>() + " WHERE 0");
 
       std::string updateQuery = "UPDATE " + getTableName<T>() + " SET ";
       for (int i = 1; i < infoQuery.getColumnCount(); i++) {

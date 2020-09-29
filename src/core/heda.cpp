@@ -152,6 +152,11 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
   return perceivedWidth * distanceFromCamera / actualWidth;
 }
 
+void TestCommand::setup(Heda& heda) {
+  heda.config.grip_offset = 1.0;
+  heda.db.update(heda.config);
+}
+
 // closesup muste be done to the tallest jars first, then store them.
 // then close up the next tallest, etc.
 void CloseupCommand::setup(Heda& heda) {

@@ -51,6 +51,7 @@ class HedaController {
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
       m_commands["done"] = [&](ParseResult tokens) {heda.user_response = "done";};
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
+      m_commands["test"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<TestCommand>());};
       m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee
         // Delete all the ingredient quantities 
         Recipe recipe;
