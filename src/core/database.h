@@ -150,6 +150,15 @@ class Database {
     }
     
     template<class T> 
+    void clear() {
+      std::lock_guard<std::mutex> guard(dbMutex);
+    
+      stringstream ss; ss << "DELETE FROM " << getTableName<T>();
+      log("DB CLEAR", ss.str());
+      db.exec(ss.str());
+    }
+    
+    template<class T> 
     void insert(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
   
@@ -187,6 +196,17 @@ class Database {
       stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << optional;
       log("DB DELETE", ss.str());
       db.exec(ss.str());
+    }
+
+    template<class T> 
+    void remove(T& item) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+    
+      stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " WHERE id = " << item.id;
+      log("DB DELETE", ss.str());
+      db.exec(ss.str());
+
+      item.id = -1;
     }
 
     template<class T> 

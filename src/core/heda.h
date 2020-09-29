@@ -344,7 +344,6 @@ class Heda {
         throw NoWorkingShelfException();
       }
 
-      db.load(codes);
       db.load(jar_formats);
       db.load(jars);
       db.load(ingredients);
@@ -535,7 +534,6 @@ class Heda {
     
     PolarCoord m_position;
 
-    DetectedHRCodeTable codes;
     ShelfTable shelves;
     JarFormatTable jar_formats;
     JarTable jars;

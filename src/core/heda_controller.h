@@ -66,14 +66,14 @@ class HedaController {
         ensure(heda.jar_formats.ifind(format, byName, jarFormatName), "calibrate must have a valid jar format name");
         heda.calibrate(format);
       };
-      m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
-        debug();
-        DetectedHRCode code;
-        unsigned long id = tokens.popPositiveInteger();
-        ensure(heda.codes.get(code, id), "closeup must have a valid code id");
-        Jar jar;
-        heda.pushCommand(make_shared<CloseupCommand>(code, jar));
-      };
+      //m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
+      //  debug();
+      //  DetectedHRCode code;
+      //  unsigned long id = tokens.popPositiveInteger();
+      //  ensure(heda.codes.get(code, id), "closeup must have a valid code id");
+      //  Jar jar;
+      //  heda.pushCommand(make_shared<CloseupCommand>(code, jar));
+      //};
       m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
 
         vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>("ORDER BY lid_y DESC");

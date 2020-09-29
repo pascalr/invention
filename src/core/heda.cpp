@@ -71,20 +71,19 @@ void removeNearDuplicates(Heda& heda) {
 
   double epsilon = pow(HRCODE_OUTER_DIA * 1.5, 2);
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
-  DetectedHRCodeTable codes;
-  heda.db.load(codes);
+  vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>();
   vector<int> ids;
   vector<Cluster> clusters;
-  for (unsigned int i = 0; i < codes.items.size(); i++) {
+  for (unsigned int i = 0; i < codes.size(); i++) {
 
-    DetectedHRCode& code = codes.items[i];
+    DetectedHRCode& code = codes[i];
     // An item can only belong to one cluster. So discard if already belongs to one.
     if (count(ids.begin(), ids.end(), code.id) > 0) continue;
 
     Cluster cluster;
     cluster.idxKept = i;
-    for (unsigned int j = i+1; j < codes.items.size(); j++) {
-      DetectedHRCode& other = codes.items[j];
+    for (unsigned int j = i+1; j < codes.size(); j++) {
+      DetectedHRCode& other = codes[j];
       if (detectedDistanceSquared(code, other) < epsilon) {
         ids.push_back(other.id);
         cluster.indicesRemoved.push_back(j);
@@ -94,20 +93,20 @@ void removeNearDuplicates(Heda& heda) {
   }
   for (Cluster& cluster : clusters) {
 
-    double sumX = codes.items[cluster.idxKept].lid_coord.x;
-    double sumZ = codes.items[cluster.idxKept].lid_coord.z;
+    double sumX = codes[cluster.idxKept].lid_coord.x;
+    double sumZ = codes[cluster.idxKept].lid_coord.z;
     for (int &idx : cluster.indicesRemoved) {
-      sumX += codes.items[idx].lid_coord.x;
-      sumZ += codes.items[idx].lid_coord.z;
+      sumX += codes[idx].lid_coord.x;
+      sumZ += codes[idx].lid_coord.z;
     }
-    DetectedHRCode& code = codes.items[cluster.idxKept];
+    DetectedHRCode& code = codes[cluster.idxKept];
     code.lid_coord.x = sumX / (cluster.indicesRemoved.size() + 1);
     code.lid_coord.z = sumZ / (cluster.indicesRemoved.size() + 1);
-    heda.db.update(heda.codes, code);
+    heda.db.update(code);
   }
 
   for (int &id : ids) {
-    heda.db.removeItem(heda.codes, id);
+    heda.db.deleteFrom<DetectedHRCode>("WHERE id = " + to_string(id));
   }
 }
 //void removeNearDuplicates(Heda& heda) {
@@ -201,7 +200,7 @@ void CloseupCommand::setup(Heda& heda) {
 
       if (detected.jar_id.size() != 3) {errorMsg = "Jar id must have 3 digits, but was '" + detected.jar_id + "'"; continue;}
       
-      heda.db.update(heda.codes, detected);
+      heda.db.update(detected);
 
       JarTable jarsBefore;
       heda.db.load(jarsBefore);
@@ -312,10 +311,9 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
 }
 
 void ParseCodesCommand::start(Heda& heda) {
-  for (size_t i = 0; i < heda.codes.items.size(); i++) {
-    DetectedHRCode& code = heda.codes.items[i];
+  for (DetectedHRCode& code : heda.db.all<DetectedHRCode>()) {
     parseCode(heda, code);
-    heda.db.update(heda.codes, code);
+    heda.db.update(code);
   }
 }
     
@@ -344,7 +342,7 @@ void OpenGripCommand::doneCallback(Heda& heda) {
 }*/
 void SweepCommand::setup(Heda& heda) {
 
-  heda.db.clear(heda.codes);
+  heda.db.clear<DetectedHRCode>();
   
   PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
 
@@ -618,10 +616,10 @@ void FetchCommand::setup(Heda& heda) {
 //}
 
 void PinpointCommand::start(Heda& heda) {
-  for (size_t i = 0; i < heda.codes.items.size(); i++) {
-    DetectedHRCode& code = heda.codes.items[i];
+
+  for (DetectedHRCode& code : heda.db.all<DetectedHRCode>()) {
     pinpointCode(heda, code);
-    heda.db.update(heda.codes, code);
+    heda.db.update(code);
   }
 }
 
@@ -723,7 +721,7 @@ void StoreDetectedCommand::doneCallback(Heda& heda) {
 
   loc.jar_id = jar.id;
   heda.db.update(loc);
-  heda.db.removeItem(heda.codes, detected.id);
+  heda.db.remove(detected);
   heda.gripped_jar.id = -1;
 }
 
@@ -734,7 +732,7 @@ void DetectCommand::start(Heda& heda) {
   vector<DetectedHRCode> detected;
   detectCodes(heda, detected, frame, heda.getPosition());
   for (DetectedHRCode& it : detected) {
-    heda.db.insert(heda.codes, it);
+    heda.db.insert(it);
   }
 }
 
