@@ -113,33 +113,12 @@ class Database {
 
     // Optional used for like ORDER BY
     // It is added at the end of the query
-    template<class T> 
-    T findBy(std::string columnName, std::string value, std::string optional = "") {
-
-      // TODO: Don't repeat everything here, send a const char* to the other findBy
-      std::lock_guard<std::mutex> guard(dbMutex);
-      
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = \"" << value << "\" " << optional << " LIMIT 1";
-
-      log("DB LOAD", queryStr.str());
-      SQLite::Statement query(db, queryStr.str());
-      if (query.executeStep()) {
-        T item; parseItem(query, item);
-        item.id = query.getColumn(0);
-        return item;
-      }
-      T item;
-      return item;
-    }
-
-    // Optional used for like ORDER BY
-    // It is added at the end of the query
     template<class T, class P> 
     T findBy(std::string columnName, P value, std::string optional = "") {
 
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = \"" << value << " " << optional << "\" LIMIT 1";
+      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << "\" LIMIT 1";
 
       log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
@@ -247,6 +226,15 @@ class Database {
     std::mutex dbMutex;
 
   protected:
+
+    template<class T>
+    T quoteValue(T value) {
+      return value;
+    }
+    
+    std::string quoteValue(std::string value) {
+      return "\"" + value + "\"";
+    }
 
     template<class T> 
     long getLastInsertedId(Table<T>& table) {
