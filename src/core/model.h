@@ -190,6 +190,10 @@ class HedaConfig : public Model {
     }
 };
 
+
+void parseItem(SQLite::Statement& query, HedaConfig& c);
+void bindQuery(SQLite::Statement& query, const HedaConfig& item);
+
 class HedaConfigTable : public Table<HedaConfig> {
   public:
     const char* TABLE_NAME = "hedas";
@@ -400,6 +404,9 @@ class JarFormat : public Model {
     double grip_force;
 };
 
+void bindQuery(SQLite::Statement& query, const JarFormat& item);
+void parseItem(SQLite::Statement& query, JarFormat& item);
+
 class JarFormatTable : public Table<JarFormat> {
   public:
     const char* TABLE_NAME = "jar_formats";
@@ -520,6 +527,9 @@ class Unit : public Model {
     bool is_weight;
 };
 
+void bindQuery(SQLite::Statement& query, const Unit& item);
+void parseItem(SQLite::Statement& query, Unit& i);
+
 class UnitTable : public Table<Unit> {
   public:
     const char* TABLE_NAME = "units";
@@ -545,13 +555,15 @@ class UnitTable : public Table<Unit> {
 
 };
 
-
 class Recipe : public Model {
   public:
     string name;
     string instructions;
     double rating;
 };
+
+void bindQuery(SQLite::Statement& query, const Recipe& item);
+void parseItem(SQLite::Statement& query, Recipe& i);
 
 class RecipeTable : public Table<Recipe> {
   public:
@@ -585,6 +597,9 @@ class IngredientQuantity : public Model {
     double value;
     int unit_id;
 };
+
+void bindQuery(SQLite::Statement& query, const IngredientQuantity& item);
+void parseItem(SQLite::Statement& query, IngredientQuantity& i);
 
 class IngredientQuantityTable : public Table<IngredientQuantity> {
   public:
