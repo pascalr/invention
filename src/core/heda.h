@@ -173,6 +173,14 @@ class GripCommand : public MetaCommand {
     Jar jar;
 };
 
+class FetchCommand : public MetaCommand {
+  public:
+    FetchCommand(Jar jar) : jar(jar) {}
+    string str() {return "fetch " + to_string(jar.id);} // TODO: Ingredient nice instead of jar id
+    void setup(Heda& heda);
+    Jar jar;
+};
+
 class CloseupCommand : public MetaCommand {
   public:
     CloseupCommand(DetectedHRCode& code, Jar& jar) : detected(code), jar(jar) {}

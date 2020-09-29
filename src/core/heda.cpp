@@ -540,32 +540,25 @@ void SlaveCommand::start(Heda& heda) {
 //  packer.generateLocations(*this);
 //}
     
+void FetchCommand::setup(Heda& heda) {
 
-/*void Heda::fetch(std::string ingredientName) {
-  cout << "About to fetch ingredient = " << ingredientName << endl;
-  for (const Ingredient& ing : ingredients.items) {
-    if (iequals(ing.name, ingredientName)) {
+  // TODO: Make sure the the quantity of ingredients left in the jar is ok.
+ 
+  Location loc = heda.db.findBy<Location>("jar_id", jar.id);
+  ensure(loc.exists(), "Could not find the location of the jar id = " + to_string(jar.id));
 
-      cout << "The ingredient exists. Now checking to find a jar that has some." << endl;
-      for (const Jar& jar : jars.items) {
-        if (jar.ingredient_id == ing.id) {
+  Shelf shelf = heda.db.find<Shelf>(loc.shelf_id);
+  ensure(shelf.exists(), "Could not find the shelf of the location id = " + to_string(loc.id));
 
-          // TODO: Make sure the the quantity of ingredients left in the jar is ok.
-          // Ok now get the location.
-          Location loc;
-          if (!locations.get(loc, jar.location_id)) {throw InvalidLocationException();} // TODO: Handle error message missing location
-          NaiveJarPacker packer;
-          packer.moveToLocation(*this, loc);
-          // TODO: pickup(jar);
-          return;
-        }
-      }
-      cout << "Oups. No jar were found containing this ingredient..." << endl;
-      return;
-    }
-  }
-  cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
-}*/
+  commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
+  commands.push_back(make_shared<LowerForGripCommand>(jar));
+  commands.push_back(make_shared<GripCommand>(jar));
+  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+    loc.occupied = false;
+  }));
+  commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
+  commands.push_back(make_shared<PutdownCommand>());
+}
 
 //void PickupCommand::setup(Heda& heda) {
 //  NaiveJarPacker packer;
@@ -710,7 +703,7 @@ void StoreDetectedCommand::setup(Heda& heda) {
     commands.push_back(make_shared<GripCommand>(jar));
     commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
       loc.occupied = true;
-    }
+    }));
     commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
     commands.push_back(make_shared<PutdownCommand>());
   }));

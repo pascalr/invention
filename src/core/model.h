@@ -264,6 +264,9 @@ class Location : public Model {
     bool occupied;
 };
 
+void parseItem(SQLite::Statement& query, Location& item);
+void bindQuery(SQLite::Statement& query, const Location& item);
+
 class LocationTable : public Table<Location> {
   public:
     const char* TABLE_NAME = "locations";
@@ -476,6 +479,9 @@ class Ingredient : public Model {
     double density;
 };
 
+void bindQuery(SQLite::Statement& query, const Ingredient& item);
+void parseItem(SQLite::Statement& query, Ingredient& i);
+
 class IngredientTable : public Table<Ingredient> {
   public:
     const char* TABLE_NAME = "ingredients";
@@ -615,6 +621,9 @@ class Shelf : public Model {
     double offset_z; // deprecated
     double moving_height;
 };
+    
+void bindQuery(SQLite::Statement& query, const Shelf& item);
+void parseItem(SQLite::Statement& query, Shelf& i);
 
 class ShelfTable : public Table<Shelf> {
   public:

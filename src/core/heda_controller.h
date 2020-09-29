@@ -206,8 +206,16 @@ class HedaController {
       m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PinpointCommand>());};
       m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
       m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
+
         string ingredientName = tokens.popNoun();
-        //heda.fetch(ingredientName);
+
+        Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName);
+        ensure(ingredient.exists(), "Could not find an ingredient with the name " + ingredientName);
+
+        Jar jar = heda.db.findBy<Jar>("ingredient_id", ingredient.id);
+        ensure(ingredient.exists(), "Could not find a jar that contains the ingredient " + ingredientName);
+
+        heda.pushCommand(make_shared<FetchCommand>(jar));
       }; 
       m_commands["photo"] = [&](ParseResult tokens) {
         Mat mat;
