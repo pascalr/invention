@@ -260,6 +260,8 @@ class Location : public Model {
     bool is_storage;
     string name;
     int jar_format_id;
+    int jar_id;
+    bool occupied;
 };
 
 class LocationTable : public Table<Location> {
@@ -279,6 +281,8 @@ class LocationTable : public Table<Location> {
       item.is_storage = (int)query.getColumn(8);
       item.name = (const char*)query.getColumn(9);
       item.jar_format_id = query.getColumn(11);
+      item.jar_id = query.getColumn(12);
+      item.occupied = (int)query.getColumn(13);
       return item;
     }
 
@@ -293,6 +297,8 @@ class LocationTable : public Table<Location> {
       query.bind(8, item.is_storage);
       query.bind(9, item.name);
       query.bind(11, item.jar_format_id);
+      query.bind(12, item.jar_id);
+      query.bind(13, item.occupied);
     }
 
     int byName(Location& loc, const string& name) {
@@ -428,7 +434,6 @@ class Jar : public Model {
   public:
     int jar_format_id = -1;
     int ingredient_id = -1;
-    int location_id = -1;
     int jar_id = -1;
 };
 
@@ -446,7 +451,6 @@ class JarTable : public Table<Jar> {
       query.bind(2, item.ingredient_id);
       query.bind(3, item.created_at);
       query.bind(4, item.updated_at);
-      query.bind(5, item.location_id);
       query.bind(6, item.jar_id);
     }
 
@@ -456,7 +460,6 @@ class JarTable : public Table<Jar> {
       jar.ingredient_id = query.getColumn(2);
       jar.created_at = query.getColumn(3);
       jar.updated_at = query.getColumn(4);
-      jar.location_id = query.getColumn(5);
       jar.jar_id = query.getColumn(6);
       return jar;
     }

@@ -547,7 +547,7 @@ class Heda {
     // Does all the heavy logic. Breaks a movement into simpler movements and checks for collisions.
     void calculateGoto(vector<MoveCommand> &mvts, const PolarCoord destination);
 
-    void generateLocations();
+    //void generateLocations();
 
     void shelfByHeight(Shelf& shelf, double userHeight) {
 

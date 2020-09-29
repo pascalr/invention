@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_25_133529) do
+ActiveRecord::Schema.define(version: 2020_09_29_144453) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -151,8 +151,11 @@ ActiveRecord::Schema.define(version: 2020_09_25_133529) do
     t.string "name"
     t.integer "colonne_id"
     t.integer "jar_format_id", null: false
+    t.integer "jar_id", null: false
+    t.boolean "occupied"
     t.index ["colonne_id"], name: "index_locations_on_colonne_id"
     t.index ["jar_format_id"], name: "index_locations_on_jar_format_id"
+    t.index ["jar_id"], name: "index_locations_on_jar_id"
     t.index ["shelf_id"], name: "index_locations_on_shelf_id"
   end
 
@@ -231,6 +234,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_133529) do
   add_foreign_key "ingredients", "aliments"
   add_foreign_key "locations", "colonnes"
   add_foreign_key "locations", "jar_formats"
+  add_foreign_key "locations", "jars"
   add_foreign_key "locations", "shelves"
   add_foreign_key "recipe_tags", "recettes"
   add_foreign_key "recipe_tags", "tags"

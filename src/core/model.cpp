@@ -39,7 +39,6 @@ void bindQuery(SQLite::Statement& query, const Jar& item) {
   query.bind(2, item.ingredient_id);
   query.bind(3, item.created_at);
   query.bind(4, item.updated_at);
-  query.bind(5, item.location_id);
   query.bind(6, item.jar_id);
 }
 
@@ -48,7 +47,6 @@ void parseItem(SQLite::Statement& query, Jar& jar) {
   jar.ingredient_id = query.getColumn(2);
   jar.created_at = query.getColumn(3);
   jar.updated_at = query.getColumn(4);
-  jar.location_id = query.getColumn(5);
   jar.jar_id = query.getColumn(6);
 }
 

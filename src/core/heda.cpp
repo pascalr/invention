@@ -5,7 +5,6 @@
 #include "../lib/opencv.h"
 //#include "calibrate.h"
 #include <opencv2/highgui.hpp>
-#include "jar_packer.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 using namespace std;
@@ -536,10 +535,10 @@ void SlaveCommand::start(Heda& heda) {
   heda.m_writer << cmd;
 }
 
-void Heda::generateLocations() {
-  NaiveJarPacker packer;
-  packer.generateLocations(*this);
-}
+//void Heda::generateLocations() {
+//  NaiveJarPacker packer;
+//  packer.generateLocations(*this);
+//}
     
 
 /*void Heda::fetch(std::string ingredientName) {
@@ -568,52 +567,52 @@ void Heda::generateLocations() {
   cout << "Oups. The ingredient " << ingredientName << " was not found." << endl;
 }*/
 
-void PickupCommand::setup(Heda& heda) {
-  NaiveJarPacker packer;
-  commands.push_back(packer.moveToLocationCmd(heda, loc));
-  commands.push_back(make_shared<LowerForGripCommand>(jar));
-  commands.push_back(make_shared<GripCommand>(jar));
-  commands.push_back(packer.moveToLocationCmd(heda, loc));
-}
+//void PickupCommand::setup(Heda& heda) {
+//  NaiveJarPacker packer;
+//  commands.push_back(packer.moveToLocationCmd(heda, loc));
+//  commands.push_back(make_shared<LowerForGripCommand>(jar));
+//  commands.push_back(make_shared<GripCommand>(jar));
+//  commands.push_back(packer.moveToLocationCmd(heda, loc));
+//}
+//
+//void PickupCommand::doneCallback(Heda& heda) {
+//  jar.location_id = -1;
+//  heda.db.update(heda.jars, jar);
+//}
 
-void PickupCommand::doneCallback(Heda& heda) {
-  jar.location_id = -1;
-  heda.db.update(heda.jars, jar);
-}
-
-void StoreCommand::setup(Heda& heda) {
-  // TODO: Error message is not gripping
-  if (heda.is_gripping) {
-
-    NaiveJarPacker packer;
-    if (!location_name.empty()) {
-      if (heda.locations.byName(loc, location_name) < 0) {
-        cout << "A location name was given, but it was not found. Aborting store.";
-        return;
-      }
-    } else {
-      int locId = packer.nextLocation(heda);
-      heda.locations.get(loc, locId);
-    }
-
-    // TODO: Handle and show to the user all possible errors
-
-    if (loc.exists()) {
-      commands.push_back(packer.moveToLocationCmd(heda, loc));
-      commands.push_back(make_shared<PutdownCommand>());
-      commands.push_back(packer.moveToLocationCmd(heda, loc));
-    }
-  } else {
-    cout << "Warning heda is not gripping. Aborting store..." << endl;
-  }
-}
-
-void StoreCommand::doneCallback(Heda& heda) {
-  if (loc.exists()) {
-    heda.gripped_jar.location_id = loc.id;
-    heda.db.update(heda.jars, heda.gripped_jar);
-  }
-}
+//void StoreCommand::setup(Heda& heda) {
+//  // TODO: Error message is not gripping
+//  if (heda.is_gripping) {
+//
+//    NaiveJarPacker packer;
+//    if (!location_name.empty()) {
+//      if (heda.locations.byName(loc, location_name) < 0) {
+//        cout << "A location name was given, but it was not found. Aborting store.";
+//        return;
+//      }
+//    } else {
+//      int locId = packer.nextLocation(heda);
+//      heda.locations.get(loc, locId);
+//    }
+//
+//    // TODO: Handle and show to the user all possible errors
+//
+//    if (loc.exists()) {
+//      commands.push_back(packer.moveToLocationCmd(heda, loc));
+//      commands.push_back(make_shared<PutdownCommand>());
+//      commands.push_back(packer.moveToLocationCmd(heda, loc));
+//    }
+//  } else {
+//    cout << "Warning heda is not gripping. Aborting store..." << endl;
+//  }
+//}
+//
+//void StoreCommand::doneCallback(Heda& heda) {
+//  if (loc.exists()) {
+//    heda.gripped_jar.location_id = loc.id;
+//    heda.db.update(heda.jars, heda.gripped_jar);
+//  }
+//}
 
 void PinpointCommand::start(Heda& heda) {
   for (size_t i = 0; i < heda.codes.items.size(); i++) {
@@ -713,8 +712,8 @@ void StoreDetectedCommand::setup(Heda& heda) {
 
 void StoreDetectedCommand::doneCallback(Heda& heda) {
 
-  jar.location_id = loc.id;
-  heda.db.update(heda.jars, jar);
+  loc.jar_id = jar.id;
+  heda.db.update(heda.locations, loc);
   heda.db.removeItem(heda.codes, detected.id);
   heda.gripped_jar.id = -1;
 }

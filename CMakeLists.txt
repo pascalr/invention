@@ -1,5 +1,4 @@
-# DEPENDENCIES LIST:
-# python is for matplotlib
+# DEPENDENCIES LIST: # python is for matplotlib
 # leptonica is for tesseract
 # tesseract if for reading words
 # zbar is for reading qr codes (obselete)
@@ -55,7 +54,6 @@ link_libraries(${MyLibs})
 ADD_LIBRARY(MyLibsModule
   src/utils/io_common.cpp
   src/utils/utils.cpp
-  src/core/jar_packer.cpp
   src/core/program.cpp
   src/core/model.cpp
   src/core/fake_program.cpp
