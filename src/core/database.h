@@ -206,9 +206,29 @@ class Database {
       }
     }
 
-    // I want to use the same format, so I am not using UPDATE query.
-    // TODO: Add a table: __updates to handle this with table_name:string, to_remove_id:int, to_add_id:int, so no record is lost
-    // in the odd chance that the system crashes between a add item and a removeItem.
+    template<class T> 
+    void insert(T& item) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+   
+      SQLite::Statement infoQuery(db, "SELECT * FROM " + getTableName<T>() + " WHERE 0");
+
+      std::string insertQuery = "INSERT INTO " + getTableName<T>() + " VALUES(NULL, ";
+      for (int i = 1; i < infoQuery.getColumnCount(); i++) {
+        insertQuery += "?";
+        if (i != infoQuery.getColumnCount() - 1) {
+          insertQuery += ", ";
+        }
+      }
+      insertQuery += ")";
+      
+      log("DB INSERT", insertQuery); // TODO: I can log better than that, find a way to get values by indices
+
+      SQLite::Statement query(db, insertQuery);
+      bindQuery(query, item);
+      query.exec();
+      item.id = getLastInsertedId<T>();
+    }
+
     template<class T> 
     void update(T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
@@ -260,6 +280,16 @@ class Database {
     
     std::string quoteValue(std::string value) {
       return "\"" + value + "\"";
+    }
+
+
+    template<class T> 
+    long getLastInsertedId() {
+      // Probably more efficient to get the last rowid inserted, than get the id of that rowid, but I dont care for now.
+      stringstream ss; ss << "SELECT MAX(id) FROM " << getTableName<T>();
+      SQLite::Statement query(db, ss.str());
+      query.executeStep();
+      return query.getColumn(0);
     }
 
     template<class T> 

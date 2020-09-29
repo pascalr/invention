@@ -347,7 +347,6 @@ class Heda {
       db.load(codes);
       db.load(jar_formats);
       db.load(jars);
-      db.load(locations);
       db.load(ingredients);
       db.load(units);
       db.load(recipes);
@@ -543,7 +542,6 @@ class Heda {
     IngredientTable ingredients;
     UnitTable units;
     RecipeTable recipes;
-    LocationTable locations;
     IngredientQuantityTable ingredient_quantities;
     Database& db;
 

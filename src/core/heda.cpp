@@ -153,8 +153,12 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
 }
 
 void TestCommand::setup(Heda& heda) {
-  heda.config.grip_offset = 1.0;
-  heda.db.update(heda.config);
+  Ingredient i;
+  i.name = "FooBar";
+  heda.db.insert(i);
+  ensure(i.exists(), "FooBar must exist!");
+  //heda.config.grip_offset = 1.0;
+  //heda.db.update(heda.config);
 }
 
 // closesup muste be done to the tallest jars first, then store them.
@@ -641,8 +645,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 
     if (shelf.id == heda.config.working_shelf_id) {continue;}
 
-    LocationTable locations;
-    heda.db.load(locations, "WHERE shelf_id = " + to_string(shelf.id));
+    vector<Location> locations = heda.db.all<Location>("WHERE shelf_id = " + to_string(shelf.id));
 
     for (double z = minZAccessible; z < shelf.depth - widthNeeded; z += 10) {
       for (double x = minXAccessible; x < shelf.width - widthNeeded - minXAccessible; x += 10) {
@@ -669,7 +672,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
           loc.jar_format_id = format.id;
           loc.jar_id = jar.id;
           loc.occupied = false;
-          heda.db.insert(locations, loc);
+          heda.db.insert(loc);
           return loc;
         }
       }
@@ -719,7 +722,7 @@ void StoreDetectedCommand::setup(Heda& heda) {
 void StoreDetectedCommand::doneCallback(Heda& heda) {
 
   loc.jar_id = jar.id;
-  heda.db.update(heda.locations, loc);
+  heda.db.update(loc);
   heda.db.removeItem(heda.codes, detected.id);
   heda.gripped_jar.id = -1;
 }
