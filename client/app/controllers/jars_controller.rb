@@ -26,10 +26,14 @@ class JarsController < ApplicationController
   def create
     @jar = Jar.new(jar_params)
 
+    # in the odd case that the jar id was misread, it might already exists, discard it.
+    old_jar = Jar.find_by(jar_id: @jar.jar_id)
+
     if params[:detected_id]
       code = DetectedCode.find(params[:detected_id])
       if @jar.save
-        code.jar_id = @jar.jar_id.to_s
+        old_jar.destroy if old_jar
+        code.jar_id = "%03i" % @jar.jar_id
         code.save
         redirect_to controller: 'heda', action: 'run', cmd: 'done'
       else

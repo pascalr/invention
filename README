@@ -1,3 +1,96 @@
+Pour la caméra:
+
+https://borislavkostov.wordpress.com/articles/macro-photography-eng/focal-length-focusing-distance-working-distance/
+
+PS3eye: http://www.zhopper.narod.ru/mobile/ov7720_ov7221_full.pdf
+
+Focus distance (u): 120 mm # (NB. inclut le focus length)
+Working distance : u - f # distance de la lentille au sujet
+Horizontal field of view: 150 mm
+Aperture (N): F/ # je veux le plus grand aperture possible pour avoir le plus grand DOF possible. Quel est le tradeoff???
+Depth of field: 2*u^2*N*c/f^2
+Focal length (f): # Plus petit possible pour plus grand DOF possible. Relié angle of view. Quel est le tradeoff???
+Angle of view (alpha): # Plus grand possible pour plus grand DOF possible. Relié focal length. Quel est le tradeoff???
+circle of confusion: # ???
+Lens size: # 1/4" ??? 1/2.33" ???
+Minimum focus distance (MFD): 
+
+https://www.edmundoptics.com/knowledge-center/application-notes/imaging/understanding-focal-length-and-field-of-view/
+
+Note: Fixed Focal Length Lenses should not be confused with Fixed Focus Lenses. Fixed Focal Length Lenses have the ability to be focused for different distances; Fixed Focus Lenses are intended for use at a single, specific working distance. Examples of Fixed Focus Lenses are many Telecentric Lenses and Microscope Objectives.
+
+Je dois avoir une field of view horizontal de 150 mm pour bien voir sur les côtés. (La largeur du bras est 6" = 150mm)
+
+Les petits pots mesurent à peu près 100mm. Je dois avec une clearance de mettons 120 mm au dessus pour pouvoir déplacer les pots
+par dessus les autres.
+
+Les plus grand pots possible à mettre seront des grands pots 1 gallon, 6" de diamètre et 10" de haut. C'est 254mm de haut.
+
+Il y a une différence de 150mm entre les petits pots et les grand pots.
+
+While it may often be convenient to have a very wide angular field of view, there are some negatives to consider. First, the level of distortion that is associated with some short focal length lenses can greatly influence the actual AFOV and can cause variations in the angle with respect to Working Distance (WD) due to the varying magnitude of the distortion. Next, short focal length lenses generally struggle to obtain the highest level of performance when compared against longer focal length options (see Best Practice #3). Additionally, short focal length lenses can have difficulties covering medium to large sensor sizes which can limit their usability, as discussed in Sensor Relative Illumination, Roll Off and Vignetting.
+
+mm: description
+0: tablette
+100: petit pot
+220: détection petit pot
+250: grand pot
+370: détection grand pot
+370: détection de tous les pots sur la surface de travail
+
+Good c'est parfaitement ce que je fais présentement.
+
+120 distance, 150 largeur de capture, 1/4":
+
+https://www.arducam.com/focal-length-calculator/
+
+The Horizontal Field of View is
+64 degrees
+
+The Focal Length needed for this sensor (3.6mm width) is
+2.88 mm
+
+120 distance, 150 largeur de capture, 1/2.3":
+
+The Horizontal Field of View is
+64 degrees
+
+The Focal Length needed for this sensor (6.3mm width) is
+5.04 mm
+
+For a lens projecting a rectilinear image (focused at infinity, see derivation), the angle of view (α) can be calculated from the chosen dimension (d), and effective focal length (f) as follows:[4]
+
+        α = 2 arctan ⁡ d 2 f {\displaystyle \alpha =2\arctan {\frac {d}{2f}}} \alpha =2\arctan {\frac {d}{2f}}
+
+d {\displaystyle d} d represents the size of the film (or sensor) in the direction measured (see below: sensor effects). For example, for 35 mm film which is 36 mm wide and 24 mm high, d = 36 {\displaystyle d=36} d=36 mm would be used to obtain the horizontal angle of view and d = 24 {\displaystyle d=24} d=24 mm for the vertical angle. 
+
+Donc pas besoin du point focal. Dans le fond j'ai seulement besoin de l'angle de détection???
+
+Maintenant il me faut le depth of field par contre.
+
+The depth of field can be determined by focal length, distance to subject, the acceptable circle of confusion size, and aperture.[2] The approximate depth of field can be given by:
+
+    DOF ≈ 2 u 2 N c f 2 {\displaystyle {\text{DOF}}\approx {\frac {2u^{2}Nc}{f^{2}}}} {\displaystyle {\text{DOF}}\approx {\frac {2u^{2}Nc}{f^{2}}}}
+
+for a given circle of confusion (c), focal length (f), f-number (N), and distance to subject (u).[3][4] 
+
+https://en.wikipedia.org/wiki/Depth_of_field
+Donc pour avoir le plus grand DOF, on veut le plus petit focal point.
+Plus l'angle est grand, plus le point focal est petit.
+Donc on veut le plus grand angle possible.
+
+Quel est le focus distance par contre???
+
+So focal length does not actually influence DoF if you adjust the camera-subject distance so that the magnification of your subject is the same.
+
+f/.... c'est l'aperture size: https://photographylife.com/what-is-depth-of-field voir l'image dans la section apterure
+
+Je veux un grand F (apterture) pour avoir un grand DOF (depth of field)
+
+Camera-Subject Distance
+
+Another important factor affecting depth of field is the distance between the camera and the subject. The shorter that distance, the smaller the depth of field.
+
 La tablette du bas a les pots les plus haut et les plus gros. Il n'y a rien derrière pour les bloquer.
 Mettre la boite eletrique au même niveau donc il ne peuvent pas tomber derrière.
 

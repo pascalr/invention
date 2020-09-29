@@ -183,6 +183,15 @@ class Database {
     }*/
 
     template<class T> 
+    void deleteFrom(std::string optional) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+    
+      stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << optional;
+      log("DB DELETE", ss.str());
+      db.exec(ss.str());
+    }
+
+    template<class T> 
     void removeItem(Table<T>& table, int id) {
       std::lock_guard<std::mutex> guard(dbMutex);
     

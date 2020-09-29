@@ -1,0 +1,53 @@
+The first rule of the Heda clus is: Don't refactor unless you have a really really good reason to do so.
+
+Code can always be improved. But you have to be careful to not get stuck into an endless improvement loop.
+So never refactor existing code unless you have a really really good reason to do so.
+It is easy to see in what way a method is better than another one, but it is hard to see in what way it is worse.
+There are always tradeoff. At least you know what is wrong with what you already have.
+
+The second rule of the Heda clus is: Never refactor unless you have a really really really good reason to do so.
+
+3rd rule: Polymorphism baaaaaaaad, templates gooooooood
+
+I don't like object-oriented design in c++. First you cannot have a virtual template fonction. And I love
+templates, so I don't like virtual anymore.
+
+Virtual can bring bugs. To define an interface it's ok. virtual = 0. Perfect.
+
+But then a template does the same thing. If it works it works. If it quacks like a duck, it is a duck.
+No need to define an interface. The compiler will tell you which methods are missing.
+
+But if you write code that you want to run in the parent. What do you do?
+Make virtual and child must call the parent function => error prone.
+Create another function which is virtual = 0 which the parent calls => ugly and now you have 2 functions when you look at an object, which one do you call? Confusing...
+
+I want to write functions. Not methods. Be more of a functional programming language.
+
+Putting some methods in classes is good for putting some logic. I see it like a Model in ruby on rails.
+You can add logic to getters and setters.
+
+4th rule: Follow naming conventions
+Naming:
+
+Those have been chosen arbitrarly, but they must be respected in order to be consistent.
+
+Filenames:
+All lowercases. Underscore instead of spaces.
+this_is_a_filename.something
+
+Classes:
+ThisIsAClassName
+
+Functions:
+thisIsAFunctionName()
+
+Member variables:
+this_is_a_member_variable
+
+Local variables:
+thisIsALocalVariable
+
+5th rule: Simple first
+
+No getters and setters first. Every member variable is public. If you later need to add some logic, make
+the variable protected or private and add a getter and setter.

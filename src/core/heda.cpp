@@ -372,7 +372,7 @@ void SweepCommand::setup(Heda& heda) {
       double x = (i*1.0*xDiff/nStepX)+xMin;
       double z = (j*1.0*zDiff/nStepZ)+zMin;
 
-      if (!xUp) {x = xMax - x;}
+      if (!xUp) {x = xMax + xMin - x;}
 
       UserCoord c(x, heda.config.detect_height, z);
       commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(c,heda.config.gripper_radius)));
@@ -623,7 +623,9 @@ void PinpointCommand::start(Heda& heda) {
 }
 
 Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
-    
+ 
+  heda.db.deleteFrom<Location>("WHERE jar_id IS NULL");  
+
   JarFormatTable formats; heda.db.load(formats);
   JarFormat format;
   ensure(formats.get(format, jar.jar_format_id), "Existing jar must refer to an existing jar format");

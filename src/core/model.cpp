@@ -52,6 +52,7 @@ void parseItem(SQLite::Statement& query, Jar& jar) {
 
 template <> string getTableName<DetectedHRCode>() { return "detected_codes"; }
 template <> string getTableName<Jar>() { return "jars"; }
+template <> string getTableName<Location>() { return "locations"; }
 //string getTableName(DetectedHRCode* code) { return "detected_codes"; }
 //string getTableName(Jar* i) { return "jars"; }
 

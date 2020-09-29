@@ -144,6 +144,15 @@ class HedaController {
         heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
       };
 
+      m_commands["store"] = [&](ParseResult tokens) {
+        heda.pushCommand(make_shared<SweepCommand>());
+
+        vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>("ORDER BY lid_y DESC");
+        for (DetectedHRCode& code : codes) {
+          heda.pushCommand(make_shared<StoreDetectedCommand>(code));
+        }
+        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
+      };
       //m_commands["store"] = [&](ParseResult tokens) {
       //  string name = "";
       //  try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional.*/}
