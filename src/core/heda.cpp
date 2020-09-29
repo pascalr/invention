@@ -668,6 +668,8 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
           loc.diameter = widthNeeded;
           loc.shelf_id = shelf.id;
           loc.jar_format_id = format.id;
+          loc.jar_id = jar.id;
+          loc.occupied = false;
           heda.db.insert(locations, loc);
           return loc;
         }
@@ -706,6 +708,9 @@ void StoreDetectedCommand::setup(Heda& heda) {
     commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
     commands.push_back(make_shared<LowerForGripCommand>(jar));
     commands.push_back(make_shared<GripCommand>(jar));
+    commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+      loc.occupied = true;
+    }
     commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
     commands.push_back(make_shared<PutdownCommand>());
   }));
