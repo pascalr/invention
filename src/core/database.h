@@ -79,8 +79,8 @@ class Database {
 
       std::vector<T> result;
 
-      SQLite::Statement query(db, queryStr.str());
       log("DB LOAD", queryStr.str());
+      SQLite::Statement query(db, queryStr.str());
       while (query.executeStep()) {
         T item; parseItem(query, item);
         item.id = query.getColumn(0);
@@ -100,8 +100,29 @@ class Database {
       //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
       queryStr << " " << optional;
 
-      SQLite::Statement query(db, queryStr.str());
       log("DB LOAD", queryStr.str());
+      SQLite::Statement query(db, queryStr.str());
+      if (query.executeStep()) {
+        T item; parseItem(query, item);
+        item.id = query.getColumn(0);
+        return item;
+      }
+      T item;
+      return item;
+    }
+
+    // Optional used for like ORDER BY
+    // It is added at the end of the query
+    template<class T> 
+    T findBy(std::string columnName, std::string value, std::string optional = "") {
+
+      // TODO: Don't repeat everything here, send a const char* to the other findBy
+      std::lock_guard<std::mutex> guard(dbMutex);
+      
+      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = \"" << value << "\" " << optional << " LIMIT 1";
+
+      log("DB LOAD", queryStr.str());
+      SQLite::Statement query(db, queryStr.str());
       if (query.executeStep()) {
         T item; parseItem(query, item);
         item.id = query.getColumn(0);
@@ -118,12 +139,10 @@ class Database {
 
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << value << " LIMIT 1";
-      //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
-      queryStr << " " << optional;
+      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = \"" << value << " " << optional << "\" LIMIT 1";
 
-      SQLite::Statement query(db, queryStr.str());
       log("DB LOAD", queryStr.str());
+      SQLite::Statement query(db, queryStr.str());
       if (query.executeStep()) {
         T item; parseItem(query, item);
         item.id = query.getColumn(0);

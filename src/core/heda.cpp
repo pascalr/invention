@@ -558,6 +558,7 @@ void FetchCommand::setup(Heda& heda) {
   }));
   commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
   commands.push_back(make_shared<PutdownCommand>());
+  commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
 }
 
 //void PickupCommand::setup(Heda& heda) {

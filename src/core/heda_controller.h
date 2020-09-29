@@ -209,7 +209,7 @@ class HedaController {
 
         string ingredientName = tokens.popNoun();
 
-        Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName);
+        Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName, "COLLATE NOCASE");
         ensure(ingredient.exists(), "Could not find an ingredient with the name " + ingredientName);
 
         Jar jar = heda.db.findBy<Jar>("ingredient_id", ingredient.id);

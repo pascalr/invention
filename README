@@ -26,7 +26,7 @@ PS3eye: http://www.zhopper.narod.ru/mobile/ov7720_ov7221_full.pdf
 Focus distance (u): 120 mm # (NB. inclut le focus length)
 Working distance : u - f # distance de la lentille au sujet
 Horizontal field of view: 150 mm
-Aperture (N): F/ # je veux le plus grand aperture possible pour avoir le plus grand DOF possible. Quel est le tradeoff???
+Aperture (N): F/16 # je veux un petit apperture pour avoir le plus grand DOF possible. Tradeoff par contre est l'image devient plus sombre. F/16 est plus petit que F/2
 Depth of field: 2*u^2*N*c/f^2
 Focal length (f): # Plus petit possible pour plus grand DOF possible. Relié angle of view. Quel est le tradeoff???
 Angle of view (alpha): # Plus grand possible pour plus grand DOF possible. Relié focal length. Quel est le tradeoff???
