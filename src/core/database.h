@@ -118,7 +118,7 @@ class Database {
 
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << "\" LIMIT 1";
+      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << " LIMIT 1";
 
       log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
