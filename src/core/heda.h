@@ -324,7 +324,7 @@ class Heda {
     }
 
     void loadConfig() {
-      db.load(configs);
+      vector<HedaConfig> configs = db.all<HedaConfig>();
       if (configs.empty()) {throw MissingConfigException();}
       config = *configs.begin();
     }
@@ -531,7 +531,6 @@ class Heda {
     PolarCoord m_position;
 
     DetectedHRCodeTable codes;
-    HedaConfigTable configs;
     ShelfTable shelves;
     JarFormatTable jar_formats;
     JarTable jars;

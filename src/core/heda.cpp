@@ -286,7 +286,7 @@ void Heda::calibrate(JarFormat& format) {
 
   double cameraDistance = unitY(getPosition().v) - format.height - working_shelf.height;
   config.camera_focal_point = detected[0].scale * cameraDistance;
-  db.update(configs, config);
+  db.update(config);
 }
 
 void parseCode(Heda& heda, DetectedHRCode& code) {

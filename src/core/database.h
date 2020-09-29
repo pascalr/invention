@@ -210,6 +210,32 @@ class Database {
     // TODO: Add a table: __updates to handle this with table_name:string, to_remove_id:int, to_add_id:int, so no record is lost
     // in the odd chance that the system crashes between a add item and a removeItem.
     template<class T> 
+    void update(T& item) {
+      std::lock_guard<std::mutex> guard(dbMutex);
+   
+      SQLite::Statement infoQuery(db, "SELECT 0 FROM " + getTableName<T>() + " WHERE 0");
+
+      std::string updateQuery = "UPDATE " + getTableName<T>() + " SET ";
+      for (int i = 1; i < infoQuery.getColumnCount(); i++) {
+        updateQuery += infoQuery.getColumnName(i); updateQuery += " = ?";
+        if (i != infoQuery.getColumnCount() - 1) {
+          updateQuery += ", ";
+        }
+      }
+      updateQuery += " WHERE id = ?";
+      
+      log("DB UPDATE", updateQuery); // TODO: I can log better than that, find a way to get values by indices
+
+      SQLite::Statement query(db, updateQuery);
+      bindQuery(query, item);
+      query.bind(infoQuery.getColumnCount(), item.id);
+      query.exec();
+    }
+
+    // I want to use the same format, so I am not using UPDATE query.
+    // TODO: Add a table: __updates to handle this with table_name:string, to_remove_id:int, to_add_id:int, so no record is lost
+    // in the odd chance that the system crashes between a add item and a removeItem.
+    template<class T> 
     void update(Table<T>& table, T& item) {
       std::lock_guard<std::mutex> guard(dbMutex);
    

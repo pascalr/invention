@@ -194,62 +194,6 @@ class HedaConfig : public Model {
 void parseItem(SQLite::Statement& query, HedaConfig& c);
 void bindQuery(SQLite::Statement& query, const HedaConfig& item);
 
-class HedaConfigTable : public Table<HedaConfig> {
-  public:
-    const char* TABLE_NAME = "hedas";
-    string getTableName() { return TABLE_NAME; };
-
-    HedaConfig parseItem(SQLite::Statement& query) {
-      HedaConfig c;
-      c.working_shelf_id = query.getColumn(1);
-      c.created_at = query.getColumn(2);
-      c.updated_at = query.getColumn(3);
-      c.user_coord_offset_x = query.getColumn(4);
-      c.user_coord_offset_y = query.getColumn(5);
-      c.user_coord_offset_z = query.getColumn(6);
-      c.camera_radius = query.getColumn(7);
-      c.gripper_radius = query.getColumn(8);
-      c.camera_focal_point = query.getColumn(9);
-      c.detect_height = query.getColumn(10);
-      c.home_position_x = query.getColumn(11);
-      c.home_position_y = query.getColumn(12);
-      c.home_position_t = query.getColumn(13);
-      c.grip_offset = query.getColumn(14);
-      c.max_h = query.getColumn(15);
-      c.max_v = query.getColumn(16);
-      c.max_t = query.getColumn(17);
-      c.closeup_distance = query.getColumn(18);
-      c.max_x = query.getColumn(19);
-      c.max_y = query.getColumn(20);
-      c.max_z = query.getColumn(21);
-      return c;
-    }
-
-    void bindQuery(SQLite::Statement& query, const HedaConfig& item) {
-      query.bind(1, item.working_shelf_id);
-      query.bind(2, item.created_at);
-      query.bind(3, item.updated_at);
-      query.bind(4, item.user_coord_offset_x);
-      query.bind(5, item.user_coord_offset_y);
-      query.bind(6, item.user_coord_offset_z);
-      query.bind(7, item.camera_radius);
-      query.bind(8, item.gripper_radius);
-      query.bind(9, item.camera_focal_point);
-      query.bind(10, item.detect_height);
-      query.bind(11, item.home_position_x);
-      query.bind(12, item.home_position_y);
-      query.bind(13, item.home_position_t);
-      query.bind(14, item.grip_offset);
-      query.bind(15, item.max_h);
-      query.bind(16, item.max_v);
-      query.bind(17, item.max_t);
-      query.bind(18, item.closeup_distance);
-      query.bind(19, item.max_x);
-      query.bind(20, item.max_y);
-      query.bind(21, item.max_z);
-    }
-};
-
 class Location : public Model {
   public:
     Location() {}
