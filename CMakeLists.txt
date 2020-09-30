@@ -55,6 +55,7 @@ ADD_LIBRARY(MyLibsModule
   src/utils/io_common.cpp
   src/utils/utils.cpp
   src/core/program.cpp
+  src/core/pinpoint.cpp
   src/core/model.cpp
   src/core/database.cpp
   src/core/fake_program.cpp

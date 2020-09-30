@@ -51,79 +51,73 @@ void UserAction::doneCallback(Heda& heda) {
   heda.user_response = "";
 }
 
-void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
+//void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
+//
+//  cout << "Running detect code." << endl;
+//  HRCodeParser parser(0.2, 0.2);
+//  vector<HRCode> positions;
+//  parser.findHRCodes(frame, positions, 100);
+//
+//  if (!positions.empty()) {
+//    for (auto it = positions.begin(); it != positions.end(); ++it) {
+//      cout << "Detected one HRCode!!!" << endl;
+//      DetectedHRCode d(*it, c);
+//      detected.push_back(d);
+//    }
+//    return;
+//  }
+//  cout << "No codes were detected..." << endl;
+//}
 
-  cout << "Running detect code." << endl;
-  HRCodeParser parser(0.2, 0.2);
-  vector<HRCode> positions;
-  parser.findHRCodes(frame, positions, 100);
-
-  if (!positions.empty()) {
-    for (auto it = positions.begin(); it != positions.end(); ++it) {
-      cout << "Detected one HRCode!!!" << endl;
-      DetectedHRCode d(*it, c);
-      detected.push_back(d);
-    }
-    return;
-  }
-  cout << "No codes were detected..." << endl;
-}
-
-double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
-  Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;
-  Vector2f lid2; lid2 << c2.lid_coord.x, c2.lid_coord.z;
-  return (lid1 - lid2).squaredNorm();
-}
-
-class Cluster {
-  public:
-    int idxKept;
-    vector<int> indicesRemoved;
-};
+//double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
+//  Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;
+//  Vector2f lid2; lid2 << c2.lid_coord.x, c2.lid_coord.z;
+//  return (lid1 - lid2).squaredNorm();
+//}
 
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
-void removeNearDuplicates(Heda& heda) {
-
-  double epsilon = pow(HRCODE_OUTER_DIA * 1.5, 2);
-  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
-  vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>();
-  vector<int> ids;
-  vector<Cluster> clusters;
-  for (unsigned int i = 0; i < codes.size(); i++) {
-
-    DetectedHRCode& code = codes[i];
-    // An item can only belong to one cluster. So discard if already belongs to one.
-    if (count(ids.begin(), ids.end(), code.id) > 0) continue;
-
-    Cluster cluster;
-    cluster.idxKept = i;
-    for (unsigned int j = i+1; j < codes.size(); j++) {
-      DetectedHRCode& other = codes[j];
-      if (detectedDistanceSquared(code, other) < epsilon) {
-        ids.push_back(other.id);
-        cluster.indicesRemoved.push_back(j);
-      }
-    }
-    clusters.push_back(cluster);
-  }
-  for (Cluster& cluster : clusters) {
-
-    double sumX = codes[cluster.idxKept].lid_coord.x;
-    double sumZ = codes[cluster.idxKept].lid_coord.z;
-    for (int &idx : cluster.indicesRemoved) {
-      sumX += codes[idx].lid_coord.x;
-      sumZ += codes[idx].lid_coord.z;
-    }
-    DetectedHRCode& code = codes[cluster.idxKept];
-    code.lid_coord.x = sumX / (cluster.indicesRemoved.size() + 1);
-    code.lid_coord.z = sumZ / (cluster.indicesRemoved.size() + 1);
-    heda.db.update(code);
-  }
-
-  for (int &id : ids) {
-    heda.db.deleteFrom<DetectedHRCode>("WHERE id = " + to_string(id));
-  }
-}
+//void removeNearDuplicates(Heda& heda) {
+//
+//  double epsilon = pow(HRCODE_OUTER_DIA * 1.5, 2);
+//  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
+//  vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>();
+//  vector<int> ids;
+//  vector<Cluster> clusters;
+//  for (unsigned int i = 0; i < codes.size(); i++) {
+//
+//    DetectedHRCode& code = codes[i];
+//    // An item can only belong to one cluster. So discard if already belongs to one.
+//    if (count(ids.begin(), ids.end(), code.id) > 0) continue;
+//
+//    Cluster cluster;
+//    cluster.idxKept = i;
+//    for (unsigned int j = i+1; j < codes.size(); j++) {
+//      DetectedHRCode& other = codes[j];
+//      if (detectedDistanceSquared(code, other) < epsilon) {
+//        ids.push_back(other.id);
+//        cluster.indicesRemoved.push_back(j);
+//      }
+//    }
+//    clusters.push_back(cluster);
+//  }
+//  for (Cluster& cluster : clusters) {
+//
+//    double sumX = codes[cluster.idxKept].lid_coord.x;
+//    double sumZ = codes[cluster.idxKept].lid_coord.z;
+//    for (int &idx : cluster.indicesRemoved) {
+//      sumX += codes[idx].lid_coord.x;
+//      sumZ += codes[idx].lid_coord.z;
+//    }
+//    DetectedHRCode& code = codes[cluster.idxKept];
+//    code.lid_coord.x = sumX / (cluster.indicesRemoved.size() + 1);
+//    code.lid_coord.z = sumZ / (cluster.indicesRemoved.size() + 1);
+//    heda.db.update(code);
+//  }
+//
+//  for (int &id : ids) {
+//    heda.db.deleteFrom<DetectedHRCode>("WHERE id = " + to_string(id));
+//  }
+//}
 //void removeNearDuplicates(Heda& heda) {
 //  double epsilon = pow(HRCODE_OUTER_DIA*0.8, 2);
 //  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
@@ -190,7 +184,7 @@ void CloseupCommand::setup(Heda& heda) {
       Mat frame;
       heda.captureFrame(frame);
       vector<DetectedHRCode> allDetected;
-      detectCodes(heda, allDetected, frame, heda.getPosition());
+      //detectCodes(heda, allDetected, frame, heda.getPosition());
 
       if (allDetected.size() < 1) {errorMsg = "There must be a detected code in a closup."; continue;}
       if (allDetected.size() > 1) {errorMsg = "There must be only one detected code in a closup."; continue;}
@@ -295,7 +289,7 @@ void Heda::calibrate(JarFormat& format) {
   Mat frame;
   captureFrame(frame);
   vector<DetectedHRCode> detected;
-  detectCodes(*this, detected, frame, getPosition());
+  //detectCodes(*this, detected, frame, getPosition());
  
   if (detected.size() < 1) {throw MissingHRCodeException();}
   if (detected.size() > 1) {throw TooManyHRCodeException();}
@@ -404,9 +398,9 @@ void SweepCommand::setup(Heda& heda) {
   commands.push_back(make_shared<PinpointCommand>());
   commands.push_back(make_shared<ParseCodesCommand>());
   commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
-  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-    removeNearDuplicates(heda);
-  }));
+  //commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+  //  removeNearDuplicates(heda);
+  //}));
 }
 
 // Get lower, either to pickup, or to putdown
@@ -449,17 +443,17 @@ void PutdownCommand::setup(Heda& heda) {
   }
 }
 
-void validateGoto(Heda& heda, PolarCoord c) {
-  ensure(c.h >= heda.config.minH(), "The goto destination h must be higher than the minimum.");
-  ensure(c.v >= heda.config.minV(), "The goto destination v must be higher than the minimum.");
-  ensure(c.t >= heda.config.minT(), "The goto destination t must be higher than the minimum.");
-}
+//void validateGoto(Heda& heda, PolarCoord c) {
+//  ensure(c.h >= heda.config.minH(), "The goto destination h must be higher than the minimum.");
+//  ensure(c.v >= heda.config.minV(), "The goto destination v must be higher than the minimum.");
+//  ensure(c.t >= heda.config.minT(), "The goto destination t must be higher than the minimum.");
+//}
 
 void GotoCommand::setup(Heda& heda) {
 
   auto h4 = Header4("GOTO");
 
-  validateGoto(heda, destination);
+  //validateGoto(heda, destination);
 
   PolarCoord position = heda.getPosition();
 
@@ -763,7 +757,7 @@ void DetectCommand::start(Heda& heda) {
   Mat frame;
   heda.captureFrame(frame);
   vector<DetectedHRCode> detected;
-  detectCodes(heda, detected, frame, heda.getPosition());
+  //detectCodes(heda, detected, frame, heda.getPosition());
   for (DetectedHRCode& it : detected) {
     heda.db.insert(it);
   }

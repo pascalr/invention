@@ -1,15 +1,19 @@
 #ifndef _HEDA_CONTROLLER_H
 #define _HEDA_CONTROLLER_H
 
+#include "pinpoint.h"
 #include "heda.h"
 #include <thread>
 #include <chrono>
+#include <iostream>
+
+using namespace std;
 
 class UnitConversionException : public exception {};
 
 //namespace Heda {
 
-void writeSlave(Heda& heda, std::string& cmd) {
+void writeSlave(Heda& heda, std::string cmd) {
   heda.m_writer << cmd;
   
   // Loops until the message MESSAGE_DONE has been received.
@@ -25,6 +29,33 @@ void writeSlave(Heda& heda, std::string& cmd) {
       
     this_thread::sleep_for(chrono::milliseconds(10));
   }
+}
+
+void openGrip(Heda& heda) {
+
+  auto h5 = Header5("OPEN GRIP"); 
+
+  writeSlave(heda, "r");
+
+  heda.is_gripping = false;
+}
+
+void reference(Heda& heda, Axis& axis) {
+
+  std::string cmd = "h" + string(1, axis.id);
+  auto h5 = Header5("HOME("+cmd+")"); 
+
+  writeSlave(heda, cmd);
+
+  if (axis.id == AXIS_H) {
+    heda.m_position.h = REFERENCE_POSITION_H;
+  } else if (axis.id == AXIS_V) {
+    heda.m_position.v = REFERENCE_POSITION_V;
+  } else if (axis.id == AXIS_T) {
+    heda.m_position.t = REFERENCE_POSITION_T;
+  //} else if (axis.id == AXIS_R) {
+  }
+  axis.is_referenced = true;
 }
 
 void move(Heda& heda, Axis& axis, double destination) {
@@ -43,6 +74,215 @@ void move(Heda& heda, Axis& axis, double destination) {
   //} else if (axis.id == AXIS_R) {
   }
 }
+
+void validateGoto(Heda& heda, PolarCoord c) {
+  ensure(c.h >= heda.config.minH(), "The goto destination h must be higher than the minimum.");
+  ensure(c.v >= heda.config.minV(), "The goto destination v must be higher than the minimum.");
+  ensure(c.t >= heda.config.minT(), "The goto destination t must be higher than the minimum.");
+}
+
+void gotoPolar(Heda& heda, PolarCoord destination) {
+
+  std::string cmd = to_string(destination.h) + " " + to_string(destination.v) + " " + to_string(destination.t);
+  auto h4 = Header4("GOTO("+cmd+")");
+
+  validateGoto(heda, destination);
+
+  PolarCoord position = heda.getPosition();
+
+  Shelf currentShelf; heda.shelfByHeight(currentShelf, heda.unitY(position.v));
+  Shelf destinationShelf; heda.shelfByHeight(destinationShelf, heda.unitY(destination.v));
+    
+  double positionT = position.t;
+
+  // must change level
+  if (currentShelf.id != destinationShelf.id) {
+
+    move(heda, heda.axisV, heda.unitV(currentShelf.moving_height));
+
+    positionT = (position.h < heda.config.middleH()) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    move(heda, heda.axisT, positionT);
+  }
+
+  move(heda, heda.axisV, destination.v);
+
+  // If moving theta would colide, move x first
+  double deltaH = cosd(destination.t) * heda.config.gripper_radius;
+  double hIfTurnsFirst = position.h - deltaH;
+
+  cout << "position.h: " << position.h << endl;
+  cout << "deltaH: " << deltaH << endl;
+  cout << "hIfTurnsFirst: " << hIfTurnsFirst << endl;
+  cout << "destination.h: " << destination.h << endl;
+  cout << "positionT: " << positionT << endl;
+
+  if (hIfTurnsFirst < 0.0 || hIfTurnsFirst > heda.config.max_h) {
+
+    // To avoid collision, if the arm goes over the middle, go to the middle before moving
+    if ((positionT < 90.0 && destination.t > 90.0) || (positionT > 90.0 && destination.t < 90.0)) {
+      move(heda, heda.axisT, 90.0);
+    }
+
+    move(heda, heda.axisH, destination.h);
+    move(heda, heda.axisT, destination.t);
+  } else {
+    move(heda, heda.axisT, destination.t);
+    move(heda, heda.axisH, destination.h);
+  }
+}
+
+void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
+
+  cout << "Running detect code." << endl;
+  HRCodeParser parser(0.2, 0.2);
+  vector<HRCode> positions;
+  parser.findHRCodes(frame, positions, 100);
+
+  if (!positions.empty()) {
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
+      cout << "Detected one HRCode!!!" << endl;
+      DetectedHRCode d(*it, c);
+      detected.push_back(d);
+    }
+    return;
+  }
+  cout << "No codes were detected..." << endl;
+}
+
+void detect(Heda& heda) {
+  
+  auto h5 = Header5("DETECT");
+
+  Mat frame;
+  heda.captureFrame(frame);
+  vector<DetectedHRCode> detected;
+  detectCodes(heda, detected, frame, heda.getPosition());
+  for (DetectedHRCode& it : detected) {
+    heda.db.insert(it);
+  }
+}
+
+void pinpoint(Heda& heda) {
+  
+  auto h2 = Header2("PINPOINT");
+
+  for (DetectedHRCode& code : heda.db.all<DetectedHRCode>()) {
+    pinpointCode(heda, code);
+    heda.db.update(code);
+  }
+}
+
+void parse(Heda& heda) {
+  
+  auto h2 = Header2("PARSE");
+
+  for (DetectedHRCode& code : heda.db.all<DetectedHRCode>()) {
+    parseCode(heda, code);
+    heda.db.update(code);
+  }
+}
+
+class Cluster {
+  public:
+    int idxKept;
+    vector<int> indicesRemoved;
+};
+
+double distanceSquare(const UserCoord& c1, const UserCoord& c2) {
+  return (c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) + (c1.z-c2.z)*(c1.z-c2.z); 
+}
+
+double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
+  Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;
+  Vector2f lid2; lid2 << c2.lid_coord.x, c2.lid_coord.z;
+  return (lid1 - lid2).squaredNorm();
+}
+
+// Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
+void removeNearDuplicates(Heda& heda) {
+
+  double epsilon = pow(HRCODE_OUTER_DIA * 1.5, 2);
+  //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
+  vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>();
+  vector<int> ids;
+  vector<Cluster> clusters;
+  for (unsigned int i = 0; i < codes.size(); i++) {
+
+    DetectedHRCode& code = codes[i];
+    // An item can only belong to one cluster. So discard if already belongs to one.
+    if (count(ids.begin(), ids.end(), code.id) > 0) continue;
+
+    Cluster cluster;
+    cluster.idxKept = i;
+    for (unsigned int j = i+1; j < codes.size(); j++) {
+      DetectedHRCode& other = codes[j];
+      if (detectedDistanceSquared(code, other) < epsilon) {
+        ids.push_back(other.id);
+        cluster.indicesRemoved.push_back(j);
+      }
+    }
+    clusters.push_back(cluster);
+  }
+  for (Cluster& cluster : clusters) {
+
+    double sumX = codes[cluster.idxKept].lid_coord.x;
+    double sumZ = codes[cluster.idxKept].lid_coord.z;
+    for (int &idx : cluster.indicesRemoved) {
+      sumX += codes[idx].lid_coord.x;
+      sumZ += codes[idx].lid_coord.z;
+    }
+    DetectedHRCode& code = codes[cluster.idxKept];
+    code.lid_coord.x = sumX / (cluster.indicesRemoved.size() + 1);
+    code.lid_coord.z = sumZ / (cluster.indicesRemoved.size() + 1);
+    heda.db.update(code);
+  }
+
+  for (int &id : ids) {
+    heda.db.deleteFrom<DetectedHRCode>("WHERE id = " + to_string(id));
+  }
+}
+
+void sweep(Heda& heda) {
+
+  auto h2 = Header2("SWEEP");
+
+  heda.db.clear<DetectedHRCode>();
+  
+  PolarCoord max(heda.config.max_h, heda.config.max_v, 90.0);
+
+  int nStepX = 10;
+  int nStepZ = 4;
+
+  double xMin = heda.unitX(heda.config.minH(), 0.0, 0.0);
+  double xMax = heda.unitX(heda.config.max_h, 0.0, 0.0);
+  double xDiff = xMax - xMin;
+
+  double zMin = heda.unitZ(90.0, heda.config.gripper_radius);
+  double zMax = heda.working_shelf.depth;
+  double zDiff = zMax - zMin;
+ 
+  bool xUp = true;
+  for (int j = 0; j <= nStepZ; j++) {
+    for (int i = 0; i <= nStepX; i++) {
+
+      double x = (i*1.0*xDiff/nStepX)+xMin;
+      double z = (j*1.0*zDiff/nStepZ)+zMin;
+
+      if (!xUp) {x = xMax + xMin - x;}
+
+      UserCoord c(x, heda.config.detect_height, z);
+      gotoPolar(heda, heda.toPolarCoord(c,heda.config.gripper_radius));
+      detect(heda);
+    }
+    xUp = !xUp;
+  }
+
+  pinpoint(heda);
+  parse(heda);
+  gotoPolar(heda, PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t));
+  removeNearDuplicates(heda);
+}
+
 
 //// Heda controller stack command
 //class StackCommand {
@@ -92,6 +332,20 @@ class HedaController {
         ensure(axis != 0, "ref command expects a valid axis name");
         move(heda, *axis, dest);
       };
+      
+      m_commands["home"] = [&](ParseResult tokens) {
+        reference(heda, heda.axisR);
+        reference(heda, heda.axisT);
+        reference(heda, heda.axisH);
+        move(heda, heda.axisT, CHANGE_LEVEL_ANGLE_HIGH);
+        reference(heda, heda.axisV);
+        gotoPolar(heda, PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t));
+        openGrip(heda);
+      };
+      
+      m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);};
+
+      // ----------------------------------------------------------
 
       // at throws a out of range exception 
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
@@ -182,15 +436,6 @@ class HedaController {
         heda.pushCommand(make_shared<ReferencingCommand>(*axis));
       };
 
-      m_commands["home"] = [&](ParseResult tokens) {
-        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisR));
-        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisT));
-        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisH));
-        heda.pushCommand(make_shared<MoveCommand>(heda.axisT, CHANGE_LEVEL_ANGLE_HIGH));
-        heda.pushCommand(make_shared<ReferencingCommand>(heda.axisV));
-        heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
-        heda.pushCommand(make_shared<OpenGripCommand>());
-      };
 
       m_commands["gohome"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
@@ -233,9 +478,6 @@ class HedaController {
       //  } // TODO Handle error
       //  cout << "Oups. No jar were found with this id." << endl;
       //};
-      m_commands["sweep"] = [&](ParseResult tokens) {
-        heda.pushCommand(make_shared<SweepCommand>());
-      };
       m_commands["loadcfg"] = [&](ParseResult tokens) {
         heda.loadConfig();
       };

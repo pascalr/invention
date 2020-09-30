@@ -35,9 +35,9 @@ Y: Y0 est la tablette la plus basse.
 Z: Z0 est à partir du devant.
 */
 
-double distanceSquare(const UserCoord& c1, const UserCoord& c2) {
-  return (c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) + (c1.z-c2.z)*(c1.z-c2.z); 
-}
+//double distanceSquare(const UserCoord& c1, const UserCoord& c2) {
+//  return (c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) + (c1.z-c2.z)*(c1.z-c2.z); 
+//}
 
 //string Movement::str() const {
 //  stringstream ss; ss << "m" << axis << destination;
