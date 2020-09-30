@@ -13,6 +13,26 @@ class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 
+void header1(std::string content) {
+  std::cout << "\033[38;5;215m***** " << content << " *****\033[0m" << std::endl;
+}
+
+void header2(std::string content) {
+  std::cout << "\033[38;5;215m**** " << content << " ***\033[0m" << std::endl;
+}
+
+void header3(std::string content) {
+  std::cout << "\033[38;5;215m--- " << content << " ---\033[0m" << std::endl;
+}
+
+void header4(std::string content) {
+  std::cout << "\033[38;5;215m- " << content << " -\033[0m" << std::endl;
+}
+
+void header5(std::string content) {
+  std::cout << "\033[38;5;215m " << content << " \033[0m" << std::endl;
+}
+
 void TestCommand::setup(Heda& heda) {
   //Ingredient i;
   //i.name = "FooBar";
@@ -163,6 +183,8 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
 // closesup muste be done to the tallest jars first, then store them.
 // then close up the next tallest, etc.
 void CloseupCommand::setup(Heda& heda) {
+  
+  header2("CLOSEUP");
 
   double robotZ = heda.config.user_coord_offset_z - detected.lid_coord.z;
 
@@ -622,7 +644,9 @@ void PinpointCommand::start(Heda& heda) {
 }
 
 Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
- 
+
+  header3("GET NEW LOCATION");
+
   heda.db.deleteFrom<Location>("WHERE jar_id IS NULL");  
 
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
@@ -633,8 +657,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
   double minZAccessible = std::max(heda.config.user_coord_offset_z - heda.config.gripper_radius + widthNeeded / 2.0 + 2.0, 0.0);
   double minXAccessible = 100.0; // FIXME hardcoded. Too close to 0 and the arm will collide with the wall.
 
-  order(heda.shelves, byHeight, false);
-  //for (shelf = heda.shelves.items.begin(); shelf != heda.shelves.items.end(); shelf++) {
+  order(heda.storage_shelves, byHeight, false);
   for (Shelf& s : heda.storage_shelves) {
     shelf = s;
 
@@ -676,8 +699,11 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 }
 
 void StoreDetectedCommand::setup(Heda& heda) {
+  
+  header1("STORE DETECTED");
+
   // Do a closeup first
-  commands.push_back(make_shared<CloseupCommand>(detected, jar));
+  commands.push_back(make_shared<CloseupCommand>(detected));
   //
   // Transform the detected code into a jar
   // Get or create a column if needed
@@ -697,29 +723,24 @@ void StoreDetectedCommand::setup(Heda& heda) {
     ensure(freshJar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
 
     Shelf shelf;
-    loc = getNewLocation(heda, jar, shelf); 
+    loc = getNewLocation(heda, freshJar, shelf); 
     ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
     commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
-    commands.push_back(make_shared<LowerForGripCommand>(jar));
-    commands.push_back(make_shared<GripCommand>(jar));
-    commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-      loc.occupied = true;
-    }));
+    commands.push_back(make_shared<LowerForGripCommand>(freshJar));
+    commands.push_back(make_shared<GripCommand>(freshJar));
     commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
     commands.push_back(make_shared<PutdownCommand>());
+    commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
+
+      loc.occupied = true;
+      heda.db.update(loc);
+      heda.db.remove(detected);
+      heda.gripped_jar.id = -1;
+    }));
   }));
       
 }
-
-void StoreDetectedCommand::doneCallback(Heda& heda) {
-
-  loc.jar_id = jar.id;
-  heda.db.update(loc);
-  heda.db.remove(detected);
-  heda.gripped_jar.id = -1;
-}
-
 
 void DetectCommand::start(Heda& heda) {
   Mat frame;

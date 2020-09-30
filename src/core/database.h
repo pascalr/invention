@@ -97,9 +97,8 @@ class Database {
 
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " LIMIT 1";
-      queryStr << " " << optional;
-
+      stringstream queryStr;
+      queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " " << optional << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
 
       T item;
@@ -122,13 +121,13 @@ class Database {
 
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << " LIMIT 1";
-
-      log("DB LOAD", queryStr.str());
+      stringstream queryStr;
+      queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
+
       T item;
       if (query.executeStep()) {
-        T item; parseItem(query, item);
+        parseItem(query, item);
         item.id = query.getColumn(0);
       }
 

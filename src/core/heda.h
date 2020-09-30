@@ -188,11 +188,10 @@ class FetchCommand : public MetaCommand {
 
 class CloseupCommand : public MetaCommand {
   public:
-    CloseupCommand(DetectedHRCode& code, Jar& jar) : detected(code), jar(jar) {}
+    CloseupCommand(DetectedHRCode& code) : detected(code) {}
     string str() {return "closeup " + to_string(detected.id);}
     void setup(Heda& heda);
     DetectedHRCode& detected;
-    Jar& jar;
 };
 
 class LowerForGripCommand : public MetaCommand {
@@ -277,9 +276,7 @@ class StoreDetectedCommand : public MetaCommand {
     string str() {return "stored " + to_string(detected.id);}
     void setup(Heda& heda);
     DetectedHRCode detected;
-    Jar jar;
     Location loc;
-    void doneCallback(Heda& heda);
 };
 
 class SweepCommand : public MetaCommand {
