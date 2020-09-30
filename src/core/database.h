@@ -11,8 +11,6 @@ using namespace std;
 // HUUUUUUUUGEEEE FIXME: I do not validate the user input. It could insert sql...
 // I should probably use ruby on rails which does all this already...
 
-// FIXME: Instead of db.insert(table, ...), it should be table.insert(...), the table should have a reference to the database when initiated.
-
 #include <mutex>
 
 std::string quoteValue(std::string value);
@@ -27,10 +25,9 @@ class LogQuery {
   public:
 
     LogQuery(SQLite::Statement& infoQuery) : info_query(infoQuery) {
-      out << " [";
+      out << "[";
     }
 
-    //[["grip_offset", 1.0], ["updated_at", "2020-09-30 15:04:33.228333"], ["id", 1]]
     template<typename T>
     void bind(int index, T val) {
       out << "[\"";
@@ -63,7 +60,7 @@ class Database {
 
     template <typename T>
     void log(const char* name, T val, LogQuery& query) {
-      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << query.print() << endl;
+      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << " " << query.print() << endl;
     }
 
     void execute(const char* cmd) {
@@ -76,10 +73,8 @@ class Database {
     // It is added at the end of the query
     template<class T> 
     std::vector<T> all(std::string optional = "") {
-    //void all(std::vector<T> result, std::string optional = "") {
       std::lock_guard<std::mutex> guard(dbMutex);
       
-      //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL);
       stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>();
       queryStr << " " << optional;
 
@@ -103,7 +98,6 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
       
       stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " LIMIT 1";
-      //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
       queryStr << " " << optional;
 
       SQLite::Statement query(db, queryStr.str());
