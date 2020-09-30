@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
     ptree pt;
     pt.put("pos", heda.getPosition());
     pt.put("toolPos", heda.getToolPosition());
-    pt.put("pending", heda.getPendingCommands());
+    //pt.put("pending", heda.getPendingCommands());
     pt.put("output", getAllAvailable(serverReader));
     pt.put("isPaused", heda.is_paused);
     pt.put("gripped_jar_format_id", heda.gripped_jar.jar_format_id);
