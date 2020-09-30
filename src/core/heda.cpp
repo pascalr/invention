@@ -13,6 +13,16 @@ class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 
+void TestCommand::setup(Heda& heda) {
+  //Ingredient i;
+  //i.name = "FooBar";
+  //heda.db.insert(i);
+  //ensure(i.exists(), "FooBar must exist!");
+  heda.config.grip_offset = 0.0;
+  heda.db.update(heda.config);
+}
+
+
 void UserAction::start(Heda& heda) {
   heda.waiting_message = getWaitingMessage();
   heda.action_required = getActionRequired();
@@ -148,15 +158,6 @@ void removeNearDuplicates(Heda& heda) {
 double computeFocalPoint(double perceivedWidth, double distanceFromCamera, double actualWidth) {
 
   return perceivedWidth * distanceFromCamera / actualWidth;
-}
-
-void TestCommand::setup(Heda& heda) {
-  Ingredient i;
-  i.name = "FooBar";
-  heda.db.insert(i);
-  ensure(i.exists(), "FooBar must exist!");
-  //heda.config.grip_offset = 1.0;
-  //heda.db.update(heda.config);
 }
 
 // closesup muste be done to the tallest jars first, then store them.

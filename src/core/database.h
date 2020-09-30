@@ -27,7 +27,7 @@ class LogQuery {
   public:
 
     LogQuery(SQLite::Statement& infoQuery) : info_query(infoQuery) {
-      out << "[";
+      out << " [";
     }
 
     //[["grip_offset", 1.0], ["updated_at", "2020-09-30 15:04:33.228333"], ["id", 1]]
@@ -35,7 +35,7 @@ class LogQuery {
     void bind(int index, T val) {
       out << "[\"";
       out << info_query.getColumnName(index);
-      out << "\"";
+      out << "\", ";
       out << quoteValue(val);
       out << "]";
     }
@@ -57,12 +57,8 @@ class Database {
     }
 
     template <typename T>
-    void log(const char* name = "", T val) {
-
-      if (name[0] != '\0') {
-        std::cout << "\033[35m" << name << "\033[0m" << ": ";
-      }
-      std::cout << val << endl;
+    void log(const char* name, T val) {
+      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << endl;
     }
 
     template <typename T>
@@ -110,14 +106,18 @@ class Database {
       //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
       queryStr << " " << optional;
 
-      log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
-      if (query.executeStep()) {
-        T item; parseItem(query, item);
-        item.id = query.getColumn(0);
-        return item;
-      }
+
       T item;
+      if (query.executeStep()) {
+        parseItem(query, item);
+        item.id = query.getColumn(0);
+      }
+
+      LogQuery logQuery(query);
+      bindQuery(logQuery, item);
+      log("DB LOAD", queryStr.str(), logQuery);
+
       return item;
     }
 
@@ -132,12 +132,16 @@ class Database {
 
       log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
+      T item;
       if (query.executeStep()) {
         T item; parseItem(query, item);
         item.id = query.getColumn(0);
-        return item;
       }
-      T item;
+
+      LogQuery logQuery(query);
+      bindQuery(logQuery, item);
+      log("DB LOAD", queryStr.str(), logQuery);
+
       return item;
     }
    
@@ -187,7 +191,7 @@ class Database {
       insertQuery += ")";
       
       bindQuery(logQuery, item);
-      log("DB INSERT", insertQuery, logQuery);
+      log("DB INSERT", "INSERT INTO " + getTableName<T>(), logQuery);
 
       SQLite::Statement query(db, insertQuery);
       bindQuery(query, item);
@@ -212,7 +216,7 @@ class Database {
       updateQuery += " WHERE id = ?";
       
       bindQuery(logQuery, item);
-      log("DB UPDATE", updateQuery, logQuery);
+      log("DB UPDATE", "UPDATE " + getTableName<T>() + " SET", logQuery);
 
       SQLite::Statement query(db, updateQuery);
       bindQuery(query, item);
