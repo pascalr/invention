@@ -82,3 +82,11 @@ ul.context-menu__items {
   background-color: rgb(255, 198, 66);
   border: solid 3px rgb(255, 160, 0);
 }
+a.button_style, a:link.button_style, a:visited.button_style, a:hover.button_style, a:active.button_style {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+}

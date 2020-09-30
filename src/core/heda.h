@@ -23,7 +23,6 @@ class Heda;
 class HedaException : public exception {};
 
 class InitArduinoException : public HedaException {};
-class FrameCaptureException : public HedaException {};
 
 class MissingConfigException : public exception {};
 class NoWorkingShelfException : public exception {};

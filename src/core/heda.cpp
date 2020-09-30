@@ -756,11 +756,10 @@ void Heda::captureFrame(Mat& frame) {
     //vector<uchar> decodeBuf(r1->content.rdbuf()->begin(), r1->content.rdbuf()->end());
     //r1->content.rdbuf()->sgetn(decodeBuf, r1->content.size());
     frame = imdecode(Mat(v), IMREAD_COLOR);
-  } catch(const SimpleWeb::system_error &e) {
-    cerr << "Client request error: " << e.what() << endl;
-    throw FrameCaptureException();
+  } catch(const SimpleWeb::system_error &e) { // e.what()
+    ensure(false, "Unable to capture frame.");
   }
   if (frame.empty()) {
-    throw FrameCaptureException();
+    ensure(false, "Was able to capture frame, but it was empty.");
   }
 }

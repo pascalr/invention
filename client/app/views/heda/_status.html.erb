@@ -5,6 +5,13 @@
   <%= @status %>
 </div>
 
+<% if @status_code == "fatal" %>
+  <br/>
+  <%= form_with(url: heda_run_path(cmd: "dismiss"), method: "post", remote: true) do %>
+    <%= submit_tag("Dismiss") %>
+  <% end %>
+<% end %>
+
 <h2>Action requise</h2>
 
 <div id="actionrequired" data-val="<%= @action_required %>" hidden ></div>
