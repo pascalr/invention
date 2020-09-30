@@ -30,7 +30,7 @@ void writeSlave(Heda& heda, std::string& cmd) {
 void move(Heda& heda, Axis& axis, double destination) {
 
   std::string cmd = "m" + string(1, axis.id) + to_string(destination);
-  //auto h5 = Header5("MOVE("+cmd+")"); 
+  auto h5 = Header5("MOVE("+cmd+")"); 
 
   writeSlave(heda, cmd);
 
