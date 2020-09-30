@@ -44,12 +44,13 @@ void move(Heda& heda, Axis& axis, double destination) {
   }
 }
 
-// Heda controller stack command
-class StackCommand {
-  public:
-    std::string name;
-    std::function<void(ParseResult)> func;
-};
+//// Heda controller stack command
+//class StackCommand {
+//  public:
+//    std::string name;
+//    std::function<void(ParseResult)> func;
+//    bool is_done;
+//};
 
 class HedaController {
   public:
@@ -79,10 +80,19 @@ class HedaController {
       return val * fromUnit.value / toUnit.value;
     }
 
-    HedaController(Heda& heda) : m_heda(heda) {
+    HedaController(Heda& heda) : heda(heda) {
 
       // ------- FIXME -------- All those are commands to the HedaController, not to Heda itself (they would not belong in a recipee!)-------------
-     
+   
+      m_commands["move"] = [&](ParseResult tokens) {
+        char axisName = tokens.popAxis();
+        double dest = tokens.popScalaire();
+       
+        Axis* axis = heda.axisByName(axisName);
+        ensure(axis != 0, "ref command expects a valid axis name");
+        move(heda, *axis, dest);
+      };
+
       // at throws a out of range exception 
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
       m_commands["dismiss"] = [&](ParseResult tokens) {heda.waiting_message = ""; heda.fatal_message = "";};
@@ -223,14 +233,6 @@ class HedaController {
       //  } // TODO Handle error
       //  cout << "Oups. No jar were found with this id." << endl;
       //};
-      m_commands["move"] = [&](ParseResult tokens) {
-        char axisName = tokens.popAxis();
-        double dest = tokens.popScalaire();
-       
-        Axis* axis = heda.axisByName(axisName);
-        ensure(axis != 0, "ref command expects a valid axis name");
-        move(heda, *axis, dest);
-      };
       m_commands["sweep"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<SweepCommand>());
       };
@@ -327,18 +329,20 @@ class HedaController {
           execute(cmd);
         }
         try {
-          this_thread::sleep_for(chrono::milliseconds(m_heda.handleCommandStack()));
+          this_thread::sleep_for(chrono::milliseconds(heda.handleCommandStack()));
         } catch (const EnsureException& e) {
-          m_heda.fatal_message = e.message;
-          m_heda.stop();
+          heda.fatal_message = e.message;
+          heda.stop();
         }
       }
     }
 
     std::unordered_map<std::string, std::function<void(ParseResult)>> m_commands;
-    std::vector<std::function<void(ParseResult)>> stack;
+    
+    //std::unordered_map<std::string, std::function<void(ParseResult)>> commands;
+    //std::vector<std::function<void(ParseResult)>> stack;
 
-    Heda& m_heda;
+    Heda& heda;
 };
 
 #endif

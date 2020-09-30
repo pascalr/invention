@@ -317,10 +317,11 @@ class ActionIdentify : public UserAction {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R),
+    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R),
               m_reader(reader),
               m_writer(writer),
               server_writer(serverWriter),
+              server_reader(serverReader),
               stack_writer("\033[38;5;215mStack\033[0m"),
               db(db) {
     
@@ -513,6 +514,7 @@ class Heda {
     Writer& m_writer;
 
     Writer& server_writer;
+    Reader& server_reader;
 
     LogWriter stack_writer;
 
@@ -592,13 +594,17 @@ class Heda {
 
     bool is_paused = false;
 
+    // Checks if the server sent a "stop" message. Discards anything else.
+    // Maybe it's OK for Heda to be only doing one command at a time.
+    // The server can keep in memory what the stack of Heda commands.
     void ensureActive() {
-      if (is_stopped) {
-        throw StoppedException();
+      while(server_reader.inputAvailable()) {
+        string cmd = getInputLine(server_reader);
+        if (cmd == "stop") {
+          throw StoppedException();
+        }
       }
     }
-
-    bool is_stopped = false;
 
     string waiting_message;
     string fatal_message;

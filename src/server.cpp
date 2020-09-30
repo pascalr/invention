@@ -98,9 +98,11 @@ int main(int argc, char** argv) {
 
   LogWriter hedaLogWriter("\033[33mTo slave\033[0m", serialWriter);
   LogReader hedaLogReader("\033[34mFrom slave\033[0m", hedaReader);
+  
+  LogReader serverLogReader("\033[36mFrom server\033[0m", serverStream);
 
   Database db(DB_PROD);
-  Heda heda(hedaLogWriter, hedaLogReader, db, hedaToServerStream); 
+  Heda heda(hedaLogWriter, hedaLogReader, db, hedaToServerStream, serverLogReader); 
 
   server.resource["^/run$"]["POST"] = [&heda,&serverStream](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "POST /run" << endl;
@@ -205,8 +207,6 @@ int main(int argc, char** argv) {
   cout << "Server listening on " << serverAddress << " port " << server_port.get_future().get() << endl << endl;
 
   //server_thread.join();
-  LogReader serverLogReader("\033[36mFrom server\033[0m", serverStream);
-
   heda.sync();
 
   HedaController c(heda);
