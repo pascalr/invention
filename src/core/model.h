@@ -42,92 +42,6 @@ void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true)
 //  return t.lid_coord.z;
 //}
 
-template<class T>
-class Table {
-  public:
-
-    virtual string getTableName() = 0;
-    virtual T parseItem(SQLite::Statement& query) = 0;
-    //virtual string getValues(const T& item) = 0;
-    virtual void bindQuery(SQLite::Statement& query, const T& item) = 0;
-    //virtual void bindQuery(SQLite::Statement& query, const T& item, int i) = 0;
-    bool get(T& item, int id) {
-      for (auto it = items.begin(); it != items.end(); ++it) {
-        if (it->id == id) {
-          item = *it;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    bool ifind(T& t, string (*func)(const T&), string cmp) {
-      for (const T& i : items) {
-        if (iequals(func(i), cmp)) {
-          t = i;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    template <class P>
-    bool find(T& t, P (*func)(const T&), P cmp) {
-      for (const T& i : items) {
-        if (func(i) == cmp) {
-          t = i;
-          return true;
-        }
-      }
-      return false;
-    }
-//    bool find(T& t, std::function<bool(const T&)> func) {
-//      for (const T& i : items) {
-//        if (func(i)) {
-//          t = i;
-//          return true;
-//        }
-//      }
-//      return false;
-//    }
-
-    typename std::vector<T>::iterator begin() {
-      return items.begin();
-    }
-    typename std::vector<T>::iterator end() {
-      return items.end();
-    }
-    int size() {
-      return items.size();
-    }
-    bool empty() {
-      return items.empty();
-    }
-    T& back() {
-      return items.back();
-    }
-    void order(double (*func)(const T&), bool ascending=true) {
-      if (ascending) {
-        std::sort(items.begin(), items.end(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
-      } else {
-        std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
-      }
-    }
-    /*void erase(std::vector<T>::iterator it) {
-      items.erase(it);
-    }*/
-    // TODO: operator[]
-
-    //bool exists = false;
-
-    int column_count;
-    std::string update_query;
-    std::string insert_query;
-    std::vector<T> items; // TODO: Make items protected
-
-};
-
-
 class Model {
   public:
     Model() {
@@ -245,7 +159,7 @@ class DetectedHRCode : public Model {
 };
 
 void parseItem(SQLite::Statement& query, DetectedHRCode& code);
-//string getTableName(DetectedHRCode* code = NULL);
+
 template<typename T>
 string getTableName();
 
@@ -269,7 +183,6 @@ class Jar : public Model {
     int jar_id = -1;
 };
 
-//string getTableName(Jar* code = NULL);
 void parseItem(SQLite::Statement& query, Jar& item);
 
 class Ingredient : public Model {
