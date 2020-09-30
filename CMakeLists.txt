@@ -56,6 +56,7 @@ ADD_LIBRARY(MyLibsModule
   src/utils/utils.cpp
   src/core/program.cpp
   src/core/model.cpp
+  src/core/database.cpp
   src/core/fake_program.cpp
   src/core/writer/writer.cpp
   src/core/reader/reader.cpp

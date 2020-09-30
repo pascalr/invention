@@ -4,6 +4,7 @@
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "model.h"
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -13,6 +14,41 @@ using namespace std;
 // FIXME: Instead of db.insert(table, ...), it should be table.insert(...), the table should have a reference to the database when initiated.
 
 #include <mutex>
+
+std::string quoteValue(std::string value);
+
+template<class T>
+T quoteValue(T value) {
+  // TODO: Sanitize value
+  return value;
+}
+
+class LogQuery {
+  public:
+
+    LogQuery(SQLite::Statement& infoQuery) : info_query(infoQuery) {
+      out << "[";
+    }
+
+    //[["grip_offset", 1.0], ["updated_at", "2020-09-30 15:04:33.228333"], ["id", 1]]
+    template<typename T>
+    void bind(int index, T val) {
+      out << "[\"";
+      out << info_query.getColumnName(index);
+      out << "\"";
+      out << quoteValue(val);
+      out << "]";
+    }
+
+    std::string print() {
+      out << "]";
+      return out.str();
+    }
+
+  protected:
+    stringstream out;
+    SQLite::Statement& info_query;
+};
 
 class Database {
   public:
@@ -27,6 +63,11 @@ class Database {
         std::cout << "\033[35m" << name << "\033[0m" << ": ";
       }
       std::cout << val << endl;
+    }
+
+    template <typename T>
+    void log(const char* name, T val, LogQuery& query) {
+      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << query.print() << endl;
     }
 
     void execute(const char* cmd) {
@@ -134,6 +175,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
    
       SQLite::Statement infoQuery(db, "SELECT * FROM " + getTableName<T>() + " WHERE 0");
+      LogQuery logQuery(infoQuery);
 
       std::string insertQuery = "INSERT INTO " + getTableName<T>() + " VALUES(NULL, ";
       for (int i = 1; i < infoQuery.getColumnCount(); i++) {
@@ -144,7 +186,8 @@ class Database {
       }
       insertQuery += ")";
       
-      log(insertQuery, "DB INSERT"); // TODO: I can log better than that, find a way to get values by indices
+      bindQuery(logQuery, item);
+      log("DB INSERT", insertQuery, logQuery);
 
       SQLite::Statement query(db, insertQuery);
       bindQuery(query, item);
@@ -180,15 +223,6 @@ class Database {
     std::mutex dbMutex;
 
   protected:
-
-    template<class T>
-    T quoteValue(T value) {
-      return value;
-    }
-    
-    std::string quoteValue(std::string value) {
-      return "\"" + value + "\"";
-    }
 
 
     template<class T> 
