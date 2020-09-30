@@ -29,6 +29,15 @@ template <class T>
 double byLidY(const T& t) {
   return t.lid_coord.y;
 }
+template <class T>
+void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true) {
+  if (ascending) {
+    std::sort(items.begin(), items.end(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
+  } else {
+    std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
+  }
+}
+
 //double byLidZ(const DetectedHRCode& t) {
 //  return t.lid_coord.z;
 //}
@@ -281,37 +290,6 @@ class Ingredient : public Model {
 void bindQuery(SQLite::Statement& query, const Ingredient& item);
 void parseItem(SQLite::Statement& query, Ingredient& i);
 
-class IngredientTable : public Table<Ingredient> {
-  public:
-    const char* TABLE_NAME = "ingredients";
-    string getTableName() { return TABLE_NAME; };
-    
-    void bindQuery(SQLite::Statement& query, const Ingredient& item) {
-      query.bind(1, item.name);
-      query.bind(2, item.aliment_id);
-      query.bind(3, item.created_at);
-      query.bind(4, item.updated_at);
-      query.bind(5, item.cost);
-      query.bind(6, item.quantity);
-      query.bind(7, item.unit_name);
-      query.bind(8, item.density);
-    }
-    
-    Ingredient parseItem(SQLite::Statement& query) {
-      Ingredient i;
-      i.name = (const char*)query.getColumn(1);
-      i.aliment_id = query.getColumn(2);
-      i.created_at = query.getColumn(3);
-      i.updated_at = query.getColumn(4);
-      i.cost = query.getColumn(5);
-      i.quantity = query.getColumn(6);
-      i.unit_name = (const char*)query.getColumn(7);
-      i.density = query.getColumn(8);
-      return i;
-    }
-
-};
-
 class Unit : public Model {
   public:
     string name;
@@ -321,31 +299,6 @@ class Unit : public Model {
 
 void bindQuery(SQLite::Statement& query, const Unit& item);
 void parseItem(SQLite::Statement& query, Unit& i);
-
-class UnitTable : public Table<Unit> {
-  public:
-    const char* TABLE_NAME = "units";
-    string getTableName() { return TABLE_NAME; };
-    
-    void bindQuery(SQLite::Statement& query, const Unit& item) {
-      query.bind(1, item.name);
-      query.bind(2, item.value);
-      query.bind(3, item.is_weight);
-      query.bind(4, item.created_at);
-      query.bind(5, item.updated_at);
-    }
-    
-    Unit parseItem(SQLite::Statement& query) {
-      Unit i;
-      i.name = (const char*)query.getColumn(1);
-      i.value = query.getColumn(2);
-      i.is_weight = (int)query.getColumn(3);
-      i.created_at = query.getColumn(4);
-      i.updated_at = query.getColumn(5);
-      return i;
-    }
-
-};
 
 class Recipe : public Model {
   public:
@@ -357,31 +310,6 @@ class Recipe : public Model {
 void bindQuery(SQLite::Statement& query, const Recipe& item);
 void parseItem(SQLite::Statement& query, Recipe& i);
 
-class RecipeTable : public Table<Recipe> {
-  public:
-    const char* TABLE_NAME = "recettes";
-    string getTableName() { return TABLE_NAME; };
-    
-    void bindQuery(SQLite::Statement& query, const Recipe& item) {
-      query.bind(1, item.name);
-      query.bind(2, item.instructions);
-      query.bind(3, item.rating);
-      query.bind(4, item.created_at);
-      query.bind(5, item.updated_at);
-    }
-    
-    Recipe parseItem(SQLite::Statement& query) {
-      Recipe i;
-      i.name = (const char*)query.getColumn(1);
-      i.instructions = (const char*)query.getColumn(2);
-      i.rating = query.getColumn(3);
-      i.created_at = query.getColumn(4);
-      i.updated_at = query.getColumn(5);
-      return i;
-    }
-
-};
-
 class IngredientQuantity : public Model {
   public:
     int recipe_id;
@@ -392,32 +320,6 @@ class IngredientQuantity : public Model {
 
 void bindQuery(SQLite::Statement& query, const IngredientQuantity& item);
 void parseItem(SQLite::Statement& query, IngredientQuantity& i);
-
-class IngredientQuantityTable : public Table<IngredientQuantity> {
-  public:
-    const char* TABLE_NAME = "ingredient_quantities";
-    string getTableName() { return TABLE_NAME; };
-    
-    void bindQuery(SQLite::Statement& query, const IngredientQuantity& item) {
-      query.bind(1, item.recipe_id);
-      query.bind(2, item.ingredient_id);
-      query.bind(3, item.value);
-      query.bind(4, item.created_at);
-      query.bind(5, item.updated_at);
-      query.bind(6, item.unit_id);
-    }
-    
-    IngredientQuantity parseItem(SQLite::Statement& query) {
-      IngredientQuantity i;
-      i.recipe_id = query.getColumn(1);
-      i.ingredient_id = query.getColumn(2);
-      i.value = query.getColumn(3);
-      i.created_at = query.getColumn(4);
-      i.updated_at = query.getColumn(5);
-      i.unit_id = query.getColumn(6);
-      return i;
-    }
-};
 
 class Shelf : public Model {
   public:

@@ -632,12 +632,10 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
   double minZAccessible = std::max(heda.config.user_coord_offset_z - heda.config.gripper_radius + widthNeeded / 2.0 + 2.0, 0.0);
   double minXAccessible = 100.0; // FIXME hardcoded. Too close to 0 and the arm will collide with the wall.
 
-  heda.shelves.order(byHeight, false);
+  order(heda.shelves, byHeight, false);
   //for (shelf = heda.shelves.items.begin(); shelf != heda.shelves.items.end(); shelf++) {
-  for (Shelf& s : heda.shelves.items) {
+  for (Shelf& s : heda.storage_shelves) {
     shelf = s;
-
-    if (shelf.id == heda.config.working_shelf_id) {continue;}
 
     vector<Location> locations = heda.db.all<Location>("WHERE shelf_id = " + to_string(shelf.id));
 

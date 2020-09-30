@@ -13,15 +13,16 @@ class HedaController {
 
     void process(Heda& heda, Recipe& recipe) {
 
-      vector<int> ids;
-      for (const IngredientQuantity& qty : heda.ingredient_quantities) {
-        if (qty.recipe_id == recipe.id) {
-          ids.push_back(qty.id);
-        }
-      }
-      for (const int& id : ids) {
-        heda.db.removeItem(heda.ingredient_quantities, id);
-      }
+      heda.db.deleteFrom<IngredientQuantity>("WHERE recipe_id = " + to_string(recipe.id));
+      //vector<int> ids;
+      //for (const IngredientQuantity& qty : heda.db.all<IngredientQuantity>()) {
+      //  if (qty.recipe_id == recipe.id) {
+      //    ids.push_back(qty.id);
+      //  }
+      //}
+      //for (const int& id : ids) {
+      //  heda.db.removeItem(heda.ingredient_quantities, id);
+      //}
 
       is_processing_recipe = true;
       recipe_being_process = recipe;
@@ -54,9 +55,9 @@ class HedaController {
       m_commands["test"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<TestCommand>());};
       m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee
         // Delete all the ingredient quantities 
-        Recipe recipe;
         string name = tokens.popNoun();
-        ensure(heda.recipes.ifind(recipe, byName, name), "process command must have a valid recipe name");
+        Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
+        ensure(recipe.exists(), "process command must have a valid recipe name");
         process(heda, recipe);
       };
       //m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();};
@@ -109,12 +110,14 @@ class HedaController {
         string unitName = tokens.popNoun();
         string ingredientName = tokens.popNoun();
 
-        Unit unit;
-        Unit toUnit;
-        Ingredient ingredient;
-        ensure(heda.units.ifind(unit, byName, unitName), "ajouter must have a valid unit name");
-        ensure(heda.ingredients.ifind(ingredient, byName, ingredientName), "ajouter must have a valid ingredient name");
-        ensure(heda.units.ifind(toUnit, byName, ingredient.unit_name), "ingredient must have a valid unit");
+        Unit unit = heda.db.findBy<Unit>("name", unitName, "COLLATE NOCASE");
+        ensure(unit.exists(), "ajouter must have a valid unit name");
+
+        Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName, "COLLATE NOCASE");
+        ensure(ingredient.exists(), "ajouter must have a valid ingredient name");
+
+        Unit toUnit = heda.db.findBy<Unit>("name", ingredient.unit_name, "COLLATE NOCASE");
+        ensure(toUnit.exists(), "ingredient must have a valid unit");
 
         IngredientQuantity qty;
         qty.recipe_id = recipe_being_process.id;
@@ -122,7 +125,7 @@ class HedaController {
         qty.value = s;
         //qty.value = convert(s, unit, toUnit, ingredient.density);
         qty.unit_id = unit.id;
-        heda.db.insert(heda.ingredient_quantities, qty);
+        heda.db.insert(qty);
       };
       
       m_commands["ref"] = [&](ParseResult tokens) {

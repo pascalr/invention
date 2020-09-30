@@ -326,28 +326,18 @@ class Heda {
               stack_writer("\033[38;5;215mStack\033[0m"),
               db(db) {
     
-      loadDb();
+      loadConfig();
     }
 
     void loadConfig() {
       vector<HedaConfig> configs = db.all<HedaConfig>();
-      if (configs.empty()) {throw MissingConfigException();}
+      ensure(!configs.empty(), "Error could not find a valid config.");
       config = *configs.begin();
-    }
 
-    void loadDb() {
-
-      loadConfig();
-
-      db.load(shelves);
-      if (!shelves.get(working_shelf, config.working_shelf_id)) {
-        throw NoWorkingShelfException();
-      }
-
-      db.load(ingredients);
-      db.load(units);
-      db.load(recipes);
-      db.load(ingredient_quantities);
+      shelves = db.all<Shelf>();
+      storage_shelves = db.all<Shelf>("WHERE id <> " + to_string(config.working_shelf_id));
+      working_shelf = db.find<Shelf>(config.working_shelf_id);
+      ensure(working_shelf.exists(), "Error could not find the working shelf.");
     }
 
     void waitUntilNotWorking() {
@@ -532,11 +522,6 @@ class Heda {
     
     PolarCoord m_position;
 
-    ShelfTable shelves;
-    IngredientTable ingredients;
-    UnitTable units;
-    RecipeTable recipes;
-    IngredientQuantityTable ingredient_quantities;
     Database& db;
 
     bool isDoneWorking() {
@@ -558,7 +543,7 @@ class Heda {
 
       if (shelves.empty()) {throw NoWorkingShelfException();}
     
-      shelves.order(byHeight);
+      order(shelves, byHeight);
       auto previousIt = shelves.begin();
       for (auto it = shelves.begin(); it != shelves.end(); ++it) {
     
@@ -603,6 +588,8 @@ class Heda {
       return 0;
     }
 
+    vector<Shelf> shelves;
+    vector<Shelf> storage_shelves;
     Shelf working_shelf;
 
     bool is_paused = false;
