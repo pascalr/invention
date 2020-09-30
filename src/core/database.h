@@ -57,7 +57,7 @@ class Database {
     }
 
     template <typename T>
-    void log(T val, const char* name = "") {
+    void log(const char* name = "", T val) {
 
       if (name[0] != '\0') {
         std::cout << "\033[35m" << name << "\033[0m" << ": ";
@@ -72,7 +72,7 @@ class Database {
 
     void execute(const char* cmd) {
       std::lock_guard<std::mutex> guard(dbMutex);
-      log(cmd, "DB EXEC");
+      log("DB EXEC", cmd);
       db.exec(cmd);
     }
 
@@ -89,7 +89,7 @@ class Database {
 
       std::vector<T> result;
 
-      log(queryStr.str(), "DB LOAD");
+      log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
       while (query.executeStep()) {
         T item; parseItem(query, item);
@@ -110,7 +110,7 @@ class Database {
       //stringstream queryStr; queryStr << "SELECT * FROM " << getTableName((T*)NULL) << " WHERE id = " << id << " LIMIT 1";
       queryStr << " " << optional;
 
-      log(queryStr.str(), "DB LOAD");
+      log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
       if (query.executeStep()) {
         T item; parseItem(query, item);
@@ -130,7 +130,7 @@ class Database {
       
       stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << " LIMIT 1";
 
-      log(queryStr.str(), "DB LOAD");
+      log("DB LOAD", queryStr.str());
       SQLite::Statement query(db, queryStr.str());
       if (query.executeStep()) {
         T item; parseItem(query, item);
@@ -146,7 +146,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
     
       stringstream ss; ss << "DELETE FROM " << getTableName<T>();
-      log(ss.str(), "DB CLEAR");
+      log("DB CLEAR", ss.str());
       db.exec(ss.str());
     }
     
@@ -155,7 +155,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
     
       stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << optional;
-      log(ss.str(), "DB DELETE");
+      log("DB DELETE", ss.str());
       db.exec(ss.str());
     }
 
@@ -164,7 +164,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
     
       stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " WHERE id = " << item.id;
-      log(ss.str(), "DB DELETE");
+      log("DB DELETE", ss.str());
       db.exec(ss.str());
 
       item.id = -1;
@@ -200,6 +200,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
    
       SQLite::Statement infoQuery(db, "SELECT * FROM " + getTableName<T>() + " WHERE 0");
+      LogQuery logQuery(infoQuery);
 
       std::string updateQuery = "UPDATE " + getTableName<T>() + " SET ";
       for (int i = 1; i < infoQuery.getColumnCount(); i++) {
@@ -210,7 +211,8 @@ class Database {
       }
       updateQuery += " WHERE id = ?";
       
-      log(updateQuery, "DB UPDATE"); // TODO: I can log better than that, find a way to get values by indices
+      bindQuery(logQuery, item);
+      log("DB UPDATE", updateQuery, logQuery);
 
       SQLite::Statement query(db, updateQuery);
       bindQuery(query, item);
