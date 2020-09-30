@@ -201,7 +201,6 @@ class HedaConfig : public Model {
 
 
 void parseItem(SQLite::Statement& query, HedaConfig& c);
-void bindQuery(SQLite::Statement& query, const HedaConfig& item);
 
 class Location : public Model {
   public:
@@ -222,7 +221,6 @@ class Location : public Model {
 };
 
 void parseItem(SQLite::Statement& query, Location& item);
-void bindQuery(SQLite::Statement& query, const Location& item);
 
 class DetectedHRCode : public Model {
   public:
@@ -246,7 +244,6 @@ class DetectedHRCode : public Model {
     UserCoord lid_coord;
 };
 
-void bindQuery(SQLite::Statement& query, const DetectedHRCode& item);
 void parseItem(SQLite::Statement& query, DetectedHRCode& code);
 //string getTableName(DetectedHRCode* code = NULL);
 template<typename T>
@@ -263,7 +260,6 @@ class JarFormat : public Model {
     double grip_force;
 };
 
-void bindQuery(SQLite::Statement& query, const JarFormat& item);
 void parseItem(SQLite::Statement& query, JarFormat& item);
 
 class Jar : public Model {
@@ -274,7 +270,6 @@ class Jar : public Model {
 };
 
 //string getTableName(Jar* code = NULL);
-void bindQuery(SQLite::Statement& query, const Jar& item);
 void parseItem(SQLite::Statement& query, Jar& item);
 
 class Ingredient : public Model {
@@ -287,7 +282,6 @@ class Ingredient : public Model {
     double density;
 };
 
-void bindQuery(SQLite::Statement& query, const Ingredient& item);
 void parseItem(SQLite::Statement& query, Ingredient& i);
 
 class Unit : public Model {
@@ -297,7 +291,6 @@ class Unit : public Model {
     bool is_weight;
 };
 
-void bindQuery(SQLite::Statement& query, const Unit& item);
 void parseItem(SQLite::Statement& query, Unit& i);
 
 class Recipe : public Model {
@@ -307,7 +300,6 @@ class Recipe : public Model {
     double rating;
 };
 
-void bindQuery(SQLite::Statement& query, const Recipe& item);
 void parseItem(SQLite::Statement& query, Recipe& i);
 
 class IngredientQuantity : public Model {
@@ -318,7 +310,6 @@ class IngredientQuantity : public Model {
     int unit_id;
 };
 
-void bindQuery(SQLite::Statement& query, const IngredientQuantity& item);
 void parseItem(SQLite::Statement& query, IngredientQuantity& i);
 
 class Shelf : public Model {
@@ -331,7 +322,130 @@ class Shelf : public Model {
     double moving_height;
 };
     
-void bindQuery(SQLite::Statement& query, const Shelf& item);
 void parseItem(SQLite::Statement& query, Shelf& i);
+
+template<typename T>
+void bindQuery(T& query, const Unit& item) {
+  query.bind(1, item.name);
+  query.bind(2, item.value);
+  query.bind(3, item.is_weight);
+  query.bind(4, item.created_at);
+  query.bind(5, item.updated_at);
+}
+template<typename T>
+void bindQuery(T& query, const Recipe& item) {
+  query.bind(1, item.name);
+  query.bind(2, item.instructions);
+  query.bind(3, item.rating);
+  query.bind(4, item.created_at);
+  query.bind(5, item.updated_at);
+}
+template<typename T>
+void bindQuery(T& query, const IngredientQuantity& item) {
+  query.bind(1, item.recipe_id);
+  query.bind(2, item.ingredient_id);
+  query.bind(3, item.value);
+  query.bind(4, item.created_at);
+  query.bind(5, item.updated_at);
+  query.bind(6, item.unit_id);
+}
+template<typename T>
+void bindQuery(T& query, const JarFormat& item) {
+  query.bind(1, item.empty_weight);
+  query.bind(2, item.height);
+  query.bind(3, item.diameter);
+  query.bind(4, item.created_at);
+  query.bind(5, item.updated_at);
+  query.bind(6, item.name);
+  query.bind(7, item.lid_diameter);
+  query.bind(8, item.lid_weight);
+  query.bind(9, item.grip_force);
+}
+template<typename T>
+void bindQuery(T& query, const HedaConfig& item) {
+  query.bind(1, item.working_shelf_id);
+  query.bind(2, item.created_at);
+  query.bind(3, item.updated_at);
+  query.bind(4, item.user_coord_offset_x);
+  query.bind(5, item.user_coord_offset_y);
+  query.bind(6, item.user_coord_offset_z);
+  query.bind(7, item.camera_radius);
+  query.bind(8, item.gripper_radius);
+  query.bind(9, item.camera_focal_point);
+  query.bind(10, item.detect_height);
+  query.bind(11, item.home_position_x);
+  query.bind(12, item.home_position_y);
+  query.bind(13, item.home_position_t);
+  query.bind(14, item.grip_offset);
+  query.bind(15, item.max_h);
+  query.bind(16, item.max_v);
+  query.bind(17, item.max_t);
+  query.bind(18, item.closeup_distance);
+  query.bind(19, item.max_x);
+  query.bind(20, item.max_y);
+  query.bind(21, item.max_z);
+}
+template<typename T>
+void bindQuery(T& query, const Location& item) {
+  query.bind(1, item.x);
+  query.bind(2, item.z);
+  query.bind(3, item.move_command);
+  query.bind(4, item.shelf_id);
+  query.bind(5, item.created_at);
+  query.bind(6, item.updated_at);
+  query.bind(7, item.diameter);
+  query.bind(8, item.is_storage);
+  query.bind(9, item.name);
+  query.bind(11, item.jar_format_id);
+  query.bind(12, item.jar_id);
+  query.bind(13, item.occupied);
+}
+template<typename T>
+void bindQuery(T& query, const Shelf& item) {
+  query.bind(1, item.height);
+  query.bind(2, item.width);
+  query.bind(3, item.depth);
+  query.bind(6, item.created_at);
+  query.bind(7, item.updated_at);
+  query.bind(8, item.moving_height);
+}
+template<typename T>
+void bindQuery(T& query, const Ingredient& item) {
+  query.bind(1, item.name);
+  query.bind(2, item.aliment_id);
+  query.bind(3, item.created_at);
+  query.bind(4, item.updated_at);
+  query.bind(5, item.cost);
+  query.bind(6, item.quantity);
+  query.bind(7, item.unit_name);
+  query.bind(8, item.density);
+}
+template<typename T>
+void bindQuery(T& query, const DetectedHRCode& item) {
+  query.bind(1, item.coord.h);
+  query.bind(2, item.coord.v);
+  query.bind(3, item.coord.t);
+  query.bind(4, item.centerX);
+  query.bind(5, item.centerY);
+  query.bind(6, item.scale);
+  query.bind(7, item.imgFilename);
+  query.bind(8, item.created_at);
+  query.bind(9, item.updated_at);
+  query.bind(10, item.jar_id);
+  query.bind(11, item.weight);
+  query.bind(12, item.content_name);
+  query.bind(13, item.content_id);
+  query.bind(14, item.lid_coord.x);
+  query.bind(15, item.lid_coord.y);
+  query.bind(16, item.lid_coord.z);
+}
+template<typename T>
+void bindQuery(T& query, const Jar& item) {
+  query.bind(1, item.jar_format_id);
+  query.bind(2, item.ingredient_id);
+  query.bind(3, item.created_at);
+  query.bind(4, item.updated_at);
+  query.bind(6, item.jar_id);
+}
 
 #endif
