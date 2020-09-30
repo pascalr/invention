@@ -13,35 +13,76 @@ class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
 
-void header1(std::string content) {
-  std::cout << "\033[38;5;215m***** " << content << " *****\033[0m" << std::endl;
-}
+class Header1 {
+  public:
+    Header1(std::string name) : name(name) {
+      std::cout << "\033[38;5;215m********** " << name << " **********\033[0m" << std::endl;
+    }
+    ~Header1() {
+      std::cout << "\033[38;5;215m_" << name << "_\033[0m" << std::endl;
+    }
+    std::string name;
+};
 
-void header2(std::string content) {
-  std::cout << "\033[38;5;215m**** " << content << " ***\033[0m" << std::endl;
-}
+class Header2 {
+  public:
+    Header2(std::string name) : name(name) {
+      std::cout << "\033[38;5;215m***** " << name << " *****\033[0m" << std::endl;
+    }
+    ~Header2() {
+      std::cout << "\033[38;5;215m_" << name << "_\033[0m" << std::endl;
+    }
+    std::string name;
+};
 
-void header3(std::string content) {
-  std::cout << "\033[38;5;215m--- " << content << " ---\033[0m" << std::endl;
-}
+class Header3 {
+  public:
+    Header3(std::string name) : name(name) {
+      std::cout << "\033[38;5;215m*** " << name << " ***\033[0m" << std::endl;
+    }
+    ~Header3() {
+      std::cout << "\033[38;5;215m_" << name << "_\033[0m" << std::endl;
+    }
+    std::string name;
+};
 
-void header4(std::string content) {
-  std::cout << "\033[38;5;215m- " << content << " -\033[0m" << std::endl;
-}
+class Header4 {
+  public:
+    Header4(std::string name) : name(name) {
+      std::cout << "\033[38;5;215m** " << name << " **\033[0m" << std::endl;
+    }
+    ~Header4() {
+      std::cout << "\033[38;5;215m_" << name << "_\033[0m" << std::endl;
+    }
+    std::string name;
+};
 
-void header5(std::string content) {
-  std::cout << "\033[38;5;215m " << content << " \033[0m" << std::endl;
-}
+class Header5 {
+  public:
+    Header5(std::string name) : name(name) {
+      std::cout << "\033[38;5;215m* " << name << " *\033[0m" << std::endl;
+    }
+    ~Header5() {
+      std::cout << "\033[38;5;215m_" << name << "_\033[0m" << std::endl;
+    }
+    std::string name;
+};
 
 void TestCommand::setup(Heda& heda) {
+
+  auto h1 = Header1("TEST");
+
   //Ingredient i;
   //i.name = "FooBar";
   //heda.db.insert(i);
   //ensure(i.exists(), "FooBar must exist!");
-  heda.config.grip_offset = 0.0;
-  heda.db.update(heda.config);
+  std::cout << "FOO!" << std::endl;
+  //heda.config.grip_offset = 0.0;
+  //heda.db.update(heda.config);
 }
 
+
+Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf);
 
 void UserAction::start(Heda& heda) {
   heda.waiting_message = getWaitingMessage();
@@ -184,7 +225,7 @@ double computeFocalPoint(double perceivedWidth, double distanceFromCamera, doubl
 // then close up the next tallest, etc.
 void CloseupCommand::setup(Heda& heda) {
   
-  header2("CLOSEUP");
+  auto h2 = Header2("CLOSEUP");
 
   double robotZ = heda.config.user_coord_offset_z - detected.lid_coord.z;
 
@@ -236,6 +277,8 @@ void CloseupCommand::setup(Heda& heda) {
 }
     
 void HoverCommand::setup(Heda& heda) {
+  
+  auto h4 = Header4("HOVER");
 
   Shelf shelf; heda.shelfByHeight(shelf, heda.unitY(heda.m_position.v));
 
@@ -331,6 +374,9 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
 }
 
 void ParseCodesCommand::start(Heda& heda) {
+  
+  auto h2 = Header2("PARSE");
+
   for (DetectedHRCode& code : heda.db.all<DetectedHRCode>()) {
     parseCode(heda, code);
     heda.db.update(code);
@@ -361,6 +407,8 @@ void OpenGripCommand::doneCallback(Heda& heda) {
   return r;
 }*/
 void SweepCommand::setup(Heda& heda) {
+
+  auto h2 = Header2("SWEEP");
 
   heda.db.clear<DetectedHRCode>();
   
@@ -419,6 +467,8 @@ void SweepCommand::setup(Heda& heda) {
 // Get lower, either to pickup, or to putdown
 void LowerForGripCommand::setup(Heda& heda) {
 
+  auto h4 = Header4("LOWER FOR GRIP");
+
   Shelf shelf; heda.shelfByHeight(shelf, heda.unitY(heda.m_position.v));
 
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
@@ -434,6 +484,8 @@ void GripCommand::doneCallback(Heda& heda) {
 }
 
 void GripCommand::setup(Heda& heda) {
+  
+  auto h5 = Header5("GRIP");
 
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
   ensure(format.exists(), "Grip needs a valid jar format. The jar did not have one.");
@@ -442,6 +494,9 @@ void GripCommand::setup(Heda& heda) {
 }
 
 void PutdownCommand::setup(Heda& heda) {
+
+  auto h4 = Header4("PUTDOWN");
+
   // TODO: Error message is not gripping
   if (heda.is_gripping) {
     commands.push_back(make_shared<LowerForGripCommand>(heda.gripped_jar));
@@ -456,6 +511,8 @@ void validateGoto(Heda& heda, PolarCoord c) {
 }
 
 void GotoCommand::setup(Heda& heda) {
+
+  auto h4 = Header4("GOTO");
 
   validateGoto(heda, destination);
 
@@ -569,6 +626,8 @@ void SlaveCommand::start(Heda& heda) {
     
 void FetchCommand::setup(Heda& heda) {
 
+  auto h2 = Header2("FETCH");
+
   // TODO: Make sure the the quantity of ingredients left in the jar is ok.
  
   Location loc = heda.db.findBy<Location>("jar_id", jar.id);
@@ -576,15 +635,23 @@ void FetchCommand::setup(Heda& heda) {
 
   Shelf shelf = heda.db.find<Shelf>(loc.shelf_id);
   ensure(shelf.exists(), "Could not find the shelf of the location id = " + to_string(loc.id));
+    
+  Location dest = getNewLocation(heda, jar, heda.working_shelf); 
+  ensure(dest.exists(), "Could not find a destination location to drop the fetched jar.");
 
   commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius)));
   commands.push_back(make_shared<LowerForGripCommand>(jar));
   commands.push_back(make_shared<GripCommand>(jar));
-  commands.push_back(make_shared<LambdaCommand>([&](Heda& heda) {
-    loc.occupied = false;
+  commands.push_back(make_shared<LambdaCommand>([loc](Heda& heda) {
+    //loc.occupied = false;
+    //heda.db.update(loc);
   }));
-  commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
+  commands.push_back(make_shared<GotoCommand>(heda.toPolarCoord(UserCoord(dest.x,shelf.moving_height,dest.z), heda.config.gripper_radius)));
   commands.push_back(make_shared<PutdownCommand>());
+  commands.push_back(make_shared<LambdaCommand>([dest](Heda& heda) {
+    //dest.occupied = true;
+    //heda.db.update(dest);
+  }));
   commands.push_back(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
 }
 
@@ -636,6 +703,8 @@ void FetchCommand::setup(Heda& heda) {
 //}
 
 void PinpointCommand::start(Heda& heda) {
+  
+  auto h2 = Header2("PINPOINT");
 
   for (DetectedHRCode& code : heda.db.all<DetectedHRCode>()) {
     pinpointCode(heda, code);
@@ -645,7 +714,7 @@ void PinpointCommand::start(Heda& heda) {
 
 Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 
-  header3("GET NEW LOCATION");
+  auto h3 = Header3("GET NEW LOCATION");
 
   heda.db.deleteFrom<Location>("WHERE jar_id IS NULL");  
 
@@ -657,40 +726,35 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
   double minZAccessible = std::max(heda.config.user_coord_offset_z - heda.config.gripper_radius + widthNeeded / 2.0 + 2.0, 0.0);
   double minXAccessible = 100.0; // FIXME hardcoded. Too close to 0 and the arm will collide with the wall.
 
-  order(heda.storage_shelves, byHeight, false);
-  for (Shelf& s : heda.storage_shelves) {
-    shelf = s;
+  vector<Location> locations = heda.db.all<Location>("WHERE shelf_id = " + to_string(shelf.id));
 
-    vector<Location> locations = heda.db.all<Location>("WHERE shelf_id = " + to_string(shelf.id));
+  for (double z = minZAccessible; z < shelf.depth - widthNeeded; z += 10) {
+    for (double x = minXAccessible; x < shelf.width - widthNeeded - minXAccessible; x += 10) {
 
-    for (double z = minZAccessible; z < shelf.depth - widthNeeded; z += 10) {
-      for (double x = minXAccessible; x < shelf.width - widthNeeded - minXAccessible; x += 10) {
+      Vector2f wantedMin; wantedMin << x, z;
+      Vector2f wantedMax; wantedMax << x+widthNeeded, z+widthNeeded;
+      AlignedBox2f wanted(wantedMin, wantedMax);
 
-        Vector2f wantedMin; wantedMin << x, z;
-        Vector2f wantedMax; wantedMax << x+widthNeeded, z+widthNeeded;
-        AlignedBox2f wanted(wantedMin, wantedMax);
+      bool doesNotIntersect = true;
+      for (const Location& loc : locations) {
+      
+        Vector2f locMin; locMin << loc.x-loc.diameter/2.0, loc.z-loc.diameter/2.0;
+        Vector2f locMax; locMax << loc.x+loc.diameter/2.0, loc.z+loc.diameter/2.0;
+        AlignedBox2f locBox(locMin, locMax);
+        if (wanted.intersects(locBox)) {doesNotIntersect = false; break;}
+      }
 
-        bool doesNotIntersect = true;
-        for (const Location& loc : locations) {
-        
-          Vector2f locMin; locMin << loc.x-loc.diameter/2.0, loc.z-loc.diameter/2.0;
-          Vector2f locMax; locMax << loc.x+loc.diameter/2.0, loc.z+loc.diameter/2.0;
-          AlignedBox2f locBox(locMin, locMax);
-          if (wanted.intersects(locBox)) {doesNotIntersect = false; break;}
-        }
-
-        if (doesNotIntersect) { // Good create new location
-          Location loc;
-          loc.x = x+widthNeeded/2.0;
-          loc.z = z+widthNeeded/2.0;
-          loc.diameter = widthNeeded;
-          loc.shelf_id = shelf.id;
-          loc.jar_format_id = format.id;
-          loc.jar_id = jar.id;
-          loc.occupied = false;
-          heda.db.insert(loc);
-          return loc;
-        }
+      if (doesNotIntersect) { // Good create new location
+        Location loc;
+        loc.x = x+widthNeeded/2.0;
+        loc.z = z+widthNeeded/2.0;
+        loc.diameter = widthNeeded;
+        loc.shelf_id = shelf.id;
+        loc.jar_format_id = format.id;
+        loc.jar_id = jar.id;
+        loc.occupied = false;
+        heda.db.insert(loc);
+        return loc;
       }
     }
   }
@@ -700,7 +764,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 
 void StoreDetectedCommand::setup(Heda& heda) {
   
-  header1("STORE DETECTED");
+  auto h1 = Header1("STORE DETECTED");
 
   // Do a closeup first
   commands.push_back(make_shared<CloseupCommand>(detected));
@@ -723,7 +787,12 @@ void StoreDetectedCommand::setup(Heda& heda) {
     ensure(freshJar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
 
     Shelf shelf;
-    loc = getNewLocation(heda, freshJar, shelf); 
+    order(heda.storage_shelves, byHeight, false);
+    for (Shelf& s : heda.storage_shelves) {
+      shelf = s;
+      loc = getNewLocation(heda, freshJar, shelf); 
+      if (loc.exists()) break;
+    }
     ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
     commands.push_back(make_shared<HoverCommand>(detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius));
@@ -743,6 +812,9 @@ void StoreDetectedCommand::setup(Heda& heda) {
 }
 
 void DetectCommand::start(Heda& heda) {
+  
+  auto h5 = Header5("DETECT");
+
   Mat frame;
   heda.captureFrame(frame);
   vector<DetectedHRCode> detected;

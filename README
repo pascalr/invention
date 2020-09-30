@@ -1,3 +1,8 @@
+Maybe one day do model.setAttr("name", value);
+Advantage update only the ones modified (does it matter)
+Update by column name and not by index.
+But for now who cares.
+
 Une tablette de petit pots: 100mm + 120mm + 50mm = 270mm
 Une tablette de moyens pots: 170mm + 120mm + 50 mm = 340mm
 Une tablette de grand pots: 250mm + 120mm + 50mm = 420mm

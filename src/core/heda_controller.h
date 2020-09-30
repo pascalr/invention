@@ -5,6 +5,16 @@
 
 class UnitConversionException : public exception {};
 
+// Heda controller stack command
+// But we don't care for that right now. I do only one command at a time.
+// This will be important when multiple users.
+//class StackCommand {
+//  public:
+//    std::string name;
+//    std::function<void(ParseResult)> func;
+//};
+//std::vector<std::function<void(ParseResult)>> HedaController::m_stack;
+
 class HedaController {
   public:
 
@@ -14,15 +24,6 @@ class HedaController {
     void process(Heda& heda, Recipe& recipe) {
 
       heda.db.deleteFrom<IngredientQuantity>("WHERE recipe_id = " + to_string(recipe.id));
-      //vector<int> ids;
-      //for (const IngredientQuantity& qty : heda.db.all<IngredientQuantity>()) {
-      //  if (qty.recipe_id == recipe.id) {
-      //    ids.push_back(qty.id);
-      //  }
-      //}
-      //for (const int& id : ids) {
-      //  heda.db.removeItem(heda.ingredient_quantities, id);
-      //}
 
       is_processing_recipe = true;
       recipe_being_process = recipe;
