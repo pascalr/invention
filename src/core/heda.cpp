@@ -12,7 +12,6 @@ using namespace std;
 class InvalidJarIdException : public exception {};
 class InvalidShelfException : public exception {};
 class InvalidLocationException : public exception {};
-class InvalidGrippedJarFormatException : public exception {};
 
 void UserAction::start(Heda& heda) {
   heda.waiting_message = getWaitingMessage();
@@ -202,10 +201,8 @@ void CloseupCommand::setup(Heda& heda) {
       
       heda.db.update(detected);
 
-      JarTable jarsBefore;
-      heda.db.load(jarsBefore);
       int id = atoi(detected.jar_id.c_str());
-      if (!jarsBefore.find(jar, byJarId, id)) {
+      if (!heda.db.findBy<Jar>("jar_id", id).exists()) {
         commands.push_back(make_shared<ActionIdentify>(detected.id)); 
       }
   
@@ -401,8 +398,8 @@ void LowerForGripCommand::setup(Heda& heda) {
 
   Shelf shelf; heda.shelfByHeight(shelf, heda.unitY(heda.m_position.v));
 
-  JarFormat format; 
-  if (!heda.jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+  JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
+  ensure(format.exists(), "Lower for grip needs a valid jar format. The jar did not have one.");
  
   double v = heda.unitV(shelf.height + format.height + heda.config.grip_offset);
   commands.push_back(make_shared<MoveCommand>(heda.axisV, v));
@@ -415,8 +412,8 @@ void GripCommand::doneCallback(Heda& heda) {
 
 void GripCommand::setup(Heda& heda) {
 
-  JarFormat format; 
-  if (!heda.jar_formats.get(format, jar.jar_format_id)) {throw InvalidGrippedJarFormatException();}
+  JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
+  ensure(format.exists(), "Grip needs a valid jar format. The jar did not have one.");
 
   commands.push_back(make_shared<GrabCommand>(format.grip_force));
 }
@@ -627,9 +624,8 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
  
   heda.db.deleteFrom<Location>("WHERE jar_id IS NULL");  
 
-  JarFormatTable formats; heda.db.load(formats);
-  JarFormat format;
-  ensure(formats.get(format, jar.jar_format_id), "Existing jar must refer to an existing jar format");
+  JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
+  ensure(format.exists(), "Get new location needs a valid jar format. The jar did not have one.");
 
   double widthNeeded = max(format.diameter, format.lid_diameter) + 32; // mm, FIXME: Hardcoded, 32mm
 

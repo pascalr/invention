@@ -62,8 +62,9 @@ class HedaController {
       //m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();};
       m_commands["calibrate"] = [&](ParseResult tokens) {
         string jarFormatName = tokens.popNoun();
-        JarFormat format;
-        ensure(heda.jar_formats.ifind(format, byName, jarFormatName), "calibrate must have a valid jar format name");
+
+        JarFormat format = heda.db.findBy<JarFormat>("name", jarFormatName, "COLLATE NOCASE");
+        ensure(format.exists(), "Calibrate needs a valid jar format.");
         heda.calibrate(format);
       };
       //m_commands["closeup"] = [&](ParseResult tokens) { // Move closer to the detected codes to get a better picture.
@@ -159,13 +160,13 @@ class HedaController {
       //  try {name = tokens.popNoun();} catch (const MissingArgumentException& e) {/*It's ok it's optional.*/}
       //  heda.pushCommand(make_shared<StoreCommand>(name));
       //};
-      m_commands["grip"] = [&](ParseResult tokens) {
-        unsigned long id = tokens.popPositiveInteger();
-        Jar jar;
-        if (heda.jars.get(jar, id)) {
-          heda.pushCommand(make_shared<GripCommand>(jar));
-        } // TODO Handle error
-      };
+      //m_commands["grip"] = [&](ParseResult tokens) {
+      //  unsigned long id = tokens.popPositiveInteger();
+      //  Jar jar;
+      //  if (heda.jars.get(jar, id)) {
+      //    heda.pushCommand(make_shared<GripCommand>(jar));
+      //  } // TODO Handle error
+      //};
       //m_commands["pickup"] = [&](ParseResult tokens) {
       //  // TODO: popLocation? worth it? wait to see...
       //  int id = tokens.popPositiveInteger();

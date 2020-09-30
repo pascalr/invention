@@ -257,39 +257,6 @@ class JarFormat : public Model {
 void bindQuery(SQLite::Statement& query, const JarFormat& item);
 void parseItem(SQLite::Statement& query, JarFormat& item);
 
-class JarFormatTable : public Table<JarFormat> {
-  public:
-    const char* TABLE_NAME = "jar_formats";
-    string getTableName() { return TABLE_NAME; };
-    
-    void bindQuery(SQLite::Statement& query, const JarFormat& item) {
-      query.bind(1, item.empty_weight);
-      query.bind(2, item.height);
-      query.bind(3, item.diameter);
-      query.bind(4, item.created_at);
-      query.bind(5, item.updated_at);
-      query.bind(6, item.name);
-      query.bind(7, item.lid_diameter);
-      query.bind(8, item.lid_weight);
-      query.bind(9, item.grip_force);
-    }
-
-    JarFormat parseItem(SQLite::Statement& query) {
-      JarFormat item;
-      item.empty_weight = query.getColumn(1);
-      item.height = query.getColumn(2);
-      item.diameter = query.getColumn(3);
-      item.created_at = query.getColumn(4);
-      item.updated_at = query.getColumn(5);
-      item.name = (const char*)query.getColumn(6);
-      item.lid_diameter = query.getColumn(7);
-      item.lid_weight = query.getColumn(8);
-      item.grip_force = query.getColumn(9);
-      return item;
-    }
-
-};
-
 class Jar : public Model {
   public:
     int jar_format_id = -1;
@@ -300,31 +267,6 @@ class Jar : public Model {
 //string getTableName(Jar* code = NULL);
 void bindQuery(SQLite::Statement& query, const Jar& item);
 void parseItem(SQLite::Statement& query, Jar& item);
-
-class JarTable : public Table<Jar> {
-  public:
-    const char* TABLE_NAME = "jars";
-    string getTableName() { return TABLE_NAME; };
-    
-    void bindQuery(SQLite::Statement& query, const Jar& item) {
-      query.bind(1, item.jar_format_id);
-      query.bind(2, item.ingredient_id);
-      query.bind(3, item.created_at);
-      query.bind(4, item.updated_at);
-      query.bind(6, item.jar_id);
-    }
-
-    Jar parseItem(SQLite::Statement& query) {
-      Jar jar;
-      jar.jar_format_id = query.getColumn(1);
-      jar.ingredient_id = query.getColumn(2);
-      jar.created_at = query.getColumn(3);
-      jar.updated_at = query.getColumn(4);
-      jar.jar_id = query.getColumn(6);
-      return jar;
-    }
-
-};
 
 class Ingredient : public Model {
   public:
