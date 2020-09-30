@@ -2,18 +2,54 @@
 #define _HEDA_CONTROLLER_H
 
 #include "heda.h"
+#include <thread>
+#include <chrono>
 
 class UnitConversionException : public exception {};
 
+//namespace Heda {
+
+void writeSlave(Heda& heda, std::string& cmd) {
+  heda.m_writer << cmd;
+  
+  // Loops until the message MESSAGE_DONE has been received.
+  while (true) {
+
+    heda.ensureActive();
+
+    if (heda.m_reader.inputAvailable()) {
+
+      string str = getInputLine(heda.m_reader);
+      if (str == MESSAGE_DONE) break;
+    }
+      
+    this_thread::sleep_for(chrono::milliseconds(10));
+  }
+}
+
+void move(Heda& heda, Axis& axis, double destination) {
+
+  std::string cmd = "m" + string(1, axis.id) + to_string(destination);
+  //auto h5 = Header5("MOVE("+cmd+")"); 
+
+  writeSlave(heda, cmd);
+
+  if (axis.id == AXIS_H) {
+    heda.m_position.h = destination;
+  } else if (axis.id == AXIS_V) {
+    heda.m_position.v = destination;
+  } else if (axis.id == AXIS_T) {
+    heda.m_position.t = destination;
+  //} else if (axis.id == AXIS_R) {
+  }
+}
+
 // Heda controller stack command
-// But we don't care for that right now. I do only one command at a time.
-// This will be important when multiple users.
-//class StackCommand {
-//  public:
-//    std::string name;
-//    std::function<void(ParseResult)> func;
-//};
-//std::vector<std::function<void(ParseResult)>> HedaController::m_stack;
+class StackCommand {
+  public:
+    std::string name;
+    std::function<void(ParseResult)> func;
+};
 
 class HedaController {
   public:
@@ -193,7 +229,7 @@ class HedaController {
        
         Axis* axis = heda.axisByName(axisName);
         ensure(axis != 0, "ref command expects a valid axis name");
-        heda.pushCommand(make_shared<MoveCommand>(*axis, dest));
+        move(heda, *axis, dest);
       };
       m_commands["sweep"] = [&](ParseResult tokens) {
         heda.pushCommand(make_shared<SweepCommand>());
@@ -300,6 +336,7 @@ class HedaController {
     }
 
     std::unordered_map<std::string, std::function<void(ParseResult)>> m_commands;
+    std::vector<std::function<void(ParseResult)>> stack;
 
     Heda& m_heda;
 };

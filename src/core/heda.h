@@ -20,6 +20,8 @@ class Heda;
 
 #include "database.h"
 
+class StoppedException : public exception {};
+
 class HedaException : public exception {};
 
 class InitArduinoException : public HedaException {};
@@ -589,6 +591,14 @@ class Heda {
     Shelf working_shelf;
 
     bool is_paused = false;
+
+    void ensureActive() {
+      if (is_stopped) {
+        throw StoppedException();
+      }
+    }
+
+    bool is_stopped = false;
 
     string waiting_message;
     string fatal_message;
