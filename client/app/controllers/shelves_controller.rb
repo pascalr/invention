@@ -2,6 +2,7 @@ class ShelvesController < ApplicationController
   def index
     @shelves = Shelf.all
     @detected_codes = DetectedCode.all
+    @config = Heda.first
   end
 
   def new

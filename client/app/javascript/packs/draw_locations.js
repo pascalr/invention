@@ -69,13 +69,15 @@ function toggleMenuOn(e, id) {
 
   var ids = []
   var locations = JSON.parse(elem.dataset["locations"]);
-  var jars = JSON.parse(elem.dataset["jars"]);
   var ingredients = JSON.parse(elem.dataset["ingredients"]);
+
+  var isworkingshelf = JSON.parse(elem.dataset["isworkingshelf"]);
+
   locations.forEach((loc, i) => {
 
     var z = shelf.depth - loc.z;
     var circle = two.makeCircle(loc.x, z, (loc.diameter/2)-LINE_THICKNESS);
-    if (jars[i]) {
+    if (loc.occupied) {
       circle.fill = loc.is_storage ? '#FF8000' : '#7777FF';
       
       two.makeText(ingredients[i], loc.x, z);
@@ -100,28 +102,30 @@ function toggleMenuOn(e, id) {
   //  }, false);
   //});
 
-  var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
-  detected_codes.forEach((code, i) => {
-    console.log("image/show?name=" + code.img)
-   
-    var HRCODE_DIAMETER = 36 // mm FIXME HARDCODED
+  if (isworkingshelf) {
+    var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
+    detected_codes.forEach((code, i) => {
+      console.log("image/show?name=" + code.img)
+     
+      var HRCODE_DIAMETER = 36 // mm FIXME HARDCODED
 
-    var texture = two.makeTexture("image/show?name=" + code.img, () => {
-      two.update();
+      var texture = two.makeTexture("image/show?name=" + code.img, () => {
+        two.update();
+      })
+      
+      // texture.scale = HRCODE_DIAMETER / texture.width // FIXME: texture.width is undefined
+      //texture.scale = 0.5
+
+      var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
+      //circle.fill = '#FF8000';
+      circle.fill = texture
+      
+      //texture.scale = HRCODE_DIAMETER / texture.width
+
+      //var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
+      //circle.fill = texture
     })
-    
-    // texture.scale = HRCODE_DIAMETER / texture.width // FIXME: texture.width is undefined
-    //texture.scale = 0.5
-
-    var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
-    //circle.fill = '#FF8000';
-    circle.fill = texture
-    
-    //texture.scale = HRCODE_DIAMETER / texture.width
-
-    //var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
-    //circle.fill = texture
-  })
+  }
   
   two.update();
 
