@@ -460,11 +460,13 @@ class Heda {
 
     void stop() {
       std::lock_guard<std::mutex> guard(commandsMutex);
+
+      auto h5 = Header5("STOP");
+
       m_stack.clear();
       m_pending_commands.clear();
       gripped_jar.id = -1;
       is_gripping = false;
-      cout << "Executing stop" << endl;
       m_writer << "s";
       askPosition();
     }
@@ -657,6 +659,7 @@ class Heda {
       while(server_reader.inputAvailable()) {
         string cmd = getInputLine(server_reader);
         if (cmd == "stop") {
+          stop();
           throw StoppedException();
         }
       }

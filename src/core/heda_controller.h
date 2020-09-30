@@ -314,6 +314,8 @@ class HedaController {
       if (func) {
         try {
           func(result);
+        } catch (const StoppedException& e) {
+          // Nothing to do
         } catch (const EnsureException& e) {
           // Return a bad request to the server when an exception like this occur. This is different thant Heda. This is HedaController.
         } catch (const MissingArgumentException& e) {cerr << "Caught a missing argument exception" << endl;}
