@@ -193,7 +193,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 
   auto h3 = Header3("GET NEW LOCATION");
 
-  heda.db.deleteFrom<Location>("WHERE jar_id IS NULL");  
+  //heda.db.deleteFrom<Location>("WHERE occupied = 0 AND shelf_id = " + to_string(heda.working_shelf.id));  
 
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
   ensure(format.exists(), "Get new location needs a valid jar format. The jar did not have one.");
@@ -424,7 +424,7 @@ void closeup(Heda& heda, DetectedHRCode& detected) {
     Mat frame;
     heda.captureFrame(frame);
     vector<DetectedHRCode> allDetected;
-    //detectCodes(heda, allDetected, frame, heda.getPosition());
+    detectCodes(heda, allDetected, frame, heda.getPosition());
 
     if (allDetected.size() < 1) {errorMsg = "There must be a detected code in a closup."; continue;}
     if (allDetected.size() > 1) {errorMsg = "There must be only one detected code in a closup."; continue;}
@@ -539,6 +539,41 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   heda.gripped_jar.id = -1;
 }
 
+void fetch(Heda& heda, Jar& jar) {
+
+  auto h2 = Header2("FETCH");
+
+  // TODO: Make sure the the quantity of ingredients left in the jar is ok.
+ 
+  Location loc = heda.db.findBy<Location>("jar_id", jar.id);
+  ensure(loc.exists(), "Could not find the location of the jar id = " + to_string(jar.id));
+
+  Shelf shelf = heda.db.find<Shelf>(loc.shelf_id);
+  ensure(shelf.exists(), "Could not find the shelf of the location id = " + to_string(loc.id));
+    
+  Location dest = getNewLocation(heda, jar, heda.working_shelf); 
+  ensure(dest.exists(), "Could not find a destination location to drop the fetched jar.");
+  
+  Shelf destShelf = heda.db.find<Shelf>(dest.shelf_id);
+  ensure(destShelf.exists(), "Could not find the shelf of the location id = " + to_string(dest.id));
+
+  gotoPolar(heda, heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius));
+  lowerForGrip(heda,jar);
+  grip(heda,jar);
+
+  loc.occupied = false;
+  heda.db.update(loc);
+
+  gotoPolar(heda, heda.toPolarCoord(UserCoord(dest.x,destShelf.moving_height,dest.z), heda.config.gripper_radius));
+  putdown(heda);
+
+  dest.occupied = true;
+  heda.db.update(dest);
+
+  gohome(heda);
+}
+
+
 //// Heda controller stack command
 //class StackCommand {
 //  public:
@@ -625,6 +660,29 @@ class HedaController {
           storeDetected(heda, code);
         }
         gohome(heda);
+      };
+      
+      m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
+
+        string ingredientName = tokens.popNoun();
+
+        Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName, "COLLATE NOCASE");
+        ensure(ingredient.exists(), "Could not find an ingredient with the name " + ingredientName);
+
+        Jar jar = heda.db.findBy<Jar>("ingredient_id", ingredient.id);
+        ensure(ingredient.exists(), "Could not find a jar that contains the ingredient " + ingredientName);
+
+        fetch(heda, jar);
+      }; 
+      m_commands["test"] = [&](ParseResult tokens) {
+        auto h1 = Header1("TEST");
+        //Ingredient i;
+        //i.name = "FooBar";
+        //heda.db.insert(i);
+        //ensure(i.exists(), "FooBar must exist!");
+        std::cout << "FOO!" << std::endl;
+        //heda.config.grip_offset = 0.0;
+        //heda.db.update(heda.config);
       };
 
       //// at throws a out of range exception 
@@ -766,18 +824,6 @@ class HedaController {
       //m_commands["parse"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<ParseCodesCommand>());};
       //m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PinpointCommand>());};
       //m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
-      //m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
-
-      //  string ingredientName = tokens.popNoun();
-
-      //  Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName, "COLLATE NOCASE");
-      //  ensure(ingredient.exists(), "Could not find an ingredient with the name " + ingredientName);
-
-      //  Jar jar = heda.db.findBy<Jar>("ingredient_id", ingredient.id);
-      //  ensure(ingredient.exists(), "Could not find a jar that contains the ingredient " + ingredientName);
-
-      //  heda.pushCommand(make_shared<FetchCommand>(jar));
-      //}; 
       //m_commands["photo"] = [&](ParseResult tokens) {
       //  Mat mat;
       //  heda.captureFrame(mat);
@@ -852,6 +898,7 @@ class HedaController {
     }
 
     std::unordered_map<std::string, std::function<void(ParseResult)>> m_commands;
+    //std::unordered_map<std::string, std::function<void(ParseResult)>> recipe_commands;
     
     //std::unordered_map<std::string, std::function<void(ParseResult)>> commands;
     //std::vector<std::function<void(ParseResult)>> stack;
