@@ -559,8 +559,6 @@ void bring(Heda& heda, Ingredient& ingredient) {
 
   dest.occupied = true;
   heda.db.update(dest);
-
-  gohome(heda);
 }
 
 void fetch(Heda& heda, Recipe& recipe) {
@@ -611,7 +609,7 @@ class HedaController {
       };
       
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
-      m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);};
+      m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
       m_commands["dismiss"] = [&](ParseResult tokens) {dismiss(heda);};
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
@@ -645,6 +643,8 @@ class HedaController {
         ensure(ingredient.exists(), "Could not find an ingredient with the name " + ingredientName);
 
         bring(heda, ingredient);
+
+        gohome(heda);
       }; 
 
       m_commands["fetch"] = [&](ParseResult tokens) { // Fetch a recipe
@@ -655,6 +655,8 @@ class HedaController {
         ensure(recipe.exists(), "Could not find an ingredient with the name " + recipeName);
 
         fetch(heda, recipe);
+        
+        gohome(heda);
       }; 
 
       m_commands["test"] = [&](ParseResult tokens) {

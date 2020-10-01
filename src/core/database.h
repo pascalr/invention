@@ -5,21 +5,41 @@
 #include "model.h"
 #include <vector>
 #include <sstream>
+#include "sqlite3.h"
 
 using namespace std;
 
-// HUUUUUUUUGEEEE FIXME: I do not validate the user input. It could insert sql...
-// I should probably use ruby on rails which does all this already...
-
 #include <mutex>
 
-std::string quoteValue(std::string value);
+std::string sanitizeQuote(std::string val);
 
 template<class T>
-T quoteValue(T value) {
-  // TODO: Sanitize value
-  return value;
+std::string sanitizeQuote(T val) {
+  stringstream ss; ss << val;
+  return sqlite3_mprintf("%q", ss.str().c_str());
 }
+
+std::string sanitize(std::string str);
+
+// I wanted to bind statements always to be safe, but it is too complicated and I
+// don't want to change everything. Simply sanitize the input.
+/*
+class DbStatement {
+};
+
+template<typename T>
+class WhereEqual : public DbStatement {
+  public:
+    Where(std::string columnName, T val) : column_name(columnName), val(val) {}
+    std::string str() {
+      stringstream ss; ss << "WHERE "
+    }
+    std::string column_name;
+    T val;
+};
+*/
+
+//db.all<Table>(WhereEqual("columnName", value));
 
 class LogQuery {
   public:
@@ -33,7 +53,7 @@ class LogQuery {
       out << "[\"";
       out << info_query.getColumnName(index);
       out << "\", ";
-      out << quoteValue(val);
+      out << sanitizeQuote(val);
       out << "]";
     }
 
@@ -63,11 +83,12 @@ class Database {
       std::cout << "\033[35m" << name << "\033[0m" << ": " << val << " " << query.print() << endl;
     }
 
-    void execute(const char* cmd) {
-      std::lock_guard<std::mutex> guard(dbMutex);
-      log("DB EXEC", cmd);
-      db.exec(cmd);
-    }
+    // Disabled because it is unsafe
+    //void execute(const char* cmd) {
+    //  std::lock_guard<std::mutex> guard(dbMutex);
+    //  log("DB EXEC", cmd);
+    //  db.exec(cmd);
+    //}
 
     // Optional used for like ORDER BY
     // It is added at the end of the query
@@ -76,7 +97,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
       
       stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>();
-      queryStr << " " << optional;
+      queryStr << " " << sanitize(optional);
 
       std::vector<T> result;
 
@@ -98,7 +119,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
       
       stringstream queryStr;
-      queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " " << optional << " LIMIT 1";
+      queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " " << sanitize(optional) << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
 
       T item;
@@ -122,7 +143,7 @@ class Database {
       std::lock_guard<std::mutex> guard(dbMutex);
       
       stringstream queryStr;
-      queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << columnName << " = " << quoteValue(value) << " " << optional << " LIMIT 1";
+      queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << sanitize(columnName) << " = " << sanitizeQuote(value) << " " << sanitize(optional) << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
 
       T item;
@@ -151,7 +172,7 @@ class Database {
     void deleteFrom(std::string optional) {
       std::lock_guard<std::mutex> guard(dbMutex);
     
-      stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << optional;
+      stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << sanitize(optional);
       log("DB DELETE", ss.str());
       db.exec(ss.str());
     }
@@ -221,7 +242,7 @@ class Database {
     
     template<class T> 
     long unsigned int getMaxLength(std::string columnName) {
-      stringstream ss; ss << "SELECT MAX(LENGTH("+columnName+")) FROM " << getTableName<T>();
+      stringstream ss; ss << "SELECT MAX(LENGTH("+sanitize(columnName)+")) FROM " << getTableName<T>();
       log("DB MAX", ss.str());
       SQLite::Statement query(db, ss.str());
       query.executeStep();
