@@ -3,6 +3,13 @@
 
 void parseRecipe() {
 }
+      //m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee
+      //  // Delete all the ingredient quantities 
+      //  string name = tokens.popNoun();
+      //  Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
+      //  ensure(recipe.exists(), "process command must have a valid recipe name");
+      //  process(heda, recipe);
+      //};
 
 //bool is_processing_recipe = false;
 //Recipe recipe_being_process;

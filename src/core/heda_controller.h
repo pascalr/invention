@@ -594,6 +594,7 @@ class HedaController {
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
       m_commands["done"] = [&](ParseResult tokens) {heda.user_response = "done";};
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
+      m_commands["loadcfg"] = [&](ParseResult tokens) {heda.loadConfig();};
       
       m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
 
@@ -637,15 +638,6 @@ class HedaController {
       };
 
       //// at throws a out of range exception 
-      //m_commands["test"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<TestCommand>());};
-      //m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee
-      //  // Delete all the ingredient quantities 
-      //  string name = tokens.popNoun();
-      //  Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
-      //  ensure(recipe.exists(), "process command must have a valid recipe name");
-      //  process(heda, recipe);
-      //};
-      ////m_commands["genloc"] = [&](ParseResult tokens) {heda.generateLocations();};
       //m_commands["calibrate"] = [&](ParseResult tokens) {
       //  string jarFormatName = tokens.popNoun();
 
@@ -661,23 +653,9 @@ class HedaController {
       ////  Jar jar;
       ////  heda.pushCommand(make_shared<CloseupCommand>(code, jar));
       ////};
-      //m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
-
-      //  vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>("ORDER BY lid_y DESC");
-      //  //heda.codes.order(byLidY, false);
-      //  for (DetectedHRCode& code : codes) {
-      //    heda.pushCommand(make_shared<StoreDetectedCommand>(code));
-      //  }
-      //  heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
-      //};
       //m_commands["nodup"] = [&](ParseResult tokens) {
       //  removeNearDuplicates(heda);
       //};
-      ////m_commands["moveover"] = [&](ParseResult tokens) {
-      ////  moveOver(Heda& heda);
-      ////};
-      //
-      //// -----------------------------------------------------------------------------------------------------
       //
       //// hover command => Move on top of the thing in x and z, at the moving height of the shelf.
       //m_commands["hover"] = [&](ParseResult tokens) {
@@ -685,23 +663,11 @@ class HedaController {
       //  double z = tokens.popScalaire();
       //  heda.pushCommand(make_shared<HoverCommand>(x,z,heda.config.gripper_radius));
       //};
-      //
-      //
-      //
       //m_commands["ref"] = [&](ParseResult tokens) {
       //  char axisName = tokens.popAxis();
       //  Axis* axis = heda.axisByName(axisName);
       //  ensure(axis != 0, "ref command expects a valid axis name");
       //  heda.pushCommand(make_shared<ReferencingCommand>(*axis));
-      //};
-      //m_commands["store"] = [&](ParseResult tokens) {
-      //  heda.pushCommand(make_shared<SweepCommand>());
-
-      //  vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>("ORDER BY lid_y DESC");
-      //  for (DetectedHRCode& code : codes) {
-      //    heda.pushCommand(make_shared<StoreDetectedCommand>(code));
-      //  }
-      //  heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
       //};
       ////m_commands["store"] = [&](ParseResult tokens) {
       ////  string name = "";
@@ -731,9 +697,6 @@ class HedaController {
       ////  } // TODO Handle error
       ////  cout << "Oups. No jar were found with this id." << endl;
       ////};
-      //m_commands["loadcfg"] = [&](ParseResult tokens) {
-      //  heda.loadConfig();
-      //};
       //m_commands["grab"] = [&](ParseResult tokens) {
       //  double strength = tokens.popScalaire();
       //  cout << "Executing grab with strength = " << strength << endl;
