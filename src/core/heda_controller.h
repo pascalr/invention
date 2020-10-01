@@ -2,6 +2,7 @@
 #define _HEDA_CONTROLLER_H
 
 #include "pinpoint.h"
+#include "recipe_parser.h"
 #include "heda.h"
 #include <thread>
 #include <chrono>
@@ -577,6 +578,8 @@ class HedaController {
       };
       
       m_commands["home"] = [&](ParseResult tokens) {
+        // TODO: home goes home, and does a referencing if needed only
+        auto h1 = Header1("REFERENCING");
         reference(heda, heda.axisR);
         reference(heda, heda.axisT);
         reference(heda, heda.axisH);
@@ -585,10 +588,16 @@ class HedaController {
         gohome(heda);
         openGrip(heda);
       };
+      
+      m_commands["parserecipe"] = [&](ParseResult tokens) { // Calculate for a recipee
+        string name = tokens.popNoun();
+        Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
+        ensure(recipe.exists(), "parserecipe command must have a valid recipe name");
+        parseRecipe(heda, recipe);
+      };
+      
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
-      
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);};
-      
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
       m_commands["dismiss"] = [&](ParseResult tokens) {dismiss(heda);};
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};
