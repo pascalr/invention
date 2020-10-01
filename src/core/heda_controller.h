@@ -378,7 +378,7 @@ void sweep(Heda& heda) {
 
       if (!xUp) {x = xMax + xMin - x;}
 
-      UserCoord c(x, heda.config.detect_height, z);
+      UserCoord c(x, heda.working_shelf.height+heda.config.detect_height, z);
       gotoPolar(heda, heda.toPolarCoord(c,heda.config.gripper_radius));
       detect(heda);
     }
