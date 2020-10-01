@@ -15,6 +15,15 @@ std::string parseWord(std::string& str) {
   return cmd;
 }
 
+// TODO: Later handle escape character, either a backslash at the end or inside quotes it's not over by newline.
+std::string parseSentence(std::string& str) {
+ 
+  ltrim(str);
+  string cmd = str.substr(0, str.find('\n'));
+  str = str.substr(cmd.length());
+  return cmd;
+}
+
 double parseFloat(std::string& str) {
   
   string number = parseWord(str);
@@ -75,12 +84,14 @@ void parseRecipe(Heda& heda, Recipe& recipe) {
 
   while (!str.empty()) {
 
-    std::string instruction = parseWord(str);
+    std::string sentence = parseSentence(str);
+
+    std::string instruction = parseWord(sentence);
     if (instruction == "ajouter") {
 
-      double qty = parseFloat(str);
-      Unit unit = parseDb<Unit>(heda, str, "name");
-      Ingredient ingredient = parseDb<Ingredient>(heda, str, "name");
+      double qty = parseFloat(sentence);
+      Unit unit = parseDb<Unit>(heda, sentence, "name");
+      Ingredient ingredient = parseDb<Ingredient>(heda, sentence, "name");
 
       ajouter(heda, recipe, qty, unit, ingredient);
 
