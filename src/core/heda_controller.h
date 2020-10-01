@@ -16,20 +16,6 @@ class UnitConversionException : public exception {};
 //namespace Heda {
 
 
-//class ActionIdentify : public UserAction {
-//  public:
-//    ActionIdentify(int id) : id(id) {
-//    }
-//    string str() {return "actionNewJar";}
-//    string getWaitingMessage() {
-//      return "Un nouveau pot a été détecté. Pouvez-vous svp déterminer ses caractéristiques?";
-//    }
-//    string getActionRequired() {
-//      return "identify " + to_string(id);
-//    }
-//    int id;
-//};
-
 void dismiss(Heda& heda) {
   heda.waiting_message = "";
   heda.fatal_message = "";
@@ -573,42 +559,9 @@ void fetch(Heda& heda, Jar& jar) {
   gohome(heda);
 }
 
-
-//// Heda controller stack command
-//class StackCommand {
-//  public:
-//    std::string name;
-//    std::function<void(ParseResult)> func;
-//    bool is_done;
-//};
-
 class HedaController {
   public:
 
-    bool is_processing_recipe = false;
-    Recipe recipe_being_process;
-
-    void process(Heda& heda, Recipe& recipe) {
-
-      heda.db.deleteFrom<IngredientQuantity>("WHERE recipe_id = " + to_string(recipe.id));
-
-      is_processing_recipe = true;
-      recipe_being_process = recipe;
-      execute(recipe.instructions);
-      is_processing_recipe = false;
-    }
-
-    double convert(double val, Unit fromUnit, Unit toUnit, double density) {
-
-      if (fromUnit.is_weight != toUnit.is_weight) {
-        if (fromUnit.is_weight) {
-          return val * (fromUnit.value / density) / toUnit.value;
-        } else {
-          return val * fromUnit.value / (toUnit.value / density);
-        }
-      }
-      return val * fromUnit.value / toUnit.value;
-    }
 
     HedaController(Heda& heda) : heda(heda) {
 
@@ -632,9 +585,7 @@ class HedaController {
         gohome(heda);
         openGrip(heda);
       };
-      m_commands["gohome"] = [&](ParseResult tokens) {
-        gohome(heda);
-      };
+      m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
       
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);};
       
@@ -736,31 +687,6 @@ class HedaController {
       //};
       //
       //
-      //m_commands["ajouter"] = [&](ParseResult tokens) {
-
-      //  ensure(is_processing_recipe, "Must be processing recipe, because actually doing it is not implemented yet");
-
-      //  double s = tokens.popScalaire();
-      //  string unitName = tokens.popNoun();
-      //  string ingredientName = tokens.popNoun();
-
-      //  Unit unit = heda.db.findBy<Unit>("name", unitName, "COLLATE NOCASE");
-      //  ensure(unit.exists(), "ajouter must have a valid unit name");
-
-      //  Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName, "COLLATE NOCASE");
-      //  ensure(ingredient.exists(), "ajouter must have a valid ingredient name");
-
-      //  Unit toUnit = heda.db.findBy<Unit>("name", ingredient.unit_name, "COLLATE NOCASE");
-      //  ensure(toUnit.exists(), "ingredient must have a valid unit");
-
-      //  IngredientQuantity qty;
-      //  qty.recipe_id = recipe_being_process.id;
-      //  qty.ingredient_id = ingredient.id;
-      //  qty.value = s;
-      //  //qty.value = convert(s, unit, toUnit, ingredient.density);
-      //  qty.unit_id = unit.id;
-      //  heda.db.insert(qty);
-      //};
       //
       //m_commands["ref"] = [&](ParseResult tokens) {
       //  char axisName = tokens.popAxis();
@@ -768,12 +694,6 @@ class HedaController {
       //  ensure(axis != 0, "ref command expects a valid axis name");
       //  heda.pushCommand(make_shared<ReferencingCommand>(*axis));
       //};
-
-
-      //m_commands["gohome"] = [&](ParseResult tokens) {
-      //  heda.pushCommand(make_shared<GotoCommand>(PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t)));
-      //};
-
       //m_commands["store"] = [&](ParseResult tokens) {
       //  heda.pushCommand(make_shared<SweepCommand>());
 
@@ -898,10 +818,6 @@ class HedaController {
     }
 
     std::unordered_map<std::string, std::function<void(ParseResult)>> m_commands;
-    //std::unordered_map<std::string, std::function<void(ParseResult)>> recipe_commands;
-    
-    //std::unordered_map<std::string, std::function<void(ParseResult)>> commands;
-    //std::vector<std::function<void(ParseResult)>> stack;
 
     Heda& heda;
 };
