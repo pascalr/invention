@@ -18,9 +18,9 @@ std::string parseWord(std::string& str) {
 // TODO: Later handle escape character, either a backslash at the end or inside quotes it's not over by newline.
 std::string parseSentence(std::string& str) {
  
-  ltrim(str);
   string cmd = str.substr(0, str.find('\n'));
   str = str.substr(cmd.length());
+  trim(cmd);
   return cmd;
 }
 
@@ -60,14 +60,17 @@ T parseDb(Heda& heda, std::string& str, std::string columnName) {
 
 void ajouter(Heda& heda, Recipe& recipe, double quantity, Unit& unit, Ingredient& ingredient) {
 
-  Unit toUnit = heda.db.findBy<Unit>("name", ingredient.unit_name, "COLLATE NOCASE");
-  ensure(toUnit.exists(), "ingredient must have a valid unit");
+  //Unit toUnit = heda.db.findBy<Unit>("name", ingredient.unit_name, "COLLATE NOCASE");
+  //if (toUnit.exists()) {
+  //  // convert? I don't remember the purpose of toUnit
+  //qty.value = convert(s, unit, toUnit, ingredient.density);
+  //}
+  //ensure(toUnit.exists(), "ingredient must have a valid unit");
 
   IngredientQuantity qty;
   qty.recipe_id = recipe.id;
   qty.ingredient_id = ingredient.id;
   qty.value = quantity;
-  //qty.value = convert(s, unit, toUnit, ingredient.density);
   qty.unit_id = unit.id;
   heda.db.insert(qty);
 }
@@ -81,6 +84,8 @@ void parseRecipe(Heda& heda, Recipe& recipe) {
 
   std::string str = recipe.instructions;
   transform(str.begin(), str.end(), str.begin(), ::tolower); 
+
+  debug();
 
   while (!str.empty()) {
 
@@ -98,6 +103,7 @@ void parseRecipe(Heda& heda, Recipe& recipe) {
     } else {
       ensure(false, "L'instruction \"" + instruction + "\" n'est pas valide.");
     }
+    trim(str);
   }
 
   //execute(recipe.instructions);

@@ -526,9 +526,12 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   heda.gripped_jar.id = -1;
 }
 
-void fetch(Heda& heda, Jar& jar) {
+void bring(Heda& heda, Ingredient& ingredient) {
 
-  auto h2 = Header2("FETCH");
+  auto h2 = Header2("BRING");
+
+  Jar jar = heda.db.findBy<Jar>("ingredient_id", ingredient.id);
+  ensure(ingredient.exists(), "Could not find a jar that contains the ingredient " + ingredient.name);
 
   // TODO: Make sure the the quantity of ingredients left in the jar is ok.
  
@@ -539,7 +542,7 @@ void fetch(Heda& heda, Jar& jar) {
   ensure(shelf.exists(), "Could not find the shelf of the location id = " + to_string(loc.id));
     
   Location dest = getNewLocation(heda, jar, heda.working_shelf); 
-  ensure(dest.exists(), "Could not find a destination location to drop the fetched jar.");
+  ensure(dest.exists(), "Could not find a destination location to drop the jar brought.");
   
   Shelf destShelf = heda.db.find<Shelf>(dest.shelf_id);
   ensure(destShelf.exists(), "Could not find the shelf of the location id = " + to_string(dest.id));
@@ -558,6 +561,17 @@ void fetch(Heda& heda, Jar& jar) {
   heda.db.update(dest);
 
   gohome(heda);
+}
+
+void fetch(Heda& heda, Recipe& recipe) {
+
+  for (IngredientQuantity ingQty : heda.db.all<IngredientQuantity>("WHERE recette_id = " + to_string(recipe.id))) {
+
+    Ingredient ingredient = heda.db.find<Ingredient>(ingQty.ingredient_id);
+    ensure(ingredient.exists(), "Could not find the ingredient of the ingredient quantity id = " + ingQty.id);
+
+    bring(heda, ingredient);
+  }
 }
 
 class HedaController {
@@ -623,18 +637,26 @@ class HedaController {
         gohome(heda);
       };
       
-      m_commands["fetch"] = [&](ParseResult tokens) {// Fetch an ingredient
+      m_commands["bring"] = [&](ParseResult tokens) { // Bring an ingredient
 
         string ingredientName = tokens.popNoun();
 
         Ingredient ingredient = heda.db.findBy<Ingredient>("name", ingredientName, "COLLATE NOCASE");
         ensure(ingredient.exists(), "Could not find an ingredient with the name " + ingredientName);
 
-        Jar jar = heda.db.findBy<Jar>("ingredient_id", ingredient.id);
-        ensure(ingredient.exists(), "Could not find a jar that contains the ingredient " + ingredientName);
-
-        fetch(heda, jar);
+        bring(heda, ingredient);
       }; 
+
+      m_commands["fetch"] = [&](ParseResult tokens) { // Fetch a recipe
+
+        string recipeName = tokens.popNoun();
+
+        Recipe recipe = heda.db.findBy<Recipe>("name", recipeName, "COLLATE NOCASE");
+        ensure(recipe.exists(), "Could not find an ingredient with the name " + recipeName);
+
+        fetch(heda, recipe);
+      }; 
+
       m_commands["test"] = [&](ParseResult tokens) {
         auto h1 = Header1("TEST");
         //Ingredient i;
