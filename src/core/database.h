@@ -221,7 +221,7 @@ class Database {
     
     template<class T> 
     long unsigned int getMaxLength(std::string columnName) {
-      stringstream ss; ss << "SELECT max(len("+columnName+")) FROM " << getTableName<T>();
+      stringstream ss; ss << "SELECT MAX(LENGTH("+columnName+")) FROM " << getTableName<T>();
       log("DB MAX", ss.str());
       SQLite::Statement query(db, ss.str());
       query.executeStep();

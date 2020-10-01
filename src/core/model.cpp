@@ -10,7 +10,7 @@ template <> string getTableName<Shelf>() { return "shelves"; }
 template <> string getTableName<HedaConfig>() { return "hedas"; }
 template <> string getTableName<JarFormat>() { return "jar_formats"; }
 template <> string getTableName<Unit>() { return "units"; }
-template <> string getTableName<Recipe>() { return "recipes"; }
+template <> string getTableName<Recipe>() { return "recettes"; }
 template <> string getTableName<IngredientQuantity>() { return "ingredient_quantities"; }
 
 void parseItem(SQLite::Statement& query, IngredientQuantity& i) {
