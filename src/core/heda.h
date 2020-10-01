@@ -22,12 +22,7 @@ class Heda;
 
 class StoppedException : public exception {};
 
-class HedaException : public exception {};
-
-class InitArduinoException : public HedaException {};
-
 class MissingConfigException : public exception {};
-class NoWorkingShelfException : public exception {};
 
 #include <mutex>
 
@@ -599,7 +594,7 @@ class Heda {
 
     void shelfByHeight(Shelf& shelf, double userHeight) {
 
-      if (shelves.empty()) {throw NoWorkingShelfException();}
+      ensure(!shelves.empty(), "There are no shelves available!");
     
       order(shelves, byHeight);
       auto previousIt = shelves.begin();
