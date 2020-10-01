@@ -6,6 +6,11 @@
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 using namespace std;
 
+//Header1* CURRENT_HEADER_1 = NULL;
+//
+//std::string currentHeaders() {
+//}
+
 void Heda::captureFrame(Mat& frame) {
 
   HttpClient client("192.168.0.19:8889");

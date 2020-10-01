@@ -24,13 +24,15 @@ class StoppedException : public exception {};
 
 class MissingConfigException : public exception {};
 
-#include <mutex>
-
 // TODO: Rename x and y to h and v at some point.
 #define AXIS_H 'h'
 #define AXIS_V 'v'
 #define AXIS_T 't'
 #define AXIS_R 'r'
+
+//extern Header1* CURRENT_HEADER_1;
+//
+//std::string currentHeaders();
 
 class Header1 {
   public:
@@ -447,14 +449,12 @@ class Heda {
     //void pushCommand(shared_ptr<HedaCommand> cmd) {
 
     //  stack_writer << "Pushing command: " + cmd->str();
-    //  std::lock_guard<std::mutex> guard(commandsMutex);
     //  m_stack.push_back(cmd);
     //  //m_stack.back()->setup(*this);
     //  calculatePendingCommands();
     //}
 
     void stop() {
-      std::lock_guard<std::mutex> guard(commandsMutex);
 
       auto h5 = Header5("STOP");
 
@@ -469,7 +469,6 @@ class Heda {
     // Get the state of the arduino and set Heda with it. (I dont change arduino much now,
     // mainly Heda. So this avoids doing a reference every time I change something to Heda.)
     void sync() {
-      std::lock_guard<std::mutex> guard(commandsMutex);
       askPosition();
     }
 
@@ -619,8 +618,6 @@ class Heda {
     // returns the time to sleep
     /*int handleCommandStack() {
 
-      std::lock_guard<std::mutex> guard(commandsMutex);
-
       if (m_stack.empty() || is_paused) {return 100;}
 
       shared_ptr<HedaCommand>& current = *m_stack.begin();
@@ -670,7 +667,6 @@ class Heda {
 
     void askPosition() {
       
-      // TODO: Assert already in this mutex. std::lock_guard<std::mutex> guard(commandsMutex);
       m_writer << "@";
 
       bool receivedMessagePosition = false;
@@ -698,9 +694,6 @@ class Heda {
         this_thread::sleep_for(chrono::milliseconds(10));
       }
     }
-
-
-    std::mutex commandsMutex;
 
     string m_pending_commands;
 

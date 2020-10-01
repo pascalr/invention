@@ -9,8 +9,6 @@
 
 using namespace std;
 
-#include <mutex>
-
 std::string sanitizeQuote(std::string val);
 
 template<class T>
@@ -85,7 +83,6 @@ class Database {
 
     // Disabled because it is unsafe
     //void execute(const char* cmd) {
-    //  std::lock_guard<std::mutex> guard(dbMutex);
     //  log("DB EXEC", cmd);
     //  db.exec(cmd);
     //}
@@ -94,7 +91,6 @@ class Database {
     // It is added at the end of the query
     template<class T> 
     std::vector<T> all(std::string optional = "") {
-      std::lock_guard<std::mutex> guard(dbMutex);
       
       stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>();
       queryStr << " " << sanitize(optional);
@@ -116,8 +112,6 @@ class Database {
     template<class T> 
     T find(int id, std::string optional = "") {
 
-      std::lock_guard<std::mutex> guard(dbMutex);
-      
       stringstream queryStr;
       queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " " << sanitize(optional) << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
@@ -140,8 +134,6 @@ class Database {
     template<class T, class P> 
     T findBy(std::string columnName, P value, std::string optional = "") {
 
-      std::lock_guard<std::mutex> guard(dbMutex);
-      
       stringstream queryStr;
       queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << sanitize(columnName) << " = " << sanitizeQuote(value) << " " << sanitize(optional) << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
@@ -161,8 +153,6 @@ class Database {
    
     template<class T> 
     void clear() {
-      std::lock_guard<std::mutex> guard(dbMutex);
-    
       stringstream ss; ss << "DELETE FROM " << getTableName<T>();
       log("DB CLEAR", ss.str());
       db.exec(ss.str());
@@ -170,8 +160,6 @@ class Database {
     
     template<class T> 
     void deleteFrom(std::string optional) {
-      std::lock_guard<std::mutex> guard(dbMutex);
-    
       stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << sanitize(optional);
       log("DB DELETE", ss.str());
       db.exec(ss.str());
@@ -179,8 +167,6 @@ class Database {
 
     template<class T> 
     void remove(T& item) {
-      std::lock_guard<std::mutex> guard(dbMutex);
-    
       stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " WHERE id = " << item.id;
       log("DB DELETE", ss.str());
       db.exec(ss.str());
@@ -190,8 +176,6 @@ class Database {
 
     template<class T> 
     void insert(T& item) {
-      std::lock_guard<std::mutex> guard(dbMutex);
-   
       SQLite::Statement infoQuery(db, "SELECT * FROM " + getTableName<T>() + " WHERE 0");
       LogQuery logQuery(infoQuery);
 
@@ -215,8 +199,6 @@ class Database {
 
     template<class T> 
     void update(T& item) {
-      std::lock_guard<std::mutex> guard(dbMutex);
-   
       SQLite::Statement infoQuery(db, "SELECT * FROM " + getTableName<T>() + " WHERE 0");
       LogQuery logQuery(infoQuery);
 
@@ -249,8 +231,6 @@ class Database {
       return (int)query.getColumn(0);
     }
     
-    std::mutex dbMutex;
-
   protected:
 
 
