@@ -27,6 +27,168 @@ class StepperMotor : public Motor {
 
     }
 
+    // delay is inversely proportional to the speed
+    // speed = distance_per_step / delay_per_step
+    // but I don't care about speed, only delay
+
+    // Source: https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article
+    // Archived here: thirdparty/mathematics-of-motion-control-profiles-article
+    // For an S-curve, there are 7 phases.
+    // 1. Increase of acceleration
+    // 2. Max acceleration reached
+    // 3. Decrease of acceleration
+    // 4. Constant speed reached
+    // 5. Decrease of acceleration
+    // 6. Max negative acceleration reached
+    // 7. Increase of acceleration back to zero
+  
+    unsigned long phase_2_step = 0;
+    unsigned long phase_3_step = 0;
+    unsigned long phase_4_step = 0;
+    unsigned long phase_5_step = 0;
+    unsigned long phase_6_step = 0;
+    unsigned long phase_7_step = 0;
+
+    int phase = 1; // what phase the motor is in
+
+    // It is called _p and _pp to mean first and second derivative respectively
+    // But careful it is not derived by time, it is derived by step
+    double delay_pp = 0; // second derivative of delay by step (jerk-1)
+    double delay_p = 0; // first derivative of delay by step (acceleration-1)
+    double delay = 0; // (speed-1)
+    int min_delay = 500;
+    int max_delay = 10000;
+    double max_delay_p = 10;
+    //double distance_steps = 0;
+
+    //double distance_steps = (getDestination() - getPosition()) * stepsPerUnit; // steps
+    //
+    void prepareDelays() {
+
+      // ----- PHASE 3 CALCULATIONS -----
+
+      // Do a stupid for loop, this way we get exactly what will happen, no calculation errors
+      int phase1Steps = 0;
+      for (double d_p = 0; d_p < max_delay_p; d_p = d_p + delay_pp * phase1Steps) {
+        phase1Steps++;
+      }
+      phase1Steps++; // One more step is done in nextDelay, replicating here, I think...
+
+      // To know when phase 2 should stop, let's go the other way
+      // Let's say we are going at maximum speed, so delay = min_delay
+      // We want to know at what speed should we start to decrease acceleration, in
+      // order to not go over the maximum speed.
+
+      // We know from phase 1 that it takes N steps to increase acceleration.
+      // The same values are used for phase 3 so it takes N steps to do phase 3.
+      
+      // d_p = d_p0 + d_pp * s
+      // d = d0 + d_p0 * s + 0.5 * d_pp * s^2
+    
+      // d = what we are looking for
+      // d0 = min_delay
+      // d_p0 = 0, the goal is to reach no acceleration at the end of phase 3
+      // d_pp = delay_pp
+      // s = phase1Steps
+
+      double d = min_delay * 0.5 * delay_pp * phase1Steps * phase1Steps;
+
+      // s = number of steps since phase 1, so zero
+      // d_p0 = max_delay_p
+
+      // d0 est nulle on redémarre s à zéro après la phase 1
+      // donc
+      // d = 0.5 * d_pp * s^2
+
+      // If we don't have a phase 2, this is handled automatically by nextDelay
+
+      // Phase 1 gives us how much time is needed to reach max acceleration
+      // Phase 3 lasts for as many steps as phase 1
+      // So stop phase 2 when there is that amount of steps left to reach min_delay
+    }
+
+    double phase_3_delay = 0; // At what delay to stop phase 2 and start phase 3
+    double phase_5_steps = 0; // At what distance travelled to stop phase 4 and start phase 5
+    double phase_6_steps = 0; // At what distance travelled to stop phase 5 and start phase 6
+    double phase_7_steps = 0; // At what distance travelled to stop phase 6 and start phase 7
+    int distance_to_travel_steps = 0; // The distance to travel in steps
+    
+    int nextDelay(double distanceTravelledSteps) {
+
+      // Increasing acceleration
+      if (phase == 1) {
+
+        delay_p = delay_p + delay_pp * distanceTravelledSteps;
+
+        // Check if we reached phase 2
+        if (delay_p >= max_delay_p) {
+
+          phase_7_steps = distance_to_travel_steps - distanceTravelledSteps;
+          delay_p = max_delay_p;
+          phase = 2;
+
+          // To know when phase 2 should stop, let's go the other way
+          // Let's say we are going at maximum speed, so delay = min_delay
+          // We want to know at what speed should we start to decrease acceleration, in
+          // order to not go over the maximum speed.
+
+          // We know from phase 1 that it takes N steps to increase acceleration.
+          // The same values are used for phase 3 so it takes N steps to do phase 3.
+          
+          // d_p = d_p0 + d_pp * s
+          // d = d0 + d_p0 * s + 0.5 * d_pp * s^2
+    
+          // d = what we are looking for
+          // d0 = min_delay
+          // d_p0 = 0, the goal is to reach no acceleration at the end of phase 3
+          // d_pp = delay_pp
+          // s = phase1Steps
+            
+          double phase_3_delay = min_delay * 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps;
+        }
+
+        // If we have reached to quarter of the distance, skip to phase 3
+        if (distanceTravelledSteps >= distance_steps / 4.0) phase = 3;
+
+      // Constant acceleration
+      } else if (phase == 2) {
+        
+        // Check if we reached phase 3
+        if (delay < phase_3_delay) {
+          phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
+          phase = 3;
+        }
+        
+      // Decreasing acceleration
+      } else if (phase == 3) {
+        
+        delay_p = delay_p - delay_pp * distanceTravelledSteps;
+        
+        if (delay_p <= 0) {
+          phase_5_steps = distance_to_travel_steps - distanceTravelledSteps;
+          delay_p = 0;
+          phase = 4;
+        }
+
+      // Constant speed
+      } else if (phase == 4) {
+        
+        if (distanceTravelledSteps >= phase_5_steps) phase = 5;
+      
+      // Decreasing acceleration
+      } else if (phase == 5) {
+        
+        delay_p = delay_p - delay_pp * distanceTravelledSteps;
+
+      // Constant acceleration
+      } else if (phase == 6) {
+      // Increasing acceleration
+      } else if (phase == 7) {
+      }
+      delay = delay + delay_p * distanceTravelledSteps;
+      return delay;
+    }
+
     void setAcceleration(double accel) {
       m_acceleration = accel;
     }
