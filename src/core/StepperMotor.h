@@ -6,6 +6,10 @@
 // Le vitesse initiale et finale (pas zéro pour un stepper motor) est
 // déterminé par la variable MAX_STEP_DELAY
 
+// La courbe n'est pas égal parce que d'un côté c'est par rapport à 10000, donc perdre 0.1 ce n'est pas
+// beaucoup, mais de l'autre côté c'est 500, donc perdre 0.1 c'est beaucoup
+// Je ne sais pas si c'est correct...
+
 #include "Motor.h"
 #include "../lib/ArduinoMock.h"
 #include "referencer.h"
@@ -122,7 +126,7 @@ class StepperMotor : public Motor {
         debug_steps_1 = distanceTravelledSteps;
 
         delay_p = delay_pp * distanceTravelledSteps;
-
+        
         // Check if we reached phase 2
         if (delay_p <= min_delay_p) {
 
@@ -149,7 +153,6 @@ class StepperMotor : public Motor {
         debug_time_2 = timeSinceStart;
         debug_steps_2 = distanceTravelledSteps;
      
-        debug(); 
         // If we don't decelerate now, will we go under the minimum delay?
         double delayIfDecelerate = delay + delay_p * steps_to_accelerate - 0.5 * steps_to_accelerate * delay_pp * steps_to_accelerate;
 
@@ -193,7 +196,8 @@ class StepperMotor : public Motor {
         
         delay_p = delay_p - delay_pp;
 
-        if (delay_p >= -min_delay_p) {
+        //if (delay_p >= -min_delay_p) {
+        if (distanceTravelledSteps >= phase_6_steps) {
           delay_p = -min_delay_p;
           phase = skip_phase_2 ? 7 : 6;
         }

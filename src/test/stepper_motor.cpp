@@ -40,7 +40,7 @@ void testAcceleration() {
   axis.prepareWorking(0);
   axis.setDestination(destination);
 
-  int nbPoints = 100;
+  int nbPoints = 500;
   vector<double> t; // time
   vector<double> s; // step
   vector<double> v; // speed
