@@ -25,8 +25,6 @@
 #define MAX_STEP_DELAY 5000 // us
 #define US_PER_S 1000000.0
 
-void debug() {}
-
 class StepperMotor : public Motor {
   public:
 
@@ -131,7 +129,7 @@ class StepperMotor : public Motor {
       distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
       percent = min_delay / max_delay;
       phaseNb = 1;
-      min_percent = min_delay / max_delay;
+      min_percent = min_delay * 1.0 / max_delay;
     }
 
     // This constant must be set
@@ -148,8 +146,6 @@ class StepperMotor : public Motor {
 
     // Using percent per time, with a trapezoidal curve
     int nextDelayPercent(long distanceTravelledSteps, unsigned long timeSinceStart) {
-
-      debug();
 
       double timeSinceStartS = timeSinceStart / 1000000.0;
 
@@ -185,7 +181,7 @@ class StepperMotor : public Motor {
       }
 
       int delay = (percent <= min_percent) ? max_delay : min_delay / percent;
-      std::cout << "percent: " << percent << endl;
+      //std::cout << "percent: " << percent << endl;
       debug_delay = delay;
       return delay;
     }
@@ -216,7 +212,7 @@ class StepperMotor : public Motor {
         // If we have reached to quarter of the distance, skip to phase 3
         // Or if we have to start decelerating now to reach the minimum delay
         if (distanceTravelledSteps >= distance_to_travel_steps / 4.0 || delayIfDecelerate < min_delay) {
-          std::cout << "!!!!!!!!!! Skipping phase 2 !!!!!!!!!!!" << std::endl;
+          //std::cout << "!!!!!!!!!! Skipping phase 2 !!!!!!!!!!!" << std::endl;
           skip_phase_2 = true;
           phase = 3;
         }
@@ -248,8 +244,8 @@ class StepperMotor : public Motor {
         delay_p = delay_p - delay_pp;
         
         if (delay_p >= 0) {
-          std::cout << "distance_to_travel_steps: " << distance_to_travel_steps<< endl;
-          std::cout << "DistancedTravelledSteps: " << distanceTravelledSteps << endl;
+          //std::cout << "distance_to_travel_steps: " << distance_to_travel_steps<< endl;
+          //std::cout << "DistancedTravelledSteps: " << distanceTravelledSteps << endl;
           phase_5_steps = distance_to_travel_steps - distanceTravelledSteps;
           delay_p = 0;
           phase = 4;
