@@ -83,32 +83,6 @@ class StepperMotor : public Motor {
     long debug_steps_6 = 0;
     long debug_steps_7 = 0;
 
-    void prepareMovement() {
-      distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
-      start_position_steps = m_position_steps;
-      delay = max_delay;
-      delay_p = 0;
-      phase = 1;
-    }
-
-    // Get the next delay following an S-curve    
-    int nextDelay(long distanceTravelledSteps, unsigned long timeSinceStart) {
-
-      // Increasing acceleration
-      if (phase == 1) {
-        debug_time_1 = timeSinceStart;
-        debug_steps_1 = distanceTravelledSteps;
-
-        delay_p = delay_p + delay_pp;
-
-        // Check if we reached phase 2
-        if (delay_p <= min_delay_p) {
-
-          phase_7_steps = distance_to_travel_steps - distanceTravelledSteps;
-          steps_to_accelerate = distanceTravelledSteps;
-          delay_p = min_delay_p;
-          skip_phase_2 = false;
-          phase = 2;
 
           // To know when phase 2 should stop, let's go the other way
           // Let's say we are going at maximum speed, so delay = min_delay
@@ -129,10 +103,42 @@ class StepperMotor : public Motor {
             
           //phase_3_delay = min_delay + 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps;
           //phase_3_delay = min_delay - 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps; // Why minus?
+          
+          
+    void prepareMovement() {
+      distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
+      start_position_steps = m_position_steps;
+      delay = max_delay;
+      delay_p = 0;
+      phase = 1;
+    }
+
+    // Get the next delay following an S-curve    
+    int nextDelay(long distanceTravelledSteps, unsigned long timeSinceStart) {
+
+      // Increasing acceleration
+      if (phase == 1) {
+        debug_time_1 = timeSinceStart;
+        debug_steps_1 = distanceTravelledSteps;
+
+        delay_p = delay_pp * distanceTravelledSteps;
+
+        // Check if we reached phase 2
+        if (delay_p <= min_delay_p) {
+
+          phase_7_steps = distance_to_travel_steps - distanceTravelledSteps;
+          steps_to_accelerate = distanceTravelledSteps;
+          delay_p = min_delay_p;
+          skip_phase_2 = false;
+          phase = 2;
         }
 
+        // If we don't decelerate now, will we go under the minimum delay?
+        double delayIfDecelerate = delay + delay_p * distanceTravelledSteps - 0.5 * distanceTravelledSteps * delay_pp * distanceTravelledSteps;
+
         // If we have reached to quarter of the distance, skip to phase 3
-        if (distanceTravelledSteps >= distance_to_travel_steps / 4.0) {
+        // Or if we have to start decelerating now to reach the minimum delay
+        if (distanceTravelledSteps >= distance_to_travel_steps / 4.0 || delayIfDecelerate < min_delay) {
           std::cout << "!!!!!!!!!! Skipping phase 2 !!!!!!!!!!!" << std::endl;
           skip_phase_2 = true;
           phase = 3;
@@ -145,7 +151,7 @@ class StepperMotor : public Motor {
      
         debug(); 
         // If we don't decelerate now, will we go under the minimum delay?
-        double delayIfDecelerate = delay + delay_p * steps_to_accelerate - 0.5 * delay_pp * steps_to_accelerate * steps_to_accelerate;
+        double delayIfDecelerate = delay + delay_p * steps_to_accelerate - 0.5 * steps_to_accelerate * delay_pp * steps_to_accelerate;
 
         if (delayIfDecelerate < min_delay) {
           phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
