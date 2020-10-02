@@ -8,7 +8,7 @@
 void testAcceleration() {
   title("Testing Axis::timeToReachDestination");
 
-  unsigned long moveTimeUs = 10 * 1000 * 1000; // 10 seconds
+  unsigned long moveTimeUs = 20 * 1000 * 1000; // 10 seconds
   //double destination = 42.0;
   double destination = 142.0;
   double maxSpeed = 1.5;
@@ -23,6 +23,11 @@ void testAcceleration() {
   axis.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
   axis.setStepsPerTurn(200 * 2 * 16);
 
+  axis.delay_pp = -0.1;
+  axis.min_delay = 500;
+  axis.max_delay = 10000;
+  axis.min_delay_p = -20;
+
   axis.setupPins(8,10,11);
   axis.setReverseMotorDirection(true);
   axis.setDefaultMaxSpeed(maxSpeed);
@@ -35,9 +40,12 @@ void testAcceleration() {
   axis.setDestination(destination);
 
   int nbPoints = 100;
-  vector<double> t(nbPoints);
-  vector<double> v(nbPoints);
-  vector<double> p(nbPoints);
+  vector<double> t; // time
+  vector<double> v; // speed
+  vector<double> p; // position
+
+  vector<double> d;
+  vector<double> d_p;
 
   unsigned long captureInterval = moveTimeUs / nbPoints;
   unsigned long lastCapture = 0;
@@ -46,18 +54,76 @@ void testAcceleration() {
     axis.handleAxis(time);
     if ((time - lastCapture) > captureInterval) {
       t.push_back(time / 1000000.0);
-      v.push_back(axis.getCurrentSpeed() / maxSpeed);
-      p.push_back(axis.getPosition() / destination);
+      //v.push_back((1/axis.delay)*axis.min_delay);
+      p.push_back(axis.getPosition());
+      d.push_back(axis.delay);
+      d_p.push_back(axis.delay_p);
       if (axis.getCurrentSpeed() < 0) {debug();}
       lastCapture = time;
     }
   }
 
-  beforeRenderScene();
+  cout << "Phase 2 start time: " << axis.debug_time_1 / 1000000.0 << endl;
+  cout << "Phase 3 start time: " << axis.debug_time_2 / 1000000.0 << endl;
+  cout << "Phase 4 start time: " << axis.debug_time_3 / 1000000.0 << endl;
+  cout << "Phase 5 start time: " << axis.debug_time_4 / 1000000.0 << endl;
+  cout << "Phase 6 start time: " << axis.debug_time_5 / 1000000.0 << endl;
+  cout << "Phase 7 start time: " << axis.debug_time_6 / 1000000.0 << endl;
+  cout << "End time: " << axis.debug_time_7 / 1000000.0 << endl;
+  cout << "Phase 3 delay: " << axis.phase_3_delay << endl;
 
-  drawLines(t,v,"b-");
-  drawLines(t,p,"r-");
-  show();
+  vector<double> beginingAndEndTime;
+  beginingAndEndTime.push_back(*t.begin());
+  beginingAndEndTime.push_back(t.back());
+ 
+  // Prepare the window 
+  plt::figure_size(1200, 780);
+
+  // Plot position
+  plt::subplot(2,2,1);
+  plt::title("Position");
+  plt::plot(t, p, "r-");
+
+  vector<double> startPosition;
+  startPosition.push_back(0);
+  startPosition.push_back(0);
+
+  vector<double> destinationPosition;
+  destinationPosition.push_back(destination);
+  destinationPosition.push_back(destination);
+
+  plt::plot(beginingAndEndTime, startPosition, "k-");
+  plt::plot(beginingAndEndTime, destinationPosition, "k-");
+
+  // Plot delay 
+  plt::subplot(2,2,2);
+  plt::title("Delay");
+  plt::plot(t, d, "k-");
+
+  // Plot delay_p
+  plt::subplot(2,2,3);
+  plt::title("Delay_p");
+  plt::plot(t, d_p, "b-");
+
+  // Set x-axis to interval [0,1000000]
+  //plt::xlim(0, 1000*1000);
+
+  // Add graph title
+  // Enable legend.
+  //plt::legend();
+
+  //plt::show(false);
+  plt::show();
+
+  //beforeRenderScene();
+  //drawLines(t,p,"r-");
+  //show();
+  //beforeRenderScene();
+  //drawLines(t,d,"k-");
+  //show();
+  //beforeRenderScene();
+  //drawLines(t,d_p,"b-");
+  //show();
 
   // So it should take one second to reach the destination
 }
