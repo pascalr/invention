@@ -10,6 +10,14 @@
 // beaucoup, mais de l'autre côté c'est 500, donc perdre 0.1 c'est beaucoup
 // Je ne sais pas si c'est correct...
 
+// Alright, using delays was not the best idea, because it is inversely proportial to speed and not linear with it.
+// So I will be using percentages of speed then which are easy to translate in both units.
+// 500 delay is max speed => 100%,
+// 10000 delay is min speed => 5%,
+// what is 50%? It's 1000, it is min_delay / percent
+// What about using the step as a unit instead of time
+// Also not the best because a step is not proportial to the time
+
 #include "Motor.h"
 #include "../lib/ArduinoMock.h"
 #include "referencer.h"
@@ -71,6 +79,8 @@ class StepperMotor : public Motor {
     bool skip_phase_2;
     long steps_to_accelerate = 0;
 
+    int debug_delay = 0;
+
     long debug_time_1 = 0;
     long debug_time_2 = 0;
     long debug_time_3 = 0;
@@ -115,6 +125,69 @@ class StepperMotor : public Motor {
       delay = max_delay;
       delay_p = 0;
       phase = 1;
+    }
+    
+    void prepareMovementPercent() {
+      distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
+      percent = min_delay / max_delay;
+      phaseNb = 1;
+      min_percent = min_delay / max_delay;
+    }
+
+    // This constant must be set
+    double percent_p = 0;
+
+    int phaseNb = 1; // what phase the motor is in
+   
+    // These are variables
+    double percent = 0;
+    double min_percent = 0;
+
+    long distance_accelerating = 0;
+    double time_started_decelerating = 0;
+
+    // Using percent per time, with a trapezoidal curve
+    int nextDelayPercent(long distanceTravelledSteps, unsigned long timeSinceStart) {
+
+      debug();
+
+      double timeSinceStartS = timeSinceStart / 1000000.0;
+
+      // Accelerating
+      if (phaseNb == 1) {
+
+        if (distanceTravelledSteps >= distance_to_travel_steps / 2.0) {
+          phaseNb = 3;
+          time_started_decelerating = timeSinceStartS;
+
+        } else {
+          percent = percent_p * timeSinceStartS;
+          if (percent >= 1.0) {
+            distance_accelerating = distanceTravelledSteps;
+            percent = 1.0;
+            phaseNb = 2;
+          }
+        }
+
+      // Constant speed
+      } else if (phaseNb == 2) {
+
+        if (distanceTravelledSteps > distance_to_travel_steps - distance_accelerating) {
+          phaseNb = 3;
+          time_started_decelerating = timeSinceStartS;
+        }
+
+      // Decelerating
+      } else {
+
+        percent = 1 - percent_p * (timeSinceStartS - time_started_decelerating);
+
+      }
+
+      int delay = (percent <= min_percent) ? max_delay : min_delay / percent;
+      std::cout << "percent: " << percent << endl;
+      debug_delay = delay;
+      return delay;
     }
 
     // Get the next delay following an S-curve    
@@ -196,8 +269,8 @@ class StepperMotor : public Motor {
         
         delay_p = delay_p - delay_pp;
 
-        //if (delay_p >= -min_delay_p) {
-        if (distanceTravelledSteps >= phase_6_steps) {
+        if (delay_p >= -min_delay_p) {
+        //if (distanceTravelledSteps >= phase_6_steps) {
           delay_p = -min_delay_p;
           phase = skip_phase_2 ? 7 : 6;
         }
@@ -398,7 +471,8 @@ class StepperMotor : public Motor {
       if (status < 0) {return status;}
 
       //calculateMovement();
-      prepareMovement();
+      //prepareMovement();
+      prepareMovementPercent();
       return 0;
     }
 
@@ -466,7 +540,7 @@ class StepperMotor : public Motor {
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
       lost_time = timeSinceStart - next_step_time;
-      next_step_delay = nextDelay(m_position_steps - start_position_steps, timeSinceStart); // time is for debug
+      next_step_delay = nextDelayPercent(m_position_steps - start_position_steps, timeSinceStart);
       //next_step_delay = nextDelay(m_position_steps - start_position_steps);
       //next_step_delay = calculateNextStepDelay(timeSinceStart); 
       next_step_time = timeSinceStart + next_step_delay - lost_time;
