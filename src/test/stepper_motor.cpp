@@ -25,8 +25,8 @@ void testAcceleration() {
 
   //axis.delay_pp = -0.1;
   //axis.delay_pp = -0.03;
-  axis.min_delay = 500;
-  axis.max_delay = 10000;
+  axis.min_delay = 100;
+  axis.max_delay = 5000;
   //axis.min_delay_p = -20;
   axis.percent_p = 0.2;
 
@@ -53,8 +53,18 @@ void testAcceleration() {
   unsigned long captureInterval = moveTimeUs / nbPoints;
   unsigned long lastCapture = 0;
 
+  bool jobFinished = false;
+  double timeFinishJobS = 0.0;
+
   for (unsigned long time = 0; time < moveTimeUs; time += 50) {
-    axis.handleAxis(time);
+
+    bool wasFinished = jobFinished;
+    jobFinished = !axis.handleAxis(time);
+
+    if (!wasFinished && jobFinished) {
+      timeFinishJobS = time / 1000000.0;
+    }
+
     if ((time - lastCapture) > captureInterval) {
       s.push_back(axis.m_position_steps);
       t.push_back(time / 1000000.0);
@@ -62,10 +72,15 @@ void testAcceleration() {
       p.push_back(axis.getPosition());
       d.push_back(axis.debug_delay);
       //d_p.push_back(axis.delay_p);
-      if (axis.getCurrentSpeed() < 0) {debug();}
       lastCapture = time;
+      debug();
     }
   }
+
+  cout << "Distance accelerating: " << axis.distance_accelerating << " steps." << endl;
+  cout << "Time stopped accelerating: " << axis.debug_time_finished_accelerating_s << " s." << endl;
+  cout << "Time started decelerating: " << axis.time_started_decelerating << " s." << endl;
+  cout << "Time job finished : " << timeFinishJobS << " s." << endl;
 
   //cout << "In phase 1 for " << axis.debug_steps_1 << " steps." << endl;
   //cout << "In phase 2 for " << axis.debug_steps_2 - axis.debug_steps_1 << " steps." << endl;

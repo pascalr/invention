@@ -144,6 +144,10 @@ class StepperMotor : public Motor {
     long distance_accelerating = 0;
     double time_started_decelerating = 0;
 
+    double debug_time_finished_accelerating_s = 0;
+
+    double max_percent_reached = 0;
+
     // Using percent per time, with a trapezoidal curve
     int nextDelayPercent(long distanceTravelledSteps, unsigned long timeSinceStart) {
 
@@ -155,11 +159,14 @@ class StepperMotor : public Motor {
         if (distanceTravelledSteps >= distance_to_travel_steps / 2.0) {
           phaseNb = 3;
           time_started_decelerating = timeSinceStartS;
+          debug_time_finished_accelerating_s = timeSinceStartS;
+          max_percent_reached = percent;
 
         } else {
           percent = percent_p * timeSinceStartS;
           if (percent >= 1.0) {
             distance_accelerating = distanceTravelledSteps;
+            max_percent_reached = 1.0;
             percent = 1.0;
             phaseNb = 2;
           }
@@ -171,12 +178,13 @@ class StepperMotor : public Motor {
         if (distanceTravelledSteps > distance_to_travel_steps - distance_accelerating) {
           phaseNb = 3;
           time_started_decelerating = timeSinceStartS;
+          debug_time_finished_accelerating_s = timeSinceStartS;
         }
 
       // Decelerating
       } else {
 
-        percent = 1 - percent_p * (timeSinceStartS - time_started_decelerating);
+        percent = max_percent_reached - percent_p * (timeSinceStartS - time_started_decelerating);
 
       }
 
