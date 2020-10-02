@@ -126,7 +126,8 @@ class StepperMotor : public Motor {
     }
     
     void prepareMovementPercent() {
-      distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
+      distance_to_travel_steps = abs(getDestination() - getPosition()) * stepsPerUnit;
+      start_position_steps = m_position_steps;
       percent = min_delay / max_delay;
       phaseNb = 1;
       min_percent = min_delay * 1.0 / max_delay;
@@ -544,7 +545,7 @@ class StepperMotor : public Motor {
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
       lost_time = timeSinceStart - next_step_time;
-      next_step_delay = nextDelayPercent(m_position_steps - start_position_steps, timeSinceStart);
+      next_step_delay = nextDelayPercent(abs(m_position_steps - start_position_steps), timeSinceStart);
       //next_step_delay = nextDelay(m_position_steps - start_position_steps);
       //next_step_delay = calculateNextStepDelay(timeSinceStart); 
       next_step_time = timeSinceStart + next_step_delay - lost_time;
