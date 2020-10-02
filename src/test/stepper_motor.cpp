@@ -23,7 +23,8 @@ void testAcceleration() {
   axis.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
   axis.setStepsPerTurn(200 * 2 * 16);
 
-  axis.delay_pp = -0.1;
+  //axis.delay_pp = -0.1;
+  axis.delay_pp = -0.03;
   axis.min_delay = 500;
   axis.max_delay = 10000;
   axis.min_delay_p = -20;
@@ -41,6 +42,7 @@ void testAcceleration() {
 
   int nbPoints = 100;
   vector<double> t; // time
+  vector<double> s; // step
   vector<double> v; // speed
   vector<double> p; // position
 
@@ -53,6 +55,7 @@ void testAcceleration() {
   for (unsigned long time = 0; time < moveTimeUs; time += 50) {
     axis.handleAxis(time);
     if ((time - lastCapture) > captureInterval) {
+      s.push_back(axis.m_position_steps);
       t.push_back(time / 1000000.0);
       //v.push_back((1/axis.delay)*axis.min_delay);
       p.push_back(axis.getPosition());
@@ -63,6 +66,13 @@ void testAcceleration() {
     }
   }
 
+  cout << "In phase 1 for " << axis.debug_steps_1 << " steps." << endl;
+  cout << "In phase 2 for " << axis.debug_steps_2 - axis.debug_steps_1 << " steps." << endl;
+  cout << "In phase 3 for " << axis.debug_steps_3 - axis.debug_steps_2 << " steps." << endl;
+  cout << "In phase 4 for " << axis.debug_steps_4 - axis.debug_steps_3 << " steps." << endl;
+  cout << "In phase 5 for " << axis.debug_steps_5 - axis.debug_steps_4 << " steps." << endl;
+  cout << "In phase 6 for " << axis.debug_steps_6 - axis.debug_steps_5 << " steps." << endl;
+  cout << "In phase 7 for " << axis.debug_steps_7 - axis.debug_steps_6 << " steps." << endl;
   cout << "Phase 2 start time: " << axis.debug_time_1 / 1000000.0 << endl;
   cout << "Phase 3 start time: " << axis.debug_time_2 / 1000000.0 << endl;
   cout << "Phase 4 start time: " << axis.debug_time_3 / 1000000.0 << endl;
@@ -82,6 +92,7 @@ void testAcceleration() {
   // Plot position
   plt::subplot(2,2,1);
   plt::title("Position");
+  //plt::plot(s, p, "r-");
   plt::plot(t, p, "r-");
 
   vector<double> startPosition;
@@ -99,11 +110,13 @@ void testAcceleration() {
   plt::subplot(2,2,2);
   plt::title("Delay");
   plt::plot(t, d, "k-");
+  //plt::plot(s, d, "k-");
 
   // Plot delay_p
   plt::subplot(2,2,3);
   plt::title("Delay_p");
   plt::plot(t, d_p, "b-");
+  //plt::plot(s, d_p, "b-");
 
   // Set x-axis to interval [0,1000000]
   //plt::xlim(0, 1000*1000);

@@ -13,6 +13,8 @@
 #define MAX_STEP_DELAY 5000 // us
 #define US_PER_S 1000000.0
 
+void debug() {}
+
 class StepperMotor : public Motor {
   public:
 
@@ -63,6 +65,7 @@ class StepperMotor : public Motor {
     long distance_to_travel_steps = 0; // The distance to travel in steps
     long start_position_steps = 0; // At the beginning of a move, what position was it?
     bool skip_phase_2;
+    long steps_to_accelerate = 0;
 
     long debug_time_1 = 0;
     long debug_time_2 = 0;
@@ -71,6 +74,14 @@ class StepperMotor : public Motor {
     long debug_time_5 = 0;
     long debug_time_6 = 0;
     long debug_time_7 = 0;
+
+    long debug_steps_1 = 0;
+    long debug_steps_2 = 0;
+    long debug_steps_3 = 0;
+    long debug_steps_4 = 0;
+    long debug_steps_5 = 0;
+    long debug_steps_6 = 0;
+    long debug_steps_7 = 0;
 
     void prepareMovement() {
       distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
@@ -86,6 +97,7 @@ class StepperMotor : public Motor {
       // Increasing acceleration
       if (phase == 1) {
         debug_time_1 = timeSinceStart;
+        debug_steps_1 = distanceTravelledSteps;
 
         delay_p = delay_p + delay_pp;
 
@@ -93,6 +105,7 @@ class StepperMotor : public Motor {
         if (delay_p <= min_delay_p) {
 
           phase_7_steps = distance_to_travel_steps - distanceTravelledSteps;
+          steps_to_accelerate = distanceTravelledSteps;
           delay_p = min_delay_p;
           skip_phase_2 = false;
           phase = 2;
@@ -115,11 +128,12 @@ class StepperMotor : public Motor {
           // s = phase1Steps
             
           //phase_3_delay = min_delay + 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps;
-          phase_3_delay = min_delay - 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps; // Why minus?
+          //phase_3_delay = min_delay - 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps; // Why minus?
         }
 
         // If we have reached to quarter of the distance, skip to phase 3
         if (distanceTravelledSteps >= distance_to_travel_steps / 4.0) {
+          std::cout << "!!!!!!!!!! Skipping phase 2 !!!!!!!!!!!" << std::endl;
           skip_phase_2 = true;
           phase = 3;
         }
@@ -127,20 +141,33 @@ class StepperMotor : public Motor {
       // Constant acceleration
       } else if (phase == 2) {
         debug_time_2 = timeSinceStart;
-        
-        // Check if we reached phase 3
-        if (delay < phase_3_delay) {
+        debug_steps_2 = distanceTravelledSteps;
+     
+        debug(); 
+        // If we don't decelerate now, will we go under the minimum delay?
+        double delayIfDecelerate = delay + delay_p * steps_to_accelerate - 0.5 * delay_pp * steps_to_accelerate * steps_to_accelerate;
+
+        if (delayIfDecelerate < min_delay) {
           phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
           phase = 3;
         }
+
+        // Check if we reached phase 3
+        //if (delay < phase_3_delay) {
+        //  phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
+        //  phase = 3;
+        //}
         
       // Decreasing acceleration
       } else if (phase == 3) {
         debug_time_3 = timeSinceStart;
+        debug_steps_3 = distanceTravelledSteps;
         
         delay_p = delay_p - delay_pp;
         
         if (delay_p >= 0) {
+          std::cout << "distance_to_travel_steps: " << distance_to_travel_steps<< endl;
+          std::cout << "DistancedTravelledSteps: " << distanceTravelledSteps << endl;
           phase_5_steps = distance_to_travel_steps - distanceTravelledSteps;
           delay_p = 0;
           phase = 4;
@@ -149,15 +176,17 @@ class StepperMotor : public Motor {
       // Constant speed
       } else if (phase == 4) {
         debug_time_4 = timeSinceStart;
+        debug_steps_4 = distanceTravelledSteps;
         
         if (distanceTravelledSteps >= phase_5_steps) phase = 5;
       
       // Decreasing acceleration
       } else if (phase == 5) {
         debug_time_5 = timeSinceStart;
+        debug_steps_5 = distanceTravelledSteps;
         
         delay_p = delay_p - delay_pp;
-        
+
         if (delay_p >= -min_delay_p) {
           delay_p = -min_delay_p;
           phase = skip_phase_2 ? 7 : 6;
@@ -166,11 +195,13 @@ class StepperMotor : public Motor {
       // Constant acceleration
       } else if (phase == 6) {
         debug_time_6 = timeSinceStart;
+        debug_steps_6 = distanceTravelledSteps;
         
         if (distanceTravelledSteps >= phase_7_steps) phase = 7;
 
       // Increasing acceleration
       } else if (phase == 7) {
+        debug_time_7 = timeSinceStart;
         debug_time_7 = timeSinceStart;
         
         delay_p = delay_p + delay_pp;
