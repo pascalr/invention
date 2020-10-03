@@ -28,6 +28,89 @@ https://borislavkostov.wordpress.com/articles/macro-photography-eng/focal-length
 
 PS3eye: http://www.zhopper.narod.ru/mobile/ov7720_ov7221_full.pdf
 
+https://www.stemmer-imaging.com/en/technical-tips/choosing-a-lens-for-machine-vision/
+There is a direct relationship between the sensor used in the camera and the most suitable lens. Parameters such as sensor size and pixel size are of major importance.
+
+This limit is generally called the resolution limit and is usually expressed in line pairs per millimetre (lp/mm)
+
+There are four types of image sensors: CCD sensors, CMOS sensors, microbolometers and Focal Plane Array (FPA) sensors.
+https://en.wikipedia.org/wiki/Image_sensor
+
+The two main types of electronic image sensors are the charge-coupled device (CCD) and the active-pixel sensor (CMOS sensor). Both CCD and CMOS sensors are based on metal–oxide–semiconductor (MOS) technology, with CCDs based on MOS capacitors and CMOS sensors based on MOSFET (MOS field-effect transistor) amplifiers.
+
+Minimum object distance and close-up rings. Another term frequently indicated by optics manufacturers is the minimum object distance (MOD). It refers to the shortest working distance between the foremost lens and the motive which can still be focused using the focus ring on the lens.
+
+In photography, the circle of confusion diameter limit ("CoC limit" or "CoC criterion") is often defined as the largest blur spot that will still be perceived by the human eye as a point, when viewed on a final image from a standard viewing distance.
+
+https://en.wikipedia.org/wiki/Circle_of_confusion
+
+CoC in mm = (viewing distance cm / 25 cm ) / (desired final-image resolution in lp/mm for a 25 cm viewing distance) / enlargement
+
+Visual acuity. For most people, the closest comfortable viewing distance, termed the near distance for distinct vision (Ray 2000, 52), is approximately 25 cm. At this distance, a person with good vision can usually distinguish an image resolution of 5 line pairs per millimeter (lp/mm), equivalent to a CoC of 0.2 mm in the final image.
+
+https://www.machinedesign.com/automation-iiot/sensors/article/21833530/lessons-in-machine-vision-eye-on-working-distance-and-depth-of-field
+
+Focal Length indicates how strongly the lens bends light to form an image. Usually shown as f in equations, it is the distance from the rear principal plane of the lens to the focus point when imaging an object infinitely far away. A lens has two principal planes, front and rear, which are theoretical planes used by optical engineers during lens design and analysis. For thick and multi-element lenses, the principal planes are usually somewhere in the middle of the lens.
+
+Primary Magnification is the ratio of image size to object size. Since most motion control applications involve objects that are much larger than the camera's image sensor, primary magnification (PMAG) is usually much smaller than unity. PMAG for a vision system is typically calculated as the horizontal sensor size divided by the horizontal field of view.
+
+For example, what is often called “the lensmaker's equation” relates the focal length to the object and image distances:
+1/f = 1/i + 1/o
+
+magnification
+m = i/o
+
+Je veux:
+
+https://en.wikipedia.org/wiki/Angle_of_view
+
+Câble soit mini USB soit micro USB
+https://www.instructables.com/Creating-you-own-USB-cables/
+
+IMX219
+4.60 mm
+1/4” (18mm / 4 et aspect ratio 4:3) https://www.arducam.com/focal-length-calculator/
+3296(H) × 2512(V) pixels
+Donc: 3.69mm X 2.81mm
+Unit cell size: 1.12 um
+
+Arducam 8MP 1080P USB Camera Module, 1/4” CMOS IMX219 Mini UVC USB2.0 Webcam Board 
+Field of View (FOV)：H=62.2°, V=48.8°
+
+angle of view: on peut approximer:
+a = d/f
+a = 180*d/pi/f
+where d represents the size of the film (or sensor) in the direction measured
+donc f = 180*d/pi/a
+f = 3.3mm ou 3.4 mm, donc 3.35mm // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Depth of field: 2*u^2*N*c/f^2
+u = distance de l'objet = 120mm
+N = f-stop (aperture) Je n'en trouve pas de données, mais posons 2
+c = 0.2mm circle of confusion
+f = 3.35mm
+DOF = 1026 mm
+Pour distance de l'objet = 50 mm
+DOF = 178 mm
+
+Un câble USB 12 pied.
+Dans le fond ce que je veux c'est être capable de calculer à quel point l'image est flou. C'est ça le problème.
+Donc je veux calculer: Le cercle de confusion pour la distance minimale de 120 mm et la distance maximale de 270mm.
+Avec ou sans aperture?
+Je veux calculer le diamètre de cercle de confusion limite (Coc limit)
+
+Machine vision lens
+Une lentille convexe.
+CCD or CMOS sensor, does not matter I think
+Mimimum focus distance ou MOD (minimum object distance): 120 mm ou moins idéalement, mais dois avoir avoir un angle plus tard sinon
+Maximum focus distance: 270 mm ou plus, (mimimum focus distance (120 mm) + plus grand pot (250 mm) - plus petit pot (100 mm)
+Horizontal field of view: 150 mm, un must, je dois voir la largeur du bras au moins, pour pouvoir voir proche des côtés.
+Depth of field: 150mm, (maximum focus distance - minimum focus distance)
+
+MIPI Camera Serial Interface 2 (MIPI CSI-2)
+
+A widely adopted, simple, high-speed protocol primarily intended for point-to-point image and video transmission between cameras and host devices
+
 Focus distance (u): 120 mm # (NB. inclut le focus length)
 Working distance : u - f # distance de la lentille au sujet
 Horizontal field of view: 150 mm
@@ -494,3 +577,40 @@ https://playground.arduino.cc/Main/RotaryEncoders/
 Upload with a single command to the arduino the new code with the arduino-cli:
 https://blog.arduino.cc/2018/08/24/announcing-the-arduino-command-line-interface-cli/
 https://arduino.github.io/arduino-cli/getting-started/
+
+Déterminer l'angle de détection requise.
+
+Raspberry pi camera module V2 35$.
+
+62.2 degrees
+48.8 degrees
+
+Focal length: 3.04 mm
+
+However, Raspberry Pi recommends using a 2A Power Supply, so you'll need to double-check that before installing this module
+
+https://www.arducam.com/product-category/spi-camera-for-arduino/
+
+I want a deep depth of field.
+
+Depth of field is determined by the relationship of the aperture (f-stop) and focal length of your lens, the distance of the subject in the photo, and the size (format) of the sensor.
+
+https://www.digitaltrends.com/photography/what-is-depth-of-field/
+
+The most common way to change your depth of field is by adjusting the aperture of your lens, which determines how much light your lens allows through it and on to your camera sensor. The narrower the aperture is, the deeper the depth of field. A wide open aperture creates nicely soft backgrounds with a shallow depth of field. Here, the depth of field is sometimes so narrow that your subject’s eye could be in focus but the tips of the eyelashes may be soft. These wide apertures (like f/1.4 or f/2) draw more attention to the subject by blurring out the background, but larger or close-up subjects may not be entirely in focus.
+
+I want a narrow aperture (f-stop) (such as f/11 or f/16),
+
+You may have noticed that smartphones often have bright lenses with seemingly wide apertures, like f/1.8 on the iPhone 11 Pro — and yet, the depth of field is still very long. Why? This is because sensor size also plays a role in the depth of field. The technical explanation behind this is a bit, well, technical, but the takeaway is this: The larger the sensor, the easier it is to get those nice soft backgrounds. But a large sensor requires a much bigger lens, which simply wouldn’t fit in in a phone.
+
+The lens, which is the most important part has a focal length range of 4.5mm – 18mm. This is the equivalent of 25mm– 100mm. It is a great tool for macro photography, as the macro mode lets you focus from 1cm to infinity.
+
+I want a big depth of field, always clear image from 2cm to 50cm.
+
+What affects depth of field?
+Depth of field depends on aperture, focus distance, focal length and circle of confusion (CoC). The latter depends on camera sensor size, final image print size, image viewing distance and viewer's visual acuity.
+
+Produce more DoF: small apertures (f/8-f/22), short focal lengths (10-35mm), longer focus distances, smaller camera sensors (crop).
+
+What’s the hyperfocal distance?
+When focusing at the hyperfocal distance, everything falling from half of this distance to infinity will be in focus. It depends on aperture, focal length and circle of confusion. It does not depend on focus distance (subject distance).
