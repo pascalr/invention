@@ -56,7 +56,7 @@ void setupAxes(Program& p) {
   p.axisT.setReverseMotorDirection(true);
   p.axisT.setDefaultMaxSpeed(0.5);
   p.axisT.setAcceleration(0.2);
-  p.axisT.percent_p = 0.3;
+  p.axisT.percent_p = 0.4;
   p.axisT.min_delay = 100;
   p.axisT.max_delay = 2000;
 
@@ -69,9 +69,9 @@ void setupAxes(Program& p) {
   p.axisH.setAcceleration(1.5);
   p.axisH.setReverseMotorDirection(true);
   p.axisH.referencer = LimitSwitchReferencer(4);
-  p.axisH.percent_p = 0.2;
-  p.axisH.min_delay = 200;
-  p.axisH.max_delay = 1000;
+  p.axisH.percent_p = 0.3;
+  p.axisH.min_delay = 100;
+  p.axisH.max_delay = 2000;
 
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
   p.axisV.setStepsPerUnit(200 * 2 * 8 / unitPerTurnY);
@@ -82,7 +82,7 @@ void setupAxes(Program& p) {
   //p.axisV.setAcceleration(200);
   p.axisV.setReverseMotorDirection(true);
   p.axisV.referencer = LimitSwitchReferencer(12);
-  p.axisV.percent_p = 0.2;
+  p.axisV.percent_p = 0.3;
   p.axisV.min_delay = 100;
   p.axisV.max_delay = 1000;
 
