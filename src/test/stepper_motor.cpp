@@ -56,7 +56,7 @@ void testAcceleration() {
   bool jobFinished = false;
   double timeFinishJobS = 0.0;
 
-  for (unsigned long time = 0; time < moveTimeUs; time += 50) {
+  for (unsigned long time = 0; time < moveTimeUs; time += 55) {
 
     bool wasFinished = jobFinished;
     jobFinished = !axis.handleAxis(time);
