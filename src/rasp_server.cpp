@@ -20,8 +20,7 @@ void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
 
   Mat frame;
   captureVideoImage(frame);
-  HRCodeParser parser(0.2, 0.2);
-  parser.findHRCodes(frame, positions, 100);
+  findHRCodes(frame, positions, 100);
 
   if (attemptsLeft >= 1 && positions.empty()) {tryDetectCodes(positions, attemptsLeft-1);}
 }

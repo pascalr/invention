@@ -16,6 +16,8 @@
 
 #include "../lib/lib.h"
 
+#include <opencv2/core/mat.hpp>
+
 #include "../utils/constants.h"
 #include "hrcode_constants.h"
 
@@ -46,19 +48,6 @@ void parseText(vector<string>& parsedLines, Mat mat);
 
 ostream &operator<<(std::ostream &os, const HRCode &c);
 
-class HRCodeParser {
-  public:
-    HRCodeParser(int epsilonDia, int epsilonDist) {
-    }
-
-    int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle);
-    
-    bool contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale);
-    
-    int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale);
-    
-    void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh);
-
-};
+void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh);
 
 #endif

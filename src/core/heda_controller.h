@@ -242,9 +242,8 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
 void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
 
   cout << "Running detect code." << endl;
-  HRCodeParser parser(0.2, 0.2);
   vector<HRCode> positions;
-  parser.findHRCodes(frame, positions, 100);
+  findHRCodes(frame, positions, 100);
 
   if (!positions.empty()) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {

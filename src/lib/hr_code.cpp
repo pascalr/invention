@@ -278,7 +278,7 @@ void parseText(vector<string>& parsedLines, Mat gray) {
 
 }
 
-int HRCodeParser::findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
+int findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle) {
   if (i < 0) return -1;
   if (contourIsCircle[i]) {
     return i;
@@ -287,7 +287,7 @@ int HRCodeParser::findNextCircle(int i, vector<cv::Vec4i> hierarchy, vector<bool
   }
 }
 
-bool HRCodeParser::contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
+bool contourIsMarker(int i, int center, vector<Point2f> centers, vector<float> radius, float scale) {
 
   float expectedDist = sqrt(HRCODE_MARKERS_DIST_FROM_MIDDLE_SQ); // mm
   float markerRadius = radius[i] / scale; // mm
@@ -303,7 +303,7 @@ bool HRCodeParser::contourIsMarker(int i, int center, vector<Point2f> centers, v
   return true;
 }
 
-int HRCodeParser::findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale) {
+int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCircle, vector<Point2f> centers, vector<float> radius, int center, float scale) {
   if (i < 0) return -1;
   if (contourIsCircle[i] && contourIsMarker(i,center, centers, radius, scale)) {
     return i;
@@ -312,7 +312,7 @@ int HRCodeParser::findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool
   }
 }
 
-void HRCodeParser::findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh) {
+void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   Mat src_gray;
   cvtColor( src, src_gray, COLOR_BGR2GRAY );
   blur( src_gray, src_gray, Size(3,3) ); // Remove noise
