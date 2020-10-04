@@ -10,6 +10,7 @@
 #include "../lib/opencv.h"
 #include <opencv2/highgui.hpp>
 #include "log.h"
+#include "parser.h"
 
 using namespace std;
 

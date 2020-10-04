@@ -4,6 +4,7 @@
 #include "../lib/opencv.h"
 #include <opencv2/highgui.hpp>
 #include "log.h"
+#include "parser.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 using namespace std;

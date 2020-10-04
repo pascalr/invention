@@ -9,10 +9,6 @@ class Heda;
 #include "writer/writer.h"
 #include "writer/log_writer.h"
 
-//#include "stack.h"
-
-#include "parser.h"
-#include "calibrate.h"
 #include "database.h"
 
 class StoppedException : public exception {};
