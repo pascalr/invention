@@ -59,3 +59,11 @@ int captureVideoImage(Mat& frame) {
 
   return 0;
 }
+
+int captureJpeg(vector<uchar> &encodeBuf) {
+  Mat frame;
+  int status = captureVideoImage(frame);
+  if (status < 0) return status;
+  imencode(".jpg",frame,encodeBuf);
+  return status;
+}

@@ -7,8 +7,8 @@
 #include "lib/opencv.h"
 #include "lib/hr_code.h"
 #include "lib/linux.h"
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgcodecs.hpp>
+//#include <opencv2/highgui.hpp>
+//#include <opencv2/imgcodecs.hpp>
 #include <thread>
 #include <chrono>
 
@@ -85,10 +85,8 @@ int main(int argc, char** argv) {
   server.resource["^/slow_capture.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
     
-    Mat frame;
-    captureVideoImage(frame);
     vector<uchar> encodeBuf(131072);
-    imencode(".jpg",frame,encodeBuf);
+    captureJpeg(encodeBuf);
     char* buf = reinterpret_cast<char*>(encodeBuf.data());
     streamsize ss = static_cast<streamsize>(encodeBuf.size());
 

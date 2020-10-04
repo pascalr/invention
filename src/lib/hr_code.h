@@ -11,13 +11,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//#include <opencv2/text/ocr.hpp>
-
 #include <boost/log/trivial.hpp>
 // trace debug info warning error fatal
 
 #include "../lib/lib.h"
-#include "../lib/opencv.h"
 
 #include "../utils/constants.h"
 #include "hrcode_constants.h"

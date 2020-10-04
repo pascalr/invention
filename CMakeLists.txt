@@ -1,7 +1,6 @@
 # DEPENDENCIES LIST: # python is for matplotlib
 # leptonica is for tesseract
 # tesseract if for reading words
-# zbar is for reading qr codes (obselete)
 
 cmake_minimum_required(VERSION 2.8)
 project( DisplayImage )
@@ -43,7 +42,7 @@ ADD_LIBRARY(ExternLibsModule
 # src/lib/sqlite3.c
 )
 
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${ZBAR_LIBRARIES}zbar ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} ExternLibsModule SQLiteCpp sqlite3 dl pthread )
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} ExternLibsModule SQLiteCpp sqlite3 dl pthread )
 # ruby-2.5 gmp crypt m
 #set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} /usr/local/include/simple-web-server/ )
 set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )

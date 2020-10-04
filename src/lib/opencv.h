@@ -19,4 +19,6 @@ bool initVideo(VideoCapture& cap);
 
 int captureVideoImage(Mat& frame);
 
+int captureJpeg(vector<uchar> &encodeBuf);
+
 #endif
