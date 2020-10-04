@@ -12,7 +12,6 @@
 
 //#include <opencv2/text/ocr.hpp>
 
-#include <boost/log/trivial.hpp>
 // trace debug info warning error fatal
 
 #include "../lib/lib.h"

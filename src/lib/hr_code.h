@@ -11,9 +11,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <boost/log/trivial.hpp>
-// trace debug info warning error fatal
-
 #include "../lib/lib.h"
 
 #include <opencv2/core/mat.hpp>
