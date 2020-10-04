@@ -5,7 +5,7 @@
 #include "model.h"
 #include <vector>
 #include <sstream>
-#include "sqlite3.h"
+#include "SQLiteCpp/sqlite3/sqlite3.h"
 
 using namespace std;
 

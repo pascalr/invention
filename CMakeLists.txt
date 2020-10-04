@@ -51,15 +51,20 @@ set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
 include_directories(${MyDirs})
 link_libraries(${MyLibs})
 
+ADD_LIBRARY(SlaveLibs
+  src/lib/ArduinoMock.cpp
+)
+
 ADD_LIBRARY(MyLibsModule
+  src/lib/ArduinoMock.cpp
   src/utils/io_common.cpp
   src/utils/utils.cpp
-  src/core/program.cpp
+#  src/core/program.cpp
   src/core/pinpoint.cpp
   src/core/heda.cpp
   src/core/model.cpp
   src/core/database.cpp
-  src/core/fake_program.cpp
+#  src/core/fake_program.cpp
   src/core/writer/writer.cpp
   src/core/reader/reader.cpp
   src/core/tess_parser.cpp
@@ -67,8 +72,7 @@ ADD_LIBRARY(MyLibsModule
   src/lib/lib.cpp
   src/lib/hr_code.cpp
   src/lib/opencv.cpp
-  src/core/input_parser.cpp
-  src/lib/ArduinoMock.cpp
+#  src/core/input_parser.cpp
   src/helper/logging.cpp
   src/core/parser.cpp
 )
@@ -81,6 +85,7 @@ link_libraries(MyLibsModule)
 #add_executable( run_tests src/test/test.cpp )
 
 add_executable( test_stepper_motor src/test/stepper_motor.cpp )
+target_link_libraries( test_stepper_motor ${MyLibs} ${SlaveLibs} )
 
 #add_executable( heda src/heda.cpp )
 
