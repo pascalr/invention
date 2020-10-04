@@ -9,6 +9,7 @@
 #include <iostream>
 #include "../lib/opencv.h"
 #include <opencv2/highgui.hpp>
+#include "log.h"
 
 using namespace std;
 

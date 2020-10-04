@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include "heda.h"
+#include "log.h"
 
 using namespace std;
 

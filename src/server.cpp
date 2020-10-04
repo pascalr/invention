@@ -27,6 +27,8 @@
 #include "core/serialize.h"
 #include "core/heda_controller.h"
 
+#include "core/log.h"
+
 using namespace std;
 using namespace boost::property_tree; // json
 
