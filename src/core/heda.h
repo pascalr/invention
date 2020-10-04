@@ -5,7 +5,6 @@ class Heda;
 
 #include "position.h"
 #include "../lib/serial.h"
-#include "../lib/opencv.h"
 #include "reader/reader.h"
 #include "writer/writer.h"
 #include "writer/log_writer.h"

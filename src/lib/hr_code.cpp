@@ -19,7 +19,7 @@
 #include "../lib/opencv.h"
 #include "../utils/io_common.h"
 
-#include "../core/tess_parser.h" // tmp
+#include "../core/tess_parser.h"
 
 #include "../utils/constants.h"
 
@@ -264,8 +264,7 @@ void parseText(vector<string>& parsedLines, Mat gray) {
   vector<Mat> lines;
   extractLines(lines, dst);
 
-  TessParser parser;
-  parsedLines.push_back(parser.parseDigitLine(lines[0]));
+  parsedLines.push_back(parseDigitLine(lines[0]));
   //parsedLines.push_back(parser.parseLine(lines[1]));
   //parsedLines.push_back(parser.parseLine(lines[2]));
   //parsedLines.push_back(parser.parseDigitLine(lines[3]));
