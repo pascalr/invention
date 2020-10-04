@@ -3,9 +3,13 @@
 #include "heda.h"
 #include <vector>
 #include "model.h"
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+using namespace Eigen;
+
  
 using namespace std;
-using namespace Eigen;
 
 // https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/
 // F = (P x  D) / W

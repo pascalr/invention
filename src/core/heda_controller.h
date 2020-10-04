@@ -12,6 +12,10 @@
 #include "log.h"
 #include "parser.h"
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+using namespace Eigen;
+
 using namespace std;
 
 class UnitConversionException : public exception {};

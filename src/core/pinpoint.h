@@ -9,8 +9,6 @@
 #include "heda.h"
  
 using namespace std;
-using namespace Eigen;
-
 
 // https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/
 // F = (P x  D) / W
@@ -21,8 +19,6 @@ using namespace Eigen;
 // D’ = (W x F) / P
 
 double heightOffset(Heda& heda, DetectedHRCode& input);
-
-Vector2d imageOffset(DetectedHRCode& input);
 
 void pinpointCode(Heda& heda, DetectedHRCode& input);
 

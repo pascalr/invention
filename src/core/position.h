@@ -9,17 +9,8 @@
 // y 0 is at height of lowest shelf
 // z 0 is at middle of carriage
 
-// TODO: Only keep Eigen/Core in header file
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
 #include <vector>
-
-using namespace Eigen;
-using namespace std;
-
-//using PolarCoord = Vector3d; // (x,y,t)
-//using CartesianCoord = Vector3d; // (x,y,z)
+#include <tuple> // For std::tie
 
 /*
 Les coordonées polaires et les coordonées cartésiennes sont vraiment différentes.
@@ -37,6 +28,7 @@ Z: Z0 est à partir du devant.
 
 /*
  * I don't have the courage to go through with this and change everything...
+ * Yeah, don't do that past Pascal. That was a bad idea. Just different name is enough to remove confusion.
 class Unit {
   Unit(double v) : value(v) {}
   Unit(const Unit& u) : value(u.value) {}
