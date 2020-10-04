@@ -19,26 +19,6 @@ std::string sanitizeQuote(T val) {
 
 std::string sanitize(std::string str);
 
-// I wanted to bind statements always to be safe, but it is too complicated and I
-// don't want to change everything. Simply sanitize the input.
-/*
-class DbStatement {
-};
-
-template<typename T>
-class WhereEqual : public DbStatement {
-  public:
-    Where(std::string columnName, T val) : column_name(columnName), val(val) {}
-    std::string str() {
-      stringstream ss; ss << "WHERE "
-    }
-    std::string column_name;
-    T val;
-};
-*/
-
-//db.all<Table>(WhereEqual("columnName", value));
-
 class LogQuery {
   public:
 
