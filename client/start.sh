@@ -1,2 +1,2 @@
 #!/bin/bash
-rails server -p 3001
+rails server -p 3001 -d
