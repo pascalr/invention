@@ -26,11 +26,29 @@
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/core/types.hpp>
 
 #include <vector>
 
 using namespace std;
 using namespace cv;
+
+bool isCircle(vector<Point> contours, Point2f center, float radius, float epsilon) {
+  // epsilon is a percentage of the radius
+  // no more than 10% variation
+  float maxVariation = radius * epsilon;
+  bool isACircle = true;
+  for( size_t i = 0; i < contours.size(); i++ ) {
+    double norm = sqrt(pow(contours[i].x - center.x, 2)+pow(contours[i].y - center.y, 2));
+    isACircle = isACircle && abs(norm-radius) < maxVariation;
+  }
+  return isACircle;
+}
+
+bool isBigCircle(vector<Point> contours, Point2f center, float radius, float epsilon, float minRadius) {
+  return radius > minRadius && isCircle(contours, center, radius, epsilon);
+}
+
 
 ostream &operator<<(std::ostream &os, const HRCode &c) {
   os << "(" << c.x << ", " << c.y << ")";

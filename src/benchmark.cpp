@@ -5,16 +5,16 @@
 #include "lib/linux.h"
 #include "lib/lib.h"
 #include "lib/serial.h"
+#include "lib/draw_matplotlib.h"
+#include "lib/matplotlibcpp.h"
+#include "lib/hrcode_constants.h"
+#include "lib/hr_code.h"
 
 // ---------------
-// ---------------
-
-//#include "lib/draw_matplotlib.h"
-//#include "lib/matplotlibcpp.h"
+// A little slow
 //#include "lib/opencv.h"
-//#include "lib/NLTemplate.h"
-//#include "lib/hrcode_constants.h"
-//#include "lib/hr_code.h"
+// ---------------
+
 //#include "helper/logging.h"
 //#include "test/test.h"
 //#include "core/input_parser.h"
@@ -54,5 +54,5 @@
 //#include "core/heda_controller.h"
 
 int main() {
-  return 2;
+  return 1;
 }

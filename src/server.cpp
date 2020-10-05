@@ -34,6 +34,8 @@ using namespace boost::property_tree; // json
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
+class InitSerialPortException : public std::exception {};
+
 //void sendJson(shared_ptr<HttpServer::Response> response, ptree& pt) {
 void sendJson(shared_ptr<HttpServer::Response> response, stringstream& ss) {
 

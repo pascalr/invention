@@ -37,12 +37,7 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/Eigen)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp/include)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/simple-web-server)
 
-ADD_LIBRARY(ExternLibsModule
-  src/lib/NLTemplate.cpp
-# src/lib/sqlite3.c
-)
-
-set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} ExternLibsModule SQLiteCpp sqlite3 dl pthread )
+set(MyLibs ${MyLibs} ${OpenCV_LIBS} ${TESSERACT_LIBRARIES} ${LEPTONICA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LOG_LIBRARY} ${Boost_LOG_SETUP_LIBRARY} ${PYTHON_LIBRARIES} SQLiteCpp sqlite3 dl pthread )
 # ruby-2.5 gmp crypt m
 #set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} /usr/local/include/simple-web-server/ )
 set(MyDirs ${MyDirs} ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS} )
@@ -105,7 +100,7 @@ target_link_libraries( test_stepper_motor ${MyLibs} ${SlaveLibs} )
 
 add_executable( server src/server.cpp )
 
-add_executable( time src/time.cpp )
+add_executable( benchmark src/benchmark.cpp )
 
 add_executable( rasp_server src/rasp_server.cpp )
 
