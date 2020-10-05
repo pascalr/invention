@@ -20,31 +20,28 @@
 
 #include <vector>
 
-using namespace std;
-using namespace cv;
-
 class HRCode {
   public:
-    HRCode(Mat mat, std::string imgFilename, double x1, double y1, double s1) : img(mat), imgFilename(imgFilename), x(x1), y(y1), scale(s1) {
+    HRCode(cv::Mat mat, std::string imgFilename, double x1, double y1, double s1) : img(mat), imgFilename(imgFilename), x(x1), y(y1), scale(s1) {
     }
     HRCode(const HRCode& code) : img(code.img.clone()), imgFilename(code.imgFilename), x(code.x), y(code.y), scale(code.scale) {
     }
 
-    friend ostream &operator<<(std::ostream &os, const HRCode &c);
+    friend std::ostream &operator<<(std::ostream &os, const HRCode &c);
 
-    Mat img;
-    string imgFilename;
+    cv::Mat img;
+    std::string imgFilename;
     double x;
     double y;
     double scale;
 };
 
-void extractChars(vector<Mat>& lines, Mat& src);
-void extractLines(vector<Mat>& lines, Mat& src);
-void parseText(vector<string>& parsedLines, Mat mat);
+void extractChars(std::vector<cv::Mat>& lines, cv::Mat& src);
+void extractLines(std::vector<cv::Mat>& lines, cv::Mat& src);
+void parseText(std::vector<std::string>& parsedLines, cv::Mat mat);
 
-ostream &operator<<(std::ostream &os, const HRCode &c);
+std::ostream &operator<<(std::ostream &os, const HRCode &c);
 
-void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh);
+void findHRCodes(cv::Mat& src, std::vector<HRCode> &detectedCodes, int thresh);
 
 #endif

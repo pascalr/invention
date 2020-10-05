@@ -5,6 +5,8 @@
 #include "../lib/draw_matplotlib.h"
 #include "../lib/lib.h"
 
+using namespace std;
+
 void testAcceleration() {
   title("Testing Axis::timeToReachDestination");
 

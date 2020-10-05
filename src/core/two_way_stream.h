@@ -7,20 +7,18 @@
 
 #include <mutex>
 
-using namespace std;
-
 class TwoWayStream : public StdWriter, public Reader {
   public:
 
-    string str() {
+    std::string str() {
       std::lock_guard<std::mutex> guard(streamMutex);
-      string str = ss.str();
+      std::string str = ss.str();
       ss.str("");
       ss.clear();
       return str;
     }
     
-    void doPrint(string str) {
+    void doPrint(std::string str) {
       std::lock_guard<std::mutex> guard(streamMutex);
       ss << str << "\n";
     }
@@ -35,7 +33,7 @@ class TwoWayStream : public StdWriter, public Reader {
       return ss.get();
     }
 
-    stringstream ss;
+    std::stringstream ss;
    
     std::mutex streamMutex;
 };

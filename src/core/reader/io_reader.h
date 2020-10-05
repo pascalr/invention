@@ -16,7 +16,7 @@ class IOReader : public Reader {
 
     int getByte() {
       char c;
-      cin.get(c);
+      std::cin.get(c);
       if (c == '\n') {hadInput = false;}
       return c;
     }

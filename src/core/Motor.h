@@ -8,11 +8,6 @@
 #include "../lib/ArduinoMock.h"
 #include "referencer.h"
 
-#ifndef ARDUINO
-#include <iostream>
-using namespace std;
-#endif
-
 // TODO: The referencing method should be independant of the motor.
 // This should be in another class.
 // class ReferenceMethod

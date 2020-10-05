@@ -15,6 +15,13 @@ using namespace std;
 
 void debug(){}
 
+void ensure(bool statement, std::string errorMessage) {
+  if (!statement) {
+    std::cerr << "\033[31mError\033[0m: " << errorMessage << std::endl;
+    throw EnsureException(errorMessage);
+  }
+}
+
 // trim from start (in place)
 void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {

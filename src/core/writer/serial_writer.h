@@ -5,15 +5,13 @@
 #include "std_writer.h"
 #include "../../lib/serial.h"
 
-using namespace std;
-
 class SerialWriter : public StdWriter {
   public:
 
     SerialWriter(SerialPort& p) : m_port(p) {
     }
 
-    void doPrint(string val) {
+    void doPrint(std::string val) {
       m_port.writePort(val);
     }
 

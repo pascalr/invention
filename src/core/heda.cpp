@@ -21,7 +21,7 @@ void Heda::stop() {
   askPosition();
 }
 
-void Heda::captureFrame(Mat& frame) {
+void Heda::captureFrame(cv::Mat& frame) {
 
   HttpClient client("192.168.0.19:8889");
   try {
@@ -37,7 +37,7 @@ void Heda::captureFrame(Mat& frame) {
 
     //vector<uchar> decodeBuf(r1->content.rdbuf()->begin(), r1->content.rdbuf()->end());
     //r1->content.rdbuf()->sgetn(decodeBuf, r1->content.size());
-    frame = imdecode(Mat(v), IMREAD_COLOR);
+    frame = cv::imdecode(cv::Mat(v), cv::IMREAD_COLOR);
   } catch(const SimpleWeb::system_error &e) { // e.what()
     ensure(false, "Unable to capture frame.");
   }

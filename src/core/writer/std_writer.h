@@ -4,32 +4,30 @@
 #include "writer.h"
 #include <string>
 
-using namespace std;
-
 class StdWriter : public Writer {
   public:
-    virtual void doPrint(string str) = 0;
+    virtual void doPrint(std::string str) = 0;
 
     void doPrint(const char* val) {
-      doPrint((string)val);
+      doPrint((std::string)val);
     }
 
     void doPrint(char val) {
-      string s = ""; s += val;
+      std::string s = ""; s += val;
       doPrint(s);
     }
 
     void doPrint(double val) {
-      doPrint(to_string(val));
+      doPrint(std::to_string(val));
     }
     void doPrint(long val) {
-      doPrint(to_string(val));
+      doPrint(std::to_string(val));
     }
     void doPrint(bool val) {
-      doPrint(to_string(val));
+      doPrint(std::to_string(val));
     }
     void doPrint(unsigned long val) {
-      doPrint(to_string(val));
+      doPrint(std::to_string(val));
     }
 };
 

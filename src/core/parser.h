@@ -8,8 +8,6 @@
 // Maybe change the parser. Because all I want to do with is is call popSomething.
 // So only the functions popSomething should be implemented, and the args are parse one at a time...
 
-using namespace std;
-
 enum TokenType {
 // A unit can be a volume, a mass or a weight.
 // cups, t., ...
@@ -25,13 +23,13 @@ enum TokenType {
 
 const char* tokenTypeName(TokenType e);
 
-class MissingArgumentException : public exception {
+class MissingArgumentException : public std::exception {
   public:
 };
-class WrongTypeArgumentException : public exception {
+class WrongTypeArgumentException : public std::exception {
   public:
     WrongTypeArgumentException(TokenType expected, TokenType actual) {
-      stringstream ss; ss << "WrongTypeArgumentException happened. Expected "
+      std::stringstream ss; ss << "WrongTypeArgumentException happened. Expected "
                           << tokenTypeName(expected) << ", but got " 
                           << tokenTypeName(actual) << ".\n";
       error = ss.str();
@@ -41,11 +39,11 @@ class WrongTypeArgumentException : public exception {
       return error.c_str();
     }
 
-    string error;
+    std::string error;
 };
 
-class WrongTokenTypeException : public exception {};
-class EmptyCommandException : public exception {};
+class WrongTokenTypeException : public std::exception {};
+class EmptyCommandException : public std::exception {};
 
 // TODO: namespace Token.
 
@@ -83,21 +81,21 @@ class PositiveInteger : public Token {
 
 class Noun : public Token {
   public:
-    Noun(const string &val) : value(val) {}
-    string value;
+    Noun(const std::string &val) : value(val) {}
+    std::string value;
     TokenType getType() {return NOUN;}
 };
 
 class Unkown : public Token {
   public:
-    Unkown(const string &val) : value(val) {}
-    string value;
+    Unkown(const std::string &val) : value(val) {}
+    std::string value;
     TokenType getType() {return UNKOWN;}
 };
 
 
 
-void splitWords(vector<string> &words, const string &str);
+void splitWords(std::vector<std::string> &words, const std::string &str);
 
 class ParseResult {
   public:
@@ -114,41 +112,41 @@ class ParseResult {
 
     double popScalaire();
     
-    string popNoun();
+    std::string popNoun();
 
-    void addToken(shared_ptr<Token> tok);
+    void addToken(std::shared_ptr<Token> tok);
 
-    void setCommand(const string &str);
+    void setCommand(const std::string &str);
 
-    string getCommand() const;
+    std::string getCommand() const;
 
-    /*vector<Token> getTokens() const {
+    /*std::vector<Token> getTokens() const {
       return m_tokens;
     }*/
 
   protected:
 
-    string m_command;
-    vector<shared_ptr<Token>> m_tokens;
+    std::string m_command;
+    std::vector<std::shared_ptr<Token>> m_tokens;
 };
 
 class Parser {
   public:
 
 
-    bool parseNoun(ParseResult &result, const string &word);
+    bool parseNoun(ParseResult &result, const std::string &word);
 
-    bool parseScalaire(ParseResult &result, const string &word);
+    bool parseScalaire(ParseResult &result, const std::string &word);
       
-    bool parsePositiveInteger(ParseResult &result, const string &word);
+    bool parsePositiveInteger(ParseResult &result, const std::string &word);
 
-    bool parseAxis(ParseResult &result, const string &word);
+    bool parseAxis(ParseResult &result, const std::string &word);
 
-    bool parseUnkown(ParseResult &result, const string &word);
+    bool parseUnkown(ParseResult &result, const std::string &word);
 
-    void tokenize(ParseResult &result, const string &word);
+    void tokenize(ParseResult &result, const std::string &word);
     
-    void parse(ParseResult &result, const string cmd1);
+    void parse(ParseResult &result, const std::string cmd1);
      
 };
 

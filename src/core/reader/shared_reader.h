@@ -7,9 +7,7 @@
 #define READER_CLIENT_ID_HEDA 1
 #define READER_CLIENT_ID_SERVER 2
 
-using namespace std;
-
-class UnregisteredClientException : public exception {};
+class UnregisteredClientException : public std::exception {};
 
 // OPTIMIZE: I don't like the way this is implemented. You should call SharedReader::register,
 // which returns a handle which the client uses. There should be no such thing as clientId.
@@ -20,7 +18,7 @@ class SharedReader {
     SharedReader(Reader& reader) : m_reader(reader) {
     }
 
-    string &getStreamForClient(int clientId) {
+    std::string &getStreamForClient(int clientId) {
 
       if (streams.empty()) {
         throw UnregisteredClientException();
@@ -43,18 +41,18 @@ class SharedReader {
       while (m_reader.inputAvailable()) {
 
         char ch = (char)m_reader.getByte();
-        for (std::unordered_map<int, string>::iterator it = streams.begin(); it != streams.end(); it++) {
+        for (std::unordered_map<int, std::string>::iterator it = streams.begin(); it != streams.end(); it++) {
           it->second = it->second + ch;
         }
       }
       
-      string &stream = getStreamForClient(clientId);
+      std::string &stream = getStreamForClient(clientId);
       return !stream.empty();
     }
 
     int getByte(int clientId) {
 
-      string &stream = getStreamForClient(clientId);
+      std::string &stream = getStreamForClient(clientId);
 
       if (stream.empty()) {throw GetByteOnEmptyStreamException();}
 
@@ -65,9 +63,9 @@ class SharedReader {
 
   protected:
 
-    std::unordered_map<int, string> streams;
+    std::unordered_map<int, std::string> streams;
     Reader& m_reader;
-    string m_input;
+    std::string m_input;
 };
 
 class SharedReaderClient : public Reader {

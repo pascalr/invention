@@ -6,19 +6,16 @@
 #include <opencv2/core/types.hpp>
 #include <exception>
 
-using namespace std;
-using namespace cv;
+class InitVideoException : public std::exception {};
 
-class InitVideoException : public exception {};
+bool isCircle(std::vector<cv::Point> contours, cv::Point2f center, float radius, float epsilon);
 
-bool isCircle(vector<Point> contours, Point2f center, float radius, float epsilon);
+bool isBigCircle(std::vector<cv::Point> contours, cv::Point2f center, float radius, float epsilon, float minRadius);
 
-bool isBigCircle(vector<Point> contours, Point2f center, float radius, float epsilon, float minRadius);
+bool initVideo(cv::VideoCapture& cap);
 
-bool initVideo(VideoCapture& cap);
+int captureVideoImage(cv::Mat& frame);
 
-int captureVideoImage(Mat& frame);
-
-int captureJpeg(vector<uchar> &encodeBuf);
+int captureJpeg(std::vector<uchar> &encodeBuf);
 
 #endif

@@ -18,7 +18,7 @@ using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 
 void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
 
-  Mat frame;
+  cv::Mat frame;
   captureVideoImage(frame);
   findHRCodes(frame, positions, 100);
 

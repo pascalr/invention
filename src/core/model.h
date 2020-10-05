@@ -9,7 +9,7 @@
 #include "../lib/opencv.h"
 #include "../lib/hr_code.h"
 
-class WrongModelTypeException : public exception {};
+class WrongModelTypeException : public std::exception {};
 
 // TODO: Validate column names indexes
 
@@ -18,7 +18,7 @@ int byJarId(const T& t) {
   return t.jar_id;
 }
 template <class T>
-string byName(const T& t) {
+std::string byName(const T& t) {
   return t.name;
 }
 template <class T>
@@ -119,16 +119,16 @@ void parseItem(SQLite::Statement& query, HedaConfig& c);
 class Location : public Model {
   public:
     Location() {}
-    Location(double x, double z, string moveCommand, int shelfId, double diameter) : x(x), z(z), move_command(moveCommand), shelf_id(shelfId), diameter(diameter) {}
+    Location(double x, double z, std::string moveCommand, int shelfId, double diameter) : x(x), z(z), move_command(moveCommand), shelf_id(shelfId), diameter(diameter) {}
 
     double x;
     double z;
-    string move_command;
+    std::string move_command;
     int shelf_id;
 
     double diameter;
     bool is_storage;
-    string name;
+    std::string name;
     int jar_format_id;
     int jar_id;
     bool occupied;
@@ -150,25 +150,25 @@ class DetectedHRCode : public Model {
     double centerX;
     double centerY;
     double scale;
-    string imgFilename;
-    string jar_id;
-    string weight;
-    string content_name;
-    string content_id;
+    std::string imgFilename;
+    std::string jar_id;
+    std::string weight;
+    std::string content_name;
+    std::string content_id;
     UserCoord lid_coord;
 };
 
 void parseItem(SQLite::Statement& query, DetectedHRCode& code);
 
 template<typename T>
-string getTableName();
+std::string getTableName();
 
 class JarFormat : public Model {
   public:
     double empty_weight;
     double height;
     double diameter;
-    string name;
+    std::string name;
     double lid_diameter;
     double lid_weight;
     double grip_force;
@@ -187,11 +187,11 @@ void parseItem(SQLite::Statement& query, Jar& item);
 
 class Ingredient : public Model {
   public:
-    string name;
+    std::string name;
     int aliment_id;
     double cost;
     double quantity;
-    string unit_name;
+    std::string unit_name;
     double density;
 };
 
@@ -199,7 +199,7 @@ void parseItem(SQLite::Statement& query, Ingredient& i);
 
 class Unit : public Model {
   public:
-    string name;
+    std::string name;
     double value;
     bool is_weight;
 };
@@ -208,8 +208,8 @@ void parseItem(SQLite::Statement& query, Unit& i);
 
 class Recipe : public Model {
   public:
-    string name;
-    string instructions;
+    std::string name;
+    std::string instructions;
     double rating;
 };
 

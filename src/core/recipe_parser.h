@@ -5,13 +5,11 @@
 #include "heda.h"
 #include "log.h"
 
-using namespace std;
-
 // Returns the substring until the next space. Updates the str parse what has been extracted.
 std::string parseWord(std::string& str) {
  
   ltrim(str);
-  string cmd = str.substr(0, str.find(' '));
+  std::string cmd = str.substr(0, str.find(' '));
   str = str.substr(cmd.length());
   return cmd;
 }
@@ -19,7 +17,7 @@ std::string parseWord(std::string& str) {
 // TODO: Later handle escape character, either a backslash at the end or inside quotes it's not over by newline.
 std::string parseSentence(std::string& str) {
  
-  string cmd = str.substr(0, str.find('\n'));
+  std::string cmd = str.substr(0, str.find('\n'));
   str = str.substr(cmd.length());
   trim(cmd);
   return cmd;
@@ -27,7 +25,7 @@ std::string parseSentence(std::string& str) {
 
 double parseFloat(std::string& str) {
   
-  string number = parseWord(str);
+  std::string number = parseWord(str);
 
   char* pEnd;
   double val = strtod(number.c_str(), &pEnd);
@@ -81,7 +79,7 @@ void parseRecipe(Heda& heda, Recipe& recipe) {
 
   auto h1 = Header1("PARSE RECIPE");
 
-  heda.db.deleteFrom<IngredientQuantity>("WHERE recette_id = " + to_string(recipe.id));
+  heda.db.deleteFrom<IngredientQuantity>("WHERE recette_id = " + std::to_string(recipe.id));
 
   std::string str = recipe.instructions;
   transform(str.begin(), str.end(), str.begin(), ::tolower); 

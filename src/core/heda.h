@@ -11,9 +11,9 @@ class Heda;
 
 #include "database.h"
 
-class StoppedException : public exception {};
+class StoppedException : public std::exception {};
 
-class MissingConfigException : public exception {};
+class MissingConfigException : public std::exception {};
 
 // TODO: Rename x and y to h and v at some point.
 #define AXIS_H 'h'
@@ -49,7 +49,7 @@ class Heda {
     Axis axisT;
     Axis axisR;
 
-    void captureFrame(Mat& frame);
+    void captureFrame(cv::Mat& frame);
 
     Axis* axisByName(char name);
 
@@ -125,8 +125,8 @@ class Heda {
 
     void shelfByHeight(Shelf& shelf, double userHeight);
 
-    vector<Shelf> shelves;
-    vector<Shelf> storage_shelves;
+    std::vector<Shelf> shelves;
+    std::vector<Shelf> storage_shelves;
     Shelf working_shelf;
 
     bool is_paused = false;
@@ -136,17 +136,17 @@ class Heda {
     // The server can keep in memory what the stack of Heda commands.
     void ensureActive();
 
-    string waiting_message;
-    string fatal_message;
-    string action_required;
+    std::string waiting_message;
+    std::string fatal_message;
+    std::string action_required;
 
-    string user_response;
+    std::string user_response;
     
   protected:
 
     void askPosition();
 
-    string m_pending_commands;
+    std::string m_pending_commands;
 
 };
 

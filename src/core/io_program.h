@@ -6,10 +6,8 @@
 #include "program.h"
 #include <thread>
 #include <chrono>
-#include "console_writer.h"
+#include "writer/console_writer.h"
 #include "reader/io_reader.h"
-
-using namespace std;
 
 class IOProgram : public Program {
   public:
@@ -25,7 +23,7 @@ class IOProgram : public Program {
     }
 
     void sleepMs(int time) {
-      this_thread::sleep_for(chrono::milliseconds(time));
+      std::this_thread::sleep_for(std::chrono::milliseconds(time));
     }
     void setCurrentTime(unsigned long time) {
       currentTime = time;

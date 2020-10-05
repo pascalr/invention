@@ -8,8 +8,6 @@
 #include "model.h"
 #include "heda.h"
  
-using namespace std;
-
 // https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/
 // F = (P x  D) / W
 // The focal point (F) equals the apparent width in pixels (P) times the distance from the camera D

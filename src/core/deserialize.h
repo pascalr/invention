@@ -3,6 +3,6 @@
 
 #include "program.h"
 
-void deserialize(Program& p, const string& json_str);
+void deserialize(Program& p, const std::string& json_str);
 
 #endif

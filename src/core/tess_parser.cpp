@@ -18,12 +18,10 @@
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
-    
-void initOcr() {
-  
-}
 
-std::string parseLine(const Mat& im) {
+using namespace std;
+    
+std::string parseLine(const cv::Mat& im) {
 
   tesseract::TessBaseAPI ocr;
   ocr.Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY);
@@ -39,7 +37,7 @@ std::string parseLine(const Mat& im) {
   return outText;
 }
 
-std::string parseDigitLine(const Mat& im) {
+std::string parseDigitLine(const cv::Mat& im) {
 
   tesseract::TessBaseAPI digitOcr;
   digitOcr.Init("tessdata", "eng", tesseract::OEM_LSTM_ONLY);

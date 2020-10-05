@@ -1,14 +1,8 @@
 #ifndef LIB_H 
 #define LIB_H
 
-#include <algorithm> // ?
-#include <cctype> // ?
-#include <locale> // ?
-#include <fstream> // ?
-
 #include <string>
 #include <exception>
-#include <iostream>
 
 void debug();
 
@@ -29,14 +23,7 @@ class EnsureException : public StringMessageException {
 //template<typename T>
 //void ensure(bool statement, T errorMessage);
 
-template<typename T>
-void ensure(bool statement, T errorMessage) {
-  if (!statement) {
-    std::cerr << "\033[31mError\033[0m: " << errorMessage << std::endl;
-    throw EnsureException(errorMessage);
-  }
-}
-
+void ensure(bool statement, std::string errorMessage);
 
 // trim from start (in place)
 void ltrim(std::string &s);

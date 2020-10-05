@@ -3,21 +3,21 @@
 
 #include "std_writer.h"
 
-using namespace std;
+#include <iostream>
 
 class LogWriter : public StdWriter {
   public:
-    LogWriter(const string& name) : name(name), writer(0) {}
-    LogWriter(const string& name, Writer& writer) : name(name), writer(&writer) {}
+    LogWriter(const std::string& name) : name(name), writer(0) {}
+    LogWriter(const std::string& name, Writer& writer) : name(name), writer(&writer) {}
     
-    void doPrint(string str) {
-      cout << name << ": " << str << endl;
+    void doPrint(std::string str) {
+      std::cout << name << ": " << str << std::endl;
       if (writer != 0) {
         *writer << str.c_str();
       }
     }
 
-    string name;
+    std::string name;
     Writer* writer;
 };
 

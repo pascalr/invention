@@ -7,13 +7,11 @@
 #include <sstream>
 #include "SQLiteCpp/sqlite3/sqlite3.h"
 
-using namespace std;
-
 std::string sanitizeQuote(std::string val);
 
 template<class T>
 std::string sanitizeQuote(T val) {
-  stringstream ss; ss << val;
+  std::stringstream ss; ss << val;
   return sqlite3_mprintf("%q", ss.str().c_str());
 }
 
@@ -41,7 +39,7 @@ class LogQuery {
     }
 
   protected:
-    stringstream out;
+    std::stringstream out;
     SQLite::Statement& info_query;
 };
 
@@ -53,12 +51,12 @@ class Database {
 
     template <typename T>
     void log(const char* name, T val) {
-      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << endl;
+      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << std::endl;
     }
 
     template <typename T>
     void log(const char* name, T val, LogQuery& query) {
-      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << " " << query.print() << endl;
+      std::cout << "\033[35m" << name << "\033[0m" << ": " << val << " " << query.print() << std::endl;
     }
 
     // Disabled because it is unsafe
@@ -72,7 +70,7 @@ class Database {
     template<class T> 
     std::vector<T> all(std::string optional = "") {
       
-      stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>();
+      std::stringstream queryStr; queryStr << "SELECT * FROM " << getTableName<T>();
       queryStr << " " << sanitize(optional);
 
       std::vector<T> result;
@@ -92,7 +90,7 @@ class Database {
     template<class T> 
     T find(int id, std::string optional = "") {
 
-      stringstream queryStr;
+      std::stringstream queryStr;
       queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE id = " << id << " " << sanitize(optional) << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
 
@@ -114,7 +112,7 @@ class Database {
     template<class T, class P> 
     T findBy(std::string columnName, P value, std::string optional = "") {
 
-      stringstream queryStr;
+      std::stringstream queryStr;
       queryStr << "SELECT * FROM " << getTableName<T>() << " WHERE " << sanitize(columnName) << " = " << sanitizeQuote(value) << " " << sanitize(optional) << " LIMIT 1";
       SQLite::Statement query(db, queryStr.str());
 
@@ -133,21 +131,21 @@ class Database {
    
     template<class T> 
     void clear() {
-      stringstream ss; ss << "DELETE FROM " << getTableName<T>();
+      std::stringstream ss; ss << "DELETE FROM " << getTableName<T>();
       log("DB CLEAR", ss.str());
       db.exec(ss.str());
     }
     
     template<class T> 
     void deleteFrom(std::string optional) {
-      stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << sanitize(optional);
+      std::stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " " << sanitize(optional);
       log("DB DELETE", ss.str());
       db.exec(ss.str());
     }
 
     template<class T> 
     void remove(T& item) {
-      stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " WHERE id = " << item.id;
+      std::stringstream ss; ss << "DELETE FROM " << getTableName<T>() << " WHERE id = " << item.id;
       log("DB DELETE", ss.str());
       db.exec(ss.str());
 
@@ -204,7 +202,7 @@ class Database {
     
     template<class T> 
     long unsigned int getMaxLength(std::string columnName) {
-      stringstream ss; ss << "SELECT MAX(LENGTH("+sanitize(columnName)+")) FROM " << getTableName<T>();
+      std::stringstream ss; ss << "SELECT MAX(LENGTH("+sanitize(columnName)+")) FROM " << getTableName<T>();
       log("DB MAX", ss.str());
       SQLite::Statement query(db, ss.str());
       query.executeStep();
@@ -217,7 +215,7 @@ class Database {
     template<class T> 
     long getLastInsertedId() {
       // Probably more efficient to get the last rowid inserted, than get the id of that rowid, but I dont care for now.
-      stringstream ss; ss << "SELECT MAX(id) FROM " << getTableName<T>();
+      std::stringstream ss; ss << "SELECT MAX(id) FROM " << getTableName<T>();
       SQLite::Statement query(db, ss.str());
       query.executeStep();
       return query.getColumn(0);

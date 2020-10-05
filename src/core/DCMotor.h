@@ -10,11 +10,6 @@
 #include "../lib/ArduinoMock.h"
 #include "Encoder.h"
 
-#ifndef ARDUINO
-#include <iostream>
-using namespace std;
-#endif
-
 class DCMotor : public Motor {
   public:
 

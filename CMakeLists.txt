@@ -55,6 +55,8 @@ ADD_LIBRARY(SlaveLibs
 )
 
 ADD_LIBRARY(MyLibsModule
+  src/lib/linux.cpp
+  src/lib/serial.cpp
   src/lib/ArduinoMock.cpp
   src/utils/io_common.cpp
   src/utils/utils.cpp
@@ -102,6 +104,8 @@ target_link_libraries( test_stepper_motor ${MyLibs} ${SlaveLibs} )
 #add_executable( simulation src/simulation.cpp )
 
 add_executable( server src/server.cpp )
+
+add_executable( time src/time.cpp )
 
 add_executable( rasp_server src/rasp_server.cpp )
 

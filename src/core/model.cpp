@@ -2,6 +2,8 @@
 
 // const char * Statement::getColumnDeclaredType(const int aIndex) const
 
+using namespace std;
+
 template <> string getTableName<DetectedHRCode>() { return "detected_codes"; }
 template <> string getTableName<Jar>() { return "jars"; }
 template <> string getTableName<Location>() { return "locations"; }

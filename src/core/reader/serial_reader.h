@@ -3,8 +3,8 @@
 
 #include "reader.h"
 
-class GetByteOnEmptyStreamException : public exception {};
-class EmptyInputInvalidException : public exception {};
+class GetByteOnEmptyStreamException : public std::exception {};
+class EmptyInputInvalidException : public std::exception {};
 
 class SerialReader : public Reader {
   public:
@@ -49,13 +49,13 @@ class SerialReader : public Reader {
   protected:
 
     void searchForSeparator() {
-      m_separator_found = m_input.find(m_separator) != string::npos;
+      m_separator_found = m_input.find(m_separator) != std::string::npos;
     }
 
     bool m_separator_found = false;
     char m_separator = '\n';
     SerialPort& m_port;
-    string m_input;
+    std::string m_input;
 };
 
 #endif

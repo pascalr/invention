@@ -235,7 +235,7 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 void parseCode(Heda& heda, DetectedHRCode& code) {
   //parseJarCode(code);
   cout << "Loading image: " << code.imgFilename << endl;
-  Mat gray = imread(DETECTED_CODES_BASE_PATH + code.imgFilename, IMREAD_GRAYSCALE);
+  cv::Mat gray = cv::imread(DETECTED_CODES_BASE_PATH + code.imgFilename, cv::IMREAD_GRAYSCALE);
   vector<string> lines;
   parseText(lines, gray);
   //ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
@@ -245,7 +245,7 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
   //code.content_id = lines[3];
 }
 
-void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, Mat& frame, PolarCoord c) {
+void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, cv::Mat& frame, PolarCoord c) {
 
   cout << "Running detect code." << endl;
   vector<HRCode> positions;
@@ -266,7 +266,7 @@ void detect(Heda& heda) {
   
   auto h5 = Header5("DETECT");
 
-  Mat frame;
+  cv::Mat frame;
   heda.captureFrame(frame);
   vector<DetectedHRCode> detected;
   detectCodes(heda, detected, frame, heda.getPosition());
@@ -413,7 +413,7 @@ void closeup(Heda& heda, DetectedHRCode& detected) {
   string errorMsg;
   int maxAttempts = 10;
   for (int i = 0; i < maxAttempts; i++) {
-    Mat frame;
+    cv::Mat frame;
     heda.captureFrame(frame);
     vector<DetectedHRCode> allDetected;
     detectCodes(heda, allDetected, frame, heda.getPosition());

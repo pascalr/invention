@@ -5,8 +5,8 @@
 
 namespace plt = matplotlibcpp;
 
-vector<double> toVect(double x) {
-  vector<double> xs(1);
+std::vector<double> toVect(double x) {
+  std::vector<double> xs(1);
   xs[0] = x;
   return xs;
 }
@@ -34,7 +34,7 @@ void drawPoint(double x, double y, const char* style="ro") {
   plt::plot(toVect(x),toVect(y),style);
 }
 
-void drawLines(vector<double> x, vector<double> y, const char* style="b-") {
+void drawLines(std::vector<double> x, std::vector<double> y, const char* style="b-") {
   plt::plot(x,y,style);
 }
 
