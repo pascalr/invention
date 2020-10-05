@@ -7,9 +7,6 @@
 // With characters having a fix position, I expect the accuracy to be very high.
 
 #include <iostream>
-#include <cmath>
-#include <stdlib.h>
-#include <stdio.h>
 
 #include "../lib/lib.h"
 

@@ -9,13 +9,13 @@
 #include "lib/matplotlibcpp.h"
 #include "lib/hrcode_constants.h"
 #include "lib/hr_code.h"
+//#include "helper/logging.h"
 
 // ---------------
 // A little slow
 //#include "lib/opencv.h"
 // ---------------
 
-//#include "helper/logging.h"
 //#include "test/test.h"
 //#include "core/input_parser.h"
 //#include "core/two_way_stream.h"
