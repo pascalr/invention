@@ -55,7 +55,7 @@ ostream &operator<<(std::ostream &os, const HRCode &c) {
   return os << "{" << c.scale << "}";
 }
 
-void extractLine(Mat& mat, int lineNb, const Mat& src, double lineWidthMm) {
+void extractLine(cv::Mat& mat, int lineNb, const cv::Mat& src, double lineWidthMm) {
   
   double scale = src.cols/HRCODE_OUTER_DIA; // px per mm
 
@@ -69,14 +69,14 @@ void extractLine(Mat& mat, int lineNb, const Mat& src, double lineWidthMm) {
 
   Rect lineRect = Rect(x, y, lineWidth, charHeight);
   //rectangle(src, lineRect, Scalar(0,255,0), 2, LINE_8);
-  Mat lineMat(src, lineRect);
+  cv::Mat lineMat(src, lineRect);
   mat = lineMat.clone();
 }
 
 // Extract chars this way does not work, because sometimes there is an even nb of chars, sometimes there is an odd.
-void extractLines(vector<Mat>& lines, Mat& src) {
+void extractLines(vector<cv::Mat>& lines, cv::Mat& src) {
 
-  Mat jarId;
+  cv::Mat jarId;
   extractLine(jarId, 0, src, HRCODE_LINE_0_WIDTH);
   lines.push_back(jarId);
   //imshow("jarId", jarId);
@@ -91,7 +91,7 @@ void extractLines(vector<Mat>& lines, Mat& src) {
 
 class ImageProcess {
   public:
-    virtual void process(Mat& src, Mat& dest) = 0;
+    virtual void process(cv::Mat& src, cv::Mat& dest) = 0;
 };
 
 class Scorer {
@@ -112,9 +112,9 @@ class Optimiser {
 class DilateProcess : public ImageProcess {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       int dilateSize = 2; // TODO: Make this a param
-      Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
+      cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
       dilate(src, dest, kernel );
     }
 
@@ -123,7 +123,7 @@ class DilateProcess : public ImageProcess {
 class AdaptiveThresholdProcess : public ImageProcess {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       adaptiveThreshold(src, dest, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 3, 5 );
     }
 
@@ -133,7 +133,7 @@ class AdaptiveThresholdProcess : public ImageProcess {
 class BrightnessProcess : public ImageProcess {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       double averageBrightness = 0;
       for(int i=0; i<src.rows; i++) {
         for(int j=0; j<src.cols; j++) {
@@ -154,9 +154,9 @@ class BrightnessProcess : public ImageProcess {
 class ErodeProcess : public ImageProcess  {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       int erosionSize = 2; // TODO: Make this a param
-      Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*erosionSize + 1, 2*erosionSize+1 ), Point( erosionSize, erosionSize ) );
+      cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*erosionSize + 1, 2*erosionSize+1 ), Point( erosionSize, erosionSize ) );
       erode(src, dest, kernel );
     }
 
@@ -165,7 +165,7 @@ class ErodeProcess : public ImageProcess  {
 class ThresholdBinaryProcess : public ImageProcess  {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       threshold(src, dest, 255/2.0, 255, THRESH_BINARY);
     }
 
@@ -175,7 +175,7 @@ class ThresholdBinaryProcess : public ImageProcess  {
 class ThresholdBlackProcess : public ImageProcess  {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       threshold(src, dest, 80, 255, THRESH_TOZERO);
     }
 
@@ -185,7 +185,7 @@ class ThresholdBlackProcess : public ImageProcess  {
 class ThresholdWhiteProcess : public ImageProcess  {
   public:
 
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       threshold(src, dest, 80, 255, THRESH_TOZERO);
     }
 
@@ -193,7 +193,7 @@ class ThresholdWhiteProcess : public ImageProcess  {
 
 class ContrastProcess : public ImageProcess  {
   public:
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       double contrast = 1.1;
       dest = src * contrast;
     }
@@ -202,14 +202,14 @@ class ContrastProcess : public ImageProcess  {
 
 class BlurProcess : public ImageProcess  {
   public:
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       blur(src, dest, Size(3,3)); // Remove noise
     }
 };
 
 class CannyProcess : public ImageProcess  {
   public:
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       int thresh = 20;
       Canny(src, dest, thresh, thresh*2 );
     }
@@ -218,7 +218,7 @@ class CannyProcess : public ImageProcess  {
 // CannyProcess should be run just before
 class DrawContoursProcess : public ImageProcess  {
   public:
-    void process(Mat& src, Mat& dest) {
+    void process(cv::Mat& src, cv::Mat& dest) {
       RNG rng(12345);
       vector<vector<Point>> contours;
       vector<cv::Vec4i> hierarchy;
@@ -254,11 +254,11 @@ class DrawContoursProcess : public ImageProcess  {
 // TODO Contours process
 
 // Find characters with contours does not work because they are too close together
-void parseText(vector<string>& parsedLines, Mat gray) {
+void parseText(vector<string>& parsedLines, cv::Mat gray) {
   
   resize(gray, gray, Size(gray.cols*2, gray.rows*2), 0, 0, INTER_AREA);
  
-  Mat dst = gray.clone(); 
+  cv::Mat dst = gray.clone(); 
 
   vector<shared_ptr<ImageProcess>> processes;
   processes.push_back(make_shared<BlurProcess>());
@@ -271,14 +271,14 @@ void parseText(vector<string>& parsedLines, Mat gray) {
   //processes.push_back(make_shared<DilateProcess>());
   //processes.push_back(make_shared<ThresholdBinaryProcess>());
   
-  Mat sideBySide = gray.clone();
+  cv::Mat sideBySide = gray.clone();
 
   for (shared_ptr<ImageProcess>& process : processes) {
     process->process(dst, dst);
     hconcat(sideBySide, dst, sideBySide);
   }
 
-  vector<Mat> lines;
+  vector<cv::Mat> lines;
   extractLines(lines, dst);
 
   parsedLines.push_back(parseDigitLine(lines[0]));
@@ -328,12 +328,12 @@ int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCir
   }
 }
 
-void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh) {
-  Mat src_gray;
+void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
+  cv::Mat src_gray;
   cvtColor( src, src_gray, COLOR_BGR2GRAY );
   blur( src_gray, src_gray, Size(3,3) ); // Remove noise
 
-  Mat canny_output;
+  cv::Mat canny_output;
   Canny( src_gray, canny_output, thresh, thresh*2 );
 
   RNG rng(12345);
@@ -344,7 +344,7 @@ void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   vector<float> radius( contours.size() );
   vector<bool> contourIsCircle( contours.size(), false );
 
-  Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+  cv::Mat drawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 );
 
   for( size_t i = 0; i < contours.size(); i++ )
   {
@@ -407,9 +407,9 @@ void findHRCodes(Mat& src, vector<HRCode> &detectedCodes, int thresh) {
  
     circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
 
-    Mat rotatedHRCode;
-    Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
-    Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
+    cv::Mat rotatedHRCode;
+    cv::Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
+    cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");

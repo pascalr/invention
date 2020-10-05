@@ -11,6 +11,10 @@
 #include "../lib/lib.h"
 
 #include <opencv2/core/mat.hpp>
+// Forward declarations
+//namespace cv {
+//  class Mat;
+//}
 
 #include "../utils/constants.h"
 #include "hrcode_constants.h"
