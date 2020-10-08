@@ -15,7 +15,6 @@ void Heda::stop() {
 
   //m_stack.clear();
   //m_pending_commands.clear();
-  gripped_jar.id = -1;
   is_gripping = false;
   m_writer << "s";
   askPosition();
