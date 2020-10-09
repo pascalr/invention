@@ -544,6 +544,7 @@ class StepperMotor : public Motor {
       m_is_step_high = !m_is_step_high;
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
 
+      // TODO: Put this logic out of turnOneStep...
       lost_time = timeSinceStart - next_step_time;
       next_step_delay = nextDelayPercent(abs(m_position_steps - start_position_steps), timeSinceStart, lost_time);
       //next_step_delay = nextDelay(m_position_steps - start_position_steps);

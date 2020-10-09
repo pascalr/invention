@@ -13,6 +13,19 @@ NOTE that the Raspberry Pi 3B+ and Pi Zero and ZeroW do not include an input ZVD
 
 Under no circumstances should a power source be connected to the GPIO header 3.3V pins.
 
+vimrc
+
+filetype plugin indent on
+" On pressing tab, insert 2 spaces
+set expandtab
+" show existing tab with 2 spaces width
+set tabstop=2
+set softtabstop=2
+" when indenting with '>', use 2 spaces width
+set shiftwidth=2
+syntax on
+
+
 Maybe one day do model.setAttr("name", value);
 Advantage update only the ones modified (does it matter)
 Update by column name and not by index.
