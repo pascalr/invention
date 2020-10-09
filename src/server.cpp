@@ -158,7 +158,6 @@ int main(int argc, char** argv) {
     writeJson(ss, "toolPos", heda.getToolPosition());
     writeJson(ss, "pending", heda.getPendingCommands());
     writeJson(ss, "output", getAllAvailable(serverReader));
-    ss << "\"" << "gripped_jar_format_id" << "\": " << heda.gripped_jar.jar_format_id;
     ss << "}";*/
 
     ptree pt;
@@ -167,7 +166,6 @@ int main(int argc, char** argv) {
     //pt.put("pending", heda.getPendingCommands());
     pt.put("output", getAllAvailable(serverReader));
     pt.put("isPaused", heda.is_paused);
-    pt.put("gripped_jar_format_id", heda.gripped_jar.jar_format_id);
 
     // TODO: Two types of errors: Error aborted and error waiting for user input
 

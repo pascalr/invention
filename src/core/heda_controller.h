@@ -68,6 +68,15 @@ void writeSlave(Heda& heda, std::string cmd) {
   }
 }
 
+void openGrip(Heda& heda, double widthOpening) {
+
+  auto h5 = Header5("OPEN GRIP(" + to_string(widthOpening) + ")"); 
+
+  writeSlave(heda, "o");
+
+  heda.is_gripping = false;
+}
+
 void openGrip(Heda& heda) {
 
   auto h5 = Header5("OPEN GRIP"); 
@@ -479,19 +488,17 @@ void grip(Heda& heda, Jar& jar) {
 
   grab(heda, format.grip_force);
 
-  heda.gripped_jar = jar;
   heda.is_gripping = true;
 }
 
-void putdown(Heda& heda) {
+void putdown(Heda& heda, Jar& jar) {
 
   auto h4 = Header4("PUTDOWN");
 
-  // TODO: Error message is not gripping
-  if (heda.is_gripping) {
-    lowerForGrip(heda, heda.gripped_jar);
-    openGrip(heda);
-  }
+  ensure(heda.is_gripping, "Heda is not gripping so it can't putdown.");
+
+  lowerForGrip(heda, jar);
+  openGrip(heda);
 }
 
 void storeDetected(Heda& heda, DetectedHRCode& detected) {
@@ -523,12 +530,11 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   lowerForGrip(heda, freshJar); 
   grip(heda, freshJar);
   gotoPolar(heda, heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius));
-  putdown(heda);
+  putdown(heda, freshJar);
 
   loc.occupied = true;
   heda.db.update(loc);
   heda.db.remove(detected);
-  heda.gripped_jar.id = -1;
 }
 
 void bring(Heda& heda, Ingredient& ingredient) {
@@ -560,7 +566,7 @@ void bring(Heda& heda, Ingredient& ingredient) {
   heda.db.update(loc);
 
   gotoPolar(heda, heda.toPolarCoord(UserCoord(dest.x,destShelf.moving_height,dest.z), heda.config.gripper_radius));
-  putdown(heda);
+  putdown(heda,jar);
 
   dest.occupied = true;
   heda.db.update(dest);

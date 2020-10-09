@@ -120,7 +120,6 @@ class Heda {
 
     HedaConfig config;
 
-    Jar gripped_jar;
     bool is_gripping = false;
 
     void shelfByHeight(Shelf& shelf, double userHeight);

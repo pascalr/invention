@@ -51,7 +51,6 @@ class HedaController < ApplicationController
     @position = vals["pos"]
     @tool_position = vals["toolPos"]
     @is_paused = vals["isPaused"]
-    @gripped_jar_format_id = vals["gripped_jar_format_id"]
     @status = vals["status"]
     @status_code = vals["status_code"]
     @action_required = vals["action_required"]
