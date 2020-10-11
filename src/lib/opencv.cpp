@@ -30,8 +30,8 @@ int captureVideoImage(Mat& frame) {
   cap.open(deviceID + apiID);
 
   if (!cap.isOpened()) {
-      cerr << "ERROR! Unable to open camera\n";
-      return -1;
+    cerr << "ERROR! Unable to open camera\n";
+    return -1;
   }
   // wait for a new frame from camera and store it into 'frame'
   cap.read(frame);

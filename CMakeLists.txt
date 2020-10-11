@@ -3,16 +3,29 @@
 # tesseract if for reading words
 
 cmake_minimum_required(VERSION 2.8)
-project( DisplayImage )
+project( Heda )
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -DBOOST_LOG_DYN_LINK -DDEBUG -DWITHOUT_NUMPY -Wno-psabi -Wall")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+
+# Python is for Matplotlib I think
 find_package(PythonLibs 2.7)
 set(Python2_INCLUDE_DIRS "/usr/include/python2.7" )
 
+# What is PkgConfig ?
+find_package( PkgConfig REQUIRED )
+
 find_package( OpenCV REQUIRED )
 
-find_package( PkgConfig REQUIRED )
+add_executable( video src/video.cpp )
+target_include_directories( video PUBLIC ${OpenCV_INCLUDE_DIRS} )
+target_link_libraries( video ${OpenCV_LIBS} )
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -DBOOST_LOG_DYN_LINK -DDEBUG -DWITHOUT_NUMPY -Wno-psabi")
+
 pkg_search_module( TESSERACT REQUIRED tesseract )
 pkg_search_module( LEPTONICA REQUIRED lept )
 include_directories( ${TESSERACT_INCLUDE_DIRS} )
@@ -26,9 +39,6 @@ link_directories(${Boost_LIBRARY_DIR})
 
 #include_directories( "/usr/include/ruby-2.5.0/" "/usr/include/x86_64-linux-gnu/ruby-2.5.0" )
 include_directories( ${OpenCV_INCLUDE_DIRS} "/usr/local/include/eigen3/" )
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp)
 
@@ -109,9 +119,9 @@ add_executable( rasp_server src/rasp_server.cpp )
 #target_include_directories( simulation PRIVATE "/usr/local/include/simple-web-server/" )
 #target_compile_definitions(simulation PUBLIC SIMULATION)
 
-enable_testing()
-add_test( regularTests bin/run_tests )
-add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )
-add_test( testAxis bin/test_axis )
+#enable_testing()
+#add_test( regularTests bin/run_tests )
+#add_test( testJarPositionAnalyzer bin/test_jar_position_analyzer )
+#add_test( testAxis bin/test_axis )
 
-add_custom_target(check COMMAND make && ${CMAKE_CTEST_COMMAND} --verbose)
+#add_custom_target(check COMMAND make && ${CMAKE_CTEST_COMMAND} --verbose)
