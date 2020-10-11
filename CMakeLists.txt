@@ -110,6 +110,8 @@ target_link_libraries( test_stepper_motor ${MyLibs} ${SlaveLibs} )
 
 add_executable( server src/server.cpp )
 
+add_executable( daemon src/daemon.cpp )
+
 add_executable( benchmark src/benchmark.cpp )
 
 add_executable( rasp_server src/rasp_server.cpp )

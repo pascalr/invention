@@ -8,12 +8,16 @@
 #include <syslog.h>
 #include <string.h>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 //I've also put in the correct include statements for interfacing with the syslog, which is recommended at the very least for sending start/stop/pause/die log statements, in addition to using your own logs with the fopen()/fwrite()/fclose() function calls.
 
 //From here, you can use this skeleton to write your own daemons. Be sure to add in your own logging (or use the syslog facility), and code defensively, code defensively, code defensively!
 
 const char* DAEMON_NAME = "heda-server-daemon";
+
+void debug() {}
 
 // Source 1:
 // http://www.netzmafia.de/skripten/unix/linux-daemon-howto.html
@@ -32,6 +36,10 @@ int main(void) {
   /* If we got a good PID, then
      we can exit the parent process. */
   if (pid > 0) {
+    std::ofstream myfile;
+    myfile.open ("tmp/server.pid");
+    myfile << pid;
+    myfile.close();
     exit(EXIT_SUCCESS);
   }
 
@@ -63,7 +71,7 @@ int main(void) {
   close(STDERR_FILENO);
   
   /* Daemon-specific initialization goes here */
-  
+
   /* The Big Loop */
   while (1) {
      /* Do some task here ... */
@@ -72,8 +80,7 @@ int main(void) {
   }
 
   // Close system logs for the child process
-  std::string msg = "Stopping "; msg += DAEMON_NAME;
-  syslog(LOG_NOTICE, msg.c_str());
+  syslog(LOG_NOTICE, "Stopping %s", DAEMON_NAME);
   closelog();
 
   exit(EXIT_SUCCESS);
