@@ -95,7 +95,23 @@ unsigned long printIntervalUs = 0.1 * 1000 * 1000;
 unsigned long lastPrintUs = 0;
 bool isLightOn = false;
 
-void loop() {
+void debugSwitch(int pin) {
+  bool lightMustBeOn = digitalRead(pin) == HIGH;
+  digitalWrite(LED_BUILTIN, lightMustBeOn ? HIGH : LOW);
+  if (lightMustBeOn) {
+    Serial.println("Switch activated!");
+    delay(200);
+  }
+  delay(10);
+}
+
+void debugEncoder(int pin) {
+  bool lightMustBeOn = analogRead(pin) > 500;
+  digitalWrite(LED_BUILTIN, lightMustBeOn ? HIGH : LOW);
+  delay(10);
+}
+
+void debugGeneral() {
   //Serial.println(analogRead(4));
   //delay(1000);
 
@@ -109,13 +125,17 @@ void loop() {
 
   isLightOn = !isLightOn;
   digitalWrite(LED_BUILTIN, isLightOn ? HIGH : LOW);
-  p.axisH.setMotorDirection(REVERSE);
-  p.axisH.turnOneStep(0);
-  p.axisV.setMotorDirection(REVERSE);
-  p.axisV.turnOneStep(0);
-  p.axisT.setMotorDirection(REVERSE);
-  p.axisT.turnOneStep(0);
+
+  Serial.println(analogRead(4));
   
-  delay(10);
-//  myLoop(p);
+  delay(500);
+  
+}
+
+void loop() {
+
+  //debugEncoder(5);
+  debugSwitch(12);
+  //myLoop(p);
+  //debugGeneral();
 }
