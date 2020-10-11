@@ -3,3 +3,18 @@ Loosing steps
 
 It doesn't detect the jar.
 Est-ce que l'étiquette est bien imprimé. Ça doit être noir noir, et pas noir mauvâtre.
+
+Encodeur:
+Si l'encodeur ne fonctionne pas (au référencement il tourne à peine au début, et ensuite il tourne à l'infini)
+
+Vérifier que le voltage autour de la résitance de la LED infrarouge de la photo-résistance baisse à cause de la LED.
+5V - 1.3V => À peu près 3.7V
+Si oui, PROBLÈME EST DANS LE CIRCUIT DE LA SWITCH DE LA PHOTO-RÉSISTANCE
+Sinon, PROBLÈME EST DANS LE CIRCUIT DE LA SWITCH DE LA PHOTO-RÉSISTANCE
+
+Utiliser debug.ino, debugEncoder();
+
+Vérifier qu'il y a 5 volt entre les 2 fils de la LED de la photo-résistance.
+Débrancher le fil de la LED du côté négatif et s'assurer qu'il y a continuité jusqu'au positif.
+Débrancher le fil de la LED du côté positif et s'assurer qu'il y a continuité jusqu'au négatif.
+Vérifier qu'il alterne entre continu et non-continu entre les 2 autres fils de la photo-résistance lorsqu'il tourne.
