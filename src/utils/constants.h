@@ -4,7 +4,7 @@
 #define CAMERA_WIDTH 640
 #define CAMERA_HEIGHT 480
 
-#define REFERENCE_SPEED_RPM 60.0 // tr/min
+#define REFERENCE_SPEED_RPM 30.0 // tr/min
 
 #define REFERENCE_POSITION_H 0.0 // mm
 #define REFERENCE_POSITION_V 0.0 // mm
