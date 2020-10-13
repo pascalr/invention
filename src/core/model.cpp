@@ -78,8 +78,8 @@ void parseItem(SQLite::Statement& query, HedaConfig& c) {
   c.max_x = query.getColumn(19);
   c.max_y = query.getColumn(20);
   c.max_z = query.getColumn(21);
-  c.camera_width = query.getColumn(22);
-  c.camera_height = query.getColumn(23);
+  //c.camera_width = query.getColumn(22);
+  //c.camera_height = query.getColumn(23);
 }
 
 

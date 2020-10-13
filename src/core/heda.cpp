@@ -24,7 +24,7 @@ void Heda::captureFrame(cv::Mat& frame) {
 
   HttpClient client("192.168.0.19:8889");
   try {
-    auto r1 = client.request("GET", "/slow_capture.jpg");
+    auto r1 = client.request("GET", "/capture.jpg");
 
     //vector<uchar> v(131072); I can't do push_back with this...
     vector<uchar> v;

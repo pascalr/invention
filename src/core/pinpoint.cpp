@@ -4,6 +4,11 @@
 #include <vector>
 #include "model.h"
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 using namespace Eigen;
@@ -26,10 +31,12 @@ double heightOffset(Heda& heda, DetectedHRCode& input) {
   return heda.config.camera_focal_point / input.scale;
 }
 
-Vector2d imageOffset(Heda& heda, DetectedHRCode& input) {
+Vector2d imageOffset(DetectedHRCode& input, cv::Mat gray) {
 
-  double width = heda.config.camera_width; // TODO: Get dimension from the image in input, not from those variables.
-  double height = heda.config.camera_height;
+  double width = gray.cols;
+  double height = gray.rows;
+  //double width = heda.config.camera_width; // TODO: Get dimension from the image in input, not from those variables.
+  //double height = heda.config.camera_height;
 
   Vector2d jarCenter; jarCenter << input.centerX, input.centerY;
   Vector2d imgCenterOffset = jarCenter - Vector2d(width/2, height/2) ;
@@ -52,7 +59,10 @@ void pinpointCode(Heda& heda, DetectedHRCode& input) {
 
   UserCoord camPos = heda.toUserCoord(input.coord, heda.config.camera_radius);
   double heightOffset0 = heightOffset(heda, input);
-  Vector2d imgOffset = imageOffset(heda, input);
+
+  cv::Mat gray = cv::imread(DETECTED_CODES_BASE_PATH + input.imgFilename, cv::IMREAD_GRAYSCALE);
+
+  Vector2d imgOffset = imageOffset(input, gray);
 
   input.lid_coord = UserCoord(camPos.x + imgOffset(0), camPos.y - heightOffset0, camPos.z + imgOffset(1));
 }
