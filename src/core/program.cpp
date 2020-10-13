@@ -75,16 +75,14 @@ void setupAxes(Program& p) {
   p.axisH.reference_speed_rpm = 30;
 
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
-  p.axisV.setStepsPerUnit(200 * 2 * 8 / unitPerTurnY);
-  p.axisV.setStepsPerTurn(200 * 2 * 8);
+  p.axisV.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
+  p.axisV.setStepsPerTurn(200 * 2 * 16);
   //p.axisV.limitSwitchPin = 12;
   p.axisV.setupPins(8,7,6);
-  //p.axisV.setDefaultMaxSpeed(500); // FIXME: Doesn't work...
-  //p.axisV.setAcceleration(200);
   p.axisV.setReverseMotorDirection(true);
   p.axisV.referencer = LimitSwitchReferencer(12);
   p.axisV.percent_p = 0.3;
-  p.axisV.min_delay = 200;
+  p.axisV.min_delay = 100;
   p.axisV.max_delay = 1000;
   p.axisV.reference_speed_rpm = 30;
 

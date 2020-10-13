@@ -52,13 +52,15 @@ class Referencer {
 class LimitSwitchReferencer : public Referencer {
   public:
     LimitSwitchReferencer() {}
-    LimitSwitchReferencer(int pin) : m_pin(pin) {}
+    LimitSwitchReferencer(int pin) : m_pin(pin) {
+     pinMode(pin, INPUT_PULLUP);
+    }
     bool isReferenceReached() {
 #ifndef ARDUINO
       return true;
 #endif
       if (m_pin == -1) {return true;}
-      return digitalRead(m_pin) == HIGH;
+      return digitalRead(m_pin) == LOW;
     }
   protected:
     int m_pin = -1;

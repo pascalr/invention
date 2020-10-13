@@ -105,10 +105,46 @@ void debugSwitch(int pin) {
   delay(10);
 }
 
+void debugDigital(int pin) {
+  bool value = digitalRead(pin) == LOW;
+  digitalWrite(LED_BUILTIN, value ? HIGH : LOW);
+
+  if (value) {
+    Serial.println("0V!");
+  }
+
+  //if (timeDifference(lastPrintUs, micros()) > printIntervalUs) {
+  //  Serial.println(value);
+  //  lastPrintUs = micros();
+  //}
+}
+
+// 1023 is the max value of analogRead
+void debugAnalog(int pin) {
+  int value = analogRead(pin);
+  bool lightMustBeOn = value > 500;
+  digitalWrite(LED_BUILTIN, lightMustBeOn ? HIGH : LOW);
+
+  if (value > 500) {
+    Serial.println(value);
+  }
+
+  if (timeDifference(lastPrintUs, micros()) > printIntervalUs) {
+    Serial.println(value);
+    lastPrintUs = micros();
+  }
+
+  delay(50);
+}
+
 void debugEncoder(int pin) {
   bool lightMustBeOn = analogRead(pin) > 500;
   digitalWrite(LED_BUILTIN, lightMustBeOn ? HIGH : LOW);
   delay(10);
+}
+
+void testing1212() {
+  digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void debugGeneral() {
@@ -134,8 +170,11 @@ void debugGeneral() {
 
 void loop() {
 
+  //testing1212();
   //debugEncoder(5);
-  debugSwitch(12);
+  //debugSwitch(12);
+  //debugAnalog(4);
+  debugDigital(12);
   //myLoop(p);
   //debugGeneral();
 }
