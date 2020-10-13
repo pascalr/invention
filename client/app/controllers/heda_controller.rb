@@ -62,13 +62,13 @@ class HedaController < ApplicationController
 
   def run_recette
     recette = Recette.find(params[:recette_id])
-    execute(recette.instructions)
+    execute!(recette.instructions)
 
     redirect_to action: 'index', recette_id: params[:recette_id]
   end
 
   def run
-    execute(params[:cmd])
+    execute!(params[:cmd])
     
     redirect_to action: 'index'
   end
@@ -91,7 +91,7 @@ class HedaController < ApplicationController
     #'http://192.168.0.19:8083/' + command
   end
 
-  def execute(cmd)
+  def execute!(cmd)
     uri = URI(heda_uri('run'))
     req = Net::HTTP::Post.new(uri)
     req.set_form_data('cmd' => cmd)
@@ -109,8 +109,17 @@ class HedaController < ApplicationController
     end
   end
 
+  def execute(cmd)
+    begin
+      execute!(cmd)
+      true
+    rescue
+      false
+    end
+  end
+
   def heda_params
-    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point, :detect_height, :home_position_x, :home_position_y, :home_position_t, :grip_offset, :max_h, :max_v, :max_t, :closeup_distance, :max_x, :max_y, :max_z)
+    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point, :detect_height, :home_position_x, :home_position_y, :home_position_t, :grip_offset, :max_h, :max_v, :max_t, :closeup_distance, :max_x, :max_y, :max_z, :camera_width, :camera_height)
   end
 
 end

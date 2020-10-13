@@ -7,14 +7,29 @@
 #include "lib/opencv.h"
 #include "lib/hr_code.h"
 #include "lib/linux.h"
-//#include <opencv2/highgui.hpp>
-//#include <opencv2/imgcodecs.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/videoio.hpp>
 #include <thread>
 #include <chrono>
 
 using namespace std;
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+
+bool initVideoDevice(cv::VideoCapture& cap) {
+  int deviceID = 0;             // 0 = open default camera
+  int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+  cap.open(deviceID + apiID);
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 1024);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 768);
+  if (!cap.isOpened()) {
+    return false;
+  }
+  return true;
+}
 
 void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
 
@@ -30,12 +45,13 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.address = "192.168.0.19";
   server.config.port = 8889;
-    
-  //VideoCapture cap;
-  //initVideo(cap);
-  //if (!cap.isOpened()) {
-  //  throw InitVideoException();
-  //}
+  
+  // TODO: Always check if it is opened before taking a picture and send back to the server if there was an error.  
+  cv::VideoCapture cap;
+  initVideoDevice(cap);
+  if (!cap.isOpened()) {
+    throw InitVideoException();
+  }
 
   //server.resource["^/detect.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
@@ -80,29 +96,12 @@ int main(int argc, char** argv) {
   //  cout << "THere" << endl;
   //};
 
-  // Sleeps for 250 ms then captures.
-  server.resource["^/slow_capture.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    //cout << "GET /cam_capture" << endl;
-    
-    vector<uchar> encodeBuf(131072);
-    captureJpeg(encodeBuf);
-    char* buf = reinterpret_cast<char*>(encodeBuf.data());
-    streamsize ss = static_cast<streamsize>(encodeBuf.size());
-
-    SimpleWeb::CaseInsensitiveMultimap header;
-    header.emplace("Content-Length", to_string(encodeBuf.size()));
-    header.emplace("Content-Type", "image/jpeg");
-    //response->write(header, encodeBuf.size());
-    response->write(SimpleWeb::StatusCode::success_ok, header);
-    response->write(buf, ss);
-  };
-
-  //server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+  //// Sleeps for 250 ms then captures.
+  //server.resource["^/slow_capture.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
   //  //cout << "GET /cam_capture" << endl;
-  //  Mat frame;
-  //  cap.read(frame);
+  //  
   //  vector<uchar> encodeBuf(131072);
-  //  imencode(".jpg",frame,encodeBuf);
+  //  captureJpeg(encodeBuf);
   //  char* buf = reinterpret_cast<char*>(encodeBuf.data());
   //  streamsize ss = static_cast<streamsize>(encodeBuf.size());
 
@@ -113,6 +112,23 @@ int main(int argc, char** argv) {
   //  response->write(SimpleWeb::StatusCode::success_ok, header);
   //  response->write(buf, ss);
   //};
+
+  server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    //cout << "GET /cam_capture" << endl;
+    cv::Mat frame;
+    cap.read(frame);
+    vector<uchar> encodeBuf(131072);
+    imencode(".jpg",frame,encodeBuf);
+    char* buf = reinterpret_cast<char*>(encodeBuf.data());
+    streamsize ss = static_cast<streamsize>(encodeBuf.size());
+
+    SimpleWeb::CaseInsensitiveMultimap header;
+    header.emplace("Content-Length", to_string(encodeBuf.size()));
+    header.emplace("Content-Type", "image/jpeg");
+    //response->write(header, encodeBuf.size());
+    response->write(SimpleWeb::StatusCode::success_ok, header);
+    response->write(buf, ss);
+  };
 
   server.default_resource["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     response->write(SimpleWeb::StatusCode::client_error_bad_request, "Could not open path " + request->path);

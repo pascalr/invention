@@ -43,73 +43,120 @@
     <%= form.number_field :user_coord_offset_z, step: 0.01 %>
   </div>
 
-  <h3>Polar coord</h3>
+  <table style="width:100%">
+    <tr>
+      <td><b>Variable</b></td>
+      <td><b>Valeur</b></td>
+      <td><b>Valeur par défaut</b></td>
+      <td><b>Notes</b></td>
+    </tr>
+    <tr>
+      <td colspan="4"><h3>Maximum</h3></td>
+    </tr>
+    <tr>
+      <td><%= form.label :max_x %></td>
+      <td><%= form.number_field :max_x , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :max_y %></td>
+      <td><%= form.number_field :max_y , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :max_z %></td>
+      <td><%= form.number_field :max_z , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :max_h %></td>
+      <td><%= form.number_field :max_h , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :max_v %></td>
+      <td><%= form.number_field :max_v , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :max_t %></td>
+      <td><%= form.number_field :max_t , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td colspan="4"><h3>Référencement</h3></td>
+    </tr>
+    <tr>
+      <td><%= form.label :home_position_t %></td>
+      <td><%= form.number_field :home_position_t, step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :home_position_y %></td>
+      <td><%= form.number_field :home_position_y, step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :home_position_x %></td>
+      <td><%= form.number_field :home_position_x, step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td colspan="4"><h3>Camera</h3></td>
+    </tr>
+    <tr>
+      <td><%= form.label :detect_height %></td>
+      <td><%= form.number_field :detect_height, step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :camera_radius %></td>
+      <td><%= form.number_field :camera_radius, step: 0.01 %></td>
+      <td></td>
+      <td>Faire un trait vis-à-vis la caméra, faire un trait vis-a-vis le centre de rotation et mesurer cette distance.</td>
+    </tr>
+    <tr>
+      <td><%= form.label :closeup_distance %></td>
+      <td><%= form.number_field :closeup_distance, step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :camera_focal_point %></td>
+      <td><%= form.text_field :camera_focal_point, readonly: true %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :camera_width %></td>
+      <td><%= form.number_field :camera_width %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :camera_height %></td>
+      <td><%= form.number_field :camera_height %></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </table> 
 
   <div class="field">
-    <%= form.label :max_h %>
-    <%= form.number_field :max_h , step: 0.01 %>
+    
+    
   </div>
 
-  <div class="field">
-    <%= form.label :max_v %>
-    <%= form.number_field :max_v , step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :max_t %>
-    <%= form.number_field :max_t , step: 0.01 %>
-  </div>
-  
-  <h3>User coord</h3>
-
-  <div class="field">
-    <%= form.label :max_x %>
-    <%= form.number_field :max_x , step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :max_y %>
-    <%= form.number_field :max_y , step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :max_z %>
-    <%= form.number_field :max_z , step: 0.01 %>
-  </div>
-  
-  <div class="field">
-    <%= form.label :home_position_x %>
-    <%= form.number_field :home_position_x, step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :home_position_y %>
-    <%= form.number_field :home_position_y, step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :home_position_t %>
-    <%= form.number_field :home_position_t, step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :detect_height %>
-    <%= form.number_field :detect_height, step: 0.01 %>
-  </div>
-
-  <p>
-    Faire un trait vis-à-vis la caméra, faire un trait vis-a-vis le centre de rotation et mesurer cette distance.
-  </p>
-
-  <div class="field">
-    <%= form.label :camera_radius %>
-    <%= form.number_field :camera_radius, step: 0.01 %>
-  </div>
-  
-  <div class="field">
-    <%= form.label :closeup_distance %>
-    <%= form.number_field :closeup_distance, step: 0.01 %>
-  </div>
+  <h3>Autre</h3>
 
   <p>
   Pour entrer cette donnée, déplacer le bras au centre de l'axe x. Ensuite mettre le bras à theta=0. Mettre outils crayon dans la pince. Faire une marque.
@@ -126,11 +173,6 @@
   <div class="field">
     <%= form.label :grip_offset %>
     <%= form.number_field :grip_offset %>
-  </div>
-
-  <div class="field">
-    <%= form.label :camera_focal_point %>
-    <%= form.text_field :camera_focal_point, readonly: true %>
   </div>
 
   <div class="actions">

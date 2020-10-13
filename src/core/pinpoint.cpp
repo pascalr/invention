@@ -26,10 +26,13 @@ double heightOffset(Heda& heda, DetectedHRCode& input) {
   return heda.config.camera_focal_point / input.scale;
 }
 
-Vector2d imageOffset(DetectedHRCode& input) {
+Vector2d imageOffset(Heda& heda, DetectedHRCode& input) {
+
+  double width = heda.config.camera_width; // TODO: Get dimension from the image in input, not from those variables.
+  double height = heda.config.camera_height;
 
   Vector2d jarCenter; jarCenter << input.centerX, input.centerY;
-  Vector2d imgCenterOffset = jarCenter - Vector2d(CAMERA_WIDTH/2, CAMERA_HEIGHT/2) ;
+  Vector2d imgCenterOffset = jarCenter - Vector2d(width/2, height/2) ;
 
   // Gauche droite sur l'image (donc jarCenter.x) c'est les z quand l'angle est à 0.
   // jarCenter.x positif c'est z négatif.
@@ -49,7 +52,7 @@ void pinpointCode(Heda& heda, DetectedHRCode& input) {
 
   UserCoord camPos = heda.toUserCoord(input.coord, heda.config.camera_radius);
   double heightOffset0 = heightOffset(heda, input);
-  Vector2d imgOffset = imageOffset(input);
+  Vector2d imgOffset = imageOffset(heda, input);
 
   input.lid_coord = UserCoord(camPos.x + imgOffset(0), camPos.y - heightOffset0, camPos.z + imgOffset(1));
 }

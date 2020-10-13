@@ -634,6 +634,7 @@ class HedaController {
         parseRecipe(heda, recipe);
       };
       
+      m_commands["detect"] = [&](ParseResult tokens) {detect(heda);};
       m_commands["raw"] = [&](ParseResult tokens) {actionRaw(heda);};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
