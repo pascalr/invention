@@ -539,6 +539,13 @@ class StepperMotor : public Motor {
     unsigned long next_step_delay = 0;
     unsigned long lost_time = 0;
 
+    void turnOneStep() {
+      digitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
+      m_is_step_high = !m_is_step_high;
+      m_position_steps = m_position_steps + (isForward ? 1 : -1);
+    }
+
+    // deprecated... use the other turnOneStep
     void turnOneStep(unsigned long timeSinceStart) {
       digitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
       m_is_step_high = !m_is_step_high;
@@ -606,13 +613,14 @@ class StepperMotor : public Motor {
       m_speed = 0;
       m_max_speed = m_default_max_speed;
     }
-   
-    // Pretty sure this does not work... 
+
+    // FIXME: All the time that are given to StepperMotor should be relative
+    // to the start of the movement. It should not have to use timeDifference...
     virtual void run(unsigned long currentTime, double speedRPM) {
-      next_step_time = ((unsigned long)(US_PER_S / (speedRPM / 60.0 * m_steps_per_turn))); // us
       unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
-      if (currentTime >= next_step_time) {
-        turnOneStep(timeSinceStart);
+      if (timeSinceStart >= next_step_time) {
+        turnOneStep();
+        next_step_time = timeSinceStart + ((unsigned long)(US_PER_S / (speedRPM / 60.0 * m_steps_per_turn))); // us
       }
     }
 

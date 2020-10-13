@@ -53,6 +53,8 @@ class Motor {
 
     virtual void run(unsigned long currentTime, double speedRPM) = 0;
 
+    double reference_speed_rpm = 30.0;
+
     bool handleReferencing(unsigned long currentTime) {
 
       if (!is_referencing) {return false;}
@@ -62,7 +64,7 @@ class Motor {
         return false;
       }
 
-      run(currentTime, REFERENCE_SPEED_RPM);
+      run(currentTime, reference_speed_rpm);
       return true;
     }
 
