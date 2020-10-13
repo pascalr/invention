@@ -68,6 +68,21 @@ void writeSlave(Heda& heda, std::string cmd) {
   }
 }
 
+void actionRaw(Heda& heda) {
+  heda.waiting_message = "Vous pouvez maintenat écrire des commandes à l'esclave.";
+  heda.action_required = "raw";
+  while (true) {
+    heda.ensureActive();
+
+    if (!heda.user_response.empty()) {
+      writeSlave(heda, heda.user_response);
+      heda.user_response.clear();
+    }
+
+    this_thread::sleep_for(chrono::milliseconds(50));
+  }
+}
+
 void openGrip(Heda& heda, double widthOpening) {
 
   auto h5 = Header5("OPEN GRIP(" + to_string(widthOpening) + ")"); 
@@ -619,6 +634,8 @@ class HedaController {
         parseRecipe(heda, recipe);
       };
       
+      m_commands["raw"] = [&](ParseResult tokens) {actionRaw(heda);};
+      m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
@@ -627,6 +644,10 @@ class HedaController {
       m_commands["done"] = [&](ParseResult tokens) {heda.user_response = "done";};
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
       m_commands["loadcfg"] = [&](ParseResult tokens) {heda.loadConfig();};
+      m_commands["response"] = [&](ParseResult tokens) {
+        // FIXME!!! Remove ParseResult, so I get the raw command here
+        //heda.user_response = true;
+      };
       
       m_commands["storeall"] = [&](ParseResult tokens) { // store all detected jar, starting with the tallest
 

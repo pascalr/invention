@@ -1,0 +1,25 @@
+<h3>Identifier le code</h3>
+
+<%= form_with(model: Jar.new, local: true) do |form| %>
+
+  <%= hidden_field_tag(:detected_id, detected_code.id) %>
+  
+  <div class="field">
+    <%= form.label :jar_id, "Numéro de pot" %>
+    <%= form.text_field :jar_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :jar_format_id %>
+    <%= form.collection_select(:jar_format_id, JarFormat.order('name ASC').all, :id, :name) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :ingredient_id %>
+    <%= form.collection_select(:ingredient_id, Ingredient.order('name ASC').all, :id, :name) %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Valider" %>
+  </div>
+<% end %>

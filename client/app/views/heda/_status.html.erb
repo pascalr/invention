@@ -5,7 +5,7 @@
   <%= @status %>
 </div>
 
-<% if @status_code == "fatal" %>
+<% if @status_code == "fatal" || @status_code == "warning" #FIXME: Not sure how dismissing action identify is handled...  %>
   <br/>
   <%= form_with(url: heda_run_path(cmd: "dismiss"), method: "post", remote: true) do %>
     <%= submit_tag("Dismiss") %>
@@ -18,6 +18,8 @@
 
 <% if @action_required.blank? %>
   Aucune
+<% elsif @action_required == "raw" %>
+  <%= render partial: 'action_raw' %>
 <% elsif @action_required.starts_with? "identify" %>
   <%= render partial: 'action_identify', locals: {detected_code: DetectedCode.find(@action_required.split(' ')[1])} %>
 <% end %>

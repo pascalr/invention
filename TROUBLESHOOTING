@@ -18,3 +18,16 @@ Vérifier qu'il y a 5 volt entre les 2 fils de la LED de la photo-résistance.
 Débrancher le fil de la LED du côté négatif et s'assurer qu'il y a continuité jusqu'au positif.
 Débrancher le fil de la LED du côté positif et s'assurer qu'il y a continuité jusqu'au négatif.
 Vérifier qu'il alterne entre continu et non-continu entre les 2 autres fils de la photo-résistance lorsqu'il tourne.
+
+Le moteur ne tourne pas dans la bonne direction: Vérifier que les fils de la direction sont biens branchés.
+
+Il y avait un trouble intermittent avec la switch de référencement de l'axe vertical. J'ai débranché complétement
+les fils de la suite. Ça l'a encore déclenché par rapport. Donc il y a un mauvais contact quelque part qui apporte du 5V
+aux fils. Je vais les débrancher peu à peu pour voir où se fait le mauvais contact.
+
+Conclusion:
+
+Ne JAMAIS mettre de thermo dans un cable tray. Ne JAMAIS mettre de soudure dans un cable tray.
+TOUJOURS couper les petits fils pointu qui dépassent de la soudure.
+Mais je ne comprends pas... Les petits fils pointu dépassaient à peine... Ils entraient en contact avec quoi?
+Au autre fil est aussi en cause...
