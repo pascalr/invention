@@ -4,9 +4,6 @@
 #include <future>
 
 #include <vector>
-#include "lib/opencv.h"
-#include "lib/hr_code.h"
-#include "lib/linux.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -14,6 +11,7 @@
 #include <opencv2/videoio.hpp>
 #include <thread>
 #include <chrono>
+#include <exception>
 
 using namespace std;
 
@@ -23,22 +21,26 @@ bool initVideoDevice(cv::VideoCapture& cap) {
   int deviceID = 0;             // 0 = open default camera
   int apiID = cv::CAP_ANY;      // 0 = autodetect default API
   cap.open(deviceID + apiID);
-  cap.set(cv::CAP_PROP_FRAME_WIDTH, 1024);
-  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 768);
+  // 2048 × 1536
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 2048);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1536);
+  cout << "Capturing at resolution "<< cap.get(cv::CAP_PROP_FRAME_WIDTH) << "x" << cap.get(cv::CAP_PROP_FRAME_HEIGHT) << "...\n";
   if (!cap.isOpened()) {
     return false;
   }
   return true;
 }
 
-void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
+class InitVideoDeviceException : public std::exception {};
 
-  cv::Mat frame;
-  captureVideoImage(frame);
-  findHRCodes(frame, positions, 100);
-
-  if (attemptsLeft >= 1 && positions.empty()) {tryDetectCodes(positions, attemptsLeft-1);}
-}
+//void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
+//
+//  cv::Mat frame;
+//  captureVideoImage(frame);
+//  findHRCodes(frame, positions, 100);
+//
+//  if (attemptsLeft >= 1 && positions.empty()) {tryDetectCodes(positions, attemptsLeft-1);}
+//}
   
 int main(int argc, char** argv) {
 
@@ -50,7 +52,7 @@ int main(int argc, char** argv) {
   cv::VideoCapture cap;
   initVideoDevice(cap);
   if (!cap.isOpened()) {
-    throw InitVideoException();
+    throw InitVideoDeviceException();
   }
 
   //server.resource["^/detect.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
@@ -115,6 +117,11 @@ int main(int argc, char** argv) {
 
   server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
+  
+    // Sleep a little to make sure the are little vibrations left
+    // in the arm in order to take a still picture. 
+    this_thread::sleep_for(chrono::milliseconds(1000)); 
+    
     cv::Mat frame;
     cap.read(frame);
     vector<uchar> encodeBuf(131072);

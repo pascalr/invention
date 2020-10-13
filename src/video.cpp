@@ -15,6 +15,13 @@ int main(int, char**)
   int apiID = cv::CAP_ANY;    // 0 = autodetect default API
   //int apiID = cv::CAP_V4L2;
   cap.open(deviceID, apiID);
+  // 640 x 480
+  // 1024 x 768
+  // 1920 x 1440
+  // 2048 × 1536
+  // 3264 x 2448
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 2048);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1536);
   if (!cap.isOpened()) {
     cerr << "ERROR! Unable to open camera\n";
     return -1;
