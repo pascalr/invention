@@ -45,6 +45,10 @@ int main(int, char**)
   cout << "Hue: " << cap.get(CAP_PROP_HUE) << endl;
   cout << "Gain: " << cap.get(CAP_PROP_GAIN) << endl;
   for (;;) {
+    if (!cap.isOpened()) {
+      cerr << "ERROR! The camera closed unexpectedly!\n";
+      return -1;
+    }
     cap.read(frame);
     if (frame.empty()) {
       cerr << "ERROR! blank frame grabbed\n";

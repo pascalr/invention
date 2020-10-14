@@ -30,7 +30,8 @@ bool initVideoDevice(cv::VideoCapture& cap) {
   return true;
 }
 
-class InitVideoDeviceException : public std::exception {};
+class InitVideoSlaveException : public std::exception {};
+class InitSerialPortSlaveException : public std::exception {};
 
 //void tryDetectCodes(vector<HRCode>& positions, int attemptsLeft = 10) {
 //
@@ -51,8 +52,16 @@ int main(int argc, char** argv) {
   cv::VideoCapture cap;
   initVideoDevice(cap);
   if (!cap.isOpened()) {
-    throw InitVideoDeviceException();
+    throw InitVideoSlaveException();
   }
+
+  //SerialPort serialPort;
+  //if (serialPort.openPort("/dev/ttyACM0") < 0) {
+  //  throw InitSerialPortSlaveException();
+  //}
+  //
+  //SerialReader serialReader(serialPort);
+  //SerialWriter serialWriter(serialPort);
 
   //server.resource["^/detect.jpg$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
@@ -112,6 +121,11 @@ int main(int argc, char** argv) {
   //  //response->write(header, encodeBuf.size());
   //  response->write(SimpleWeb::StatusCode::success_ok, header);
   //  response->write(buf, ss);
+  //};
+ 
+  // Executing is easy, the issue is reading. 
+  // Leave as is for now socat is fine. Later anyway everything will run on the raspberry pi.
+  //server.resource["^/exe$"]["POST"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
   //};
 
   server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
