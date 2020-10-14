@@ -16,12 +16,16 @@ int main(int, char**)
   //int apiID = cv::CAP_V4L2;
   cap.open(deviceID, apiID);
   // 640 x 480
-  // 1024 x 768
-  // 1920 x 1440
-  // 2048 × 1536
+  // 800 x 600
+  // 1280 x 720
+  // 1280 x 800
+  // 1600 x 1200
+  // 1920 x 1080
+  // 2048 x 1536
+  // 2592 x 1944
   // 3264 x 2448
-  cap.set(cv::CAP_PROP_FRAME_WIDTH, 2048);
-  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1536);
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 1600);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1200);
   if (!cap.isOpened()) {
     cerr << "ERROR! Unable to open camera\n";
     return -1;

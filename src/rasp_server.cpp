@@ -21,9 +21,8 @@ bool initVideoDevice(cv::VideoCapture& cap) {
   int deviceID = 0;             // 0 = open default camera
   int apiID = cv::CAP_ANY;      // 0 = autodetect default API
   cap.open(deviceID + apiID);
-  // 2048 × 1536
-  cap.set(cv::CAP_PROP_FRAME_WIDTH, 2048);
-  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1536);
+  cap.set(cv::CAP_PROP_FRAME_WIDTH, 1600);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1200);
   cout << "Capturing at resolution "<< cap.get(cv::CAP_PROP_FRAME_WIDTH) << "x" << cap.get(cv::CAP_PROP_FRAME_HEIGHT) << "...\n";
   if (!cap.isOpened()) {
     return false;
