@@ -417,7 +417,7 @@ void sweep(Heda& heda) {
   pinpoint(heda);
   parse(heda);
   gotoPolar(heda, PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t));
-  removeNearDuplicates(heda);
+  //removeNearDuplicates(heda);
 }
 
 void closeup(Heda& heda, DetectedHRCode& detected) {
@@ -638,7 +638,6 @@ class HedaController {
       m_commands["raw"] = [&](ParseResult tokens) {actionRaw(heda);};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
-      m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["stop"] = [&](ParseResult tokens) {heda.stop();};
       m_commands["dismiss"] = [&](ParseResult tokens) {dismiss(heda);};
       m_commands["pause"] = [&](ParseResult tokens) {heda.is_paused = true;};

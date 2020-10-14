@@ -22,27 +22,32 @@ void Heda::stop() {
 
 void Heda::captureFrame(cv::Mat& frame) {
 
-  HttpClient client("192.168.0.19:8889");
-  try {
-    auto r1 = client.request("GET", "/capture.jpg");
+  cv::VideoCapture cap("http:192.168.0.19:8081/?action=stream");
+  ensure(cap.isOpened(), "Unable to capture frame, the camera stream is not opened.");
+  cap.read(frame);
+  ensure(!frame.empty(), "Was able to capture frame, but it was empty.");
 
-    //vector<uchar> v(131072); I can't do push_back with this...
-    vector<uchar> v;
-    while (true) {
-      char ch = r1->content.rdbuf()->sgetc();
-      if (r1->content.rdbuf()->snextc() == std::streambuf::traits_type::eof()) {break;}
-      v.push_back(ch);
-    }
+  //HttpClient client("192.168.0.19:8889");
+  //try {
+  //  auto r1 = client.request("GET", "/capture.jpg");
 
-    //vector<uchar> decodeBuf(r1->content.rdbuf()->begin(), r1->content.rdbuf()->end());
-    //r1->content.rdbuf()->sgetn(decodeBuf, r1->content.size());
-    frame = cv::imdecode(cv::Mat(v), cv::IMREAD_COLOR);
-  } catch(const SimpleWeb::system_error &e) { // e.what()
-    ensure(false, "Unable to capture frame.");
-  }
-  if (frame.empty()) {
-    ensure(false, "Was able to capture frame, but it was empty.");
-  }
+  //  //vector<uchar> v(131072); I can't do push_back with this...
+  //  vector<uchar> v;
+  //  while (true) {
+  //    char ch = r1->content.rdbuf()->sgetc();
+  //    if (r1->content.rdbuf()->snextc() == std::streambuf::traits_type::eof()) {break;}
+  //    v.push_back(ch);
+  //  }
+
+  //  //vector<uchar> decodeBuf(r1->content.rdbuf()->begin(), r1->content.rdbuf()->end());
+  //  //r1->content.rdbuf()->sgetn(decodeBuf, r1->content.size());
+  //  frame = cv::imdecode(cv::Mat(v), cv::IMREAD_COLOR);
+  //} catch(const SimpleWeb::system_error &e) { // e.what()
+  //  ensure(false, "Unable to capture frame.");
+  //}
+  //if (frame.empty()) {
+  //  ensure(false, "Was able to capture frame, but it was empty.");
+  //}
 }
 
 void Heda::askPosition() {
