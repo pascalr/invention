@@ -344,16 +344,20 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   vector<float> radius( contours.size() );
   vector<bool> contourIsCircle( contours.size(), false );
 
-  cv::Mat drawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 );
+  cv::Mat circlesDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
+  cv::Mat contoursDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
 
   for( size_t i = 0; i < contours.size(); i++ )
   {
       minEnclosingCircle( contours[i], centers[i], radius[i] );
-      Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) );
+
+      Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
+      drawContours( contoursDrawing, contours, i, color, FILLED, 8, hierarchy ); // DEBUG ONLY
+
       // FIXME: Minimum circle is 6 pixels wide, is that ok?
       if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
         contourIsCircle[i] = true;
-        circle( drawing, centers[i], (int)radius[i], color, 2 );
+        circle( circlesDrawing, centers[i], (int)radius[i], color, 2 ); // DEBUG ONLY
       }
   }
 
@@ -405,8 +409,6 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
 
     //BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
  
-    circle( drawing, centers[i], 4, Scalar(0,0,255), FILLED );
-
     cv::Mat rotatedHRCode;
     cv::Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
     cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
@@ -418,6 +420,10 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
     HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, scale); 
     detectedCodes.push_back(codePos);
   }
+
+  imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
+  imwrite("tmp/lastContoursDrawing.jpg", circlesDrawing); // DEBUG ONLY
+
   //resize(drawing, drawing, Size(drawing.cols*2, drawing.rows*2), 0, 0, INTER_AREA);
   //imshow( "Contours", drawing );
   //waitKey(0);

@@ -607,9 +607,11 @@ void fetch(Heda& heda, Recipe& recipe) {
   }
 }
 
-// The camera must be 150 mm above the sticker.
 void calibrate(Heda& heda) {
 
+  PolarCoord c = heda.getPosition();
+  c.v = heda.unitV(heda.config.camera_calibration_height + heda.working_shelf.height);
+  gotoPolar(heda, c);
   DetectedHRCode code = mustDetectOneCode(heda);
   heda.config.camera_focal_point = heda.config.camera_calibration_height * code.scale;
   heda.db.update(heda.config);
