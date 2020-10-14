@@ -328,6 +328,61 @@ int findNextMarker(int i, vector<cv::Vec4i> hierarchy, vector<bool> contourIsCir
   }
 }
 
+class CircleDetected {
+  public:
+    // OPTIMIZE: Use faster distanceSquared, whatever...
+    double distancePx(CircleDetected c) {
+      return sqrt(pow(centerX - c.centerX, 2) + pow(centerY - c.centerY, 2));
+    }
+    double distanceMm(CircleDetected c, double pixelsPerMm) {
+      return distancePx(c) / pixelsPerMm;
+    }
+    double radiusMm(double pixelsPerMm) {
+      return radiusPx / pixelsPerMm;
+    }
+    int id;
+    double radiusPx;
+    double centerX;
+    double centerY;
+};
+
+bool hasInnerPerimeter(CircleDetected c, vector<CircleDetected> circles, double pixelsPerMm) {
+  for (CircleDetected& circle : circles) {
+    if (c.id == circle.id) continue;
+
+    bool correctSize = abs(circle.radiusMm(pixelsPerMm) - HRCODE_INNER_RADIUS)/HRCODE_INNER_RADIUS < 0.2; // HARDCODED. 20% is very generous
+    bool sameCenter = c.distanceMm(circle, pixelsPerMm) < 4; // HARDCODED. 4 mm is very generous, but OK for now.
+    if (correctSize && sameCenter) return true;
+  }
+  return false;
+}
+
+vector<CircleDetected> findAllMarkers(CircleDetected c, vector<CircleDetected> circles, double pixelsPerMm) {
+
+  float expectedDist = sqrt(HRCODE_MARKERS_DIST_FROM_MIDDLE_SQ); // mm
+
+  vector<CircleDetected> result;
+
+  for (CircleDetected& circle : circles) {
+
+    bool correctSize = abs(circle.radiusMm(pixelsPerMm) - HRCODE_MARKER_RADIUS)/HRCODE_MARKER_RADIUS < 0.2; // HARDCODED. 20% is a little generous
+    bool correctDistance = abs(c.distanceMm(circle, pixelsPerMm) - expectedDist)/expectedDist < 0.2; // HARDCODED. 20% is a little generous
+    if (correctSize && correctDistance) {
+      result.push_back(circle);
+    }
+  }
+
+  return result;
+}
+
+// OK, new algorithm needed... I cannot use the hierarchies...
+// Because when only an arc of a circle is detected, than it is not considered a container.
+// But for me an arc is enough. The contours detector offen detects multiple edges for the same circle edge.
+//
+// We find all the circles.
+// Then for each circle, we assume it is the outer perimeter.
+// We then check if it has an inner perimeter.
+// We then check if it has two and only two markers.
 void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   cv::Mat src_gray;
   cvtColor( src, src_gray, COLOR_BGR2GRAY );
@@ -342,7 +397,8 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
   vector<Point2f> centers( contours.size() );
   vector<float> radius( contours.size() );
-  vector<bool> contourIsCircle( contours.size(), false );
+  //vector<bool> contourIsCircle( contours.size(), false );
+  vector<CircleDetected> circles;
 
   cv::Mat circlesDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
   cv::Mat contoursDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
@@ -352,77 +408,137 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
       minEnclosingCircle( contours[i], centers[i], radius[i] );
 
       Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
-      drawContours( contoursDrawing, contours, i, color, FILLED, 8, hierarchy ); // DEBUG ONLY
+      drawContours( contoursDrawing, contours, i, color, 3, cv::LINE_8, hierarchy ); // DEBUG ONLY
 
       // FIXME: Minimum circle is 6 pixels wide, is that ok?
       if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
-        contourIsCircle[i] = true;
-        circle( circlesDrawing, centers[i], (int)radius[i], color, 2 ); // DEBUG ONLY
+        //contourIsCircle[i] = true;
+        circle( circlesDrawing, centers[i], (int)radius[i], color, 3 ); // DEBUG ONLY
+
+        CircleDetected c;
+        c.id = i;
+        c.radiusPx = radius[i];
+        c.centerX = centers[i].x;
+        c.centerY = centers[i].y;
+        circles.push_back(c);
       }
   }
 
-  // OPTIMIZE: Follow the three instead of going through all the leaves    
-  for( size_t i = 0; i < hierarchy.size(); i++ ) {
-    
-    float scale = radius[i] / HRCODE_OUTER_RADIUS; // pixels per mm
-    std::cout << "Detected a contour with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
+  for (CircleDetected& circle : circles) {
 
-    if (!contourIsCircle[i]) { std::cout << "The contour is not a circle." << std::endl; continue; }
-    
-    // TODO: Return an error message with the reason why it did not detect instead of logging stuff like this.
-    //BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
+    // Assume the circle is the outer perimeter of the code
+    float pixelsPerMm = circle.radiusPx / HRCODE_OUTER_RADIUS;
+    std::cout << "Detected a circle with a radius of " << circle.radiusPx << " pixels. Pixels per mm: " << pixelsPerMm << std::endl;
+    // Maybe output what it is expecting it to be? Would that help? For example: expects an inner circle of ... px.
 
-    int child = hierarchy[i][2];
-    if (child < 0) { std::cout << "Found a circle but it has no children..." << std::endl; continue; }
+    if (!hasInnerPerimeter(circle, circles, pixelsPerMm)) {
+      std::cout << "No perimeter was found for this circle." << std::endl; continue;
+    }
+ 
     
-    //BOOST_LOG_TRIVIAL(debug) << "Child found.";
-   
-    float insideRadius = radius[child] / scale; // mm
+    // The difference in size is big between the perimeter and the markers, so it does not matter if
+    // checking the perimeters in the list for nothing.
+    vector<CircleDetected> markers = findAllMarkers(circle, circles, pixelsPerMm);
+    if (markers.size() < 2) { std::cout << "Did not detect 2 markers. Detected: " << markers.size() << std::endl; continue; }
+    if (markers.size() > 2) { std::cout << "Detected too many markers. Expected only 2. Detected: " << markers.size() << std::endl; continue; }
+    
+    bool correctDistance = abs(markers[0].distanceMm(markers[1], pixelsPerMm) - HRCODE_MARKERS_INTERSPACE)/HRCODE_MARKERS_INTERSPACE < 0.2; // HARDCODED. 20% is a little generous
+    if (!correctDistance) {std::cout << "The interspace between the two markers was not at the correct distance." << std::endl; continue;}
 
-    bool correctSize = abs(insideRadius - HRCODE_INNER_RADIUS)/HRCODE_INNER_RADIUS < 0.2;
-    if (!correctSize) { std::cout << "Expected inner dia to be " << HRCODE_INNER_RADIUS << ", but was: " << insideRadius << std::endl; continue; }
-    
-    int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (firstMarker < 0) { std::cout << "Did not find a first marker" << std::endl; continue; }
-    
-    int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (secondMarker < 0) { std::cout << "Did not find a second marker" << std::endl; continue; }
-    
-    int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-    if (thirdInnerCircle >= 0) { std::cout << "Should not have detected a third inner circle. Aborting..." << std::endl; continue; }
-    
-    //cout << "Detected HRCode!" << endl;
+    cout << "Detected HRCode!" << endl;
+
     // Calculate angle
-    double rise = centers[secondMarker].y - centers[firstMarker].y;
-    double run = centers[secondMarker].x - centers[firstMarker].x;
+    double rise = markers[0].centerY - markers[1].centerY;
+    double run = markers[1].centerX - markers[0].centerX;
     double angle_degrees;
     if (run == 0) { // edge case both circles are vertically aligned
-      angle_degrees = centers[secondMarker].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+      angle_degrees = markers[1].centerX > circle.centerX ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
     } else {
       angle_degrees = atan2(rise, run)*180.0 / CV_PI;
 
-      double avg_x = (centers[secondMarker].x + centers[firstMarker].x)/2;
-      if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
+      double avg_x = (markers[1].centerX + markers[0].centerX)/2;
+      if (avg_x > circle.centerX) { // FIXME: I don't think this is 100% accurate...
         angle_degrees += 180.0;
       }
     }
 
-    //BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
- 
     cv::Mat rotatedHRCode;
-    cv::Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
-    cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
+    cv::Mat detectedHRCode(src_gray, Rect(circle.centerX-circle.radiusPx, circle.centerY-circle.radiusPx, circle.radiusPx*2, circle.radiusPx*2));
+    cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(circle.radiusPx,circle.radiusPx), angle_degrees, 1.0);
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
     string imgFilename = DETECTED_CODES_BASE_PATH + filename;
     imwrite(imgFilename, rotatedHRCode);
-    HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, scale); 
+    HRCode codePos(rotatedHRCode, filename, circle.centerX, circle.centerY, pixelsPerMm); 
     detectedCodes.push_back(codePos);
+
   }
 
+  //for( size_t i = 0; i < hierarchy.size(); i++ ) {
+
+  //  if (!contourIsCircle[i]) { continue; }
+  //  
+  //  float scale = radius[i] / HRCODE_OUTER_RADIUS; // pixels per mm
+  //  std::cout << "Detected a contour with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
+  //  
+  //  // TODO: Return an error message with the reason why it did not detect instead of logging stuff like this.
+  //  //BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
+
+  //  int child = hierarchy[i][2];
+  //  if (child < 0) { std::cout << "Found a circle but it has no children..." << std::endl; continue; }
+  //  
+  //  //BOOST_LOG_TRIVIAL(debug) << "Child found.";
+  // 
+  //  float insideRadius = radius[child] / scale; // mm
+
+  //  bool correctSize = abs(insideRadius - HRCODE_INNER_RADIUS)/HRCODE_INNER_RADIUS < 0.2;
+  //  if (!correctSize) { std::cout << "Expected inner dia to be " << HRCODE_INNER_RADIUS << ", but was: " << insideRadius << std::endl; continue; }
+  //  
+  //  int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
+  //  if (firstMarker < 0) { std::cout << "Did not find a first marker" << std::endl; continue; }
+  //  
+  //  int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
+  //  if (secondMarker < 0) { std::cout << "Did not find a second marker" << std::endl; continue; }
+  //  
+  //  int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
+  //  if (thirdInnerCircle >= 0) { std::cout << "Should not have detected a third inner circle. Aborting..." << std::endl; continue; }
+  //  
+  //  //cout << "Detected HRCode!" << endl;
+  //  // Calculate angle
+  //  double rise = centers[secondMarker].y - centers[firstMarker].y;
+  //  double run = centers[secondMarker].x - centers[firstMarker].x;
+  //  double angle_degrees;
+  //  if (run == 0) { // edge case both circles are vertically aligned
+  //    angle_degrees = centers[secondMarker].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+  //  } else {
+  //    angle_degrees = atan2(rise, run)*180.0 / CV_PI;
+
+  //    double avg_x = (centers[secondMarker].x + centers[firstMarker].x)/2;
+  //    if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
+  //      angle_degrees += 180.0;
+  //    }
+  //  }
+
+  //  //BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
+ 
+  //  cv::Mat rotatedHRCode;
+  //  cv::Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
+  //  cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
+  //  warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
+
+  //  string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
+  //  string imgFilename = DETECTED_CODES_BASE_PATH + filename;
+  //  imwrite(imgFilename, rotatedHRCode);
+  //  HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, scale); 
+  //  detectedCodes.push_back(codePos);
+  //}
+
+  imwrite("tmp/lastCapture.jpg", src); // DEBUG ONLY
+  imwrite("tmp/lastGray.jpg", src_gray); // DEBUG ONLY
   imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
-  imwrite("tmp/lastContoursDrawing.jpg", circlesDrawing); // DEBUG ONLY
+  imwrite("tmp/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
+  imwrite("tmp/lastCannyDrawing.jpg", canny_output); // DEBUG ONLY
 
   //resize(drawing, drawing, Size(drawing.cols*2, drawing.rows*2), 0, 0, INTER_AREA);
   //imshow( "Contours", drawing );

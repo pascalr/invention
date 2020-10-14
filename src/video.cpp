@@ -15,15 +15,15 @@ int main(int, char**)
   int apiID = cv::CAP_ANY;    // 0 = autodetect default API
   //int apiID = cv::CAP_V4L2;
   cap.open(deviceID, apiID);
-  // 640 x 480
-  // 800 x 600
-  // 1280 x 720
-  // 1280 x 800
-  // 1600 x 1200
-  // 1920 x 1080
-  // 2048 x 1536
-  // 2592 x 1944
-  // 3264 x 2448
+  // 640 x 480, 4:3
+  // 800 x 600, 4:3
+  // 1280 x 720, 1.7777777
+  // 1280 x 800, 1.6
+  // 1600 x 1200, 4:3
+  // 1920 x 1080, 1.7777777
+  // 2048 x 1536, 4:3
+  // 2592 x 1944, 4:3
+  // 3264 x 2448, 4:3
   cap.set(cv::CAP_PROP_FRAME_WIDTH, 1600);
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1200);
   if (!cap.isOpened()) {

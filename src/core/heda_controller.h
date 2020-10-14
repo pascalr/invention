@@ -290,6 +290,13 @@ void detectCodes(Heda& heda, vector<DetectedHRCode>& detected) {
   cout << "No codes were detected..." << endl;
 }
 
+void debugDetect(Heda& heda) {
+ 
+  cv::Mat src = cv::imread("tmp/lastCapture.jpg", cv::IMREAD_COLOR);
+  vector<HRCode> positions;
+  findHRCodes(src, positions, 100);
+}
+
 // Maybe use must as a convention for functions that can throw exception?
 DetectedHRCode mustDetectOneCode(Heda& heda) {
 
@@ -673,6 +680,7 @@ class HedaController {
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint(heda);};
       m_commands["calibrate"] = [&](ParseResult tokens) {calibrate(heda);};
       m_commands["parse"] = [&](ParseResult tokens) {parse(heda);};
+      m_commands["debugdetect"] = [&](ParseResult tokens) {debugDetect(heda);};
       m_commands["response"] = [&](ParseResult tokens) {
         // FIXME!!! Remove ParseResult, so I get the raw command here
         //heda.user_response = true;
