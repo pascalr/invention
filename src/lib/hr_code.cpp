@@ -30,6 +30,8 @@
 
 #include <vector>
 
+#include "near_duplicates.h"
+
 using namespace std;
 using namespace cv;
 
@@ -440,23 +442,33 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
     // checking the perimeters in the list for nothing.
     vector<CircleDetected> markers = findAllMarkers(circle, circles, pixelsPerMm);
     if (markers.size() < 2) { std::cout << "Did not detect 2 markers. Detected: " << markers.size() << std::endl; continue; }
-    if (markers.size() > 2) { std::cout << "Detected too many markers. Expected only 2. Detected: " << markers.size() << std::endl; continue; }
-    
-    bool correctDistance = abs(markers[0].distanceMm(markers[1], pixelsPerMm) - HRCODE_MARKERS_INTERSPACE)/HRCODE_MARKERS_INTERSPACE < 0.2; // HARDCODED. 20% is a little generous
+
+    CircleDetected firstMarker = markers[0];
+    CircleDetected secondMarker = markers[1];
+
+    if (markers.size() > 2) {
+      std::function<double(CircleDetected,CircleDetected)> func = [pixelsPerMm](CircleDetected c1, CircleDetected c2) -> double {return c1.distanceMm(c2,pixelsPerMm);};
+      vector<vector<size_t>> groups = groupNearDuplicates(markers, func, 4.0); // HARDCODED. 4mm. Very generous
+      if (groups.size() > 2) { std::cout << "Detected too many markers. Expected only 2. Detected: " << groups.size() << std::endl; continue;}
+      firstMarker = markers[groups[0][0]];
+      secondMarker = markers[groups[1][0]];
+    }
+
+    bool correctDistance = abs(firstMarker.distanceMm(secondMarker, pixelsPerMm) - HRCODE_MARKERS_INTERSPACE)/HRCODE_MARKERS_INTERSPACE < 0.2; // HARDCODED. 20% is a little generous
     if (!correctDistance) {std::cout << "The interspace between the two markers was not at the correct distance." << std::endl; continue;}
 
     cout << "Detected HRCode!" << endl;
 
     // Calculate angle
-    double rise = markers[0].centerY - markers[1].centerY;
-    double run = markers[1].centerX - markers[0].centerX;
+    double rise = firstMarker.centerY - secondMarker.centerY;
+    double run = secondMarker.centerX - firstMarker.centerX;
     double angle_degrees;
     if (run == 0) { // edge case both circles are vertically aligned
-      angle_degrees = markers[1].centerX > circle.centerX ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+      angle_degrees = secondMarker.centerX > circle.centerX ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
     } else {
       angle_degrees = atan2(rise, run)*180.0 / CV_PI;
 
-      double avg_x = (markers[1].centerX + markers[0].centerX)/2;
+      double avg_x = (secondMarker.centerX + firstMarker.centerX)/2;
       if (avg_x > circle.centerX) { // FIXME: I don't think this is 100% accurate...
         angle_degrees += 180.0;
       }
