@@ -38,10 +38,6 @@ void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true)
   }
 }
 
-//double byLidZ(const DetectedHRCode& t) {
-//  return t.lid_coord.z;
-//}
-
 class Model {
   public:
     Model() {
@@ -86,8 +82,9 @@ class HedaConfig : public Model {
     double max_x;
     double max_y;
     double max_z;
-    //double camera_height;
-    //double camera_width;
+    double camera_height;
+    double camera_width;
+    double camera_calibration_height;
 
     double minX() {
       return 0.0;
@@ -299,8 +296,9 @@ void bindQuery(T& query, const HedaConfig& item) {
   query.bind(19, item.max_x);
   query.bind(20, item.max_y);
   query.bind(21, item.max_z);
-  //query.bind(22, item.camera_width);
-  //query.bind(23, item.camera_height);
+  query.bind(22, item.camera_width);
+  query.bind(23, item.camera_height);
+  query.bind(24, item.camera_calibration_height);
 }
 template<typename T>
 void bindQuery(T& query, const Location& item) {

@@ -269,7 +269,11 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
   //code.content_id = lines[3];
 }
 
-void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, cv::Mat& frame, PolarCoord c) {
+
+void detectCodes(Heda& heda, vector<DetectedHRCode>& detected) {
+    
+  cv::Mat frame;
+  heda.captureFrame(frame);
 
   cout << "Running detect code." << endl;
   vector<HRCode> positions;
@@ -278,7 +282,7 @@ void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, cv::Mat& frame, P
   if (!positions.empty()) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {
       cout << "Detected one HRCode!!!" << endl;
-      DetectedHRCode d(*it, c);
+      DetectedHRCode d(*it, heda.getPosition());
       detected.push_back(d);
     }
     return;
@@ -286,14 +290,21 @@ void detectCodes(Heda& heda, vector<DetectedHRCode>& detected, cv::Mat& frame, P
   cout << "No codes were detected..." << endl;
 }
 
+// Maybe use must as a convention for functions that can throw exception?
+DetectedHRCode mustDetectOneCode(Heda& heda) {
+
+  vector<DetectedHRCode> detected;
+  detectCodes(heda, detected);
+  ensure(detected.size() == 1, "There should have been one and only one code detected.");
+  return detected.back();
+}
+
 void detect(Heda& heda) {
   
   auto h5 = Header5("DETECT");
 
-  cv::Mat frame;
-  heda.captureFrame(frame);
   vector<DetectedHRCode> detected;
-  detectCodes(heda, detected, frame, heda.getPosition());
+  detectCodes(heda, detected);
   for (DetectedHRCode& it : detected) {
     heda.db.insert(it);
   }
@@ -417,7 +428,7 @@ void sweep(Heda& heda) {
   pinpoint(heda);
   parse(heda);
   gotoPolar(heda, PolarCoord(heda.unitH(heda.config.home_position_x, 0, 0), heda.unitV(heda.config.home_position_y), heda.config.home_position_t));
-  //removeNearDuplicates(heda);
+  removeNearDuplicates(heda);
 }
 
 void closeup(Heda& heda, DetectedHRCode& detected) {
@@ -437,10 +448,8 @@ void closeup(Heda& heda, DetectedHRCode& detected) {
   string errorMsg;
   int maxAttempts = 10;
   for (int i = 0; i < maxAttempts; i++) {
-    cv::Mat frame;
-    heda.captureFrame(frame);
     vector<DetectedHRCode> allDetected;
-    detectCodes(heda, allDetected, frame, heda.getPosition());
+    detectCodes(heda, allDetected); // TODO: use mustDetectOneCode, attempts=10
 
     if (allDetected.size() < 1) {errorMsg = "There must be a detected code in a closup."; continue;}
     if (allDetected.size() > 1) {errorMsg = "There must be only one detected code in a closup."; continue;}
@@ -598,6 +607,14 @@ void fetch(Heda& heda, Recipe& recipe) {
   }
 }
 
+// The camera must be 150 mm above the sticker.
+void calibrate(Heda& heda) {
+
+  DetectedHRCode code = mustDetectOneCode(heda);
+  heda.config.camera_focal_point = heda.config.camera_calibration_height * code.scale;
+  heda.db.update(heda.config);
+}
+
 class HedaController {
   public:
 
@@ -645,6 +662,7 @@ class HedaController {
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
       m_commands["loadcfg"] = [&](ParseResult tokens) {heda.loadConfig();};
       m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint(heda);};
+      m_commands["calibrate"] = [&](ParseResult tokens) {calibrate(heda);};
       m_commands["parse"] = [&](ParseResult tokens) {parse(heda);};
       m_commands["response"] = [&](ParseResult tokens) {
         // FIXME!!! Remove ParseResult, so I get the raw command here

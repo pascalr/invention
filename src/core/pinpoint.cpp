@@ -4,11 +4,6 @@
 #include <vector>
 #include "model.h"
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 using namespace Eigen;
@@ -26,17 +21,25 @@ using namespace std;
 
 double heightOffset(Heda& heda, DetectedHRCode& input) {
 
+  // FIXME: Camera offset of a few mm from the bottom of the arm.
+
+  // F = 3.35mm
+  // P = pixelsPerMM * WIDTH
+  // W = WIDTH
+  // Distance D = ???
+  // D = WIDTH X 3.35mm / (pixelsPerMM * WIDTH)
+  //double pixelsPerMM = input.scale;
+  return heda.config.camera_focal_point / input.scale;
   //double perseivedWidth = HR_CODE_WITH * input.scale;
   //double distanceFromCam = HR_CODE_WIDTH * heda.config.camera_focal_point / perceivedWidth;
-  return heda.config.camera_focal_point / input.scale;
+  //return heda.config.camera_focal_point / input.scale;
 }
 
-Vector2d imageOffset(DetectedHRCode& input, cv::Mat gray) {
+Vector2d imageOffset(Heda& heda, DetectedHRCode& input) {
 
-  double width = gray.cols;
-  double height = gray.rows;
-  //double width = heda.config.camera_width; // TODO: Get dimension from the image in input, not from those variables.
-  //double height = heda.config.camera_height;
+  // Using heda config to get camera width because the image is not the full image, it is only the cropped of the code.
+  double width = heda.config.camera_width;
+  double height = heda.config.camera_height;
 
   Vector2d jarCenter; jarCenter << input.centerX, input.centerY;
   Vector2d imgCenterOffset = jarCenter - Vector2d(width/2, height/2) ;
@@ -60,9 +63,7 @@ void pinpointCode(Heda& heda, DetectedHRCode& input) {
   UserCoord camPos = heda.toUserCoord(input.coord, heda.config.camera_radius);
   double heightOffset0 = heightOffset(heda, input);
 
-  cv::Mat gray = cv::imread(DETECTED_CODES_BASE_PATH + input.imgFilename, cv::IMREAD_GRAYSCALE);
-
-  Vector2d imgOffset = imageOffset(input, gray);
+  Vector2d imgOffset = imageOffset(heda, input);
 
   input.lid_coord = UserCoord(camPos.x + imgOffset(0), camPos.y - heightOffset0, camPos.z + imgOffset(1));
 }

@@ -28,9 +28,9 @@ class HedaController < ApplicationController
     #render 'edit', status: if @heda.update(heda_params) then :ok else :unprocessable_entity end
     if @heda.update(heda_params)
       execute('loadcfg')
-      redirect_to action: 'edit', status: :ok
+      redirect_to action: 'edit'#, status: :ok
     else
-      redirect_to action: 'edit', status: :unprocessable_entity
+      redirect_to action: 'edit'#, status: :unprocessable_entity
     end
   end
 
@@ -119,7 +119,7 @@ class HedaController < ApplicationController
   end
 
   def heda_params
-    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point, :detect_height, :home_position_x, :home_position_y, :home_position_t, :grip_offset, :max_h, :max_v, :max_t, :closeup_distance, :max_x, :max_y, :max_z, :camera_width, :camera_height)
+    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point, :detect_height, :home_position_x, :home_position_y, :home_position_t, :grip_offset, :max_h, :max_v, :max_t, :closeup_distance, :max_x, :max_y, :max_z, :camera_width, :camera_height, :camera_calibration_height)
   end
 
 end
