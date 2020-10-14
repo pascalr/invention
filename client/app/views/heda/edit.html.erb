@@ -14,34 +14,8 @@
   <% end %>
 
   <p>
-    La tablette principale est celle où les mélanges se passent et où tu déposes tes pots.<br/>
-    Veuillez inscrire le numéro de le tablette désignée pour être principale.<br/>
-    Voici la liste des tablettes:
-  </p>
-
-  <div class="field">
-    <%= form.label :shelf_id %>
-    <%= form.text_field :shelf_id %>
-  </div>
-
-  <p>
     Pour pas mal toute les mesures, faire un marque sur l'axe centrale et se mesurer à partir du zéro.
   </p>
-
-  <div class="field">
-    <%= form.label :user_coord_offset_x %>
-    <%= form.number_field :user_coord_offset_x, step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :user_coord_offset_y %>
-    <%= form.number_field :user_coord_offset_y, step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :user_coord_offset_z %>
-    <%= form.number_field :user_coord_offset_z, step: 0.01 %>
-  </div>
 
   <table style="width:100%">
     <tr>
@@ -49,6 +23,36 @@
       <td><b>Valeur</b></td>
       <td><b>Valeur par défaut</b></td>
       <td><b>Notes</b></td>
+    </tr>
+    <tr>
+      <td colspan="4"><h3>Tablettes</h3></td>
+    </tr>
+    <tr>
+      <td><%= form.label :shelf_id %></td>
+      <td><%= form.text_field :shelf_id %></td>
+      <td></td>
+      <td>Id de la tablette de travail.</td>
+    </tr>
+    <tr>
+      <td colspan="4"><h3>Offsets</h3></td>
+    </tr>
+    <tr>
+      <td><%= form.label :user_coord_offset_x %></td>
+      <td><%= form.number_field :user_coord_offset_x , step: 0.01 %></td>
+      <td></td>
+      <td>La distance entre le zéro de l'axe H et le zéro de l'axe X.</td>
+    </tr>
+    <tr>
+      <td><%= form.label :user_coord_offset_y %></td>
+      <td><%= form.number_field :user_coord_offset_y , step: 0.01 %></td>
+      <td></td>
+      <td>La distance entre le zéro de l'axe V et le zéro de l'axe Y.</td>
+    </tr>
+    <tr>
+      <td><%= form.label :user_coord_offset_z %></td>
+      <td><%= form.number_field :user_coord_offset_z , step: 0.01 %></td>
+      <td></td>
+      <td>La distance entre l'axe de rotation et le devant de l'armoire.</td>
     </tr>
     <tr>
       <td colspan="4"><h3>Maximum</h3></td>
@@ -139,9 +143,9 @@
     </tr>
     <tr>
       <td><%= form.label :camera_focal_point %></td>
-      <td><%= form.text_field :camera_focal_point, readonly: true %></td>
+      <td><%= form.number_field :camera_focal_point, readonly: true %></td>
       <td></td>
-      <td></td>
+      <td>Utiliser la commande "calibrate" pour modifier cette valeur.</td>
     </tr>
     <tr>
       <td><%= form.label :camera_width %></td>
@@ -155,51 +159,24 @@
       <td></td>
       <td></td>
     </tr>
+    <tr>
+      <td colspan="4"><h3>Autre</h3></td>
+    </tr>
+    <tr>
+      <td><%= form.label :gripper_radius %></td>
+      <td><%= form.number_field :gripper_radius, step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :grip_offset %></td>
+      <td><%= form.number_field :grip_offset %></td>
+      <td></td>
+      <td></td>
+    </tr>
   </table> 
-
-  <div class="field">
-    
-    
-  </div>
-
-  <h3>Autre</h3>
-
-  <p>
-  Pour entrer cette donnée, déplacer le bras au centre de l'axe x. Ensuite mettre le bras à theta=0. Mettre outils crayon dans la pince. Faire une marque.
-  Déplacer theta = 180. Faire une marque. Divisier la distance en 2.
-
-  Ça ne fonctionne pas trop. Simplement faire un trait vis-à-vis le centre de l'outil, faire un trait vis-a-vis le centre de rotation et mesurer cette distance.
-  </p>
-
-  <div class="field">
-    <%= form.label :gripper_radius %>
-    <%= form.number_field :gripper_radius, step: 0.01 %>
-  </div>
-
-  <div class="field">
-    <%= form.label :grip_offset %>
-    <%= form.number_field :grip_offset %>
-  </div>
 
   <div class="actions">
     <%= form.submit %>
   </div>
-<% end %>
-
-<%= render :file => 'jar_formats/index' %>
-
-<h2>Calibrate camera</h2>
-
-<p>
-La tablette de travail doit être libre.
-</p>
-
-<p>
-Insérer un pot de référence dans les pinces et remplir le forumulaire suivant.
-</p>
-
-<%= form_with url: heda_run_path(cmd: "calibrate") do |form| %>
-  <%= form.label :jar_height %>
-  <%= form.number_field :jar_height %>
-  <%= form.submit "Calibrate" %>
 <% end %>
