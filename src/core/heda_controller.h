@@ -651,7 +651,14 @@ class HedaController {
         parseRecipe(heda, recipe);
       };
       
-      m_commands["detect"] = [&](ParseResult tokens) {detect(heda);};
+      m_commands["detect"] = [&](ParseResult tokens) {
+        DetectedHRCode code = mustDetectOneCode(heda);
+        parseCode(heda,code);
+        heda.waiting_message = "Pot détecté #" + code.jar_id;
+        heda.action_required = "none";
+        waitActionDone(heda);
+
+      };
       m_commands["raw"] = [&](ParseResult tokens) {actionRaw(heda);};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
