@@ -644,6 +644,8 @@ class HedaController {
       m_commands["done"] = [&](ParseResult tokens) {heda.user_response = "done";};
       m_commands["unpause"] = [&](ParseResult tokens) {heda.is_paused = false;};
       m_commands["loadcfg"] = [&](ParseResult tokens) {heda.loadConfig();};
+      m_commands["pinpoint"] = [&](ParseResult tokens) {pinpoint(heda);};
+      m_commands["parse"] = [&](ParseResult tokens) {parse(heda);};
       m_commands["response"] = [&](ParseResult tokens) {
         // FIXME!!! Remove ParseResult, so I get the raw command here
         //heda.user_response = true;
@@ -769,8 +771,6 @@ class HedaController {
       //};
       //m_commands["capture"] = [&](ParseResult tokens) {heda.capture();};
       //m_commands["detect"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<DetectCommand>());};
-      //m_commands["parse"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<ParseCodesCommand>());};
-      //m_commands["pinpoint"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PinpointCommand>());};
       //m_commands["putdown"] = [&](ParseResult tokens) {heda.pushCommand(make_shared<PutdownCommand>());};
       //m_commands["photo"] = [&](ParseResult tokens) {
       //  Mat mat;

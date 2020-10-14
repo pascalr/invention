@@ -2,66 +2,6 @@ var elems = document.getElementsByClassName("drawing_location");
 
 var LINE_THICKNESS = 5;
 
-// TODO: Put everything menu related in another js file
-
-function getPosition(e) {
-  var posx = 0;
-  var posy = 0;
-
-  if (!e) var e = window.event;
-
-  if (e.pageX || e.pageY) {
-    posx = e.pageX;
-    posy = e.pageY;
-  } else if (e.clientX || e.clientY) {
-    posx = e.clientX + document.body.scrollLeft +
-                       document.documentElement.scrollLeft;
-    posy = e.clientY + document.body.scrollTop +
-                       document.documentElement.scrollTop;
-  }
-
-  return {
-    x: posx,
-    y: posy
-  }
-}
-
-function positionMenu(menu, e) {
-  let clickCoords = getPosition(e);
-  let clickCoordsX = clickCoords.x;
-  let clickCoordsY = clickCoords.y;
-
-  let menuWidth = menu.offsetWidth + 4;
-  let menuHeight = menu.offsetHeight + 4;
-
-  let windowWidth = window.innerWidth;
-  let windowHeight = window.innerHeight;
-
-  if ( (windowWidth - clickCoordsX) < menuWidth ) {
-    menu.style.left = windowWidth - menuWidth + "px";
-  } else {
-    menu.style.left = clickCoordsX + "px";
-  }
-
-  if ( (windowHeight - clickCoordsY) < menuHeight ) {
-    menu.style.top = windowHeight - menuHeight + "px";
-  } else {
-    menu.style.top = clickCoordsY + "px";
-  }
-}
-
-function toggleMenuOff() {
-  //let menu = document.querySelector("#location-context-menu");
-  //menu.style.display = "none";
-}
-
-function toggleMenuOn(e, id) {
-  //let menu = document.querySelector("#location-context-menu");
-  //menu.dataset["location_id"] = id
-  //positionMenu(menu, e);
-  //menu.style.display = "block";
-}
-
 [].forEach.call(elems, elem => {
   var shelf = JSON.parse(elem.dataset["shelf"]);
   var params = { width: shelf.width, height: shelf.depth };
@@ -105,20 +45,20 @@ function toggleMenuOn(e, id) {
   if (isworkingshelf) {
     var detected_codes = JSON.parse(elem.dataset["detectedcodes"])
     detected_codes.forEach((code, i) => {
-      console.log("image/show?name=" + code.img)
+      //console.log("image/show?name=" + code.img)
      
       var HRCODE_DIAMETER = 36 // mm FIXME HARDCODED
 
-      var texture = two.makeTexture("image/show?name=" + code.img, () => {
-        two.update();
-      })
+      //var texture = two.makeTexture("image/show?name=" + code.img, () => {
+      //  two.update();
+      //})
       
       // texture.scale = HRCODE_DIAMETER / texture.width // FIXME: texture.width is undefined
       //texture.scale = 0.5
 
       var circle = two.makeCircle(code.lid_x, shelf.depth - code.lid_z, HRCODE_DIAMETER);
-      //circle.fill = '#FF8000';
-      circle.fill = texture
+      circle.fill = '#FF8000';
+      //circle.fill = texture
       
       //texture.scale = HRCODE_DIAMETER / texture.width
 
@@ -137,11 +77,70 @@ function toggleMenuOn(e, id) {
   //rect.noStroke();
 
 })
-  
-document.addEventListener( "click", function(e) {
-  toggleMenuOff();
-});
-window.onresize = function(e) {
-  toggleMenuOff();
-};
 
+
+//function toggleMenuOff() {
+//  //let menu = document.querySelector("#location-context-menu");
+//  //menu.style.display = "none";
+//}
+//
+//function toggleMenuOn(e, id) {
+//  //let menu = document.querySelector("#location-context-menu");
+//  //menu.dataset["location_id"] = id
+//  //positionMenu(menu, e);
+//  //menu.style.display = "block";
+//}
+//  
+//document.addEventListener( "click", function(e) {
+//  toggleMenuOff();
+//});
+//window.onresize = function(e) {
+//  toggleMenuOff();
+//};
+//
+// TODO: Put everything menu related in another js file
+//function getPosition(e) {
+//  var posx = 0;
+//  var posy = 0;
+//
+//  if (!e) var e = window.event;
+//
+//  if (e.pageX || e.pageY) {
+//    posx = e.pageX;
+//    posy = e.pageY;
+//  } else if (e.clientX || e.clientY) {
+//    posx = e.clientX + document.body.scrollLeft +
+//                       document.documentElement.scrollLeft;
+//    posy = e.clientY + document.body.scrollTop +
+//                       document.documentElement.scrollTop;
+//  }
+//
+//  return {
+//    x: posx,
+//    y: posy
+//  }
+//}
+//
+//function positionMenu(menu, e) {
+//  let clickCoords = getPosition(e);
+//  let clickCoordsX = clickCoords.x;
+//  let clickCoordsY = clickCoords.y;
+//
+//  let menuWidth = menu.offsetWidth + 4;
+//  let menuHeight = menu.offsetHeight + 4;
+//
+//  let windowWidth = window.innerWidth;
+//  let windowHeight = window.innerHeight;
+//
+//  if ( (windowWidth - clickCoordsX) < menuWidth ) {
+//    menu.style.left = windowWidth - menuWidth + "px";
+//  } else {
+//    menu.style.left = clickCoordsX + "px";
+//  }
+//
+//  if ( (windowHeight - clickCoordsY) < menuHeight ) {
+//    menu.style.top = windowHeight - menuHeight + "px";
+//  } else {
+//    menu.style.top = clickCoordsY + "px";
+//  }
+//}
