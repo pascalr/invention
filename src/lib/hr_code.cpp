@@ -152,7 +152,7 @@ class BrightnessProcess : public ImageProcess {
     }
 
 };
-
+    
 class ErodeProcess : public ImageProcess  {
   public:
 
@@ -490,6 +490,22 @@ bool isArc(vector<Point> points, ArcDetected &a) {
   return true;
 }
 
+void adjustBrightness(cv::Mat& src, cv::Mat& dest) {
+  double averageBrightness = 0;
+  for(int i=0; i<src.rows; i++) {
+    for(int j=0; j<src.cols; j++) {
+      averageBrightness += src.at<uchar>(i,j);
+    }
+  }
+  averageBrightness /= src.rows*src.cols;
+  std::cout << "Avg brightness: " << averageBrightness << std::endl;
+
+  double requiredBrightness = 255.0 / 2.0;
+  double factor = requiredBrightness / averageBrightness;
+
+  dest = src*factor;
+}
+
 // OK, new algorithm needed... I cannot use the hierarchies...
 // Because when only an arc of a circle is detected, than it is not considered a container.
 // But for me an arc is enough. The contours detector offen detects multiple edges for the same circle edge.
@@ -507,18 +523,70 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   imwrite("tmp/lastGray.jpg", src); // DEBUG ONLY
   Mat srcGray = src.clone();
 
-  blur(src, src, Size(3,3) ); // Remove noise
-  imwrite("tmp/lastBlur.jpg", src); // DEBUG ONLY
+  // Adjust brighteness to average this way always similar process
+  adjustBrightness(src, src);
+  imwrite("tmp/lastBrightness.jpg", src); // DEBUG ONLY
 
-  int thresh = 100; // HARDCODED
+  // https://docs.opencv.org/master/d4/d13/tutorial_py_filtering.html
+  // maybe medianBlur could be used instead of blur
+  // cv.bilateralFilter() is highly effective in noise removal while keeping edges sharp.
+
+  ////blur(src, src, Size(3,3) ); // Remove noise
+  ////medianBlur(src, src, 5);
+  //bilateralFilter(src.clone(), src, 9, 75, 75);
+  //imwrite("tmp/lastBlur.jpg", src); // DEBUG ONLY
+
+  // http://datahacker.rs/004-how-to-smooth-and-sharpen-an-image-in-opencv/
+  // Sharpen the image with a 2d filter, 9 score for the pixel itself and -1 for the neightbors.
+  // 1ere ligne, 2e ligne, etc
+  //Mat filterKernel = Mat::ones(5, 5, CV_64F) * -1;
+  //filterKernel.at<double>(2,2) = 9;
+  //double mydata[]={0, -1,  0,
+  //                -1,  9, -1,
+  //                 0, -1,  0};
+  double mydata[]={0, -1,  0, 0, 0,
+                  -1,  5, -2, 0, 0,
+                  -1,  -2, 9, -2, 0,
+                  -1,  5, -2, 0, 0,
+                   0, -1,  0, 0, 0};
+  //double mydata[]={-1, -1, -1, -1, 9, -1, -1, -1, -1};
+  //double mydata[]={-1, -1, -1, -1, 9, -1, -1, -1, -1};
+  cv::Mat filterKernel(3,3,CV_64F,mydata);
+  filter2D(src,src,-1,filterKernel);
+  //filter2D(src,src,-1,filterKernel);
+  imwrite("tmp/lastFilter2D.jpg", src); // DEBUG ONLY
+
+  cv::Mat kernel;
+
+  //int beforeDilateSize = 4; // HARDCODED.
+  //kernel = getStructuringElement( MORPH_RECT, Size( 2*beforeDilateSize + 1, 2*beforeDilateSize+1 ), Point( beforeDilateSize, beforeDilateSize ) );
+  //dilate(src, src, kernel );
+  //imwrite("tmp/lastDilateBefore.jpg", src); // DEBUG ONLY
+  //erode(src, src, kernel );
+  //imwrite("tmp/lastErodeBefore.jpg", src); // DEBUG ONLY
+
+  // Canny does a gaussian internally, I wanted to see the result.
+  cv::Mat gaussianDest;
+  GaussianBlur(src, gaussianDest, Size(5,5), 0);
+  imwrite("tmp/lastCannyGaussian.jpg", gaussianDest); // DEBUG ONLY
+
+  //int thresh = 100; // HARDCODED
+  int thresh = 70; // HARDCODED
   Canny(src, src, thresh, thresh*2 );
   imwrite("tmp/lastCanny.jpg", src); // DEBUG ONLY
+
+  // https://stackoverflow.com/questions/35922687/pre-processing-image-before-applying-canny-edge-detection
+  // Convert the image to grayscale
+  // Apply a bilateral filter
+  // Run the Canny edge detection process
+  // Apply two more bilateral filters to remove any noise
+  // Apply a dilation filter to 'plug' any holes in the edges
   
   int dilateSize = 1; // HARDCODED.
-  cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
+  kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
   dilate(src, src, kernel );
   erode(src, src, kernel );
-  imwrite("tmp/lastErrodeAndDilateOutput.jpg", src); // DEBUG ONLY
+  imwrite("tmp/lastErrodeAndDilateAfter.jpg", src); // DEBUG ONLY
 
   // ellipse2Poly(), maybe use this
 
