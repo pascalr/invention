@@ -292,7 +292,7 @@ void detectCodes(Heda& heda, vector<DetectedHRCode>& detected) {
 
 void debugDetect(Heda& heda) {
  
-  cv::Mat src = cv::imread("tmp/lastCapture.jpg", cv::IMREAD_COLOR);
+  cv::Mat src = cv::imread("tmp/hrcode/finder/lastCapture.jpg", cv::IMREAD_COLOR);
   vector<HRCode> positions;
   findHRCodes(src, positions);
 }

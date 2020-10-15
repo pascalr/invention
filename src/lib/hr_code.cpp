@@ -110,14 +110,19 @@ void adjustBrightness(cv::Mat& src, cv::Mat& dest) {
 void parseText(vector<string>& parsedLines, cv::Mat gray) {
   
   //resize(gray, gray, Size(gray.cols*2, gray.rows*2), 0, 0, INTER_AREA);
- 
+  
   cv::Mat dst = gray.clone(); 
-
+  imwrite("tmp/hrcode/parser/lastText.jpg", dst); // DEBUG ONLY
+ 
   blur(dst, dst, Size(3,3)); // Remove noise
+  imwrite("tmp/hrcode/parser/lastBlur.jpg", dst); // DEBUG ONLY
+
   adjustBrightness(dst,dst);
+  imwrite("tmp/hrcode/parser/lastBrightness.jpg", dst); // DEBUG ONLY
 
   vector<cv::Mat> lines;
   extractLines(lines, dst);
+  imwrite("tmp/hrcode/parser/lastJarId.jpg", lines[0]); // DEBUG ONLY
 
   parsedLines.push_back(parseDigitLine(lines[0]));
   //parsedLines.push_back(parser.parseLine(lines[1]));
@@ -522,7 +527,7 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
     cout << "Detected HRCode!" << endl;
 
     // Calculate angle
-    double rise = firstMarker.center.y - secondMarker.center.y;
+    double rise = secondMarker.center.y - firstMarker.center.y;
     double run = secondMarker.center.x - firstMarker.center.x;
     double angle_degrees;
     if (run == 0) { // edge case both circles are vertically aligned
