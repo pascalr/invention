@@ -277,7 +277,7 @@ void detectCodes(Heda& heda, vector<DetectedHRCode>& detected) {
 
   cout << "Running detect code." << endl;
   vector<HRCode> positions;
-  findHRCodes(frame, positions, 100);
+  findHRCodes(frame, positions);
 
   if (!positions.empty()) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {
@@ -294,7 +294,7 @@ void debugDetect(Heda& heda) {
  
   cv::Mat src = cv::imread("tmp/lastCapture.jpg", cv::IMREAD_COLOR);
   vector<HRCode> positions;
-  findHRCodes(src, positions, 100);
+  findHRCodes(src, positions);
 }
 
 // Maybe use must as a convention for functions that can throw exception?

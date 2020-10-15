@@ -43,6 +43,6 @@ void parseText(std::vector<std::string>& parsedLines, cv::Mat mat);
 
 std::ostream &operator<<(std::ostream &os, const HRCode &c);
 
-void findHRCodes(cv::Mat& src, std::vector<HRCode> &detectedCodes, int thresh);
+void findHRCodes(cv::Mat& src, std::vector<HRCode> &detectedCodes);
 
 #endif

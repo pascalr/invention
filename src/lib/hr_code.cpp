@@ -84,9 +84,9 @@ void extractLines(vector<cv::Mat>& lines, cv::Mat& src) {
   //imshow("jarId", jarId);
   //waitKey(0);
     
- // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1), centerX+mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1));
- // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2), centerX+mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2));
- // SDL_RenderDrawLine(gRenderer, centerX-mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3), centerX+mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3));
+ // SDL_RenderDrawLine(gRenderer, center_x-mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1), center_x+mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1));
+ // SDL_RenderDrawLine(gRenderer, center_x-mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2), center_x+mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2));
+ // SDL_RenderDrawLine(gRenderer, center_x-mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3), center_x+mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3));
 
   // Get the sub-matrices (minors) for every character.
 }
@@ -334,18 +334,20 @@ class CircleDetected {
   public:
     // OPTIMIZE: Use faster distanceSquared, whatever...
     double distancePx(CircleDetected c) {
-      return sqrt(pow(centerX - c.centerX, 2) + pow(centerY - c.centerY, 2));
+      return sqrt(pow(center_x - c.center_x, 2) + pow(center_y - c.center_y, 2));
     }
     double distanceMm(CircleDetected c, double pixelsPerMm) {
       return distancePx(c) / pixelsPerMm;
     }
     double radiusMm(double pixelsPerMm) {
-      return radiusPx / pixelsPerMm;
+      return radius_px / pixelsPerMm;
     }
     int id;
-    double radiusPx;
-    double centerX;
-    double centerY;
+    double radius_px;
+    // Point2f center; should be this...
+    // double res = cv::norm(a-b); And I should use this
+    double center_x;
+    double center_y;
 };
 
 bool hasInnerPerimeter(CircleDetected c, vector<CircleDetected> circles, double pixelsPerMm) {
@@ -397,6 +399,97 @@ void averageEnclosingCircle(const vector<Point> &contour, Point2f &center, float
   radius /= contour.size();
 }
 
+class ArcDetected {
+  public:
+    double angle() {
+      // Source: https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
+      double a = end_angle_deg - start_angle_deg;
+      a += (a>180) ? -360 : (a<-180) ? 360 : 0;
+      return a;
+    }
+    Point2f center;
+    double radius_px;
+    double start_angle_deg;
+    double end_angle_deg;
+};
+
+// OPTIMIZE: merge the arcs based on the start and end angles, not just the centers.
+
+// Source: https://stackoverflow.com/questions/15888180/calculating-the-angle-between-points
+double angleTwoPointDeg(const Point& src1, const Point& src2, const Point2f& center) {
+
+  Point2f v1 = Point2f(src1) - center;
+  Point2f v2 = Point2f(src2) - center;
+
+  double cosAngle = v1.dot(v2) / (cv::norm(v1) * cv::norm(v2));
+  if (cosAngle > 1.0)
+      return 0.0;
+  else if (cosAngle < -1.0)
+      return 180.0;
+  return std::acos(cosAngle) * 180.0 / PI;
+}
+
+bool isArc(vector<Point> points, ArcDetected &a) {
+
+  // There must be a minimum amount of points for fitEllipse (6), which is find because we don't want too small contours.
+  if (points.size() < 10) return false;
+
+  // There are many fitEllipse available. OPTIMIZE: Test which one is better for my use case.
+  // Ah maybe try it for each one every time and see which one gives me the best fit.
+  //cv::fitEllipse
+  //cv::fitEllipseAMS
+  //cv::fitEllipseDirect
+  RotatedRect r = cv::fitEllipse(points);
+  // The detected enclosing rectangle must be close to a square because we want to detet cercles.
+  // HARCODED. Smaller side must be at least 80% of the bigger side.
+  if (min(r.size.height, r.size.width) / max(r.size.height, r.size.width) < 0.8) return false; 
+
+  double minRadius = 9999999999999999.9;
+  double maxRadius = 0.0;
+  for (Point& pt : points) {
+    // The radius is the distance between the point and the center.
+    double radius = cv::norm(r.center - Point2f(pt));
+    minRadius = min(radius, minRadius);
+    maxRadius = max(radius, maxRadius);
+  }
+ 
+  // Doing it this way in order to get the correct angle of the two possible
+  double sumAngle = 0.0;
+  for (size_t i = 0; i < points.size() - 1; i++) {
+    sumAngle += angleTwoPointDeg(points[i], points[i+1], r.center);
+  }
+
+  // HARCODED. Smallest radius must be at least 80% of the biggest radius.
+  if (minRadius / maxRadius < 0.8) return false; 
+
+  // What is better for the radius?
+  // a.radius_px = (r.size.height + r.size.width) / 4.0;
+  // a.radius_px = meanRadius;
+
+  a.center = r.center;
+  a.radius_px = (r.size.height + r.size.width) / 4.0;
+
+  Point2f firstVect = Point2f(*points.begin()) - a.center;
+  a.start_angle_deg = atan2(firstVect.y, firstVect.x)*180.0/PI;
+
+  //Point2f lastVect = Point2f(points.back()) - a.center;
+  //a.end_angle_deg = atan2(lastVect.y, lastVect.x)*180.0/PI;
+
+  a.end_angle_deg = a.start_angle_deg + sumAngle;
+
+  double angle = angleTwoPointDeg(*points.begin(), points.back(), a.center);
+
+  cout << "Arc: (" << a.center.x << "," << a.center.y << ") r" << a.radius_px << " px, start=" << a.start_angle_deg << ", end=" << a.end_angle_deg << endl;
+  cout << "Sum angle: " << sumAngle << endl;
+  cout << "Angle: " << angle << endl;
+
+  // HARDCODED. A minimum of 30 degrees is required
+  //if (a.angle() < 30.0) {
+  //}
+
+  return true;
+}
+
 // OK, new algorithm needed... I cannot use the hierarchies...
 // Because when only an arc of a circle is detected, than it is not considered a container.
 // But for me an arc is enough. The contours detector offen detects multiple edges for the same circle edge.
@@ -405,56 +498,96 @@ void averageEnclosingCircle(const vector<Point> &contour, Point2f &center, float
 // Then for each circle, we assume it is the outer perimeter.
 // We then check if it has an inner perimeter.
 // We then check if it has two and only two markers.
-void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
-  cv::Mat src_gray;
-  cvtColor( src, src_gray, COLOR_BGR2GRAY );
-  blur( src_gray, src_gray, Size(3,3) ); // Remove noise
+void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
 
-  cv::Mat canny_output;
-  Canny( src_gray, canny_output, thresh, thresh*2 );
+  cv::Mat src = original.clone();
+  imwrite("tmp/lastCapture.jpg", src); // DEBUG ONLY
+
+  cvtColor(src, src, COLOR_BGR2GRAY );
+  imwrite("tmp/lastGray.jpg", src); // DEBUG ONLY
+  Mat srcGray = src.clone();
+
+  blur(src, src, Size(3,3) ); // Remove noise
+  imwrite("tmp/lastBlur.jpg", src); // DEBUG ONLY
+
+  int thresh = 100; // HARDCODED
+  Canny(src, src, thresh, thresh*2 );
+  imwrite("tmp/lastCanny.jpg", src); // DEBUG ONLY
+  
+  int dilateSize = 1; // HARDCODED.
+  cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
+  dilate(src, src, kernel );
+  erode(src, src, kernel );
+  imwrite("tmp/lastErrodeAndDilateOutput.jpg", src); // DEBUG ONLY
+
+  // ellipse2Poly(), maybe use this
 
   RNG rng(12345);
   vector<vector<Point>> contours;
   vector<cv::Vec4i> hierarchy;
-  findContours( canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+  findContours( src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
   vector<Point2f> centers( contours.size() );
   vector<float> radius( contours.size() );
   //vector<bool> contourIsCircle( contours.size(), false );
   vector<CircleDetected> circles;
 
-  cv::Mat circlesDrawing = src.clone();
-  cv::Mat contoursDrawing = src.clone();
+  cv::Mat circlesDrawing = original.clone();
+  cv::Mat arcsDrawing = original.clone();
+  cv::Mat contoursDrawing = original.clone();
   //cv::Mat circlesDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
   //cv::Mat contoursDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
 
-  for( size_t i = 0; i < contours.size(); i++ )
-  {
-      //minEnclosingCircle( contours[i], centers[i], radius[i] );
-      averageEnclosingCircle(contours[i], centers[i], radius[i]);
+  for( size_t i = 0; i < contours.size(); i++ ) {
 
-      Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
-      drawContours( contoursDrawing, contours, i, color, 3, cv::LINE_8, hierarchy ); // DEBUG ONLY
+    //Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
+    //drawContours( contoursDrawing, contours, i, color, 3, cv::LINE_8, hierarchy ); // DEBUG ONLY
 
-      // FIXME: Minimum circle is 6 pixels wide, is that ok?
-      if (isBigCircle(contours[i], centers[i], radius[i], 0.3, 6)) {
-        //contourIsCircle[i] = true;
-        circle( circlesDrawing, centers[i], (int)radius[i], color, 3 ); // DEBUG ONLY
+    //ArcDetected arc;
+    //if (!isArc(contours[i], arc)) continue;
+    //
+    //CircleDetected c;
+    //c.id = i;
+    //c.radius_px = arc.radius_px;
+    //c.center_x = arc.center.x;
+    //c.center_y = arc.center.y;
+    //circles.push_back(c);
+    //
+    //cv::ellipse( arcsDrawing, arc.center, Size(arc.radius_px, arc.radius_px), 0.0, arc.start_angle_deg, arc.end_angle_deg, color, 3, LINE_8);
+    //cv::circle( circlesDrawing, Point2f(c.center_x, c.center_y), (int)c.radius_px, color, 3 ); // DEBUG ONLY
 
-        CircleDetected c;
-        c.id = i;
-        c.radiusPx = radius[i];
-        c.centerX = centers[i].x;
-        c.centerY = centers[i].y;
-        circles.push_back(c);
+    // ------------------------------------------------------------------------------
 
-      }
+    //minEnclosingCircle( contours[i], centers[i], radius[i] );
+    averageEnclosingCircle(contours[i], centers[i], radius[i]);
+
+    Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
+    drawContours( contoursDrawing, contours, i, color, 3, cv::LINE_8, hierarchy ); // DEBUG ONLY
+
+    // FIXME: Minimum circle is 6 pixels wide, is that ok?
+    if (isBigCircle(contours[i], centers[i], radius[i], 0.3, 6)) {
+      //contourIsCircle[i] = true;
+
+      CircleDetected c;
+      c.id = i;
+      c.radius_px = radius[i];
+      c.center_x = centers[i].x;
+      c.center_y = centers[i].y;
+      circles.push_back(c);
+      
+      circle( circlesDrawing, Point2f(c.center_x, c.center_y), (int)c.radius_px, color, 3 ); // DEBUG ONLY
+
+    }
   }
+ 
+  imwrite("tmp/lastArcsDrawing.jpg", arcsDrawing); // DEBUG ONLY
+  imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
+  imwrite("tmp/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
 
   for (CircleDetected& circle : circles) {
 
     // Assume the circle is the outer perimeter of the code
-    float pixelsPerMm = circle.radiusPx / HRCODE_OUTER_RADIUS;
-    std::cout << "Detected a circle with a radius of " << circle.radiusPx << " pixels. Pixels per mm: " << pixelsPerMm << std::endl;
+    float pixelsPerMm = circle.radius_px / HRCODE_OUTER_RADIUS;
+    std::cout << "Detected a circle with a radius of " << circle.radius_px << " pixels. Pixels per mm: " << pixelsPerMm << std::endl;
     // Maybe output what it is expecting it to be? Would that help? For example: expects an inner circle of ... px.
 
     if (!hasInnerPerimeter(circle, circles, pixelsPerMm)) {
@@ -484,29 +617,29 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
     cout << "Detected HRCode!" << endl;
 
     // Calculate angle
-    double rise = firstMarker.centerY - secondMarker.centerY;
-    double run = secondMarker.centerX - firstMarker.centerX;
+    double rise = firstMarker.center_y - secondMarker.center_y;
+    double run = secondMarker.center_x - firstMarker.center_x;
     double angle_degrees;
     if (run == 0) { // edge case both circles are vertically aligned
-      angle_degrees = secondMarker.centerX > circle.centerX ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+      angle_degrees = secondMarker.center_x > circle.center_x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
     } else {
       angle_degrees = atan2(rise, run)*180.0 / CV_PI;
 
-      double avg_x = (secondMarker.centerX + firstMarker.centerX)/2;
-      if (avg_x > circle.centerX) { // FIXME: I don't think this is 100% accurate...
+      double avg_x = (secondMarker.center_x + firstMarker.center_x)/2;
+      if (avg_x > circle.center_x) { // FIXME: I don't think this is 100% accurate...
         angle_degrees += 180.0;
       }
     }
 
     cv::Mat rotatedHRCode;
-    cv::Mat detectedHRCode(src_gray, Rect(circle.centerX-circle.radiusPx, circle.centerY-circle.radiusPx, circle.radiusPx*2, circle.radiusPx*2));
-    cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(circle.radiusPx,circle.radiusPx), angle_degrees, 1.0);
+    cv::Mat detectedHRCode(srcGray, Rect(circle.center_x-circle.radius_px, circle.center_y-circle.radius_px, circle.radius_px*2, circle.radius_px*2));
+    cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(circle.radius_px,circle.radius_px), angle_degrees, 1.0);
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
     string imgFilename = DETECTED_CODES_BASE_PATH + filename;
     imwrite(imgFilename, rotatedHRCode);
-    HRCode codePos(rotatedHRCode, filename, circle.centerX, circle.centerY, pixelsPerMm); 
+    HRCode codePos(rotatedHRCode, filename, circle.center_x, circle.center_y, pixelsPerMm); 
     detectedCodes.push_back(codePos);
 
   }
@@ -570,11 +703,6 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   //  detectedCodes.push_back(codePos);
   //}
 
-  imwrite("tmp/lastCapture.jpg", src); // DEBUG ONLY
-  imwrite("tmp/lastGray.jpg", src_gray); // DEBUG ONLY
-  imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
-  imwrite("tmp/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
-  imwrite("tmp/lastCannyDrawing.jpg", canny_output); // DEBUG ONLY
 
   //resize(drawing, drawing, Size(drawing.cols*2, drawing.rows*2), 0, 0, INTER_AREA);
   //imshow( "Contours", drawing );
