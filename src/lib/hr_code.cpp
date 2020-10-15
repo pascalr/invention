@@ -377,6 +377,26 @@ vector<CircleDetected> findAllMarkers(CircleDetected c, vector<CircleDetected> c
   return result;
 }
 
+// Take the average of all points to get the center.
+// Take the average of all the distances between the points and the center to get radius.
+void averageEnclosingCircle(const vector<Point> &contour, Point2f &center, float &radius) {
+
+  center.x = 0;
+  center.y = 0;
+  for (const Point& pt : contour) {
+    center.x += pt.x;
+    center.y += pt.y;
+  }
+  center.x /= contour.size();
+  center.y /= contour.size();
+
+  radius = 0;
+  for (const Point& pt : contour) {
+    radius += sqrt(pow(pt.x - center.x, 2) + pow(pt.y - center.y, 2));
+  }
+  radius /= contour.size();
+}
+
 // OK, new algorithm needed... I cannot use the hierarchies...
 // Because when only an arc of a circle is detected, than it is not considered a container.
 // But for me an arc is enough. The contours detector offen detects multiple edges for the same circle edge.
@@ -402,18 +422,21 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
   //vector<bool> contourIsCircle( contours.size(), false );
   vector<CircleDetected> circles;
 
-  cv::Mat circlesDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
-  cv::Mat contoursDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
+  cv::Mat circlesDrawing = src.clone();
+  cv::Mat contoursDrawing = src.clone();
+  //cv::Mat circlesDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
+  //cv::Mat contoursDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
 
   for( size_t i = 0; i < contours.size(); i++ )
   {
-      minEnclosingCircle( contours[i], centers[i], radius[i] );
+      //minEnclosingCircle( contours[i], centers[i], radius[i] );
+      averageEnclosingCircle(contours[i], centers[i], radius[i]);
 
       Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
       drawContours( contoursDrawing, contours, i, color, 3, cv::LINE_8, hierarchy ); // DEBUG ONLY
 
       // FIXME: Minimum circle is 6 pixels wide, is that ok?
-      if (isBigCircle(contours[i], centers[i], radius[i], 0.2, 6)) {
+      if (isBigCircle(contours[i], centers[i], radius[i], 0.3, 6)) {
         //contourIsCircle[i] = true;
         circle( circlesDrawing, centers[i], (int)radius[i], color, 3 ); // DEBUG ONLY
 
@@ -423,6 +446,7 @@ void findHRCodes(cv::Mat& src, vector<HRCode> &detectedCodes, int thresh) {
         c.centerX = centers[i].x;
         c.centerY = centers[i].y;
         circles.push_back(c);
+
       }
   }
 
