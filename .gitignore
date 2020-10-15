@@ -17,8 +17,14 @@ log
 *.FCStd1
 data/ingredients/
 *.swp
-tmp
-
+tmp/*
+!tmp/hrcode/
+tmp/hrcode/finder/*
+tmp/hrcode/parser/*
+!tmp/.gitkeep
+!tmp/hrcode/.gitkeep
+!tmp/hrcode/finder/.gitkeep
+!tmp/hrcode/parser/.gitkeep
 
 # See https://help.github.com/articles/ignoring-files for more about ignoring files.
 #

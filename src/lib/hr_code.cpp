@@ -83,202 +83,38 @@ void extractLines(vector<cv::Mat>& lines, cv::Mat& src) {
   lines.push_back(jarId);
   //imshow("jarId", jarId);
   //waitKey(0);
-    
- // SDL_RenderDrawLine(gRenderer, center_x-mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1), center_x+mmToPx(HRCODE_LINE_1_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*1));
- // SDL_RenderDrawLine(gRenderer, center_x-mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2), center_x+mmToPx(HRCODE_LINE_2_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*2));
- // SDL_RenderDrawLine(gRenderer, center_x-mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3), center_x+mmToPx(HRCODE_LINE_3_WIDTH/2.0), textY+mmToPx(HRCODE_LINE_INTERSPACE*3));
 
   // Get the sub-matrices (minors) for every character.
 }
 
-class ImageProcess {
-  public:
-    virtual void process(cv::Mat& src, cv::Mat& dest) = 0;
-};
-
-class Scorer {
-  public:
-    double score(string expected, string actual) {
-      // +5 per good character, -1 per bad character
-      return 1.0;
+// Adjusts contrast or brightness I don't know. Darkens too white images and whitens too dark images.
+void adjustBrightness(cv::Mat& src, cv::Mat& dest) {
+  double averageBrightness = 0;
+  for(int i=0; i<src.rows; i++) {
+    for(int j=0; j<src.cols; j++) {
+      averageBrightness += src.at<uchar>(i,j);
     }
-};
+  }
+  averageBrightness /= src.rows*src.cols;
+  std::cout << "Avg brightness: " << averageBrightness << std::endl;
 
-// Automatically detect the best combination of process to get the best accuracy.
-class Optimiser {
-  public:
-    vector<ImageProcess> processes;
-    Scorer scorer;
-};
+  double requiredBrightness = 255.0 / 2.0;
+  double factor = requiredBrightness / averageBrightness;
 
-class DilateProcess : public ImageProcess {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      int dilateSize = 2; // TODO: Make this a param
-      cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
-      dilate(src, dest, kernel );
-    }
-
-};
-
-class AdaptiveThresholdProcess : public ImageProcess {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      adaptiveThreshold(src, dest, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 3, 5 );
-    }
-
-};
-
-// Adjusts contrast. Darkens too white images and whitens too dark images.
-class BrightnessProcess : public ImageProcess {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      double averageBrightness = 0;
-      for(int i=0; i<src.rows; i++) {
-        for(int j=0; j<src.cols; j++) {
-          averageBrightness += src.at<uchar>(i,j);
-        }
-      }
-      averageBrightness /= src.rows*src.cols;
-      std::cout << "Avg brightness: " << averageBrightness << std::endl;
-
-      double requiredBrightness = 255.0 / 2.0;
-      double factor = requiredBrightness / averageBrightness;
-
-      dest = src*factor;
-    }
-
-};
-    
-class ErodeProcess : public ImageProcess  {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      int erosionSize = 2; // TODO: Make this a param
-      cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*erosionSize + 1, 2*erosionSize+1 ), Point( erosionSize, erosionSize ) );
-      erode(src, dest, kernel );
-    }
-
-};
-
-class ThresholdBinaryProcess : public ImageProcess  {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      threshold(src, dest, 255/2.0, 255, THRESH_BINARY);
-    }
-
-};
-
-// Make everything below the threshold black
-class ThresholdBlackProcess : public ImageProcess  {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      threshold(src, dest, 80, 255, THRESH_TOZERO);
-    }
-
-};
-
-// Make everything above (255-threshold) white
-class ThresholdWhiteProcess : public ImageProcess  {
-  public:
-
-    void process(cv::Mat& src, cv::Mat& dest) {
-      threshold(src, dest, 80, 255, THRESH_TOZERO);
-    }
-
-};
-
-class ContrastProcess : public ImageProcess  {
-  public:
-    void process(cv::Mat& src, cv::Mat& dest) {
-      double contrast = 1.1;
-      dest = src * contrast;
-    }
-};
+  dest = src*factor;
+}
 
 
-class BlurProcess : public ImageProcess  {
-  public:
-    void process(cv::Mat& src, cv::Mat& dest) {
-      blur(src, dest, Size(3,3)); // Remove noise
-    }
-};
-
-class CannyProcess : public ImageProcess  {
-  public:
-    void process(cv::Mat& src, cv::Mat& dest) {
-      int thresh = 20;
-      Canny(src, dest, thresh, thresh*2 );
-    }
-};
-
-// CannyProcess should be run just before
-class DrawContoursProcess : public ImageProcess  {
-  public:
-    void process(cv::Mat& src, cv::Mat& dest) {
-      RNG rng(12345);
-      vector<vector<Point>> contours;
-      vector<cv::Vec4i> hierarchy;
-      findContours( src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
-
-      int idx = 0;
-      for(; idx >= 0; idx = hierarchy[idx][0] )
-      {
-          Scalar color( rand()&255, rand()&255, rand()&255 );
-          drawContours( dest, contours, idx, color, FILLED, 8, hierarchy );
-      }
-    }
-};
-
-// Given a point, I want everything above to get brighter, and everything below to get darker, and more the farther it gets.
-/*class MyContrastProcess {
-  public:
-    void process(Mat& src, Mat& dest) {
-      double midPoint = 0.5;
-      for( int y = 0; y < src.rows; y++ ) {
-          for( int x = 0; x < src.cols; x++ ) {
-              for( int c = 0; c < src.channels(); c++ ) {
-                  dest.at<Vec3b>(y,x)[c] =
-                    saturate_cast<uchar>( (image.at<Vec3b>(y,x)[c] / 255.0) );
-                    //saturate_cast<uchar>( alpha*image.at<Vec3b>(y,x)[c] + beta );
-              }
-          }
-      }
-    }
-};
-*/
-
-// TODO Contours process
 
 // Find characters with contours does not work because they are too close together
 void parseText(vector<string>& parsedLines, cv::Mat gray) {
   
-  resize(gray, gray, Size(gray.cols*2, gray.rows*2), 0, 0, INTER_AREA);
+  //resize(gray, gray, Size(gray.cols*2, gray.rows*2), 0, 0, INTER_AREA);
  
   cv::Mat dst = gray.clone(); 
 
-  vector<shared_ptr<ImageProcess>> processes;
-  processes.push_back(make_shared<BlurProcess>());
-  processes.push_back(make_shared<BrightnessProcess>());
-  //processes.push_back(make_shared<ErodeProcess>());
-  //processes.push_back(make_shared<CannyProcess>());
-  //processes.push_back(make_shared<DrawContoursProcess>());
-  //processes.push_back(make_shared<AdaptiveThresholdProcess>());
-  //processes.push_back(make_shared<DilateProcess>());
-  //processes.push_back(make_shared<DilateProcess>());
-  //processes.push_back(make_shared<ThresholdBinaryProcess>());
-  
-  cv::Mat sideBySide = gray.clone();
-
-  for (shared_ptr<ImageProcess>& process : processes) {
-    process->process(dst, dst);
-    hconcat(sideBySide, dst, sideBySide);
-  }
+  blur(dst, dst, Size(3,3)); // Remove noise
+  adjustBrightness(dst,dst);
 
   vector<cv::Mat> lines;
   extractLines(lines, dst);
@@ -291,8 +127,7 @@ void parseText(vector<string>& parsedLines, cv::Mat gray) {
     cout << "Detected code: " << line << endl;
   }
 
-  //imshow("show_side_by_side",sideBySide);
-  //waitKey(0);
+  //hconcat(sideBySide, dst, sideBySide);
 
 }
 
@@ -490,22 +325,6 @@ bool isArc(vector<Point> points, ArcDetected &a) {
   return true;
 }
 
-void adjustBrightness(cv::Mat& src, cv::Mat& dest) {
-  double averageBrightness = 0;
-  for(int i=0; i<src.rows; i++) {
-    for(int j=0; j<src.cols; j++) {
-      averageBrightness += src.at<uchar>(i,j);
-    }
-  }
-  averageBrightness /= src.rows*src.cols;
-  std::cout << "Avg brightness: " << averageBrightness << std::endl;
-
-  double requiredBrightness = 255.0 / 2.0;
-  double factor = requiredBrightness / averageBrightness;
-
-  dest = src*factor;
-}
-
 // OK, new algorithm needed... I cannot use the hierarchies...
 // Because when only an arc of a circle is detected, than it is not considered a container.
 // But for me an arc is enough. The contours detector offen detects multiple edges for the same circle edge.
@@ -517,15 +336,15 @@ void adjustBrightness(cv::Mat& src, cv::Mat& dest) {
 void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
 
   cv::Mat src = original.clone();
-  imwrite("tmp/lastCapture.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastCapture.jpg", src); // DEBUG ONLY
 
   cvtColor(src, src, COLOR_BGR2GRAY );
-  imwrite("tmp/lastGray.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastGray.jpg", src); // DEBUG ONLY
   Mat srcGray = src.clone();
 
   // Adjust brighteness to average this way always similar process
   adjustBrightness(src, src);
-  imwrite("tmp/lastBrightness.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastBrightness.jpg", src); // DEBUG ONLY
 
   // https://docs.opencv.org/master/d4/d13/tutorial_py_filtering.html
   // maybe medianBlur could be used instead of blur
@@ -534,7 +353,7 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   ////blur(src, src, Size(3,3) ); // Remove noise
   ////medianBlur(src, src, 5);
   //bilateralFilter(src.clone(), src, 9, 75, 75);
-  //imwrite("tmp/lastBlur.jpg", src); // DEBUG ONLY
+  //imwrite("tmp/hrcode/finder/lastBlur.jpg", src); // DEBUG ONLY
 
   // http://datahacker.rs/004-how-to-smooth-and-sharpen-an-image-in-opencv/
   double mydata[]={0, -1,  0,
@@ -542,30 +361,30 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
                    0, -1,  0};
   cv::Mat filterKernel(3,3,CV_64F,mydata);
   filter2D(src,src,-1,filterKernel);
-  imwrite("tmp/lastFilter2D.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastFilter2D.jpg", src); // DEBUG ONLY
 
   cv::Mat kernel;
 
   int beforeDilateSize = 2; // HARDCODED.
   kernel = getStructuringElement( MORPH_RECT, Size( 2*beforeDilateSize + 1, 2*beforeDilateSize+1 ), Point( beforeDilateSize, beforeDilateSize ) );
   erode(src, src, kernel );
-  imwrite("tmp/lastErodeBefore.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastErodeBefore.jpg", src); // DEBUG ONLY
   dilate(src, src, kernel );
-  imwrite("tmp/lastDilateBefore.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastDilateBefore.jpg", src); // DEBUG ONLY
 
   // Canny does a gaussian internally, I wanted to see the result.
   cv::Mat gaussianDest;
   GaussianBlur(src, gaussianDest, Size(5,5), 0);
-  imwrite("tmp/lastCannyGaussian.jpg", gaussianDest); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastCannyGaussian.jpg", gaussianDest); // DEBUG ONLY
 
   cv::bitwise_not(src, src);
   filter2D(src,src,-1,filterKernel);
   cv::bitwise_not(src, src);
-  imwrite("tmp/lastInvertedFilter2D.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastInvertedFilter2D.jpg", src); // DEBUG ONLY
   
   int thresh = 128; // HARDCODED
   Canny(src, src, thresh, thresh*2 );
-  imwrite("tmp/lastCanny.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastCanny.jpg", src); // DEBUG ONLY
 
   // https://stackoverflow.com/questions/35922687/pre-processing-image-before-applying-canny-edge-detection
   // Convert the image to grayscale
@@ -578,11 +397,11 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
   dilate(src, src, kernel );
   erode(src, src, kernel );
-  imwrite("tmp/lastErrodeAndDilateAfter.jpg", src); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastErrodeAndDilateAfter.jpg", src); // DEBUG ONLY
 
   //cv::adaptiveThreshold(src, src, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY,11,2);
   ////cv::adaptiveThreshold(src, src, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,11,2);
-  //imwrite("tmp/lastThreshold.jpg", src); // DEBUG ONLY
+  //imwrite("tmp/hrcode/finder/lastThreshold.jpg", src); // DEBUG ONLY
 
   // ellipse2Poly(), maybe use this
 
@@ -671,10 +490,10 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
     circle( mergedDrawing, c.center, (int)c.radius_px, color, 3 ); // DEBUG ONLY
   }
  
-  imwrite("tmp/lastArcsDrawing.jpg", arcsDrawing); // DEBUG ONLY
-  imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
-  imwrite("tmp/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
-  imwrite("tmp/lastMergedCirclesDrawing.jpg", mergedDrawing); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastArcsDrawing.jpg", arcsDrawing); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
+  imwrite("tmp/hrcode/finder/lastMergedCirclesDrawing.jpg", mergedDrawing); // DEBUG ONLY
 
   for (CircleDetected& circle : circles) {
 
@@ -731,3 +550,62 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   }
 
 }
+
+
+//      int dilateSize = 2; // TODO: Make this a param
+//      cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*dilateSize + 1, 2*dilateSize+1 ), Point( dilateSize, dilateSize ) );
+//      dilate(src, dest, kernel );
+//
+//      adaptiveThreshold(src, dest, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 3, 5 );
+//
+//    
+//      int erosionSize = 2; // TODO: Make this a param
+//      cv::Mat kernel = getStructuringElement( MORPH_RECT, Size( 2*erosionSize + 1, 2*erosionSize+1 ), Point( erosionSize, erosionSize ) );
+//      erode(src, dest, kernel );
+//      
+//      threshold(src, dest, 255/2.0, 255, THRESH_BINARY);
+//
+//// Make everything below the threshold black
+//      threshold(src, dest, 80, 255, THRESH_TOZERO);
+//
+//// Make everything above (255-threshold) white
+//      threshold(src, dest, 80, 255, THRESH_TOZERO);
+//
+//      double contrast = 1.1;
+//      dest = src * contrast;
+//
+//      blur(src, dest, Size(3,3)); // Remove noise
+//
+//      int thresh = 20;
+//      Canny(src, dest, thresh, thresh*2 );
+//
+//// CannyProcess should be run just before
+//      RNG rng(12345);
+//      vector<vector<Point>> contours;
+//      vector<cv::Vec4i> hierarchy;
+//      findContours( src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE );
+//
+//      int idx = 0;
+//      for(; idx >= 0; idx = hierarchy[idx][0] )
+//      {
+//          Scalar color( rand()&255, rand()&255, rand()&255 );
+//          drawContours( dest, contours, idx, color, FILLED, 8, hierarchy );
+//      }
+
+// Given a point, I want everything above to get brighter, and everything below to get darker, and more the farther it gets.
+/*class MyContrastProcess {
+  public:
+    void process(Mat& src, Mat& dest) {
+      double midPoint = 0.5;
+      for( int y = 0; y < src.rows; y++ ) {
+          for( int x = 0; x < src.cols; x++ ) {
+              for( int c = 0; c < src.channels(); c++ ) {
+                  dest.at<Vec3b>(y,x)[c] =
+                    saturate_cast<uchar>( (image.at<Vec3b>(y,x)[c] / 255.0) );
+                    //saturate_cast<uchar>( alpha*image.at<Vec3b>(y,x)[c] + beta );
+              }
+          }
+      }
+    }
+};
+*/
