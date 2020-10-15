@@ -334,7 +334,8 @@ class CircleDetected {
   public:
     // OPTIMIZE: Use faster distanceSquared, whatever...
     double distancePx(CircleDetected c) {
-      return sqrt(pow(center_x - c.center_x, 2) + pow(center_y - c.center_y, 2));
+      return cv::norm(center - c.center);
+      //return sqrt(pow(center_x - c.center_x, 2) + pow(center_y - c.center_y, 2));
     }
     double distanceMm(CircleDetected c, double pixelsPerMm) {
       return distancePx(c) / pixelsPerMm;
@@ -346,8 +347,7 @@ class CircleDetected {
     double radius_px;
     // Point2f center; should be this...
     // double res = cv::norm(a-b); And I should use this
-    double center_x;
-    double center_y;
+    Point2f center;
 };
 
 bool hasInnerPerimeter(CircleDetected c, vector<CircleDetected> circles, double pixelsPerMm) {
@@ -615,9 +615,10 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   vector<Point2f> centers( contours.size() );
   vector<float> radius( contours.size() );
   //vector<bool> contourIsCircle( contours.size(), false );
-  vector<CircleDetected> circles;
+  vector<CircleDetected> manyCircles;
 
   cv::Mat circlesDrawing = original.clone();
+  cv::Mat mergedDrawing = original.clone();
   cv::Mat arcsDrawing = original.clone();
   cv::Mat contoursDrawing = original.clone();
   //cv::Mat circlesDrawing = cv::Mat::zeros( canny_output.size(), CV_8UC3 ); // DEBUG ONLY
@@ -656,23 +657,46 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
       CircleDetected c;
       c.id = i;
       c.radius_px = radius[i];
-      c.center_x = centers[i].x;
-      c.center_y = centers[i].y;
-      circles.push_back(c);
+      c.center = centers[i];
+      manyCircles.push_back(c);
       
-      circle( circlesDrawing, Point2f(c.center_x, c.center_y), (int)c.radius_px, color, 3 ); // DEBUG ONLY
+      circle( circlesDrawing, c.center, (int)c.radius_px, color, 3 ); // DEBUG ONLY
 
     }
+  }
+      
+  std::function<bool(CircleDetected,CircleDetected)> func = [](CircleDetected c1, CircleDetected c2) {
+    return c1.distancePx(c2) < 10 && abs(c1.radius_px - c2.radius_px) < 4; // HARDCODED.
+  };
+  //std::function<bool(CircleDetected,CircleDetected)> func = [](CircleDetected c1, CircleDetected c2) {
+  //  return c1.distancePx(c2) < 4; // HARDCODED.
+  //};
+  vector<vector<size_t>> groups = groupNearDuplicates(manyCircles, func);
+  vector<CircleDetected> circles;
+
+  // Merge the near duplicates
+  for (vector<size_t> &group : groups) {
+    Point2f center(0.0, 0.0);
+    double radiusPx = 0.0;
+    for (size_t &i : group) {
+      center += manyCircles[i].center;
+      radiusPx += manyCircles[i].radius_px;
+    }
+
+    CircleDetected c;
+    c.id = *group.begin();
+    c.radius_px = radiusPx / group.size();
+    c.center = center / (float)group.size();
+    circles.push_back(c);
+
+    Scalar color = Scalar( rng.uniform(0, 256), rng.uniform(0,256), rng.uniform(0,256) ); // DEBUG ONLY
+    circle( mergedDrawing, c.center, (int)c.radius_px, color, 3 ); // DEBUG ONLY
   }
  
   imwrite("tmp/lastArcsDrawing.jpg", arcsDrawing); // DEBUG ONLY
   imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
   imwrite("tmp/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
-  
-  //imwrite("tmp/lastMergedCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
-      
-  std::function<double(CircleDetected,CircleDetected)> func = [pixelsPerMm](CircleDetected c1, CircleDetected c2) -> double {return c1.distanceMm(c2,pixelsPerMm);};
-  vector<vector<size_t>> groups = groupNearDuplicates(markers, func, 4.0); // HARDCODED. 4mm. Very generous
+  imwrite("tmp/lastMergedCirclesDrawing.jpg", mergedDrawing); // DEBUG ONLY
 
   for (CircleDetected& circle : circles) {
 
@@ -695,11 +719,13 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
     CircleDetected secondMarker = markers[1];
 
     if (markers.size() > 2) {
-      std::function<double(CircleDetected,CircleDetected)> func = [pixelsPerMm](CircleDetected c1, CircleDetected c2) -> double {return c1.distanceMm(c2,pixelsPerMm);};
-      vector<vector<size_t>> groups = groupNearDuplicates(markers, func, 4.0); // HARDCODED. 4mm. Very generous
-      if (groups.size() > 2) { std::cout << "Detected too many markers. Expected only 2. Detected: " << groups.size() << std::endl; continue;}
-      firstMarker = markers[groups[0][0]];
-      secondMarker = markers[groups[1][0]];
+      //std::function<double(CircleDetected,CircleDetected)> func = [pixelsPerMm](CircleDetected c1, CircleDetected c2) -> double {return c1.distanceMm(c2,pixelsPerMm);};
+      //vector<vector<size_t>> groups = groupNearDuplicates(markers, func, 4.0); // HARDCODED. 4mm. Very generous
+      //if (groups.size() > 2) {
+        std::cout << "Detected too many markers. Expected only 2. Detected: " << groups.size() << std::endl; continue;
+      //}
+      //firstMarker = markers[groups[0][0]];
+      //secondMarker = markers[groups[1][0]];
     }
 
     bool correctDistance = abs(firstMarker.distanceMm(secondMarker, pixelsPerMm) - HRCODE_MARKERS_INTERSPACE)/HRCODE_MARKERS_INTERSPACE < 0.2; // HARDCODED. 20% is a little generous
@@ -708,29 +734,29 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
     cout << "Detected HRCode!" << endl;
 
     // Calculate angle
-    double rise = firstMarker.center_y - secondMarker.center_y;
-    double run = secondMarker.center_x - firstMarker.center_x;
+    double rise = firstMarker.center.y - secondMarker.center.y;
+    double run = secondMarker.center.x - firstMarker.center.x;
     double angle_degrees;
     if (run == 0) { // edge case both circles are vertically aligned
-      angle_degrees = secondMarker.center_x > circle.center_x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
+      angle_degrees = secondMarker.center.x > circle.center.x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
     } else {
       angle_degrees = atan2(rise, run)*180.0 / CV_PI;
 
-      double avg_x = (secondMarker.center_x + firstMarker.center_x)/2;
-      if (avg_x > circle.center_x) { // FIXME: I don't think this is 100% accurate...
+      double avg_x = (secondMarker.center.x + firstMarker.center.x)/2;
+      if (avg_x > circle.center.x) { // FIXME: I don't think this is 100% accurate...
         angle_degrees += 180.0;
       }
     }
 
     cv::Mat rotatedHRCode;
-    cv::Mat detectedHRCode(srcGray, Rect(circle.center_x-circle.radius_px, circle.center_y-circle.radius_px, circle.radius_px*2, circle.radius_px*2));
+    cv::Mat detectedHRCode(srcGray, Rect(circle.center.x-circle.radius_px, circle.center.y-circle.radius_px, circle.radius_px*2, circle.radius_px*2));
     cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(circle.radius_px,circle.radius_px), angle_degrees, 1.0);
     warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
 
     string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
     string imgFilename = DETECTED_CODES_BASE_PATH + filename;
     imwrite(imgFilename, rotatedHRCode);
-    HRCode codePos(rotatedHRCode, filename, circle.center_x, circle.center_y, pixelsPerMm); 
+    HRCode codePos(rotatedHRCode, filename, circle.center.x, circle.center.y, pixelsPerMm); 
     detectedCodes.push_back(codePos);
 
   }

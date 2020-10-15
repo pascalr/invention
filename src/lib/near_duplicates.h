@@ -5,7 +5,7 @@
 
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
 template<typename T>
-std::vector<std::vector<size_t>> groupNearDuplicates(std::vector<T> items, std::function<double(T, T)> distanceFunction, double epsilon) {
+std::vector<std::vector<size_t>> groupNearDuplicates(std::vector<T> items, std::function<bool(T, T)> cmpFunction) {
 
   std::vector<std::vector<size_t>> result;
 
@@ -20,7 +20,7 @@ std::vector<std::vector<size_t>> groupNearDuplicates(std::vector<T> items, std::
     cluster.push_back(i);
 
     for (unsigned int j = i+1; j < items.size(); j++) {
-      if (distanceFunction(items[i], items[j]) < epsilon) {
+      if (cmpFunction(items[i], items[j])) {
         indices.push_back(j);
         cluster.push_back(j);
       }
