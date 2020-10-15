@@ -468,7 +468,7 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   }
       
   std::function<bool(CircleDetected,CircleDetected)> func = [](CircleDetected c1, CircleDetected c2) {
-    return c1.distancePx(c2) < 10 && abs(c1.radius_px - c2.radius_px) < 4; // HARDCODED.
+    return c1.distancePx(c2) < 25 && abs(c1.radius_px - c2.radius_px) < 4; // HARDCODED.
   };
   //std::function<bool(CircleDetected,CircleDetected)> func = [](CircleDetected c1, CircleDetected c2) {
   //  return c1.distancePx(c2) < 4; // HARDCODED.
