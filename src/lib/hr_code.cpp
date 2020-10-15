@@ -537,33 +537,11 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   //imwrite("tmp/lastBlur.jpg", src); // DEBUG ONLY
 
   // http://datahacker.rs/004-how-to-smooth-and-sharpen-an-image-in-opencv/
-  // Sharpen the image with a 2d filter, 9 score for the pixel itself and -1 for the neightbors.
-  // 1ere ligne, 2e ligne, etc
-  //Mat filterKernel = Mat::ones(5, 5, CV_64F) * -1;
-  //filterKernel.at<double>(2,2) = 9;
-  //double mydata[]={0, -1,  0,
-  //                -1,  9, -1,
-  //                 0, -1,  0};
-  //double mydata[]={0, -1,  0, 0, 0,
-  //                -1,  5, -2, 0, 0,
-  //                -1,  -2, 9, -2, 0,
-  //                -1,  5, -2, 0, 0,
-  //                 0, -1,  0, 0, 0};
-  //double mydata[]={-4, -2,  0, -2, -4,
-  //                 -2,  0,  4,  0, -2,
-  //                  0,  4,  8,  4,  0,
-  //                 -2,  0,  4,  0, -2,
-  //                 -4, -2,  0, -2, -4};
   double mydata[]={0, -1,  0,
                   -1,  9, -1,
                    0, -1,  0};
-  //double mydata[]={-1, -1, -1, -1, 9, -1, -1, -1, -1};
-  //double mydata[]={-1, -1, -1, -1, 9, -1, -1, -1, -1};
   cv::Mat filterKernel(3,3,CV_64F,mydata);
-  //cv::Mat filterKernel(5,5,CV_64F,mydata);
-  //filterKernel / 4.0;
   filter2D(src,src,-1,filterKernel);
-  //filter2D(src,src,-1,filterKernel);
   imwrite("tmp/lastFilter2D.jpg", src); // DEBUG ONLY
 
   cv::Mat kernel;
@@ -709,7 +687,6 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
       std::cout << "No perimeter was found for this circle." << std::endl; continue;
     }
  
-    
     // The difference in size is big between the perimeter and the markers, so it does not matter if
     // checking the perimeters in the list for nothing.
     vector<CircleDetected> markers = findAllMarkers(circle, circles, pixelsPerMm);
@@ -718,15 +695,7 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
     CircleDetected firstMarker = markers[0];
     CircleDetected secondMarker = markers[1];
 
-    if (markers.size() > 2) {
-      //std::function<double(CircleDetected,CircleDetected)> func = [pixelsPerMm](CircleDetected c1, CircleDetected c2) -> double {return c1.distanceMm(c2,pixelsPerMm);};
-      //vector<vector<size_t>> groups = groupNearDuplicates(markers, func, 4.0); // HARDCODED. 4mm. Very generous
-      //if (groups.size() > 2) {
-        std::cout << "Detected too many markers. Expected only 2. Detected: " << groups.size() << std::endl; continue;
-      //}
-      //firstMarker = markers[groups[0][0]];
-      //secondMarker = markers[groups[1][0]];
-    }
+    if (markers.size() > 2) {std::cout << "Detected too many markers. Expected only 2. Detected: " << groups.size() << std::endl; continue;}
 
     bool correctDistance = abs(firstMarker.distanceMm(secondMarker, pixelsPerMm) - HRCODE_MARKERS_INTERSPACE)/HRCODE_MARKERS_INTERSPACE < 0.2; // HARDCODED. 20% is a little generous
     if (!correctDistance) {std::cout << "The interspace between the two markers was not at the correct distance." << std::endl; continue;}
@@ -761,67 +730,4 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
 
   }
 
-  //for( size_t i = 0; i < hierarchy.size(); i++ ) {
-
-  //  if (!contourIsCircle[i]) { continue; }
-  //  
-  //  float scale = radius[i] / HRCODE_OUTER_RADIUS; // pixels per mm
-  //  std::cout << "Detected a contour with a radius of " << radius[i] << " pixels. Scale: " << scale << std::endl;
-  //  
-  //  // TODO: Return an error message with the reason why it did not detect instead of logging stuff like this.
-  //  //BOOST_LOG_TRIVIAL(debug) << "Checking circle " << i;
-
-  //  int child = hierarchy[i][2];
-  //  if (child < 0) { std::cout << "Found a circle but it has no children..." << std::endl; continue; }
-  //  
-  //  //BOOST_LOG_TRIVIAL(debug) << "Child found.";
-  // 
-  //  float insideRadius = radius[child] / scale; // mm
-
-  //  bool correctSize = abs(insideRadius - HRCODE_INNER_RADIUS)/HRCODE_INNER_RADIUS < 0.2;
-  //  if (!correctSize) { std::cout << "Expected inner dia to be " << HRCODE_INNER_RADIUS << ", but was: " << insideRadius << std::endl; continue; }
-  //  
-  //  int firstMarker = findNextMarker(hierarchy[child][2], hierarchy, contourIsCircle, centers, radius, child, scale);
-  //  if (firstMarker < 0) { std::cout << "Did not find a first marker" << std::endl; continue; }
-  //  
-  //  int secondMarker = findNextMarker(hierarchy[firstMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-  //  if (secondMarker < 0) { std::cout << "Did not find a second marker" << std::endl; continue; }
-  //  
-  //  int thirdInnerCircle = findNextMarker(hierarchy[secondMarker][0], hierarchy, contourIsCircle, centers, radius, child, scale);
-  //  if (thirdInnerCircle >= 0) { std::cout << "Should not have detected a third inner circle. Aborting..." << std::endl; continue; }
-  //  
-  //  //cout << "Detected HRCode!" << endl;
-  //  // Calculate angle
-  //  double rise = centers[secondMarker].y - centers[firstMarker].y;
-  //  double run = centers[secondMarker].x - centers[firstMarker].x;
-  //  double angle_degrees;
-  //  if (run == 0) { // edge case both circles are vertically aligned
-  //    angle_degrees = centers[secondMarker].x > centers[i].x ? 90.0 : -90.0; // TODO: Test this is the correct way... pure guess right now
-  //  } else {
-  //    angle_degrees = atan2(rise, run)*180.0 / CV_PI;
-
-  //    double avg_x = (centers[secondMarker].x + centers[firstMarker].x)/2;
-  //    if (avg_x > centers[i].x) { // FIXME: I don't think this is 100% accurate...
-  //      angle_degrees += 180.0;
-  //    }
-  //  }
-
-  //  //BOOST_LOG_TRIVIAL(debug) << "angle_degrees: "  << angle_degrees;
- 
-  //  cv::Mat rotatedHRCode;
-  //  cv::Mat detectedHRCode(src_gray, Rect(centers[i].x-radius[i], centers[i].y-radius[i], radius[i]*2, radius[i]*2));
-  //  cv::Mat rotationMatrix = cv::getRotationMatrix2D(Point2f(radius[i],radius[i]), angle_degrees, 1.0);
-  //  warpAffine(detectedHRCode, rotatedHRCode, rotationMatrix, detectedHRCode.size());
-
-  //  string filename = nextFilename(DETECTED_CODES_BASE_PATH, "detected_code", ".jpg");
-  //  string imgFilename = DETECTED_CODES_BASE_PATH + filename;
-  //  imwrite(imgFilename, rotatedHRCode);
-  //  HRCode codePos(rotatedHRCode, filename, centers[i].x, centers[i].y, scale); 
-  //  detectedCodes.push_back(codePos);
-  //}
-
-
-  //resize(drawing, drawing, Size(drawing.cols*2, drawing.rows*2), 0, 0, INTER_AREA);
-  //imshow( "Contours", drawing );
-  //waitKey(0);
 }
