@@ -544,34 +544,48 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   //double mydata[]={0, -1,  0,
   //                -1,  9, -1,
   //                 0, -1,  0};
-  double mydata[]={0, -1,  0, 0, 0,
-                  -1,  5, -2, 0, 0,
-                  -1,  -2, 9, -2, 0,
-                  -1,  5, -2, 0, 0,
-                   0, -1,  0, 0, 0};
+  //double mydata[]={0, -1,  0, 0, 0,
+  //                -1,  5, -2, 0, 0,
+  //                -1,  -2, 9, -2, 0,
+  //                -1,  5, -2, 0, 0,
+  //                 0, -1,  0, 0, 0};
+  //double mydata[]={-4, -2,  0, -2, -4,
+  //                 -2,  0,  4,  0, -2,
+  //                  0,  4,  8,  4,  0,
+  //                 -2,  0,  4,  0, -2,
+  //                 -4, -2,  0, -2, -4};
+  double mydata[]={0, -1,  0,
+                  -1,  9, -1,
+                   0, -1,  0};
   //double mydata[]={-1, -1, -1, -1, 9, -1, -1, -1, -1};
   //double mydata[]={-1, -1, -1, -1, 9, -1, -1, -1, -1};
   cv::Mat filterKernel(3,3,CV_64F,mydata);
+  //cv::Mat filterKernel(5,5,CV_64F,mydata);
+  //filterKernel / 4.0;
   filter2D(src,src,-1,filterKernel);
   //filter2D(src,src,-1,filterKernel);
   imwrite("tmp/lastFilter2D.jpg", src); // DEBUG ONLY
 
   cv::Mat kernel;
 
-  //int beforeDilateSize = 4; // HARDCODED.
-  //kernel = getStructuringElement( MORPH_RECT, Size( 2*beforeDilateSize + 1, 2*beforeDilateSize+1 ), Point( beforeDilateSize, beforeDilateSize ) );
-  //dilate(src, src, kernel );
-  //imwrite("tmp/lastDilateBefore.jpg", src); // DEBUG ONLY
-  //erode(src, src, kernel );
-  //imwrite("tmp/lastErodeBefore.jpg", src); // DEBUG ONLY
+  int beforeDilateSize = 2; // HARDCODED.
+  kernel = getStructuringElement( MORPH_RECT, Size( 2*beforeDilateSize + 1, 2*beforeDilateSize+1 ), Point( beforeDilateSize, beforeDilateSize ) );
+  erode(src, src, kernel );
+  imwrite("tmp/lastErodeBefore.jpg", src); // DEBUG ONLY
+  dilate(src, src, kernel );
+  imwrite("tmp/lastDilateBefore.jpg", src); // DEBUG ONLY
 
   // Canny does a gaussian internally, I wanted to see the result.
   cv::Mat gaussianDest;
   GaussianBlur(src, gaussianDest, Size(5,5), 0);
   imwrite("tmp/lastCannyGaussian.jpg", gaussianDest); // DEBUG ONLY
 
-  //int thresh = 100; // HARDCODED
-  int thresh = 70; // HARDCODED
+  cv::bitwise_not(src, src);
+  filter2D(src,src,-1,filterKernel);
+  cv::bitwise_not(src, src);
+  imwrite("tmp/lastInvertedFilter2D.jpg", src); // DEBUG ONLY
+  
+  int thresh = 128; // HARDCODED
   Canny(src, src, thresh, thresh*2 );
   imwrite("tmp/lastCanny.jpg", src); // DEBUG ONLY
 
@@ -587,6 +601,10 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   dilate(src, src, kernel );
   erode(src, src, kernel );
   imwrite("tmp/lastErrodeAndDilateAfter.jpg", src); // DEBUG ONLY
+
+  //cv::adaptiveThreshold(src, src, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY,11,2);
+  ////cv::adaptiveThreshold(src, src, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,11,2);
+  //imwrite("tmp/lastThreshold.jpg", src); // DEBUG ONLY
 
   // ellipse2Poly(), maybe use this
 
@@ -650,6 +668,11 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
   imwrite("tmp/lastArcsDrawing.jpg", arcsDrawing); // DEBUG ONLY
   imwrite("tmp/lastCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
   imwrite("tmp/lastContoursDrawing.jpg", contoursDrawing); // DEBUG ONLY
+  
+  //imwrite("tmp/lastMergedCirclesDrawing.jpg", circlesDrawing); // DEBUG ONLY
+      
+  std::function<double(CircleDetected,CircleDetected)> func = [pixelsPerMm](CircleDetected c1, CircleDetected c2) -> double {return c1.distanceMm(c2,pixelsPerMm);};
+  vector<vector<size_t>> groups = groupNearDuplicates(markers, func, 4.0); // HARDCODED. 4mm. Very generous
 
   for (CircleDetected& circle : circles) {
 
