@@ -16,11 +16,9 @@ class StepperMotor : public Motor {
       isMotorEnabled = true;
       forceRotation = false;
       m_position_steps = 0;
-
-      m_default_max_speed = 1;
-      m_acceleration = 0.2; // tour/s^2 [turn/sec^2]
-
     }
+
+    double steps_per_turn; // FIXME: This should be in constructor because it is a must.
 
     void prepareMovementPercent() {
       distance_to_travel_steps = abs(getDestination() - getPosition()) * stepsPerUnit;
@@ -36,7 +34,7 @@ class StepperMotor : public Motor {
     int min_delay = 500;
     int max_delay = 10000;
 
-    // This constant must be set
+    // This constant must be set. TODO: Put this in constructor if it is a must...
     double percent_p = 0;
 
     int phaseNb = 1; // what phase the motor is in
@@ -100,53 +98,13 @@ class StepperMotor : public Motor {
       return delay;
     }
 
-
-    void setAcceleration(double accel) {
-      m_acceleration = accel;
-    }
-
     double max_step_delay = MAX_STEP_DELAY;
-
-    //void setDefaultMaxSpeed(double s) {
-    //  m_default_max_speed = s;
-    //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
-    //}
-
-    //void setStepsPerTurn(double ratio) {
-    //  m_steps_per_turn = ratio;
-    //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
-    //}
-
-    void setMaxSpeed(double s) {
-      m_max_speed = s;
-    }
-
-    double getAcceleration() {
-      return m_acceleration;
-    }
-
-    double getAccelerationInUnits() {
-      return m_acceleration * m_steps_per_turn / stepsPerUnit;
-    }
-
-    double getDefaultMaxSpeed() {
-      return m_default_max_speed;
-    }
-    
-    double getMaxSpeed() {
-      return m_max_speed;
-    }
-    
 
     // Linear axes units are mm. Rotary axes units are degrees.
     // Number of steps per turn of the motor * microstepping / distance per turn
     // The value is multiplied by two because we have to write LOW then HIGH for one step
     void setStepsPerUnit(double ratio) {
       stepsPerUnit = ratio;
-    }
-
-    double getStepsPerTurn() {
-      return m_steps_per_turn;
     }
 
     double getStepsPerUnit() {
@@ -196,14 +154,6 @@ class StepperMotor : public Motor {
       return getDestination() * stepsPerUnit;
     }
 
-    double getDestinationTurns() {
-      return getDestination() * m_steps_per_turn;
-    }
-
-    void updateDirection() {
-      setMotorDirection(getDestination() > getPosition());
-    }
-    
     void setMotorEnabled(bool value) {
       digitalWrite(m_enabled_pin, LOW); // FIXME: ALWAYS ENABLED
       //digitalWrite(m_enabled_pin, value ? LOW : HIGH);
@@ -213,7 +163,6 @@ class StepperMotor : public Motor {
   //protected:
     // Linear axes units are mm. Rotary axes units are degrees.
     double stepsPerUnit;
-    double m_steps_per_turn;
     
     int m_enabled_pin;
     int m_step_pin;
@@ -222,55 +171,10 @@ class StepperMotor : public Motor {
     bool isMotorEnabled;
     bool forceRotation;
 
-    // TODO: All the units should simply be steps... NOOOOOOOOOO All units are in turns!
-    // WARNING: THIS ONLY WORKS AT THE BEGINNING, DOES NOT COMPUTE ALL THE TIME
-    unsigned long timeToReachDestinationUs() {
-      return m_time_to_reach_middle_us * 2;
-    }
-
-    // tours [turns]
-    double distanceToReachDestination() {
-      double distance = (getDestination() - getPosition()) * stepsPerUnit / m_steps_per_turn; // tr
-      distance *= (distance < 0) ? -1 : 1;
-      return distance;
-    }
 
     double position_to_decelerate;
     double v_0;
 
-    void calculateMovement() {
-
-      double halfDistance = distanceToReachDestination() / 2;
-      v_0 = US_PER_S / max_step_delay / m_steps_per_turn;
-
-      m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance + v_0*v_0); // tr/s
-      
-      if (m_max_speed_reached > m_max_speed) {m_max_speed_reached = m_max_speed;} // s
-
-      double timeToAccelerate = (m_max_speed_reached - v_0) / m_acceleration; // s
-      m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * US_PER_S)); // us
-      double timeConstantSpeed = 0;
-      double distanceAccelerating = v_0*timeToAccelerate + 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
-      bool goingForward = getDestination() > getPosition();
-      position_to_decelerate += getDestination() + (distanceAccelerating * m_steps_per_turn / stepsPerUnit * (goingForward ? -1 : 1));
-
-      if (m_max_speed_reached == m_max_speed) {
-
-        double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
-        timeConstantSpeed = halfDistanceLeft / m_max_speed; // s
-        m_time_to_reach_middle_us += ((unsigned long) (timeConstantSpeed * US_PER_S)); // us
-      }
-     
-      m_time_to_start_decelerating_us = ((unsigned long)((timeConstantSpeed*2.0 + timeToAccelerate) * US_PER_S)); // us
-
-      //std::cout << "position: " << getPosition() << std::endl;
-      //std::cout << "destination: " << getDestination() << std::endl;
-      //std::cout << "distanceAccelerating: " << distanceAccelerating << std::endl;
-      //std::cout << "position_to_decelerate: " << position_to_decelerate << std::endl;
-      //std::cout << "timeToAccelerate: " << timeToAccelerate << std::endl;
-      //std::cout << "v_0: " << v_0 << std::endl;
-      //std::cout << "acceleration: " << m_acceleration << std::endl;
-    }
 
     int getto(double dest) {
       if (is_referenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
@@ -288,29 +192,6 @@ class StepperMotor : public Motor {
     }
 
     
-    unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
-
-      if (forceRotation) {return max_step_delay;}
-
-      // Decelerate
-      if (timeSinceStart > m_time_to_start_decelerating_us) {
-      //if (getPosition() > position_to_decelerate) {
-
-        //std::cout << "Decelerating.\n";
-        double t_s = (timeSinceStart - m_time_to_start_decelerating_us) / US_PER_S; // s
-        m_speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
-      
-      // Accelerate or go top speed
-      } else {
-
-        m_speed = v_0 + m_acceleration * (timeSinceStart / US_PER_S); // tr/s
-        if (m_speed > m_max_speed) {m_speed = m_max_speed;} // tr/s
-      }
-
-      unsigned long stepDelay = ((unsigned long)(US_PER_S / (m_speed * m_steps_per_turn))); // us
-
-      return stepDelay > max_step_delay ? max_step_delay : stepDelay;
-    }
 
     unsigned long next_step_delay = 0;
     unsigned long lost_time = 0;
@@ -396,7 +277,7 @@ class StepperMotor : public Motor {
       unsigned long timeSinceStart = timeDifference(m_start_time, currentTime); // us
       if (timeSinceStart >= next_step_time) {
         turnOneStep();
-        next_step_time = timeSinceStart + ((unsigned long)(US_PER_S / (speedRPM / 60.0 * m_steps_per_turn))); // us
+        next_step_time = timeSinceStart + ((unsigned long)(US_PER_S / (speedRPM / 60.0 * steps_per_turn))); // us
       }
     }
 
@@ -669,3 +550,86 @@ class MotorT : public StepperMotor {
     //}
 
     //unsigned int microsteps = 16;
+    //
+    //
+    //void calculateMovement() {
+
+    //  double halfDistance = distanceToReachDestination() / 2;
+    //  v_0 = US_PER_S / max_step_delay / m_steps_per_turn;
+
+    //  m_max_speed_reached = sqrt(2 * m_acceleration * halfDistance + v_0*v_0); // tr/s
+    //  
+    //  if (m_max_speed_reached > m_max_speed) {m_max_speed_reached = m_max_speed;} // s
+
+    //  double timeToAccelerate = (m_max_speed_reached - v_0) / m_acceleration; // s
+    //  m_time_to_reach_middle_us = ((unsigned long) (timeToAccelerate * US_PER_S)); // us
+    //  double timeConstantSpeed = 0;
+    //  double distanceAccelerating = v_0*timeToAccelerate + 0.5 * m_acceleration * timeToAccelerate * timeToAccelerate; // tr
+    //  bool goingForward = getDestination() > getPosition();
+    //  position_to_decelerate += getDestination() + (distanceAccelerating * m_steps_per_turn / stepsPerUnit * (goingForward ? -1 : 1));
+
+    //  if (m_max_speed_reached == m_max_speed) {
+
+    //    double halfDistanceLeft = halfDistance - distanceAccelerating; // tr
+    //    timeConstantSpeed = halfDistanceLeft / m_max_speed; // s
+    //    m_time_to_reach_middle_us += ((unsigned long) (timeConstantSpeed * US_PER_S)); // us
+    //  }
+    // 
+    //  m_time_to_start_decelerating_us = ((unsigned long)((timeConstantSpeed*2.0 + timeToAccelerate) * US_PER_S)); // us
+
+    //  //std::cout << "position: " << getPosition() << std::endl;
+    //  //std::cout << "destination: " << getDestination() << std::endl;
+    //  //std::cout << "distanceAccelerating: " << distanceAccelerating << std::endl;
+    //  //std::cout << "position_to_decelerate: " << position_to_decelerate << std::endl;
+    //  //std::cout << "timeToAccelerate: " << timeToAccelerate << std::endl;
+    //  //std::cout << "v_0: " << v_0 << std::endl;
+    //  //std::cout << "acceleration: " << m_acceleration << std::endl;
+    //}
+    //
+    //
+    //unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
+
+    //  if (forceRotation) {return max_step_delay;}
+
+    //  // Decelerate
+    //  if (timeSinceStart > m_time_to_start_decelerating_us) {
+    //  //if (getPosition() > position_to_decelerate) {
+
+    //    //std::cout << "Decelerating.\n";
+    //    double t_s = (timeSinceStart - m_time_to_start_decelerating_us) / US_PER_S; // s
+    //    m_speed = m_max_speed_reached - (m_acceleration * t_s); // tr/s
+    //  
+    //  // Accelerate or go top speed
+    //  } else {
+
+    //    m_speed = v_0 + m_acceleration * (timeSinceStart / US_PER_S); // tr/s
+    //    if (m_speed > m_max_speed) {m_speed = m_max_speed;} // tr/s
+    //  }
+
+    //  unsigned long stepDelay = ((unsigned long)(US_PER_S / (m_speed * m_steps_per_turn))); // us
+
+    //  return stepDelay > max_step_delay ? max_step_delay : stepDelay;
+    //}
+    //
+    //// WARNING: THIS ONLY WORKS AT THE BEGINNING, DOES NOT COMPUTE ALL THE TIME
+    //unsigned long timeToReachDestinationUs() {
+    //  return m_time_to_reach_middle_us * 2;
+    //}
+
+    //// tours [turns]
+    //double distanceToReachDestination() {
+    //  double distance = (getDestination() - getPosition()) * stepsPerUnit / m_steps_per_turn; // tr
+    //  distance *= (distance < 0) ? -1 : 1;
+    //  return distance;
+    //}
+    //
+    //void setDefaultMaxSpeed(double s) {
+    //  m_default_max_speed = s;
+    //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
+    //}
+
+    //void setStepsPerTurn(double ratio) {
+    //  m_steps_per_turn = ratio;
+    //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
+    //}
+
