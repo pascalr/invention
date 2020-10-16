@@ -130,7 +130,13 @@ int main(int argc, char** argv) {
 
   server.resource["^/capture.jpg$"]["GET"] = [&cap](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     //cout << "GET /cam_capture" << endl;
-  
+
+    if (!cap.isOpened()) {
+      cerr << "ERROR! Trying to get a capture, but the camera is not opened...\n";
+      response->write(SimpleWeb::StatusCode::client_error_bad_request, "The camera is not opened...");
+      return;
+    }
+
     // Sleep a little to make sure the are little vibrations left
     // in the arm in order to take a still picture. 
     this_thread::sleep_for(chrono::milliseconds(1000)); 
