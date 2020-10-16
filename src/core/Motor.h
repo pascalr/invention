@@ -42,7 +42,7 @@ class Motor {
       is_referenced = true;
       is_referencing = false;
       setPosition(0);
-      setDestination(0);
+      m_destination = 0;
       //setMotorEnabled(true);
       m_writer << "Done referencing axis " << getName() << '\n';
     }
@@ -104,8 +104,6 @@ class Motor {
 
     virtual double getPosition() = 0;
 
-    virtual void updateDirection() {}
-
     virtual bool handleAxis(unsigned long currentTime) = 0;
 
   protected:
@@ -119,7 +117,7 @@ class Motor {
     
     void setDestination(double dest) {
       m_destination = dest;
-      updateDirection();
+      setMotorDirection(getDestination() > getPosition());
     }
 
     int m_dir_pin;
