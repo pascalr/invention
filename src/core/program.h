@@ -22,7 +22,8 @@ class Program {
   public:
     Program(Writer& writer, Reader& reader) :
         axisT(writer, 'T'), axisH(writer, 'H'),
-        axisV(writer, 'V'), axisR(writer, 'R') {
+        axisV(writer, 'V'),
+        axisR(writer, 'R', 8, (0.186*25.4*13)/90) {
     }
 
     virtual Writer& getWriter() = 0;

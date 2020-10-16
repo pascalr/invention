@@ -13,7 +13,7 @@
 class DCMotor : public Motor {
   public:
 
-    DCMotor(Writer& writer, char name) : Motor(writer, name), referencer(m_encoder) {
+    DCMotor(Writer& writer, char name, int wheelNbHoles, double unitsPerTurn) : Motor(writer, name), encoder(wheelNbHoles, unitsPerTurn), referencer(encoder) {
       m_duty_cycle = 0;
     }
 
@@ -52,18 +52,18 @@ class DCMotor : public Motor {
       m_pwm_pin = pwmPin;
       m_dir_pin = dirPin;
   
-      m_encoder.setStepPin(stepPin);
+      encoder.setStepPin(stepPin);
 
       pinMode(m_dir_pin, OUTPUT);
       pinMode(m_pwm_pin, OUTPUT);
     }
 
     void setPosition(double pos) {
-      m_encoder.setPosition(pos);
+      encoder.setPosition(pos);
     }
 
     double getPosition() {
-      return m_encoder.getPosition();
+      return encoder.getPosition();
     }
 
     void stop() {
@@ -83,7 +83,7 @@ class DCMotor : public Motor {
 
       if (m_duty_cycle == 0) {return false;}
       
-      m_encoder.checkPosition(currentTime, isForward);
+      encoder.checkPosition(currentTime, isForward);
 
       if (handleReferencing(currentTime)) {return true;}
 
@@ -91,8 +91,10 @@ class DCMotor : public Motor {
         setDutyCycle(0);
       }
       
-      return !(m_encoder.isRpmCalculated() && m_encoder.getRpm() < 0.01);
+      return !(encoder.isRpmCalculated() && encoder.getRpm() < 0.01);
     }
+    
+    Encoder encoder;
 
   protected:
 
@@ -101,12 +103,11 @@ class DCMotor : public Motor {
     virtual void doStartReferencing() {
       setDutyCycle(50);
     }
-
+    
     void prepare(unsigned long time) {
-      m_encoder.prepare(time);
+      encoder.prepare(time);
     }
 
-    Encoder m_encoder;
     uint8_t m_pwm_pin;
     int m_duty_cycle = 10; // Duty cycle from 0 to 255
 };

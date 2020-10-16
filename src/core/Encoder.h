@@ -7,12 +7,14 @@
 class Encoder {
   public:
 
+    Encoder(int wheelNbHoles, double unitsPerTurn) : wheel_nb_holes(wheelNbHoles), units_per_steps(unitsPerTurn/wheelNbHoles) {
+    }
+
     void checkPosition(unsigned long currentTime, bool isForward) {
 
       if (timeDifference(m_last_rpm_time, currentTime) > 100000) { // Calculate RPM every 100ms.
-        // There are 8 steps per turn FIXME: Pass this as an argument to the class.
 	      m_is_rpm_calculated = true;
-        m_rpm = m_rpm_count / 8.0 * 60;
+        m_rpm = m_rpm_count * 60.0 / wheel_nb_holes;
         m_last_rpm_time = currentTime;
         m_rpm_count = 0;
       }
@@ -34,12 +36,12 @@ class Encoder {
       m_step_pin = stepPin;
     }
 
-    void setPosition(long pos) {
-      m_position_steps = pos;
+    void setPosition(double pos) {
+      m_position_steps = pos / units_per_steps;
     }
 
     double getPosition() {
-      return m_position_steps;
+      return m_position_steps * units_per_steps;
     }
 
     void prepare(unsigned long time) {
@@ -56,6 +58,9 @@ class Encoder {
     double getRpm() {
       return m_rpm;
     }
+
+    int wheel_nb_holes;
+    double units_per_steps;
       
   protected:
 
