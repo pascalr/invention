@@ -35,7 +35,7 @@ class DCMotor : public Motor {
     }
         
     int getto(double destination) {
-      setDestination(90 * 8 * 0.75);
+      setDestination(destination);
       setDutyCycle(50);
       return 0;
     }

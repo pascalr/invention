@@ -23,7 +23,8 @@ class Program {
     Program(Writer& writer, Reader& reader) :
         axisT(writer, 'T'), axisH(writer, 'H'),
         axisV(writer, 'V'),
-        axisR(writer, 'R', 8, (0.186*25.4*13)/90) {
+        // The movement of axis R refers to the space between the two jaws (hence multiplied by 2)
+        axisR(writer, 'R', 8, 2.0*(0.186*25.4*13)/90.0) {
     }
 
     virtual Writer& getWriter() = 0;
