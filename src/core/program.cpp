@@ -75,8 +75,8 @@ void setupAxes(Program& p) {
   p.axisH.reference_speed_rpm = 30;
 
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
-  p.axisV.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
-  p.axisV.setStepsPerTurn(200 * 2 * 16);
+  p.axisV.setStepsPerUnit(200 * 2 * 32 / unitPerTurnY);
+  p.axisV.setStepsPerTurn(200 * 2 * 32);
   //p.axisV.limitSwitchPin = 12;
   p.axisV.setupPins(8,7,6);
   p.axisV.setReverseMotorDirection(true);
