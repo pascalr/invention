@@ -642,3 +642,7 @@ Produce more DoF: small apertures (f/8-f/22), short focal lengths (10-35mm), lon
 
 What’s the hyperfocal distance?
 When focusing at the hyperfocal distance, everything falling from half of this distance to infinity will be in focus. It depends on aperture, focal length and circle of confusion. It does not depend on focus distance (subject distance).
+
+
+J'essaie avec https://github.com/jacksonliam/mjpg-streamer.git
+mjpg-streamer
