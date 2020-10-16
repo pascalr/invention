@@ -181,17 +181,9 @@ class StepperMotor : public Motor {
 
       setDestination(dest);
 
-      //calculateMovement();
-      //prepareMovement();
       prepareMovementPercent();
       return 0;
     }
-
-    double getCurrentSpeed() {
-      return m_speed;
-    }
-
-    
 
     unsigned long next_step_delay = 0;
     unsigned long lost_time = 0;
@@ -219,17 +211,9 @@ class StepperMotor : public Motor {
     bool m_is_step_high;
 
     long m_position_steps;
-
-    double m_max_speed_reached;
     unsigned long next_step_time; // us
+    
     unsigned long m_start_time; // us
-    unsigned long m_time_to_reach_middle_us; // us
-    unsigned long m_time_to_start_decelerating_us; // us
-   
-    double m_acceleration; // tour/s^2 [turn/sec^2]
-    double m_max_speed; // tour/s [turn/sec]
-    double m_default_max_speed; // tour/s [turn/sec]
-    double m_speed;
 
     LimitSwitchReferencer referencer;
     Referencer& getReferencer() {
@@ -252,8 +236,6 @@ class StepperMotor : public Motor {
           turnOneStep(timeSinceStart);
         }
         return true;
-      } else {
-        m_speed = 0;
       }
       return false;
     }
@@ -267,8 +249,6 @@ class StepperMotor : public Motor {
     virtual void prepare(unsigned long time) {
       m_start_time = time;
       next_step_time = 0;
-      m_speed = 0;
-      m_max_speed = m_default_max_speed;
     }
 
     // FIXME: All the time that are given to StepperMotor should be relative
@@ -632,4 +612,13 @@ class MotorT : public StepperMotor {
     //  m_steps_per_turn = ratio;
     //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
     //}
-
+//
+//
+//    double m_max_speed_reached;
+//    unsigned long m_time_to_reach_middle_us; // us
+//    unsigned long m_time_to_start_decelerating_us; // us
+//   
+//    double m_acceleration; // tour/s^2 [turn/sec^2]
+//    double m_max_speed; // tour/s [turn/sec]
+//    double m_default_max_speed; // tour/s [turn/sec]
+//    double m_speed;
