@@ -52,6 +52,8 @@ class Motor {
     virtual Referencer& getReferencer() = 0;
 
     virtual void run(unsigned long currentTime, double speedRPM) = 0;
+    
+    virtual int getto(double dest) = 0;
 
     double reference_speed_rpm = 30.0;
 
@@ -102,14 +104,6 @@ class Motor {
 
     virtual double getPosition() = 0;
 
-    virtual int setDestination(double dest) {
-
-      m_destination = dest;
-      updateDirection();
-
-      return 0;
-    }
-    
     virtual void updateDirection() {}
 
     virtual bool handleAxis(unsigned long currentTime) = 0;
@@ -122,6 +116,11 @@ class Motor {
     virtual void doStartReferencing() = 0;
     
     virtual void prepare(unsigned long time) = 0;
+    
+    void setDestination(double dest) {
+      m_destination = dest;
+      updateDirection();
+    }
 
     int m_dir_pin;
     bool m_reverse_motor_direction = false;

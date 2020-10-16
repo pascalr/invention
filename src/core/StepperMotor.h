@@ -469,11 +469,10 @@ class StepperMotor : public Motor {
       //std::cout << "acceleration: " << m_acceleration << std::endl;
     }
 
-    int setDestination(double dest) {
+    int getto(double dest) {
       if (is_referenced == false) {return ERROR_AXIS_NOT_REFERENCED;}
 
-      int status = Motor::setDestination(dest);
-      if (status < 0) {return status;}
+      setDestination(dest);
 
       //calculateMovement();
       //prepareMovement();

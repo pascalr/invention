@@ -44,7 +44,7 @@ int parseActionCommand(char cmd, Program& p) {
   if (cmd == 'M' || cmd == 'm') {
     if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
     if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
-    if ((status = motorAxis->setDestination(number)) < 0) {return status;}
+    if ((status = motorAxis->getto(number)) < 0) {return status;}
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {

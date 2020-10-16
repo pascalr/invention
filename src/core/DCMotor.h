@@ -34,9 +34,15 @@ class DCMotor : public Motor {
       setDestination(90 * 8 * 0.75);
     }
         
+    int getto(double destination) {
+      setDestination(90 * 8 * 0.75);
+      setDutyCycle(50);
+      return 0;
+    }
+
     void rotate(bool direction) {
       setMotorDirection(direction);
-      setDutyCycle(40);
+      setDutyCycle(50);
     }
    
     // already running, nothing to do here

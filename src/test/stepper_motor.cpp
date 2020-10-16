@@ -41,7 +41,7 @@ void testAcceleration() {
   axis.setPosition(0);
   
   axis.prepareWorking(0);
-  axis.setDestination(destination);
+  axis.getto(destination);
 
   int nbPoints = 500;
   vector<double> t; // time
