@@ -1,23 +1,6 @@
 #ifndef STEPPER_MOTOR_H
 #define STEPPER_MOTOR_H
 
-// Pour le mouvement: voir thirdparty/mathematics-of-motion-control-profiles-article
-// Plus tard déplacer en courbe S. Pour l'instant en courbe trapézoïdale.
-// Le vitesse initiale et finale (pas zéro pour un stepper motor) est
-// déterminé par la variable MAX_STEP_DELAY
-
-// La courbe n'est pas égal parce que d'un côté c'est par rapport à 10000, donc perdre 0.1 ce n'est pas
-// beaucoup, mais de l'autre côté c'est 500, donc perdre 0.1 c'est beaucoup
-// Je ne sais pas si c'est correct...
-
-// Alright, using delays was not the best idea, because it is inversely proportial to speed and not linear with it.
-// So I will be using percentages of speed then which are easy to translate in both units.
-// 500 delay is max speed => 100%,
-// 10000 delay is min speed => 5%,
-// what is 50%? It's 1000, it is min_delay / percent
-// What about using the step as a unit instead of time
-// Also not the best because a step is not proportial to the time
-
 #include "Motor.h"
 #include "../lib/ArduinoMock.h"
 #include "referencer.h"
@@ -39,92 +22,6 @@ class StepperMotor : public Motor {
 
     }
 
-    // delay is inversely proportional to the speed
-    // speed = distance_per_step / delay_per_step
-    // but I don't care about speed, only delay
-
-    // Source: https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article
-    // Archived here: thirdparty/mathematics-of-motion-control-profiles-article
-    // For an S-curve, there are 7 phases.
-    // 1. Increase of acceleration
-    // 2. Max acceleration reached
-    // 3. Decrease of acceleration
-    // 4. Constant speed reached
-    // 5. Decrease of acceleration
-    // 6. Max negative acceleration reached
-    // 7. Increase of acceleration back to zero
-  
-    int phase = 1; // what phase the motor is in
-
-    // It is called _p and _pp to mean first and second derivative respectively
-    // But careful it is not derived by time, it is derived by step
-    // These are constants that should be set for each motor
-    double delay_pp = 1; // second derivative of delay by step (jerk-1)
-    int min_delay = 500;
-    int max_delay = 10000;
-    double min_delay_p = -10;
-   
-    // These are variables
-    double delay_p = 0; // first derivative of delay by step (acceleration-1)
-    double delay = 0; // (speed-1)
-
-    double phase_3_delay = 0; // At what delay to stop phase 2 and start phase 3
-    long phase_5_steps = 0; // At what distance travelled to stop phase 4 and start phase 5
-    long phase_6_steps = 0; // At what distance travelled to stop phase 5 and start phase 6
-    long phase_7_steps = 0; // At what distance travelled to stop phase 6 and start phase 7
-    long distance_to_travel_steps = 0; // The distance to travel in steps
-    long start_position_steps = 0; // At the beginning of a move, what position was it?
-    bool skip_phase_2;
-    long steps_to_accelerate = 0;
-
-    int debug_delay = 0;
-
-    long debug_time_1 = 0;
-    long debug_time_2 = 0;
-    long debug_time_3 = 0;
-    long debug_time_4 = 0;
-    long debug_time_5 = 0;
-    long debug_time_6 = 0;
-    long debug_time_7 = 0;
-
-    long debug_steps_1 = 0;
-    long debug_steps_2 = 0;
-    long debug_steps_3 = 0;
-    long debug_steps_4 = 0;
-    long debug_steps_5 = 0;
-    long debug_steps_6 = 0;
-    long debug_steps_7 = 0;
-
-
-          // To know when phase 2 should stop, let's go the other way
-          // Let's say we are going at maximum speed, so delay = min_delay
-          // We want to know at what speed should we start to decrease acceleration, in
-          // order to not go over the maximum speed.
-
-          // We know from phase 1 that it takes N steps to increase acceleration.
-          // The same values are used for phase 3 so it takes N steps to do phase 3.
-          
-          // d_p = d_p0 + d_pp * s
-          // d = d0 + d_p0 * s + 0.5 * d_pp * s^2
-    
-          // d = what we are looking for
-          // d0 = min_delay
-          // d_p0 = 0, the goal is to reach no acceleration at the end of phase 3
-          // d_pp = delay_pp
-          // s = phase1Steps
-            
-          //phase_3_delay = min_delay + 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps;
-          //phase_3_delay = min_delay - 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps; // Why minus?
-          
-          
-    void prepareMovement() {
-      distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
-      start_position_steps = m_position_steps;
-      delay = max_delay;
-      delay_p = 0;
-      phase = 1;
-    }
-    
     void prepareMovementPercent() {
       distance_to_travel_steps = abs(getDestination() - getPosition()) * stepsPerUnit;
       start_position_steps = m_position_steps;
@@ -132,6 +29,12 @@ class StepperMotor : public Motor {
       phaseNb = 1;
       min_percent = min_delay * 1.0 / max_delay;
     }
+
+    long distance_to_travel_steps = 0; // The distance to travel in steps
+    long start_position_steps = 0; // At the beginning of a move, what position was it?
+
+    int min_delay = 500;
+    int max_delay = 10000;
 
     // This constant must be set
     double percent_p = 0;
@@ -148,6 +51,8 @@ class StepperMotor : public Motor {
     double debug_time_finished_accelerating_s = 0;
 
     double max_percent_reached = 0;
+
+    int debug_delay = 0;
 
     // Using percent per time, with a trapezoidal curve
     int nextDelayPercent(long distanceTravelledSteps, unsigned long timeSinceStart, unsigned long lostTime) {
@@ -195,108 +100,6 @@ class StepperMotor : public Motor {
       return delay;
     }
 
-    // Get the next delay following an S-curve    
-    int nextDelay(long distanceTravelledSteps, unsigned long timeSinceStart) {
-
-      // Increasing acceleration
-      if (phase == 1) {
-        debug_time_1 = timeSinceStart;
-        debug_steps_1 = distanceTravelledSteps;
-
-        delay_p = delay_pp * distanceTravelledSteps;
-        
-        // Check if we reached phase 2
-        if (delay_p <= min_delay_p) {
-
-          phase_7_steps = distance_to_travel_steps - distanceTravelledSteps;
-          steps_to_accelerate = distanceTravelledSteps;
-          delay_p = min_delay_p;
-          skip_phase_2 = false;
-          phase = 2;
-        }
-
-        // If we don't decelerate now, will we go under the minimum delay?
-        double delayIfDecelerate = delay + delay_p * distanceTravelledSteps - 0.5 * distanceTravelledSteps * delay_pp * distanceTravelledSteps;
-
-        // If we have reached to quarter of the distance, skip to phase 3
-        // Or if we have to start decelerating now to reach the minimum delay
-        if (distanceTravelledSteps >= distance_to_travel_steps / 4.0 || delayIfDecelerate < min_delay) {
-          //std::cout << "!!!!!!!!!! Skipping phase 2 !!!!!!!!!!!" << std::endl;
-          skip_phase_2 = true;
-          phase = 3;
-        }
-
-      // Constant acceleration
-      } else if (phase == 2) {
-        debug_time_2 = timeSinceStart;
-        debug_steps_2 = distanceTravelledSteps;
-     
-        // If we don't decelerate now, will we go under the minimum delay?
-        double delayIfDecelerate = delay + delay_p * steps_to_accelerate - 0.5 * steps_to_accelerate * delay_pp * steps_to_accelerate;
-
-        if (delayIfDecelerate < min_delay) {
-          phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
-          phase = 3;
-        }
-
-        // Check if we reached phase 3
-        //if (delay < phase_3_delay) {
-        //  phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
-        //  phase = 3;
-        //}
-        
-      // Decreasing acceleration
-      } else if (phase == 3) {
-        debug_time_3 = timeSinceStart;
-        debug_steps_3 = distanceTravelledSteps;
-        
-        delay_p = delay_p - delay_pp;
-        
-        if (delay_p >= 0) {
-          //std::cout << "distance_to_travel_steps: " << distance_to_travel_steps<< endl;
-          //std::cout << "DistancedTravelledSteps: " << distanceTravelledSteps << endl;
-          phase_5_steps = distance_to_travel_steps - distanceTravelledSteps;
-          delay_p = 0;
-          phase = 4;
-        }
-
-      // Constant speed
-      } else if (phase == 4) {
-        debug_time_4 = timeSinceStart;
-        debug_steps_4 = distanceTravelledSteps;
-        
-        if (distanceTravelledSteps >= phase_5_steps) phase = 5;
-      
-      // Decreasing acceleration
-      } else if (phase == 5) {
-        debug_time_5 = timeSinceStart;
-        debug_steps_5 = distanceTravelledSteps;
-        
-        delay_p = delay_p - delay_pp;
-
-        if (delay_p >= -min_delay_p) {
-        //if (distanceTravelledSteps >= phase_6_steps) {
-          delay_p = -min_delay_p;
-          phase = skip_phase_2 ? 7 : 6;
-        }
-
-      // Constant acceleration
-      } else if (phase == 6) {
-        debug_time_6 = timeSinceStart;
-        debug_steps_6 = distanceTravelledSteps;
-        
-        if (distanceTravelledSteps >= phase_7_steps) phase = 7;
-
-      // Increasing acceleration
-      } else if (phase == 7) {
-        debug_time_7 = timeSinceStart;
-        debug_time_7 = timeSinceStart;
-        
-        delay_p = delay_p + delay_pp;
-      }
-      delay = delay + delay_p;
-      return delay;
-    }
 
     void setAcceleration(double accel) {
       m_acceleration = accel;
@@ -304,15 +107,15 @@ class StepperMotor : public Motor {
 
     double max_step_delay = MAX_STEP_DELAY;
 
-    void setDefaultMaxSpeed(double s) {
-      m_default_max_speed = s;
-      max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
-    }
+    //void setDefaultMaxSpeed(double s) {
+    //  m_default_max_speed = s;
+    //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
+    //}
 
-    void setStepsPerTurn(double ratio) {
-      m_steps_per_turn = ratio;
-      max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
-    }
+    //void setStepsPerTurn(double ratio) {
+    //  m_steps_per_turn = ratio;
+    //  max_step_delay = ((unsigned long)(US_PER_S / (m_default_max_speed / 5.0 * m_steps_per_turn))); // us
+    //}
 
     void setMaxSpeed(double s) {
       m_max_speed = s;
@@ -484,32 +287,6 @@ class StepperMotor : public Motor {
       return m_speed;
     }
 
-    //virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
-
-    //  double distanceDecelerating = 0.5 * m_speed * m_speed / m_acceleration; // tr
-    //  double position = getPosition();
-    //  double distanceToGo = abs(getDestination() - position);
-    //  double distanceToCollision = isForward ? getMaxPosition() - position : position - getMinPosition();
-
-    //  // decelerate
-    //  if (distanceDecelerating > distanceToGo || distanceDecelerating > distanceToCollision) {
-    //   
-    //    cout << "Decelerating!" << endl;
-    //    m_speed -= m_acceleration * (m_next_step_time / 1000000.0); // tr/s
-
-    //  // accelerate
-    //  } else if (m_speed < getMaxSpeed()) {
-
-    //    cout << "Accelerating!" << endl;
-    //    m_speed += m_acceleration * (m_next_step_time / 1000000.0); // tr/s
-    //  }
-    //  
-    //  unsigned long stepDelay = ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
-
-    //  return stepDelay > max_step_delay ? max_step_delay : stepDelay;
-    //}
-
-    //unsigned int microsteps = 16;
     
     unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
 
@@ -655,3 +432,240 @@ class MotorT : public StepperMotor {
 };
 
 #endif
+
+
+// Pour le mouvement: voir thirdparty/mathematics-of-motion-control-profiles-article
+// Plus tard déplacer en courbe S. Pour l'instant en courbe trapézoïdale.
+// Le vitesse initiale et finale (pas zéro pour un stepper motor) est
+// déterminé par la variable MAX_STEP_DELAY
+
+// La courbe n'est pas égal parce que d'un côté c'est par rapport à 10000, donc perdre 0.1 ce n'est pas
+// beaucoup, mais de l'autre côté c'est 500, donc perdre 0.1 c'est beaucoup
+// Je ne sais pas si c'est correct...
+
+// Alright, using delays was not the best idea, because it is inversely proportial to speed and not linear with it.
+// So I will be using percentages of speed then which are easy to translate in both units.
+// 500 delay is max speed => 100%,
+// 10000 delay is min speed => 5%,
+// what is 50%? It's 1000, it is min_delay / percent
+// What about using the step as a unit instead of time
+// Also not the best because a step is not proportial to the time
+
+
+//    long debug_time_1 = 0;
+//    long debug_time_2 = 0;
+//    long debug_time_3 = 0;
+//    long debug_time_4 = 0;
+//    long debug_time_5 = 0;
+//    long debug_time_6 = 0;
+//    long debug_time_7 = 0;
+//
+//    long debug_steps_1 = 0;
+//    long debug_steps_2 = 0;
+//    long debug_steps_3 = 0;
+//    long debug_steps_4 = 0;
+//    long debug_steps_5 = 0;
+//    long debug_steps_6 = 0;
+//    long debug_steps_7 = 0;
+
+//    // Get the next delay following an S-curve    
+//    int nextDelay(long distanceTravelledSteps, unsigned long timeSinceStart) {
+//
+//      // Increasing acceleration
+//      if (phase == 1) {
+//        debug_time_1 = timeSinceStart;
+//        debug_steps_1 = distanceTravelledSteps;
+//
+//        delay_p = delay_pp * distanceTravelledSteps;
+//        
+//        // Check if we reached phase 2
+//        if (delay_p <= min_delay_p) {
+//
+//          phase_7_steps = distance_to_travel_steps - distanceTravelledSteps;
+//          steps_to_accelerate = distanceTravelledSteps;
+//          delay_p = min_delay_p;
+//          skip_phase_2 = false;
+//          phase = 2;
+//        }
+//
+//        // If we don't decelerate now, will we go under the minimum delay?
+//        double delayIfDecelerate = delay + delay_p * distanceTravelledSteps - 0.5 * distanceTravelledSteps * delay_pp * distanceTravelledSteps;
+//
+//        // If we have reached to quarter of the distance, skip to phase 3
+//        // Or if we have to start decelerating now to reach the minimum delay
+//        if (distanceTravelledSteps >= distance_to_travel_steps / 4.0 || delayIfDecelerate < min_delay) {
+//          //std::cout << "!!!!!!!!!! Skipping phase 2 !!!!!!!!!!!" << std::endl;
+//          skip_phase_2 = true;
+//          phase = 3;
+//        }
+//
+//      // Constant acceleration
+//      } else if (phase == 2) {
+//        debug_time_2 = timeSinceStart;
+//        debug_steps_2 = distanceTravelledSteps;
+//     
+//        // If we don't decelerate now, will we go under the minimum delay?
+//        double delayIfDecelerate = delay + delay_p * steps_to_accelerate - 0.5 * steps_to_accelerate * delay_pp * steps_to_accelerate;
+//
+//        if (delayIfDecelerate < min_delay) {
+//          phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
+//          phase = 3;
+//        }
+//
+//        // Check if we reached phase 3
+//        //if (delay < phase_3_delay) {
+//        //  phase_6_steps = distance_to_travel_steps - distanceTravelledSteps;
+//        //  phase = 3;
+//        //}
+//        
+//      // Decreasing acceleration
+//      } else if (phase == 3) {
+//        debug_time_3 = timeSinceStart;
+//        debug_steps_3 = distanceTravelledSteps;
+//        
+//        delay_p = delay_p - delay_pp;
+//        
+//        if (delay_p >= 0) {
+//          //std::cout << "distance_to_travel_steps: " << distance_to_travel_steps<< endl;
+//          //std::cout << "DistancedTravelledSteps: " << distanceTravelledSteps << endl;
+//          phase_5_steps = distance_to_travel_steps - distanceTravelledSteps;
+//          delay_p = 0;
+//          phase = 4;
+//        }
+//
+//      // Constant speed
+//      } else if (phase == 4) {
+//        debug_time_4 = timeSinceStart;
+//        debug_steps_4 = distanceTravelledSteps;
+//        
+//        if (distanceTravelledSteps >= phase_5_steps) phase = 5;
+//      
+//      // Decreasing acceleration
+//      } else if (phase == 5) {
+//        debug_time_5 = timeSinceStart;
+//        debug_steps_5 = distanceTravelledSteps;
+//        
+//        delay_p = delay_p - delay_pp;
+//
+//        if (delay_p >= -min_delay_p) {
+//        //if (distanceTravelledSteps >= phase_6_steps) {
+//          delay_p = -min_delay_p;
+//          phase = skip_phase_2 ? 7 : 6;
+//        }
+//
+//      // Constant acceleration
+//      } else if (phase == 6) {
+//        debug_time_6 = timeSinceStart;
+//        debug_steps_6 = distanceTravelledSteps;
+//        
+//        if (distanceTravelledSteps >= phase_7_steps) phase = 7;
+//
+//      // Increasing acceleration
+//      } else if (phase == 7) {
+//        debug_time_7 = timeSinceStart;
+//        debug_time_7 = timeSinceStart;
+//        
+//        delay_p = delay_p + delay_pp;
+//      }
+//      delay = delay + delay_p;
+//      return delay;
+//    }
+//
+//
+//    void prepareMovement() {
+//      distance_to_travel_steps = (getDestination() - getPosition()) * stepsPerUnit;
+//      start_position_steps = m_position_steps;
+//      delay = max_delay;
+//      delay_p = 0;
+//      phase = 1;
+//    }
+//
+//    // delay is inversely proportional to the speed
+//    // speed = distance_per_step / delay_per_step
+//    // but I don't care about speed, only delay
+//
+//    // Source: https://www.pmdcorp.com/resources/type/articles/get/mathematics-of-motion-control-profiles-article
+//    // Archived here: thirdparty/mathematics-of-motion-control-profiles-article
+//    // For an S-curve, there are 7 phases.
+//    // 1. Increase of acceleration
+//    // 2. Max acceleration reached
+//    // 3. Decrease of acceleration
+//    // 4. Constant speed reached
+//    // 5. Decrease of acceleration
+//    // 6. Max negative acceleration reached
+//    // 7. Increase of acceleration back to zero
+//  
+//    int phase = 1; // what phase the motor is in
+//
+//    // It is called _p and _pp to mean first and second derivative respectively
+//    // But careful it is not derived by time, it is derived by step
+//    // These are constants that should be set for each motor
+//    double delay_pp = 1; // second derivative of delay by step (jerk-1)
+//    int min_delay = 500;
+//    int max_delay = 10000;
+//    double min_delay_p = -10;
+//   
+//    // These are variables
+//    double delay_p = 0; // first derivative of delay by step (acceleration-1)
+//    double delay = 0; // (speed-1)
+//
+//    double phase_3_delay = 0; // At what delay to stop phase 2 and start phase 3
+//    long phase_5_steps = 0; // At what distance travelled to stop phase 4 and start phase 5
+//    long phase_6_steps = 0; // At what distance travelled to stop phase 5 and start phase 6
+//    long phase_7_steps = 0; // At what distance travelled to stop phase 6 and start phase 7
+//    bool skip_phase_2;
+//    long steps_to_accelerate = 0;
+//
+//    int debug_delay = 0;
+//
+//
+//          // To know when phase 2 should stop, let's go the other way
+//          // Let's say we are going at maximum speed, so delay = min_delay
+//          // We want to know at what speed should we start to decrease acceleration, in
+//          // order to not go over the maximum speed.
+//
+//          // We know from phase 1 that it takes N steps to increase acceleration.
+//          // The same values are used for phase 3 so it takes N steps to do phase 3.
+//          
+//          // d_p = d_p0 + d_pp * s
+//          // d = d0 + d_p0 * s + 0.5 * d_pp * s^2
+//    
+//          // d = what we are looking for
+//          // d0 = min_delay
+//          // d_p0 = 0, the goal is to reach no acceleration at the end of phase 3
+//          // d_pp = delay_pp
+//          // s = phase1Steps
+//            
+//          //phase_3_delay = min_delay + 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps;
+//          //phase_3_delay = min_delay - 0.5 * delay_pp * distanceTravelledSteps * distanceTravelledSteps; // Why minus?
+//          
+//          
+//    
+//
+//
+    //virtual unsigned long calculateNextStepDelay(unsigned long timeSinceStart) {
+
+    //  double distanceDecelerating = 0.5 * m_speed * m_speed / m_acceleration; // tr
+    //  double position = getPosition();
+    //  double distanceToGo = abs(getDestination() - position);
+    //  double distanceToCollision = isForward ? getMaxPosition() - position : position - getMinPosition();
+
+    //  // decelerate
+    //  if (distanceDecelerating > distanceToGo || distanceDecelerating > distanceToCollision) {
+    //   
+    //    cout << "Decelerating!" << endl;
+    //    m_speed -= m_acceleration * (m_next_step_time / 1000000.0); // tr/s
+
+    //  // accelerate
+    //  } else if (m_speed < getMaxSpeed()) {
+
+    //    cout << "Accelerating!" << endl;
+    //    m_speed += m_acceleration * (m_next_step_time / 1000000.0); // tr/s
+    //  }
+    //  
+    //  unsigned long stepDelay = ((unsigned long)(1000000.0 / (m_speed * m_steps_per_turn))); // us
+
+    //  return stepDelay > max_step_delay ? max_step_delay : stepDelay;
+    //}
+
+    //unsigned int microsteps = 16;

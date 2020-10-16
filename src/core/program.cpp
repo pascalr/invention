@@ -50,7 +50,7 @@ void setupAxes(Program& p) {
 
   //p.axisT.microsteps = 16;
   p.axisT.setStepsPerUnit(200 * 2 * 16 / (360*12/61));
-  p.axisT.setStepsPerTurn(200 * 2 * 16);
+  //p.axisT.setStepsPerTurn(200 * 2 * 16);
   //p.axisT.limitSwitchPin = 12;
   p.axisT.setupPins(8,2,3);
   p.axisT.setReverseMotorDirection(true);
@@ -62,7 +62,7 @@ void setupAxes(Program& p) {
 
   //p.axisH.microsteps = 8;
   p.axisH.setStepsPerUnit(200 * 2 * 8 / (12.2244*3.1416)); // Diameter from openscad pulley file
-  p.axisH.setStepsPerTurn(200 * 2 * 8);
+  //p.axisH.setStepsPerTurn(200 * 2 * 8);
   //p.axisH.limitSwitchPin = 12;
   p.axisH.setupPins(8,10,11);
   p.axisH.setDefaultMaxSpeed(4);
@@ -76,7 +76,7 @@ void setupAxes(Program& p) {
 
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
   p.axisV.setStepsPerUnit(200 * 2 * 32 / unitPerTurnY);
-  p.axisV.setStepsPerTurn(200 * 2 * 32);
+  //p.axisV.setStepsPerTurn(200 * 2 * 32);
   //p.axisV.limitSwitchPin = 12;
   p.axisV.setupPins(8,7,6);
   p.axisV.setReverseMotorDirection(true);

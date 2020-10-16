@@ -13,7 +13,7 @@ void testAcceleration() {
   unsigned long moveTimeUs = 20 * 1000 * 1000; // 10 seconds
   //double destination = 42.0;
   double destination = 142.0;
-  double maxSpeed = 1.5;
+  //double maxSpeed = 1.5;
   double acceleration = 1.5;
   
   //p.axisV.limitSwitchPin = 12;
@@ -23,7 +23,7 @@ void testAcceleration() {
   
   double unitPerTurnY = (2.625*25.4*3.1416 * 13/51);
   axis.setStepsPerUnit(200 * 2 * 16 / unitPerTurnY);
-  axis.setStepsPerTurn(200 * 2 * 16);
+  //axis.setStepsPerTurn(200 * 2 * 16);
 
   //axis.delay_pp = -0.1;
   //axis.delay_pp = -0.03;
@@ -34,7 +34,7 @@ void testAcceleration() {
 
   axis.setupPins(8,10,11);
   axis.setReverseMotorDirection(true);
-  axis.setDefaultMaxSpeed(maxSpeed);
+  //axis.setDefaultMaxSpeed(maxSpeed);
   axis.setAcceleration(acceleration);
 
   axis.referenceReached();

@@ -11,7 +11,7 @@ class Encoder {
 
       if (timeDifference(m_last_rpm_time, currentTime) > 100000) { // Calculate RPM every 100ms.
         // There are 8 steps per turn FIXME: Pass this as an argument to the class.
-	m_is_rpm_calculated = true;
+	      m_is_rpm_calculated = true;
         m_rpm = m_rpm_count / 8.0 * 60;
         m_last_rpm_time = currentTime;
         m_rpm_count = 0;
