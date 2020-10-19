@@ -34,15 +34,15 @@ double parseFloat(std::string& str) {
 }
 
 template<typename T>
-T parseDb(Heda& heda, std::string& str, std::string columnName) {
+T parseDb(Database& db, std::string& str, std::string columnName) {
   
   ltrim(str);
 
-  int maxLength = std::max(str.length(), heda.db.getMaxLength<T>(columnName));
+  int maxLength = std::max(str.length(), db.getMaxLength<T>(columnName));
 
   for (int i = maxLength; i > 0; i--) {
     std::string sub = str.substr(0,i-1);
-    T item = heda.db.findBy<T>(columnName, sub, "COLLATE NOCASE");
+    T item = db.findBy<T>(columnName, sub, "COLLATE NOCASE");
     if (item.exists()) {
       str = str.substr(sub.length());
       return item;
@@ -57,9 +57,9 @@ T parseDb(Heda& heda, std::string& str, std::string columnName) {
 //from table t
 //order by len(CR) desc
 
-void ajouter(Heda& heda, Recipe& recipe, double quantity, Unit& unit, Ingredient& ingredient) {
+void ajouter(Database& db, Recipe& recipe, double quantity, Unit& unit, Ingredient& ingredient) {
 
-  //Unit toUnit = heda.db.findBy<Unit>("name", ingredient.unit_name, "COLLATE NOCASE");
+  //Unit toUnit = db.findBy<Unit>("name", ingredient.unit_name, "COLLATE NOCASE");
   //if (toUnit.exists()) {
   //  // convert? I don't remember the purpose of toUnit
   //qty.value = convert(s, unit, toUnit, ingredient.density);
@@ -71,15 +71,15 @@ void ajouter(Heda& heda, Recipe& recipe, double quantity, Unit& unit, Ingredient
   qty.ingredient_id = ingredient.id;
   qty.value = quantity;
   qty.unit_id = unit.id;
-  heda.db.insert(qty);
+  db.insert(qty);
 }
 
 // The instructions are all transformed to lower case
-void parseRecipe(Heda& heda, Recipe& recipe) {
+void parseRecipe(Database& db, Recipe& recipe) {
 
   auto h1 = Header1("PARSE RECIPE");
 
-  heda.db.deleteFrom<IngredientQuantity>("WHERE recette_id = " + std::to_string(recipe.id));
+  db.deleteFrom<IngredientQuantity>("WHERE recette_id = " + std::to_string(recipe.id));
 
   std::string str = recipe.instructions;
   transform(str.begin(), str.end(), str.begin(), ::tolower); 
@@ -94,10 +94,10 @@ void parseRecipe(Heda& heda, Recipe& recipe) {
     if (instruction == "ajouter") {
 
       double qty = parseFloat(sentence);
-      Unit unit = parseDb<Unit>(heda, sentence, "name");
-      Ingredient ingredient = parseDb<Ingredient>(heda, sentence, "name");
+      Unit unit = parseDb<Unit>(db, sentence, "name");
+      Ingredient ingredient = parseDb<Ingredient>(db, sentence, "name");
 
-      ajouter(heda, recipe, qty, unit, ingredient);
+      ajouter(db, recipe, qty, unit, ingredient);
 
     } else {
       ensure(false, "L'instruction \"" + instruction + "\" n'est pas valide.");

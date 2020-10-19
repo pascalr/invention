@@ -85,12 +85,12 @@ void actionRaw(Heda& heda) {
 
 void openGrip(Heda& heda, double opening) {
 
-  auto h5 = Header5("OPEN GRIP(" + to_string(jar.id) + ")"); 
+  auto h5 = Header5("OPEN GRIP(" + to_string(opening) + ")"); 
 
   double mvt = heda.config.space_between_jaws - opening;
-  ensure(mvt > 0, "Il est impossible de fermer la prise si petit. Ouverture = " + to_string(widthOpening));
+  ensure(mvt > 0, "Il est impossible de fermer la prise si petit. Ouverture = " + to_string(opening));
 
-  writeSlave(heda, "mr"+to_string(widthOpening));
+  writeSlave(heda, "mr"+to_string(opening));
 
   heda.is_gripping = false;
 }
@@ -674,7 +674,7 @@ class HedaController {
         string name = tokens.popNoun();
         Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
         ensure(recipe.exists(), "parserecipe command must have a valid recipe name");
-        parseRecipe(heda, recipe);
+        parseRecipe(heda.db, recipe);
       };
       
       m_commands["detect"] = [&](ParseResult tokens) {
