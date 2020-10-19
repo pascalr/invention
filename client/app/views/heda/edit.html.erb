@@ -94,6 +94,12 @@
       <td></td>
     </tr>
     <tr>
+      <td><%= form.label :max_r %></td>
+      <td><%= form.number_field :max_r , step: 0.01 %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
       <td colspan="4"><h3>Référencement</h3></td>
     </tr>
     <tr>
@@ -173,6 +179,18 @@
       <td><%= form.number_field :grip_offset %></td>
       <td></td>
       <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :space_between_jaws %></td>
+      <td><%= form.number_field :space_between_jaws %></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= form.label :grip_gap %></td>
+      <td><%= form.number_field :grip_gap %></td>
+      <td></td>
+      <td>L'espace de libre de chaque côté du pot lorsqu'on le libère ou qu'on le prend.</td>
     </tr>
   </table> 
 

@@ -83,23 +83,35 @@ void actionRaw(Heda& heda) {
   }
 }
 
-void openGrip(Heda& heda, double widthOpening) {
+void openGrip(Heda& heda, double opening) {
 
-  auto h5 = Header5("OPEN GRIP(" + to_string(widthOpening) + ")"); 
+  auto h5 = Header5("OPEN GRIP(" + to_string(jar.id) + ")"); 
 
-  writeSlave(heda, "o");
+  double mvt = heda.config.space_between_jaws - opening;
+  ensure(mvt > 0, "Il est impossible de fermer la prise si petit. Ouverture = " + to_string(widthOpening));
 
-  heda.is_gripping = false;
-}
-
-void openGrip(Heda& heda) {
-
-  auto h5 = Header5("OPEN GRIP"); 
-
-  writeSlave(heda, "r");
+  writeSlave(heda, "mr"+to_string(widthOpening));
 
   heda.is_gripping = false;
 }
+
+void openGrip(Heda& heda, Jar jar) {
+
+  // OPTIMIZE: Keep the jar format in memory for the jar instead of doing this every time.
+  JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
+  ensure(format.exists(), "Putdown needs a valid jar format. The jar did not have one.");
+
+  openGrip(heda, max(format.diameter, format.lid_diameter) + heda.config.grip_gap*2.0);
+}
+
+//void openGrip(Heda& heda) {
+//
+//  auto h5 = Header5("OPEN GRIP"); 
+//
+//  writeSlave(heda, "r");
+//
+//  heda.is_gripping = false;
+//}
 
 void reference(Heda& heda, Axis& axis) {
 
@@ -527,9 +539,9 @@ void putdown(Heda& heda, Jar& jar) {
   auto h4 = Header4("PUTDOWN");
 
   ensure(heda.is_gripping, "Heda is not gripping so it can't putdown.");
-
+ 
   lowerForGrip(heda, jar);
-  openGrip(heda);
+  openGrip(heda, jar);
 }
 
 void storeDetected(Heda& heda, DetectedHRCode& detected) {
@@ -558,6 +570,7 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
   hover(heda, detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius);
+  openGrip(heda, heda.config.max_r);
   lowerForGrip(heda, freshJar); 
   grip(heda, freshJar);
   gotoPolar(heda, heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius));
@@ -650,10 +663,14 @@ class HedaController {
         move(heda, heda.axisT, CHANGE_LEVEL_ANGLE_HIGH);
         reference(heda, heda.axisV);
         gohome(heda);
-        openGrip(heda);
+        //openGrip(heda);
       };
       
-      m_commands["parserecipe"] = [&](ParseResult tokens) { // Calculate for a recipee
+      //m_commands["process"] = [&](ParseResult tokens) { // Calculate for a recipee by id
+      //  unsigned long id = tokens.popPositiveInteger();
+      //  Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
+      //}
+      m_commands["parserecipe"] = [&](ParseResult tokens) { // Calculate for a recipee by name
         string name = tokens.popNoun();
         Recipe recipe = heda.db.findBy<Recipe>("name", name, "COLLATE NOCASE");
         ensure(recipe.exists(), "parserecipe command must have a valid recipe name");

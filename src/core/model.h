@@ -85,6 +85,9 @@ class HedaConfig : public Model {
     double camera_height;
     double camera_width;
     double camera_calibration_height;
+    double space_between_jaws;
+    double grip_gap;
+    double max_r;
 
     double minX() {
       return 0.0;
@@ -299,6 +302,9 @@ void bindQuery(T& query, const HedaConfig& item) {
   query.bind(22, item.camera_width);
   query.bind(23, item.camera_height);
   query.bind(24, item.camera_calibration_height);
+  query.bind(25, item.space_between_jaws);
+  query.bind(26, item.grip_gap);
+  query.bind(27, item.max_r);
 }
 template<typename T>
 void bindQuery(T& query, const Location& item) {

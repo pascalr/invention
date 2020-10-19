@@ -119,7 +119,7 @@ class HedaController < ApplicationController
   end
 
   def heda_params
-    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point, :detect_height, :home_position_x, :home_position_y, :home_position_t, :grip_offset, :max_h, :max_v, :max_t, :closeup_distance, :max_x, :max_y, :max_z, :camera_width, :camera_height, :camera_calibration_height)
+    params.require(:heda).permit(:user_coord_offset_x, :user_coord_offset_y, :user_coord_offset_z, :shelf_id, :camera_radius, :gripper_radius, :camera_focal_point, :detect_height, :home_position_x, :home_position_y, :home_position_t, :grip_offset, :max_h, :max_v, :max_t, :closeup_distance, :max_x, :max_y, :max_z, :camera_width, :camera_height, :camera_calibration_height, :space_between_jaws, :grip_gap, :max_r)
   end
 
 end
