@@ -2,7 +2,7 @@
 #define _RECIPE_PARSER_H
 
 #include "model.h"
-#include "heda.h"
+#include "database.h"
 #include "log.h"
 
 // Returns the substring until the next space. Updates the str parse what has been extracted.
@@ -79,7 +79,7 @@ void parseRecipe(Database& db, Recipe& recipe) {
 
   auto h1 = Header1("PARSE RECIPE");
 
-  db.deleteFrom<IngredientQuantity>("WHERE recette_id = " + std::to_string(recipe.id));
+  db.deleteFrom<IngredientQuantity>("WHERE recipe_id = " + std::to_string(recipe.id));
 
   std::string str = recipe.instructions;
   transform(str.begin(), str.end(), str.begin(), ::tolower); 

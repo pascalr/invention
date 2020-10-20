@@ -618,7 +618,7 @@ void bring(Heda& heda, Ingredient& ingredient) {
 
 void fetch(Heda& heda, Recipe& recipe) {
 
-  for (IngredientQuantity ingQty : heda.db.all<IngredientQuantity>("WHERE recette_id = " + to_string(recipe.id))) {
+  for (IngredientQuantity ingQty : heda.db.all<IngredientQuantity>("WHERE recipe_id = " + to_string(recipe.id))) {
 
     Ingredient ingredient = heda.db.find<Ingredient>(ingQty.ingredient_id);
     ensure(ingredient.exists(), "Could not find the ingredient of the ingredient quantity id = " + ingQty.id);
