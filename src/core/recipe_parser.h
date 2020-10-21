@@ -49,9 +49,17 @@ T parseDb(Database& db, std::string& str, std::string columnName) {
     }
   }
 
-  ensure(false, "Was unable to parse a unit with sentence = " + str);
-  T unreachable; return unreachable; // Damn complaining compiler
+  T dontExist; return dontExist;
 }
+
+template<typename T>
+T mustParseDb(Database& db, std::string& str, std::string columnName) {
+
+  T result = parseDb<T>(db, str, columnName);  
+  ensure(result.exists(), "Was unable to parse a unit with sentence = " + str);
+  return result;
+}
+
 
 //select top 1 CR
 //from table t
@@ -95,7 +103,7 @@ void parseRecipe(Database& db, Recipe& recipe) {
 
       double qty = parseFloat(sentence);
       Unit unit = parseDb<Unit>(db, sentence, "name");
-      Ingredient ingredient = parseDb<Ingredient>(db, sentence, "name");
+      Ingredient ingredient = mustParseDb<Ingredient>(db, sentence, "name");
 
       ajouter(db, recipe, qty, unit, ingredient);
 
