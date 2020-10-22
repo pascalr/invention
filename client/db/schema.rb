@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_16_205642) do
+ActiveRecord::Schema.define(version: 2020_10_22_130536) do
 
   create_table "aliments", force: :cascade do |t|
     t.string "name"
@@ -143,6 +143,7 @@ ActiveRecord::Schema.define(version: 2020_10_16_205642) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "location_id"
     t.integer "jar_id"
+    t.index ["jar_id"], name: "index_jars_on_jar_id", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
