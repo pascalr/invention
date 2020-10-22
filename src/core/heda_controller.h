@@ -87,10 +87,10 @@ void openGrip(Heda& heda, double opening) {
 
   auto h5 = Header5("OPEN GRIP(" + to_string(opening) + ")"); 
 
-  double mvt = opening - heda.config.space_between_jaws;
+  double mvt = min(opening - heda.config.space_between_jaws, heda.config.max_r);
   ensure(mvt > 0, "Il est impossible de fermer la prise si petit. Ouverture = " + to_string(opening) + ". Minimum = " + to_string(heda.config.space_between_jaws));
 
-  writeSlave(heda, "mr"+to_string(opening));
+  writeSlave(heda, "mr"+to_string(mvt));
 
   heda.is_gripping = false;
 }
