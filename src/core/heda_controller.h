@@ -143,7 +143,7 @@ void grab(Heda& heda, double force) {
 
 void move(Heda& heda, Axis& axis, double destination) {
 
-  std::string cmd = "m" + string(1, axis.id) + to_string(destination);
+  std::string cmd = "d" + string(1, axis.id) + to_string(destination);
   auto h5 = Header5("MOVE("+cmd+")"); 
 
   writeSlave(heda, cmd);
@@ -570,7 +570,7 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
   hover(heda, detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius);
-  openGrip(heda, heda.config.max_r);
+  openGrip(heda, heda.config.max_r+heda.config.space_between_jaws);
   lowerForGrip(heda, freshJar); 
   grip(heda, freshJar);
   gotoPolar(heda, heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius));
