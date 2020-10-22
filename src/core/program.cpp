@@ -78,7 +78,7 @@ void setupAxes(Program& p) {
   p.axisV.setReverseMotorDirection(true);
   p.axisV.referencer = LimitSwitchReferencer(12);
   p.axisV.percent_p = 0.3;
-  p.axisV.min_delay = 100;
+  p.axisV.min_delay = 40;
   p.axisV.max_delay = 1000;
   p.axisV.reference_speed_rpm = 30;
 

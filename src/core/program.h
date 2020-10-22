@@ -46,6 +46,7 @@ class Program {
      
     // These axes actually moves the motors. 
     Motor* motors[NUMBER_OF_MOTORS+1] = {&axisH, &axisV, &axisT, &axisR, 0}; // FIXME: CAREFULL WITH SIZE!!!
+    StepperMotor* steppers[4] = {&axisH, &axisV, &axisT}; // FIXME: CAREFULL WITH SIZE!!!
 
     bool isWorking = false;
     

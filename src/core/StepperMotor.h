@@ -194,13 +194,8 @@ class StepperMotor : public Motor {
       m_position_steps = m_position_steps + (isForward ? 1 : -1);
     }
 
-    // deprecated... use the other turnOneStep
     void turnOneStep(unsigned long timeSinceStart) {
-      digitalWrite(m_step_pin, m_is_step_high ? LOW : HIGH);
-      m_is_step_high = !m_is_step_high;
-      m_position_steps = m_position_steps + (isForward ? 1 : -1);
-
-      // TODO: Put this logic out of turnOneStep...
+      turnOneStep();
       lost_time = timeSinceStart - next_step_time;
       next_step_delay = nextDelayPercent(abs(m_position_steps - start_position_steps), timeSinceStart, lost_time);
       //next_step_delay = nextDelay(m_position_steps - start_position_steps);
