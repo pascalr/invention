@@ -105,7 +105,7 @@ class Motor {
     virtual double getPosition() = 0;
 
     virtual bool handleAxis(unsigned long currentTime) = 0;
-
+    
   protected:
     Writer& m_writer;
     char m_name;

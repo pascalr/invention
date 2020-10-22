@@ -43,14 +43,16 @@ bool askedToStop(Program& p) {
   if (p.getReader().inputAvailable()) {
     int incomingByte = p.getReader().getByte();
     if (incomingByte < 0) {
-      return;
+      return false;
     }
     char cmd = (char) incomingByte;
 
     // stop
     if (cmd == 's' || cmd == 'S') {
-      p.stopMoving();
+      return true;
+    }
   }
+  return false;
 }
 
 // TODO: Do referencing the same way as this. Much simpler.
@@ -66,7 +68,7 @@ void moveStepper(Program& p, StepperMotor* motor, double destination) {
 
   unsigned long startTime = p.getCurrentTime();
   unsigned long timeSinceStart = 0;
-  motor->setDestination(destination);
+  motor->getto(destination);
 
   while (!motor->isDestinationReached()) {
 
