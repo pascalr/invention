@@ -518,7 +518,7 @@ void lowerForGrip(Heda& heda, Jar& jar) {
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
   ensure(format.exists(), "Lower for grip needs a valid jar format. The jar did not have one.");
  
-  double v = heda.unitV(shelf.height + format.height + heda.config.grip_offset);
+  double v = heda.unitV(shelf.height + format.height - heda.config.grip_offset);
   move(heda, heda.axisV, v);
 }
 
