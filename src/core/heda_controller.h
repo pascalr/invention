@@ -87,10 +87,10 @@ void openGrip(Heda& heda, double opening) {
 
   auto h5 = Header5("OPEN GRIP(" + to_string(opening) + ")"); 
 
-  double mvt = heda.config.space_between_jaws - opening;
-  ensure(mvt > 0, "Il est impossible de fermer la prise si petit. Ouverture = " + to_string(opening));
+  double mvt = min(opening - heda.config.space_between_jaws, heda.config.max_r);
+  ensure(mvt > 0, "Il est impossible de fermer la prise si petit. Ouverture = " + to_string(opening) + ". Minimum = " + to_string(heda.config.space_between_jaws));
 
-  writeSlave(heda, "mr"+to_string(opening));
+  writeSlave(heda, "mr"+to_string(mvt));
 
   heda.is_gripping = false;
 }
@@ -368,7 +368,7 @@ double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c
 // Inefficient algorithm when n is large, but in my case n is small. O(n^2) I believe.
 void removeNearDuplicates(Heda& heda) {
 
-  double epsilon = pow(HRCODE_OUTER_DIA * 1.5, 2);
+  double epsilon = pow(HRCODE_OUTER_DIA * 2, 2); // FIXME: Be better than this, handle the jars closer together
   //removeNearDuplicates(heda.codes, detectedDistanceSquared, epsilon);
   vector<DetectedHRCode> codes = heda.db.all<DetectedHRCode>();
   vector<int> ids;
@@ -518,7 +518,7 @@ void lowerForGrip(Heda& heda, Jar& jar) {
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
   ensure(format.exists(), "Lower for grip needs a valid jar format. The jar did not have one.");
  
-  double v = heda.unitV(shelf.height + format.height + heda.config.grip_offset);
+  double v = heda.unitV(shelf.height + format.height - heda.config.grip_offset);
   move(heda, heda.axisV, v);
 }
 
@@ -685,6 +685,10 @@ class HedaController {
         waitActionDone(heda);
 
       };
+      m_commands["open"] = [&](ParseResult tokens) {
+        double opening = tokens.popScalaire();
+        openGrip(heda, opening);
+      };
       m_commands["raw"] = [&](ParseResult tokens) {actionRaw(heda);};
       m_commands["sweep"] = [&](ParseResult tokens) {sweep(heda);gohome(heda);};
       m_commands["gohome"] = [&](ParseResult tokens) {gohome(heda);};
@@ -744,6 +748,9 @@ class HedaController {
         
         gohome(heda);
       }; 
+      m_commands["nodup"] = [&](ParseResult tokens) {
+        removeNearDuplicates(heda);
+      };
 
       m_commands["test"] = [&](ParseResult tokens) {
         auto h1 = Header1("TEST");
@@ -772,9 +779,6 @@ class HedaController {
       ////  Jar jar;
       ////  heda.pushCommand(make_shared<CloseupCommand>(code, jar));
       ////};
-      //m_commands["nodup"] = [&](ParseResult tokens) {
-      //  removeNearDuplicates(heda);
-      //};
       //
       //// hover command => Move on top of the thing in x and z, at the moving height of the shelf.
       //m_commands["hover"] = [&](ParseResult tokens) {

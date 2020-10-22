@@ -26,7 +26,63 @@ Motor* parseInputMotorAxis(Program& p, char** input, Motor* &axis) {
   return 0;
 }
 
+StepperMotor* parseStepper(Program& p, char** input) {
+  char name = **input;
+
+  for (int i = 0; p.steppers[i] != 0; i++) {
+    if (toupper(name) == p.steppers[i]->getName()) {
+      (*input)++;
+      return p.motors[i];
+    }
+  }
+
+  return 0;
+}
+
+bool askedToStop(Program& p) {
+  if (p.getReader().inputAvailable()) {
+    int incomingByte = p.getReader().getByte();
+    if (incomingByte < 0) {
+      return;
+    }
+    char cmd = (char) incomingByte;
+
+    // stop
+    if (cmd == 's' || cmd == 'S') {
+      p.stopMoving();
+  }
+}
+
+// TODO: Do referencing the same way as this. Much simpler.
+//
+// Faster way to move a stepper motor allowing for higher micro-stepping
+// Only checks if there is input available after each step
+// OPTIMIZE: I can do even better than this by not using micros() which only
+// has an accuracy of 8 microseconds
+// OPTIMIZE: Use interrupts instead of askedToStop I believe
+void moveStepper(Program& p, StepperMotor* motor, double destination) {
+
+  if (!motor) return;
+
+  unsigned long startTime = p.getCurrentTime();
+  unsigned long timeSinceStart = 0;
+  motor->setDestination(destination);
+
+  while (!motor->isDestinationReached()) {
+
+    if (askedToStop(p)) {
+      motor->stop();
+      break;
+    }
+    motor->turnOneStep(timeSinceStart);
+    delayMicroseconds(motor->next_step_delay);
+    timeSinceStart = timeDifference(startTime, p.getCurrentTime());
+  }
+}
+
 int parseActionCommand(char cmd, Program& p) {
+
+  p.getWriter() << "Cmd: " << cmd << "\n";
 
   Motor* motorAxis;
   double number;
@@ -45,6 +101,12 @@ int parseActionCommand(char cmd, Program& p) {
     if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
     if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
     if ((status = motorAxis->getto(number)) < 0) {return status;}
+  
+  } else if (cmd == 'd' || cmd == 'D') { // move only one stepper (faster because not checking all axes)
+    StepperMotor* stepper;
+    if (!(stepper = parseStepper(p, &input))) {return ERROR_EXPECTED_AXIS;}
+    if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+    moveStepper(p, stepper, number);
 
   // Home (referencing) (currently only supports referencing all (not HX or HY)
   } else if (cmd == 'H' || cmd == 'h') {
@@ -83,8 +145,6 @@ int parseActionCommand(char cmd, Program& p) {
     if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
     motorAxis->rotate(REVERSE);
   }
-
-  p.getWriter() << "Cmd: " << cmd << "\n";
 
   return 0;
 }
