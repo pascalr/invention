@@ -21,6 +21,12 @@ class LocationsController < ApplicationController
   def edit
   end
 
+  # DELETE
+  def delete_all
+    Location.delete_all
+    redirect_to locations_path
+  end
+
   # GET /location/clear # FIXME: Should be delete
   def clear
     location = Location.find(params[:id])

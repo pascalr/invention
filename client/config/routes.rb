@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :nutrients
   resources :fdcs
   resources :locations
+  delete 'location/delete_all', to: 'locations#delete_all', as: 'delete_all_location'
   get 'location/clear/:id', to: 'locations#clear'
   resources :jars
   resources :recettes
