@@ -56,7 +56,7 @@ template<typename T>
 T mustParseDb(Database& db, std::string& str, std::string columnName) {
 
   T result = parseDb<T>(db, str, columnName);  
-  ensure(result.exists(), "Was unable to parse a unit with sentence = " + str);
+  ensure(result.exists(), "Was unable to parse a "+getTableName<T>()+" with sentence = " + str);
   return result;
 }
 
