@@ -582,7 +582,7 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   UserCoord c(detected.lid_coord.x, heda.getToolPosition().y, detected.lid_coord.z);
   gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
 
-  openGrip(heda, heda.config.max_r+heda.config.space_between_jaws);
+  openGrip(heda, jar);
   lowerForGrip(heda, jar); 
   grip(heda, jar);
 
@@ -616,6 +616,7 @@ void bring(Heda& heda, Ingredient& ingredient) {
   ensure(destShelf.exists(), "Could not find the shelf of the location id = " + to_string(dest.id));
 
   gotoPolar(heda, heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius));
+  openGrip(heda, heda.config.max_r+heda.config.space_between_jaws);
   lowerForGrip(heda,jar);
   grip(heda,jar);
 
@@ -752,10 +753,12 @@ class HedaController {
 
       m_commands["fetch"] = [&](ParseResult tokens) { // Fetch a recipe
 
-        string recipeName = tokens.popNoun();
+        //string recipeName = tokens.popNoun();
+        //Recipe recipe = heda.db.findBy<Recipe>("name", recipeName, "COLLATE NOCASE");
 
-        Recipe recipe = heda.db.findBy<Recipe>("name", recipeName, "COLLATE NOCASE");
-        ensure(recipe.exists(), "Could not find an ingredient with the name " + recipeName);
+        int id = tokens.popPositiveInteger();
+        Recipe recipe = heda.db.find<Recipe>(id);
+        ensure(recipe.exists(), "Could not find the recipe with id = " + id);
 
         fetch(heda, recipe);
         
