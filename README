@@ -1,3 +1,6 @@
+Calibrer avec une étiquette directement sur la tablette. Ou peu importe avec un pot normal,
+et je connais le format du pot avec l'id...
+
 Back Powering the Pi via the GPIO Header
 
 It is possible to power the Pi by supplying 5V through the GPIO header pins 2,4 and GND. The acceptable input voltage range is 5V ±5%.
