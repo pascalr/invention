@@ -566,8 +566,10 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   ensure(jar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
 
   Location loc = heda.db.findBy<Location>("jar_id", jar.jar_id);
-  if (!loc.exists()) {
-    Shelf shelf;
+  Shelf shelf;
+  if (loc.exists()) {
+    shelf = heda.db.find<Shelf>(loc.shelf_id);
+  } else {
     order(heda.storage_shelves, byHeight, false);
     for (Shelf& s : heda.storage_shelves) {
       shelf = s;
