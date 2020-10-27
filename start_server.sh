@@ -1,5 +1,5 @@
 #!/bin/bash
-make server && bin/server
+make server && gdb bin/server -ex run
 #cmake .
 #make server
 #./update_arduino.sh
