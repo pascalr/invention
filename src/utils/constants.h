@@ -8,7 +8,7 @@
 #define REFERENCE_POSITION_T 90.0 // degrees
 #define REFERENCE_POSITION_R 0.0
 
-#define DETECTED_CODES_BASE_PATH "client/storage/detected_codes/"
+#define DETECTED_CODES_BASE_PATH "../heda-recipes/storage/detected_codes/"
 
 #ifndef PI
 #define PI 3.1415926535897932384626433832795
@@ -77,9 +77,9 @@
 #define ERROR_OUT_OF_BOUNDS_MAX_X -6
 #define ERROR_AXIS_NOT_REFERENCED -7
 
-#define DB_TEST "client/db/development.sqlite3"
-#define DB_DEV "client/db/development.sqlite3"
-#define DB_PROD "client/db/development.sqlite3"
+#define DB_TEST "../heda-recipes/db/development.sqlite3"
+#define DB_DEV "../heda-recipes/db/development.sqlite3"
+#define DB_PROD "../heda-recipes/db/development.sqlite3"
 
 #define PIN_THETA_POT 4
 #define POT_180_VAL 715.0

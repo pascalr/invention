@@ -45,6 +45,9 @@ void waitActionDone(Heda& heda) {
 }
 
 void actionIdentify(Heda& heda, DetectedHRCode& code) {
+
+  auto h5 = Header5("ACTION IDENTIFY"); 
+
   heda.waiting_message = "Un nouveau pot a été détecté. Pouvez-vous svp déterminer ses caractéristiques?";
   heda.action_required = "identify " + to_string(code.id);
   waitActionDone(heda);
@@ -69,6 +72,9 @@ void writeSlave(Heda& heda, std::string cmd) {
 }
 
 void actionRaw(Heda& heda) {
+
+  auto h5 = Header5("ACTION RAW"); 
+
   heda.waiting_message = "Vous pouvez maintenat écrire des commandes à l'esclave.";
   heda.action_required = "raw";
   while (true) {
@@ -556,25 +562,30 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   ensure(updated.exists(), "Error the previously existing detected hr code was not found anymore. Aborting stored...");
   int jarId = atoi(updated.jar_id.c_str());
 
-  Jar freshJar = heda.db.findBy<Jar>("jar_id", jarId); 
-  ensure(freshJar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
+  Jar jar = heda.db.findBy<Jar>("jar_id", jarId); 
+  ensure(jar.exists(), "A jar should already exists or should have been created by the user in the cloesup. Aborting stored...");
 
-  Location loc;
-  Shelf shelf;
-  order(heda.storage_shelves, byHeight, false);
-  for (Shelf& s : heda.storage_shelves) {
-    shelf = s;
-    loc = getNewLocation(heda, freshJar, shelf); 
-    if (loc.exists()) break;
+  Location loc = heda.db.findBy<Location>("jar_id", jar.jar_id);
+  if (!loc.exists()) {
+    Shelf shelf;
+    order(heda.storage_shelves, byHeight, false);
+    for (Shelf& s : heda.storage_shelves) {
+      shelf = s;
+      loc = getNewLocation(heda, jar, shelf); 
+      if (loc.exists()) break;
+    }
+    ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
   }
-  ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
 
-  hover(heda, detected.lid_coord.x, detected.lid_coord.z, heda.config.gripper_radius);
+  UserCoord c(detected.lid_coord.x, heda.getToolPosition().y, detected.lid_coord.z);
+  gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
+
   openGrip(heda, heda.config.max_r+heda.config.space_between_jaws);
-  lowerForGrip(heda, freshJar); 
-  grip(heda, freshJar);
+  lowerForGrip(heda, jar); 
+  grip(heda, jar);
+
   gotoPolar(heda, heda.toPolarCoord(UserCoord(loc.x,shelf.moving_height,loc.z), heda.config.gripper_radius));
-  putdown(heda, freshJar);
+  putdown(heda, jar);
 
   loc.occupied = true;
   heda.db.update(loc);

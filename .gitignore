@@ -33,37 +33,37 @@ tmp/hrcode/parser/*
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore bundler config.
-client/.bundle
+old_client/.bundle
 
 tessinput.tif
 tessout.txt
 
-client/Gemfile.lock
+old_client/Gemfile.lock
 
 # Ignore the default SQLite database.
-client/db/*.sqlite3
-client/db/*.sqlite3.backup
-client/db/*.sqlite3-journal
-client/db/*.sqlite3-*
-!client/db/production.sqlite3
+old_client/db/*.sqlite3
+old_client/db/*.sqlite3.backup
+old_client/db/*.sqlite3-journal
+old_client/db/*.sqlite3-*
+!old_client/db/production.sqlite3
 
 # Ignore all logfiles and tempfiles.
-client/log/*
-client/tmp/*
-!client/log/.keep
-!client/tmp/.keep
+old_client/log/*
+old_client/tmp/*
+!old_client/log/.keep
+!old_client/tmp/.keep
 
 # Ignore pidfiles, but keep the directory.
-client/tmp/pids/*
-!client/tmp/pids/
-!client/tmp/pids/.keep
+old_client/tmp/pids/*
+!old_client/tmp/pids/
+!old_client/tmp/pids/.keep
 
 # Ignore uploaded files in development.
-client/storage/*
-!client/storage/.keep
-client/public/assets
-client/public/packs/
-client/.byebug_history
+old_client/storage/*
+!old_client/storage/.keep
+old_client/public/assets
+old_client/public/packs/
+old_client/.byebug_history
 
 # Ignore master key for decrypting credentials and more.
-client//config/master.key
+old_client//config/master.key
