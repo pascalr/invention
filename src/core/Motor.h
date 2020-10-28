@@ -32,6 +32,10 @@ class Motor {
       digitalWrite(m_dir_pin, val);
       isForward = forward;
     }
+
+    bool getMotorDirection() {
+      return isForward;
+    }
     
     void setReverseMotorDirection(bool val) {
       m_reverse_motor_direction = val;

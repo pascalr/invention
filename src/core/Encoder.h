@@ -10,6 +10,10 @@ class Encoder {
     Encoder(int wheelNbHoles, double unitsPerTurn) : wheel_nb_holes(wheelNbHoles), units_per_steps(unitsPerTurn/wheelNbHoles) {
     }
 
+    void setUnitsPerTurn(double unitsPerTurn) {
+      units_per_steps = wheel_nb_holes / unitsPerTurn;
+    }
+
     void checkPosition(unsigned long currentTime, bool isForward) {
 
       if (timeDifference(m_last_rpm_time, currentTime) > 100000) { // Calculate RPM every 100ms.

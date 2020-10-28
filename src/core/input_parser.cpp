@@ -82,6 +82,49 @@ void moveStepper(Program& p, StepperMotor* motor, double destination) {
   }
 }
 
+void shake(Program& p, Motor* motor) {
+  
+  if (!motor) return;
+
+  unsigned long startTimeUs = p.getCurrentTime();
+  
+  unsigned long time = 0;
+  unsigned long shakingTimeUs = 2 * 1000 * 1000;
+
+  unsigned long lastShakeTime = 0;
+  unsigned long shakingIntervalUs = 200 * 1000;
+
+  bool forward = true;
+
+  while (time < shakingTimeUs) {
+    
+    if (askedToStop(p)) {
+      motor->stop();
+      break;
+    }
+
+    if (timeDifference(lastShakeTime, time) > shakingIntervalUs) {
+      p.sleepMs(50); // Sleep a little so it is not too much of a big change to not loose steps.
+      motor->setMotorDirection(!motor->getMotorDirection());
+      lastShakeTime = time;
+    }
+
+    motor->run(p.getCurrentTime(), SHAKE_SPEED_RPM);
+
+    time = timeDifference(startTime, p.getCurrentTime())
+  }
+}
+
+void moveGrip(Program& p, double dest) {
+  p.axisR.setUnitsPerTurn(2.0*(0.186*25.4*13)/90.0);
+  p.axisR.getto(dest);
+}
+
+void moveSpoon(Program& p, double dest) {
+  p.axisR.setUnitsPerTurn(360.0/90.0);
+  p.axisR.getto(dest);
+}
+
 int parseActionCommand(char cmd, Program& p) {
 
   p.getWriter() << "Cmd: " << cmd << "\n";
@@ -100,9 +143,21 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Move
   if (cmd == 'M' || cmd == 'm') {
-    if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
-    if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
-    if ((status = motorAxis->getto(number)) < 0) {return status;}
+    if (input[0] == "p") {
+      input++;
+      if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+      moveSpoon(p, number);
+
+    } else if (input[0] == "r") {
+      input++;
+      if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+      moveGrip(p, number);
+
+    } else {
+      if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+      if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
+      if ((status = motorAxis->getto(number)) < 0) {return status;}
+    }
   
   } else if (cmd == 'd' || cmd == 'D') { // move only one stepper (faster because not checking all axes)
     StepperMotor* stepper;
@@ -129,6 +184,11 @@ int parseActionCommand(char cmd, Program& p) {
 #ifdef ARDUINO
     p.axisR.release();
 #endif
+  
+  // Shake
+  } else if (cmd == 'k' || cmd == 'K') {
+    if (!parseInputMotorAxis(p, &input, motorAxis)) {return ERROR_EXPECTED_AXIS;}
+    shake(p, motorAxis);
 
   // Grab
   } else if (cmd == 'g' || cmd == 'G') {
