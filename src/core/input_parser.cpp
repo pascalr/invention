@@ -89,11 +89,11 @@ void shake(Program& p, Motor* motor) {
   unsigned long startTimeUs = p.getCurrentTime();
   
   unsigned long time = 0;
-  //unsigned long shakingTimeUs = 10 * 1000 * 1000; // FIXME: Why the hell does this not work?
+  //unsigned long shakingTimeUs = 1000 * 1000; // WARNING: THIS DOES NOT WORK
+  //unsigned long shakingTimeUs = (unsigned long)1000 * (unsigned long)1000; // BUT THIS DOES
   unsigned long shakingTimeUs = 2000000;
 
   unsigned long lastShakeTime = 0;
-  //unsigned long shakingIntervalUs = 1 * 1000 * 1000; // FIXME: Why the hell does this not work? // 1*1000*1000 == 16000??
   unsigned long shakingIntervalUs = 100000;
 
   bool forward = true;
