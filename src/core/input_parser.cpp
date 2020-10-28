@@ -104,7 +104,7 @@ void shake(Program& p, Motor* motor) {
     }
 
     if (timeDifference(lastShakeTime, time) > shakingIntervalUs) {
-      p.sleepMs(50); // Sleep a little so it is not too much of a big change to not loose steps.
+      //p.sleepMs(50); // Sleep a little so it is not too much of a big change to not loose steps.
       motor->setMotorDirection(!motor->getMotorDirection());
       lastShakeTime = time;
     }

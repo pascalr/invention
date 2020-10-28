@@ -664,7 +664,7 @@ void scoop(Heda& heda, Jar jar) {
   gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
 
   // Angle the spoon a little backward
-  move(heda, heda.axisP, -5);
+  move(heda, heda.axisP, -10);
 
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id); // OPTIMIZE: Do a mustFind instead
   ensure(format.exists(), "Scoop needs a valid jar format. The jar did not have one.");
@@ -674,7 +674,7 @@ void scoop(Heda& heda, Jar jar) {
   move(heda, heda.axisV, heda.unitV(y));
   
   // Angle the spoon a little forward
-  move(heda, heda.axisP, 5);
+  move(heda, heda.axisP, 10);
  
   // Go up a little
   y = heda.working_shelf.height + format.height;
