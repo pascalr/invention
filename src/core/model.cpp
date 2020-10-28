@@ -84,6 +84,10 @@ void parseItem(SQLite::Statement& query, HedaConfig& c) {
   c.space_between_jaws = query.getColumn(25);
   c.grip_gap = query.getColumn(26);
   c.max_r = query.getColumn(27);
+  c.working_x = query.getColumn(28);
+  c.working_z = query.getColumn(29);
+  c.bowl_x = query.getColumn(30);
+  c.bowl_z = query.getColumn(31);
 }
 
 

@@ -88,6 +88,10 @@ class HedaConfig : public Model {
     double space_between_jaws;
     double grip_gap;
     double max_r;
+    double working_x;
+    double working_z;
+    double bowl_x;
+    double bowl_z;
 
     double minX() {
       return 0.0;
@@ -305,6 +309,10 @@ void bindQuery(T& query, const HedaConfig& item) {
   query.bind(25, item.space_between_jaws);
   query.bind(26, item.grip_gap);
   query.bind(27, item.max_r);
+  query.bind(28, item.working_x);
+  query.bind(29, item.working_z);
+  query.bind(30, item.bowl_x);
+  query.bind(31, item.bowl_z);
 }
 template<typename T>
 void bindQuery(T& query, const Location& item) {

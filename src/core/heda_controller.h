@@ -524,7 +524,7 @@ void lowerForGrip(Heda& heda, Jar& jar) {
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id);
   ensure(format.exists(), "Lower for grip needs a valid jar format. The jar did not have one.");
  
-  double v = heda.unitV(shelf.height + format.height - heda.config.grip_offset);
+  double v = heda.unitV(shelf.height + format.height + heda.config.grip_offset);
   move(heda, heda.axisV, v);
 }
 
@@ -651,6 +651,47 @@ void calibrate(Heda& heda) {
   heda.db.update(heda.config);
 }
 
+void shake(Heda& heda) {
+  auto h4 = Header4("SHAKE");
+  writeSlave(heda, "k");
+}
+
+void scoop(Heda& heda, Jar jar) {
+  auto h3 = Header3("SCOOP");
+
+  // Move on top of the working jar
+  UserCoord c(heda.config.working_x,heda.working_shelf.moving_height,heda.config.working_z);
+  gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
+
+  // Angle the spoon a little backward
+  move(heda, heda.axisP, -5);
+
+  JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id); // OPTIMIZE: Do a mustFind instead
+  ensure(format.exists(), "Scoop needs a valid jar format. The jar did not have one.");
+ 
+  // Get down some distance below the jar
+  double y = heda.working_shelf.height + format.height - 30.0;
+  move(heda, heda.axisV, heda.unitV(y));
+  
+  // Angle the spoon a little forward
+  move(heda, heda.axisP, 5);
+ 
+  // Go up a little
+  y = heda.working_shelf.height + format.height;
+  move(heda, heda.axisV, heda.unitV(y));
+
+  // Shake to make sure it will not fall when trying to reach the bowl
+  shake(heda);
+ 
+  // Get on top of the bowl
+  c = UserCoord(heda.config.bowl_x,heda.working_shelf.moving_height,heda.config.bowl_z);
+  gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
+  
+  // Drop everything from the spoon
+  move(heda, heda.axisP, -90);
+  shake(heda);
+}
+
 class HedaController {
   public:
 
@@ -716,6 +757,21 @@ class HedaController {
       m_commands["calibrate"] = [&](ParseResult tokens) {calibrate(heda);};
       m_commands["parse"] = [&](ParseResult tokens) {parse(heda);};
       m_commands["debugdetect"] = [&](ParseResult tokens) {debugDetect(heda);};
+      m_commands["shake"] = [&](ParseResult tokens) {shake(heda);};
+
+      m_commands["scoop"] = [&](ParseResult tokens) {
+
+        int id = tokens.popPositiveInteger();
+        //Ingredient ingredient = heda.db.find<Ingredient>(id);
+        //ensure(ingredient.exists(), "Could not find an ingredient with id = " + to_string(id));
+
+        Jar jar = heda.db.findBy<Jar>("ingredient_id", id);
+        ensure(jar.exists(), "Could not find a jar for the ingredient id = " + to_string(id));
+
+        scoop(heda, jar);
+        gohome(heda);
+      };
+
       m_commands["response"] = [&](ParseResult tokens) {
         // FIXME!!! Remove ParseResult, so I get the raw command here
         //heda.user_response = true;

@@ -15,11 +15,11 @@ class StoppedException : public std::exception {};
 
 class MissingConfigException : public std::exception {};
 
-// TODO: Rename x and y to h and v at some point.
 #define AXIS_H 'h'
 #define AXIS_V 'v'
 #define AXIS_T 't'
 #define AXIS_R 'r'
+#define AXIS_P 'p'
 
 class Axis {
   public:
@@ -31,7 +31,8 @@ class Axis {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader) : axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R),
+    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader) :
+              axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), axisP(AXIS_P),
               m_reader(reader),
               m_writer(writer),
               server_writer(serverWriter),
@@ -48,6 +49,7 @@ class Heda {
     Axis axisV;
     Axis axisT;
     Axis axisR;
+    Axis axisP;
 
     void captureFrame(cv::Mat& frame);
 
