@@ -111,17 +111,17 @@ void shake(Program& p, Motor* motor) {
 
     motor->run(p.getCurrentTime(), SHAKE_SPEED_RPM);
 
-    time = timeDifference(startTime, p.getCurrentTime())
+    time = timeDifference(startTimeUs, p.getCurrentTime());
   }
 }
 
 void moveGrip(Program& p, double dest) {
-  p.axisR.setUnitsPerTurn(2.0*(0.186*25.4*13)/90.0);
+  p.axisR.encoder.setUnitsPerTurn(2.0*(0.186*25.4*13)/90.0);
   p.axisR.getto(dest);
 }
 
 void moveSpoon(Program& p, double dest) {
-  p.axisR.setUnitsPerTurn(360.0/90.0);
+  p.axisR.encoder.setUnitsPerTurn(360.0/90.0*4.0); // FIXME: Why multiply by 4???
   p.axisR.getto(dest);
 }
 
@@ -143,12 +143,12 @@ int parseActionCommand(char cmd, Program& p) {
 
   // Move
   if (cmd == 'M' || cmd == 'm') {
-    if (input[0] == "p") {
+    if (*input == 'p' || *input == 'P') {
       input++;
       if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
       moveSpoon(p, number);
 
-    } else if (input[0] == "r") {
+    } else if (*input == 'r' || *input == 'R') {
       input++;
       if (parseNumber(&input,number) < 0) {return ERROR_EXPECTED_NUMBER;}
       moveGrip(p, number);
