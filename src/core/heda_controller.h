@@ -433,7 +433,7 @@ void sweep(Heda& heda) {
   int nStepX = 10;
   int nStepZ = 4;
 
-  double xMin = 0.0;
+  double xMin = heda.unitX(0.0, 0.0, 0.0);
   double xMax = heda.unitX(heda.config.max_h, 0.0, 0.0);
   double xDiff = xMax - xMin;
 
