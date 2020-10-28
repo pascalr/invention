@@ -69,7 +69,7 @@ ADD_LIBRARY(MyLibsModule
   src/core/pinpoint.cpp
 #  src/core/deserialize.cpp
   src/core/heda.cpp
-  src/core/model.cpp
+  src/core/schema_generated.cpp
   src/core/database.cpp
 #  src/core/fake_program.cpp
   src/core/writer/writer.cpp

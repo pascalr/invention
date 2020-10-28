@@ -165,9 +165,9 @@ void move(Heda& heda, Axis& axis, double destination) {
 }
 
 void validateGoto(Heda& heda, PolarCoord c) {
-  ensure(c.h >= heda.config.minH(), "The goto destination h must be higher than the minimum.");
-  ensure(c.v >= heda.config.minV(), "The goto destination v must be higher than the minimum.");
-  ensure(c.t >= heda.config.minT(), "The goto destination t must be higher than the minimum.");
+  ensure(c.h >= 0.0, "The goto destination h must be higher or equal to zero.");
+  ensure(c.v >= 0.0, "The goto destination v must be higher or equal to zero.");
+  ensure(c.t >= 0.0, "The goto destination t must be higher or equal to zero.");
 }
 
 void gotoPolar(Heda& heda, PolarCoord destination) {
@@ -189,7 +189,7 @@ void gotoPolar(Heda& heda, PolarCoord destination) {
 
     move(heda, heda.axisV, heda.unitV(currentShelf.moving_height));
 
-    positionT = (position.h < heda.config.middleH()) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
+    positionT = (position.h < (heda.config.max_h / 2.0)) ? CHANGE_LEVEL_ANGLE_HIGH : CHANGE_LEVEL_ANGLE_LOW;
     move(heda, heda.axisT, positionT);
   }
 
@@ -276,8 +276,8 @@ Location getNewLocation(Heda& heda, Jar& jar, Shelf& shelf) {
 
 void parseCode(Heda& heda, DetectedHRCode& code) {
   //parseJarCode(code);
-  cout << "Loading image: " << code.imgFilename << endl;
-  cv::Mat gray = cv::imread(DETECTED_CODES_BASE_PATH + code.imgFilename, cv::IMREAD_GRAYSCALE);
+  cout << "Loading image: " << code.img << endl;
+  cv::Mat gray = cv::imread(DETECTED_CODES_BASE_PATH + code.img, cv::IMREAD_GRAYSCALE);
   vector<string> lines;
   parseText(lines, gray);
   //ensure(lines.size() == 4, "There must be 4 lines in the HRCode.");
@@ -300,7 +300,14 @@ void detectCodes(Heda& heda, vector<DetectedHRCode>& detected) {
   if (!positions.empty()) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {
       cout << "Detected one HRCode!!!" << endl;
-      DetectedHRCode d(*it, heda.getPosition());
+      DetectedHRCode d;
+      d.h = heda.getPosition().h;
+      d.v = heda.getPosition().v;
+      d.t = heda.getPosition().t;
+      d.centerX = it->x;
+      d.centerY = it->y;
+      d.scale = it->scale;
+      d.img = it->imgFilename;
       detected.push_back(d);
     }
     return;
@@ -366,8 +373,8 @@ double distanceSquare(const UserCoord& c1, const UserCoord& c2) {
 }
 
 double detectedDistanceSquared(const DetectedHRCode& c1, const DetectedHRCode& c2) {
-  Vector2f lid1; lid1 << c1.lid_coord.x, c1.lid_coord.z;
-  Vector2f lid2; lid2 << c2.lid_coord.x, c2.lid_coord.z;
+  Vector2f lid1; lid1 << c1.lid_x, c1.lid_z;
+  Vector2f lid2; lid2 << c2.lid_x, c2.lid_z;
   return (lid1 - lid2).squaredNorm();
 }
 
@@ -398,15 +405,15 @@ void removeNearDuplicates(Heda& heda) {
   }
   for (Cluster& cluster : clusters) {
 
-    double sumX = codes[cluster.idxKept].lid_coord.x;
-    double sumZ = codes[cluster.idxKept].lid_coord.z;
+    double sumX = codes[cluster.idxKept].lid_x;
+    double sumZ = codes[cluster.idxKept].lid_z;
     for (int &idx : cluster.indicesRemoved) {
-      sumX += codes[idx].lid_coord.x;
-      sumZ += codes[idx].lid_coord.z;
+      sumX += codes[idx].lid_x;
+      sumZ += codes[idx].lid_z;
     }
     DetectedHRCode& code = codes[cluster.idxKept];
-    code.lid_coord.x = sumX / (cluster.indicesRemoved.size() + 1);
-    code.lid_coord.z = sumZ / (cluster.indicesRemoved.size() + 1);
+    code.lid_x = sumX / (cluster.indicesRemoved.size() + 1);
+    code.lid_z = sumZ / (cluster.indicesRemoved.size() + 1);
     heda.db.update(code);
   }
 
@@ -426,7 +433,7 @@ void sweep(Heda& heda) {
   int nStepX = 10;
   int nStepZ = 4;
 
-  double xMin = heda.unitX(heda.config.minH(), 0.0, 0.0);
+  double xMin = 0.0;
   double xMax = heda.unitX(heda.config.max_h, 0.0, 0.0);
   double xDiff = xMax - xMin;
 
@@ -460,7 +467,7 @@ void closeup(Heda& heda, DetectedHRCode& detected) {
   
   auto h2 = Header2("CLOSEUP");
 
-  double robotZ = heda.config.user_coord_offset_z - detected.lid_coord.z;
+  double robotZ = heda.config.user_coord_offset_z - detected.lid_z;
 
   if (robotZ > heda.config.camera_radius) {
     robotZ = heda.config.camera_radius;
@@ -468,7 +475,7 @@ void closeup(Heda& heda, DetectedHRCode& detected) {
 
   double userZ = heda.config.user_coord_offset_z - robotZ;
  
-  gotoPolar(heda, heda.toPolarCoord(UserCoord(detected.lid_coord.x, detected.lid_coord.y + heda.config.closeup_distance, userZ), heda.config.camera_radius));
+  gotoPolar(heda, heda.toPolarCoord(UserCoord(detected.lid_x, detected.lid_y + heda.config.closeup_distance, userZ), heda.config.camera_radius));
 
   string errorMsg;
   int maxAttempts = 10;
@@ -481,11 +488,13 @@ void closeup(Heda& heda, DetectedHRCode& detected) {
     
     DetectedHRCode recent = allDetected[0];
 
-    detected.coord = recent.coord;
+    detected.h = recent.h;
+    detected.v = recent.v;
+    detected.t = recent.t;
     detected.centerX = recent.centerX;
     detected.centerY = recent.centerY;
     detected.scale = recent.scale;
-    detected.imgFilename = recent.imgFilename;
+    detected.img = recent.img;
 
     pinpointCode(heda, detected);
     parseCode(heda, detected);
@@ -579,7 +588,7 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
     ensure(loc.exists(), "Location could not be created. No space on shelves left? Can't save to database?");
   }
 
-  UserCoord c(detected.lid_coord.x, heda.getToolPosition().y, detected.lid_coord.z);
+  UserCoord c(detected.lid_x, heda.getToolPosition().y, detected.lid_z);
   gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
 
   openGrip(heda, jar);

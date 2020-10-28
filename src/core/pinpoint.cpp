@@ -52,7 +52,7 @@ Vector2d imageOffset(Heda& heda, DetectedHRCode& input) {
   jarOffset /= input.scale; // Translate pixels dimensions into mm.
 
   // I must rotate the offset value because the camera is rotated.
-  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(input.coord.t / 180.0 * PI));
+  Transform<double, 2, TransformTraits::Affine> t(Rotation2D<double>(input.t / 180.0 * PI));
   jarOffset = t * jarOffset;
 
   return jarOffset;
@@ -60,10 +60,12 @@ Vector2d imageOffset(Heda& heda, DetectedHRCode& input) {
 
 void pinpointCode(Heda& heda, DetectedHRCode& input) {
 
-  UserCoord camPos = heda.toUserCoord(input.coord, heda.config.camera_radius);
+  UserCoord camPos = heda.toUserCoord(PolarCoord(input.h, input.v, input.t), heda.config.camera_radius);
   double heightOffset0 = heightOffset(heda, input);
 
   Vector2d imgOffset = imageOffset(heda, input);
 
-  input.lid_coord = UserCoord(camPos.x + imgOffset(0), camPos.y - heightOffset0, camPos.z + imgOffset(1));
+  input.lid_x = camPos.x + imgOffset(0);
+  input.lid_y = camPos.y - heightOffset0;
+  input.lid_z = camPos.z + imgOffset(1);
 }

@@ -2,7 +2,7 @@
 #define _DATABASE_H
 
 #include "SQLiteCpp/SQLiteCpp.h"
-#include "model.h"
+#include "schema_generated.h"
 #include <vector>
 #include <sstream>
 #include "SQLiteCpp/sqlite3/sqlite3.h"

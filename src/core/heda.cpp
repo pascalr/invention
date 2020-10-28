@@ -126,7 +126,7 @@ PolarCoord Heda::toPolarCoord(const UserCoord c, double reference) {
   ensure(robotZ <= reference, errorMsg.str().c_str());
   
   double t = (asin(robotZ / reference) * 180.0 / PI);
-  if (c.x > config.middleX()) { // FIXME: Is X_MIDDLE THE GOOD CONSTANT? Probably not. Use something from heda config.
+  if (c.x > (config.max_x / 2.0)) {
     t = 180.0 - t;
   }
   double h = c.x - config.user_coord_offset_x + (cosd(t) * reference);
