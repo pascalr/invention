@@ -117,11 +117,13 @@ void shake(Program& p, Motor* motor) {
 
 void moveGrip(Program& p, double dest) {
   p.axisR.encoder.setUnitsPerTurn(2.0*(0.186*25.4*13)/90.0);
+  p.axisR.setReverseMotorDirection(false);
   p.axisR.getto(dest);
 }
 
 void moveSpoon(Program& p, double dest) {
   p.axisR.encoder.setUnitsPerTurn(360.0/90.0*4.0); // FIXME: Why multiply by 4???
+  p.axisR.setReverseMotorDirection(true);
   p.axisR.getto(dest);
 }
 

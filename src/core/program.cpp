@@ -45,7 +45,7 @@ void Program::stopMoving() {
 void setupAxes(Program& p) {
 
   p.axisR.setupPins(8,9,5);
-  p.axisR.setReverseMotorDirection(false);
+  p.axisR.setReverseMotorDirection(false); // FIXME: THIS IS MODIFIED IN moveSpoon and moveGrip...
   // min and max positions depends on the tool, sometimes no limits (mixer), sometimes yes (gripper)
 
   //p.axisT.microsteps = 16;
