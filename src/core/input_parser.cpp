@@ -89,10 +89,12 @@ void shake(Program& p, Motor* motor) {
   unsigned long startTimeUs = p.getCurrentTime();
   
   unsigned long time = 0;
-  unsigned long shakingTimeUs = 2 * 1000 * 1000;
+  //unsigned long shakingTimeUs = 10 * 1000 * 1000; // FIXME: Why the hell does this not work?
+  unsigned long shakingTimeUs = 2000000;
 
   unsigned long lastShakeTime = 0;
-  unsigned long shakingIntervalUs = 200 * 1000;
+  //unsigned long shakingIntervalUs = 1 * 1000 * 1000; // FIXME: Why the hell does this not work? // 1*1000*1000 == 16000??
+  unsigned long shakingIntervalUs = 100000;
 
   bool forward = true;
 
@@ -109,10 +111,12 @@ void shake(Program& p, Motor* motor) {
       lastShakeTime = time;
     }
 
-    motor->run(p.getCurrentTime(), SHAKE_SPEED_RPM);
-
-    time = timeDifference(startTimeUs, p.getCurrentTime());
+    unsigned long now = p.getCurrentTime();
+    motor->run(now, SHAKE_SPEED_RPM);
+    time = timeDifference(startTimeUs, now);
   }
+
+  motor->stop();
 }
 
 void moveGrip(Program& p, double dest) {
