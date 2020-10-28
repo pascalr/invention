@@ -14,6 +14,7 @@ template <> string getTableName<JarFormat>() { return "jar_formats"; }
 template <> string getTableName<Unit>() { return "units"; }
 template <> string getTableName<Recipe>() { return "recipes"; }
 template <> string getTableName<IngredientQuantity>() { return "ingredient_quantities"; }
+template <> string getTableName<Spoon>() { return "spoons"; }
 
 void parseItem(SQLite::Statement& query, IngredientQuantity& i) {
   i.recipe_id = query.getColumn(1);
@@ -24,7 +25,11 @@ void parseItem(SQLite::Statement& query, IngredientQuantity& i) {
   i.unit_id = query.getColumn(6);
 }
 
-
+void parseItem(SQLite::Statement& query, Spoon& i) {
+  i.offset_y = query.getColumn(1);
+  i.radius = query.getColumn(2);
+  i.volume = query.getColumn(3);
+}
 
 void parseItem(SQLite::Statement& query, Recipe& i) {
   i.name = (const char*)query.getColumn(1);

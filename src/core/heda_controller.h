@@ -651,33 +651,40 @@ void calibrate(Heda& heda) {
   heda.db.update(heda.config);
 }
 
-void shake(Heda& heda) {
-  auto h4 = Header4("SHAKE");
-  writeSlave(heda, "k");
+void moveSpoon(Heda& heda, double angle) {
+  
+  std::string cmd = "mp" + to_string(angle);
+  auto h5 = Header5("MOVE("+cmd+")"); 
+  writeSlave(heda, cmd);
 }
 
-void scoop(Heda& heda, Jar jar) {
+void shake(Heda& heda) {
+  auto h4 = Header4("SHAKE");
+  writeSlave(heda, "kh");
+}
+
+void scoop(Heda& heda, Jar jar, Spoon spoon) {
   auto h3 = Header3("SCOOP");
 
   // Move on top of the working jar
   UserCoord c(heda.config.working_x,heda.working_shelf.moving_height,heda.config.working_z);
-  gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
+  gotoPolar(heda, heda.toPolarCoord(c, spoon.radius));
 
   // Angle the spoon a little backward
-  move(heda, heda.axisP, -10);
+  moveSpoon(heda, -10);
 
   JarFormat format = heda.db.find<JarFormat>(jar.jar_format_id); // OPTIMIZE: Do a mustFind instead
   ensure(format.exists(), "Scoop needs a valid jar format. The jar did not have one.");
  
   // Get down some distance below the jar
-  double y = heda.working_shelf.height + format.height - 30.0;
+  double y = heda.working_shelf.height + format.height + spoon.offset_y - 50.0;
   move(heda, heda.axisV, heda.unitV(y));
   
   // Angle the spoon a little forward
-  move(heda, heda.axisP, 10);
+  moveSpoon(heda, 10);
  
   // Go up a little
-  y = heda.working_shelf.height + format.height;
+  y = heda.working_shelf.height + format.height + spoon.offset_y;
   move(heda, heda.axisV, heda.unitV(y));
 
   // Shake to make sure it will not fall when trying to reach the bowl
@@ -685,10 +692,10 @@ void scoop(Heda& heda, Jar jar) {
  
   // Get on top of the bowl
   c = UserCoord(heda.config.bowl_x,heda.working_shelf.moving_height,heda.config.bowl_z);
-  gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
+  gotoPolar(heda, heda.toPolarCoord(c, spoon.radius));
   
   // Drop everything from the spoon
-  move(heda, heda.axisP, -90);
+  moveSpoon(heda, -90);
   shake(heda);
 }
 
@@ -768,7 +775,10 @@ class HedaController {
         Jar jar = heda.db.findBy<Jar>("ingredient_id", id);
         ensure(jar.exists(), "Could not find a jar for the ingredient id = " + to_string(id));
 
-        scoop(heda, jar);
+        Spoon spoon = heda.db.find<Spoon>(1);
+        ensure(spoon.exists(), "Could not find a spoon to scoop with");
+
+        scoop(heda, jar, spoon);
         gohome(heda);
       };
 

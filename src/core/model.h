@@ -142,6 +142,16 @@ class Location : public Model {
 
 void parseItem(SQLite::Statement& query, Location& item);
 
+class Spoon : public Model {
+  public:
+    Spoon() {}
+    double offset_y;
+    double radius;
+    double volume;
+};
+
+void parseItem(SQLite::Statement& query, Spoon& item);
+
 class DetectedHRCode : public Model {
   public:
     DetectedHRCode() {}
@@ -328,6 +338,12 @@ void bindQuery(T& query, const Location& item) {
   query.bind(11, item.jar_format_id);
   query.bind(12, item.jar_id);
   query.bind(13, item.occupied);
+}
+template<typename T>
+void bindQuery(T& query, const Spoon& item) {
+  query.bind(1, item.offset_y);
+  query.bind(2, item.radius);
+  query.bind(3, item.volume);
 }
 template<typename T>
 void bindQuery(T& query, const Shelf& item) {
