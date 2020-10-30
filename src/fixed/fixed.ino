@@ -55,7 +55,7 @@ void loop() {
 
     // get weight
     if (cmd == 'w') {
-      Serial.print(scale.getGram(), 1); // Print the gram value with one decimal precision
+      Serial.println(scale.getGram(), 1); // Print the gram value with one decimal precision
       
     } else if (cmd == 'c') {
       double nb;
