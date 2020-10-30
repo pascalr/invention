@@ -20,6 +20,16 @@ find_package( PkgConfig REQUIRED )
 
 find_package( OpenCV REQUIRED )
 
+ADD_LIBRARY(WhichLib
+  src/core/writer/writer.cpp
+  src/core/reader/reader.cpp
+  src/lib/serial.cpp
+  src/lib/lib.cpp
+)
+
+add_executable( which_acm0 src/which_acm0.cpp )
+target_link_libraries( which_acm0 WhichLib )
+
 add_executable( video src/video.cpp )
 target_include_directories( video PUBLIC ${OpenCV_INCLUDE_DIRS} )
 target_link_libraries( video ${OpenCV_LIBS} )

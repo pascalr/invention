@@ -2,6 +2,8 @@
 #define _SERIAL_READER_H
 
 #include "reader.h"
+#include "../../lib/serial.h"
+#include <cstring>
 
 class GetByteOnEmptyStreamException : public std::exception {};
 class EmptyInputInvalidException : public std::exception {};
