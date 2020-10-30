@@ -91,6 +91,14 @@ int main(int argc, char** argv) {
   
   SerialReader serialReader(serialPort);
   SerialWriter serialWriter(serialPort);
+
+  SerialPort fixedPort;
+  if (fixedPort.openPort("/tmp/heda1") < 0) {
+    throw InitSerialPortException();
+  }
+  
+  SerialReader fixedReader(fixedPort);
+  SerialWriter fixedWriter(fixedPort);
   
   SharedReader sharedReader(serialReader);
   SharedReaderClient hedaReader(sharedReader, READER_CLIENT_ID_HEDA);
@@ -106,7 +114,7 @@ int main(int argc, char** argv) {
   LogReader serverLogReader("\033[36mFrom server\033[0m", serverStream);
 
   Database db(DB_PROD);
-  Heda heda(hedaLogWriter, hedaLogReader, db, hedaToServerStream, serverLogReader); 
+  Heda heda(hedaLogWriter, hedaLogReader, db, hedaToServerStream, serverLogReader, fixedWriter, fixedReader); 
 
   server.resource["^/run$"]["POST"] = [&heda,&serverStream](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     cout << "POST /run" << endl;

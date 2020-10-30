@@ -31,12 +31,14 @@ class Axis {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader) :
+    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader, Writer& fixedWriter, Reader& fixedReader) :
               axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), axisP(AXIS_P),
               m_reader(reader),
               m_writer(writer),
-              server_writer(serverWriter),
               server_reader(serverReader),
+              server_writer(serverWriter),
+              fixed_reader(fixedReader),
+              fixed_writer(fixedWriter),
               stack_writer("\033[38;5;215mStack\033[0m"),
               db(db) {
     
@@ -111,8 +113,11 @@ class Heda {
     Reader& m_reader;
     Writer& m_writer;
 
-    Writer& server_writer;
     Reader& server_reader;
+    Writer& server_writer;
+    
+    Reader& fixed_reader;
+    Writer& fixed_writer;
 
     LogWriter stack_writer;
 
