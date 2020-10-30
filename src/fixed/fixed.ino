@@ -60,6 +60,9 @@ void loop() {
     } else if (cmd == 'c') {
       calibrateWithWeight();
 
+    } else if (cmd == '#') { // Print the version
+      Serial.println("fixed");
+
     } else if (cmd == 'e') {
       calibrateEmpty();
     
