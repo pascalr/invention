@@ -1,6 +1,7 @@
 #include "hx711.h"
+#include "arduino_lib.h"
 
-#define CALIBRATION_WEIGHT 642
+#define CALIBRATION_WEIGHT 654
 
 // https://github.com/aguegu/ardulibs/tree/master/hx711 
 
@@ -33,31 +34,41 @@ void calibrateEmpty() {
 }
 
 void calibrateWithWeight() {
-  float ratio = (w - offset) / CALIBRATION_WEIGHT;
+  float ratio = (scale.averageValue() - offset) / CALIBRATION_WEIGHT;
+  //writer << ratio;
+  Serial.println(ratio);
   scale.setScale(ratio);
 }
 
 void loop() {
 
   if (reader.inputAvailable()) {
+
     char cmd = reader.getByte();
+
+    // ignore newline characters
+    if (cmd == '\r' || cmd == '\n') return;
+
+    Serial.print("Received: ");
+    Serial.println(cmd);
 
     // get weight
     if (cmd == 'w') {
-      //writer.doPrint();
       Serial.print(scale.getGram(), 1); // Print the gram value with one decimal precision
       Serial.println(" g");
-
-    } else if (cmd = 'c') {
+      
+    } else if (cmd == 'c') {
       calibrateWithWeight();
 
-    } else if (cmd = 'e') {
+    } else if (cmd == 'e') {
       calibrateEmpty();
     
     } else {
-      writer << "Unkown command " << cmd << "\n";
+      Serial.println("Unkown command");
+      return;
       // TODO: Discard the rest of the input to be sure.
     }
+    Serial.println("done");
   }
 
   delay(100);

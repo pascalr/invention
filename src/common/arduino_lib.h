@@ -1,6 +1,6 @@
 //#include "utils.h"
-#include "reader/reader.h"
-#include "writer/writer.h"
+#include "../core/reader/reader.h"
+#include "../core/writer/writer.h"
 
 class ArduinoReader : public Reader {
 
@@ -56,34 +56,3 @@ class ArduinoWriter : public Writer {
 //}
   
 //Serial.begin(115200);
-
-void setup() {
-
-  //Initiate Serial communication.
-  Serial.begin(115200);
-  Serial.println("Setup...");
-
-  setupAxes(p);
-  
-  pinMode(LED_BUILTIN, OUTPUT);
-
-  Serial.println(MESSAGE_READY);
-}
-
-unsigned long printIntervalUs = 0.1 * 1000 * 1000;
-unsigned long lastPrintUs = 0;
-
-void loop() {
-  //Serial.println(analogRead(4));
-  //delay(1000);
-
-  //if (timeDifference(lastPrintUs, micros()) > printIntervalUs) {
-  //  Serial.println("-----");
-  //  Serial.println(timeDifference(p.axisT.m_start_time, micros()));
-  //  Serial.println(p.axisT.next_step_delay);
-  //  Serial.println(p.axisT.next_step_time);
-  //  lastPrintUs = micros();
-  //}
-
-  myLoop(p);
-}
