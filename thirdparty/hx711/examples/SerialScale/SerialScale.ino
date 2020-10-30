@@ -13,13 +13,13 @@
 // Hx711.DOUT - pin #A1
 // Hx711.SCK - pin #A0
 
-#include "hx711.h"
+#include "../hx711.h"
 
 Hx711 scale(A1, A0);
 
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
 }
 
@@ -30,4 +30,3 @@ void loop() {
 
   delay(200);
 }
-

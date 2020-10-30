@@ -5,6 +5,7 @@ mkdir ../Arduino/libraries/core/reader
 mkdir ../Arduino/libraries/core/writer
 mkdir ../Arduino/libraries/utils
 mkdir ../Arduino/libraries/lib
+mkdir ../Arduino/libraries/hx711
 cp src/utils/utils.h ../Arduino/libraries/utils/utils.h
 cp src/utils/utils.cpp ../Arduino/libraries/utils/utils.cpp
 
@@ -26,3 +27,6 @@ cp src/core/DCMotor.h ../Arduino/libraries/core/DCMotor.h
 cp src/core/Encoder.h ../Arduino/libraries/core/Encoder.h
 cp src/lib/ArduinoMock.h ../Arduino/libraries/lib/ArduinoMock.h
 cp src/core/reader/reader.h ../Arduino/libraries/core/reader/reader.h
+
+cp thirdparty/hx711/hx711.h ../Arduino/libraries/hx711/hx711.h
+cp thirdparty/hx711/hx711.cpp ../Arduino/libraries/hx711/hx711.cpp
