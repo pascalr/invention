@@ -2,6 +2,35 @@
 #include "../core/reader/reader.h"
 #include "../core/writer/writer.h"
 
+// Returns the number of bytes read.
+// Arduino already has a function that does this, but it was so slow I don't know why.
+int getInputLine(Reader& reader, char* buf, int bufSize) {
+  int i = 0;
+  while (true) {
+    if (reader.inputAvailable()) {
+
+      char ch = reader.getByte();
+
+      if (ch == '\n') break;
+      if (i >= bufSize-1) break;
+      buf[i] = ch;
+      i++;
+    }
+    delay(50); // OPTIMIZE: Probably useless since it is busy wait I believe
+  }
+  buf[i] = '\0';
+  return i;
+}
+
+int parseNumber(char** input, double& n) {
+  char* pEnd;
+  n = strtod(*input, &pEnd);
+  // If no number was found
+  if (pEnd == *input) {return -1;}
+  *input = pEnd;
+  return 0;
+}
+
 class ArduinoReader : public Reader {
 
   public:
