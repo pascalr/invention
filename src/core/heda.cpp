@@ -19,6 +19,8 @@ void Heda::connectFixedSlave() {
   }
   fixed_writer << "t" + to_string(config.scale_ratio);
   waitUntilDone(fixed_reader);
+  fixed_writer << "e";
+  waitUntilDone(fixed_reader);
 }
 
 void Heda::stop() {

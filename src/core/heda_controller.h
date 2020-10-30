@@ -1,6 +1,7 @@
 #ifndef _HEDA_CONTROLLER_H
 #define _HEDA_CONTROLLER_H
 
+#include "../common/comm.h"
 #include "pinpoint.h"
 #include "recipe_parser.h"
 #include "heda.h"
@@ -708,8 +709,12 @@ void scoop(Heda& heda, Jar jar, Spoon spoon) {
   shake(heda);
 }
 
-double getWeight(Heda& h) {
-  
+double getWeight(Heda& heda) {
+  auto h = Header5("WEIGHT");
+  heda.fixed_writer << "w";
+  std::string w = readAllUntilDone(heda.fixed_reader);
+  std::cout << w << "\n";
+  return 0.0; // TODO: Parse the string to get the weight
 }
 
 class HedaController {

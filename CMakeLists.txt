@@ -25,6 +25,7 @@ ADD_LIBRARY(WhichLib
   src/core/reader/reader.cpp
   src/lib/serial.cpp
   src/lib/lib.cpp
+  src/common/comm.cpp
 )
 
 add_executable( which_acm0 src/which_acm0.cpp )
@@ -74,6 +75,7 @@ ADD_LIBRARY(MyLibsModule
   src/lib/serial.cpp
   src/lib/ArduinoMock.cpp
   src/utils/io_common.cpp
+  src/common/comm.cpp
   src/utils/utils.cpp
 #  src/core/program.cpp
   src/core/pinpoint.cpp
