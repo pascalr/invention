@@ -235,6 +235,10 @@ void myLoop(Program& p) {
       p.getWriter() << "\n" << MESSAGE_JSON << "\n";
       serialize<Writer>(p, p.getWriter());
       p.getWriter() << "\n";
+    
+    // vesrion
+    } else if (cmd == '#') {
+      p.getWriter() << "mobile\n";
 
     // position (faster than info)
     } else if (cmd == '@') {
