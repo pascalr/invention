@@ -1,3 +1,7 @@
+Un problème avec l'arduino souvent le serial contient Preparing... ready déjà
+Au lieu du message ready pour savoir si l'arduino est prêt, faire un id
+que arduino doit echo pour s'assurer qu'il est prêt à recevoir des commandes.
+
 Des biscuits qui plaisent à toute la famille:
 La même base à biscuit pour tous, mais chaque membre décide de ce qu'il veut mettre à l'intérieur de ses biscuits.
 

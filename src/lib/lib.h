@@ -20,6 +20,11 @@ class EnsureException : public StringMessageException {
     EnsureException(std::string msg) : StringMessageException(msg) {}
 };
 
+class TimeoutException : public StringMessageException {
+  public:
+    TimeoutException(std::string msg) : StringMessageException(msg) {}
+};
+
 //template<typename T>
 //void ensure(bool statement, T errorMessage);
 

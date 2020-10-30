@@ -55,6 +55,7 @@ void parseItem(SQLite::Statement& query, HedaConfig& i) {
   i.working_z = query.getColumn(29);
   i.bowl_x = query.getColumn(30);
   i.bowl_z = query.getColumn(31);
+  i.scale_ratio = query.getColumn(32);
 }
 
 void parseItem(SQLite::Statement& query, Spoon& i) {

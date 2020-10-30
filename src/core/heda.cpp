@@ -6,8 +6,20 @@
 #include "log.h"
 #include "parser.h"
 
+#include "../common/comm.h"
+
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 using namespace std;
+    
+// Heda sends the value of the calibration to the fixed slave every time it is started.
+// This way there is no need to reupload to the arduino when the variable changes.
+void Heda::connectFixedSlave() {
+  if (!isArduinoReady(fixed_reader)) {
+    throw TimeoutException("Error arduino response timeout. It was not ready.\n");
+  }
+  fixed_writer << "t" + to_string(config.scale_ratio);
+  waitUntilDone(fixed_reader);
+}
 
 void Heda::stop() {
 

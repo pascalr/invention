@@ -46,6 +46,7 @@ class Heda {
     }
 
     void loadConfig();
+    void connectFixedSlave();
 
     Axis axisH;
     Axis axisV;

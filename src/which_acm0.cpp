@@ -1,6 +1,7 @@
 #include "core/reader/serial_reader.h"
 #include "core/writer/serial_writer.h"
 #include "lib/lib.h"
+#include "common/comm.h"
 
 #include <thread>
 #include <chrono>
@@ -9,24 +10,6 @@
 
 void clearSerial(SerialReader &reader) {
   while (reader.inputAvailable()) reader.getByte();
-}
-
-bool isArduinoReady(SerialReader &reader) {
-
-  double timeoutS = 20.0;
-  double sleepTimeMs = 50.0;
-  int nbAttempts = timeoutS * 1000.0 / sleepTimeMs;
-
-  for (int i = 0; i < nbAttempts; i++) {
-    if (reader.inputAvailable()) {
-      //std::string str = getAllAvailable(reader);
-      std::string cmd = getInputLine(reader);
-      //std::cerr << cmd << "\n";
-      if (cmd == "ready") return true;
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)sleepTimeMs));
-  }
-  return false;
 }
 
 int main() {

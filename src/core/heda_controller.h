@@ -708,6 +708,10 @@ void scoop(Heda& heda, Jar jar, Spoon spoon) {
   shake(heda);
 }
 
+double getWeight(Heda& h) {
+  
+}
+
 class HedaController {
   public:
 
@@ -849,7 +853,7 @@ class HedaController {
         //i.name = "FooBar";
         //heda.db.insert(i);
         //ensure(i.exists(), "FooBar must exist!");
-        std::cout << "FOO!" << std::endl;
+        std::cout << getWeight(heda) << std::endl;
         //heda.config.grip_offset = 0.0;
         //heda.db.update(heda.config);
       };

@@ -34,6 +34,7 @@ class HedaConfig : public Model {
     double working_z;
     double bowl_x;
     double bowl_z;
+    double scale_ratio;
 };
 
 class Spoon : public Model {
@@ -243,6 +244,7 @@ void bindQuery(T& query, const HedaConfig& item) {
   query.bind(29, item.working_z);
   query.bind(30, item.bowl_x);
   query.bind(31, item.bowl_z);
+  query.bind(32, item.scale_ratio);
 }
 
 template<typename T>

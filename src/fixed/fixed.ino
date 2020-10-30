@@ -52,24 +52,29 @@ void loop() {
 
     Serial.print("Received: ");
     Serial.println(cmd);
+    
+    double nb;
+    char* input = buf; input++;
 
     // get weight
     if (cmd == 'w') {
       Serial.println(scale.getGram(), 1); // Print the gram value with one decimal precision
       
     } else if (cmd == 'c') {
-      double nb;
-      char* input = buf; input++;
       if (parseNumber(&input, nb) < 0) {
-        Serial.println("error");
-        Serial.println("Invalid number given.");
-        return;
+        Serial.println("error"); Serial.println("Invalid number given."); return;
       }
       Serial.println(nb);
       calibrateWithWeight(nb);
     
     } else if (cmd == '#') { // Print the version
       Serial.println("fixed");
+    
+    } else if (cmd == 't') { // Set the ratio
+      if (parseNumber(&input, nb) < 0) {
+        Serial.println("error"); Serial.println("Invalid number given."); return;
+      }
+      scale.setScale(nb);
 
     } else if (cmd == 'e') {
       calibrateEmpty();
