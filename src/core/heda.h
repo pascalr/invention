@@ -43,6 +43,7 @@ class Heda {
               db(db) {
     
       loadConfig();
+      connectFixedSlave();
     }
 
     void loadConfig();

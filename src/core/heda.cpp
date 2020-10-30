@@ -14,6 +14,7 @@ using namespace std;
 // Heda sends the value of the calibration to the fixed slave every time it is started.
 // This way there is no need to reupload to the arduino when the variable changes.
 void Heda::connectFixedSlave() {
+  std::cout << "Connection to fixed slave...";
   if (!isArduinoReady(fixed_reader)) {
     throw TimeoutException("Error arduino response timeout. It was not ready.\n");
   }
@@ -21,6 +22,7 @@ void Heda::connectFixedSlave() {
   waitUntilDone(fixed_reader);
   fixed_writer << "e";
   waitUntilDone(fixed_reader);
+  std::cout << "Done connection.";
 }
 
 void Heda::stop() {
