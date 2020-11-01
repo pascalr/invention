@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "database.h"
+
 template <> std::string getTableName<DetectedHRCode>() { return "detected_codes"; }
 template <> std::string getTableName<Faq>() { return "faqs"; }
 template <> std::string getTableName<HedaConfig>() { return "hedas"; }
@@ -245,5 +247,270 @@ void parseItem(SQLite::Statement& query, Unit& i) {
   i.updated_at = query.getColumn(5);
   i.is_volume = (int)query.getColumn(6);
   i.show_fraction = (int)query.getColumn(7);
+}
+
+Unit Ingredient::getUnit() {
+  if (unit == NULL) {
+    Unit __record = Db::conn().db.find<Unit>(unit_id);
+  }
+  return *unit;
+}
+
+Recipe IngredientQuantity::getRecipe() {
+  if (recipe == NULL) {
+    Recipe __record = Db::conn().db.find<Recipe>(recipe_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find IngredientQuantity.recipe with recipe_id=" + std::to_string(recipe_id));
+    recipe = new Recipe(__record);
+  }
+  return *recipe;
+}
+
+Ingredient IngredientQuantity::getIngredient() {
+  if (ingredient == NULL) {
+    Ingredient __record = Db::conn().db.find<Ingredient>(ingredient_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find IngredientQuantity.ingredient with ingredient_id=" + std::to_string(ingredient_id));
+    ingredient = new Ingredient(__record);
+  }
+  return *ingredient;
+}
+
+Unit IngredientQuantity::getUnit() {
+  if (unit == NULL) {
+    Unit __record = Db::conn().db.find<Unit>(unit_id);
+  }
+  return *unit;
+}
+
+Item Item::getParent() {
+  if (parent == NULL) {
+    Item __record = Db::conn().db.find<Item>(parent_id);
+  }
+  return *parent;
+}
+
+Image Item::getDefaultImage() {
+  if (default_image == NULL) {
+    Image __record = Db::conn().db.find<Image>(default_image_id);
+  }
+  return *default_image;
+}
+
+JarFormat Jar::getJarFormat() {
+  if (jar_format == NULL) {
+    JarFormat __record = Db::conn().db.find<JarFormat>(jar_format_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Jar.jar_format with jar_format_id=" + std::to_string(jar_format_id));
+    jar_format = new JarFormat(__record);
+  }
+  return *jar_format;
+}
+
+Ingredient Jar::getIngredient() {
+  if (ingredient == NULL) {
+    Ingredient __record = Db::conn().db.find<Ingredient>(ingredient_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Jar.ingredient with ingredient_id=" + std::to_string(ingredient_id));
+    ingredient = new Ingredient(__record);
+  }
+  return *ingredient;
+}
+
+JarFormat Location::getJarFormat() {
+  if (jar_format == NULL) {
+    JarFormat __record = Db::conn().db.find<JarFormat>(jar_format_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Location.jar_format with jar_format_id=" + std::to_string(jar_format_id));
+    jar_format = new JarFormat(__record);
+  }
+  return *jar_format;
+}
+
+Jar Location::getJar() {
+  if (jar == NULL) {
+    Jar __record = Db::conn().db.find<Jar>(jar_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Location.jar with jar_id=" + std::to_string(jar_id));
+    jar = new Jar(__record);
+  }
+  return *jar;
+}
+
+Shelf Location::getShelf() {
+  if (shelf == NULL) {
+    Shelf __record = Db::conn().db.find<Shelf>(shelf_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Location.shelf with shelf_id=" + std::to_string(shelf_id));
+    shelf = new Shelf(__record);
+  }
+  return *shelf;
+}
+
+Recipe Meal::getRecipe() {
+  if (recipe == NULL) {
+    Recipe __record = Db::conn().db.find<Recipe>(recipe_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Meal.recipe with recipe_id=" + std::to_string(recipe_id));
+    recipe = new Recipe(__record);
+  }
+  return *recipe;
+}
+
+Image Recipe::getImage() {
+  if (image == NULL) {
+    Image __record = Db::conn().db.find<Image>(image_id);
+  }
+  return *image;
+}
+
+Item Recipe::getItem() {
+  if (item == NULL) {
+    Item __record = Db::conn().db.find<Item>(item_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find Recipe.item with item_id=" + std::to_string(item_id));
+    item = new Item(__record);
+  }
+  return *item;
+}
+
+Image Recipe::getPrimaryImage() {
+  if (primary_image == NULL) {
+    Image __record = Db::conn().db.find<Image>(primary_image_id);
+  }
+  return *primary_image;
+}
+
+Image Recipe::getSecondaryImageLeft() {
+  if (secondary_image_left == NULL) {
+    Image __record = Db::conn().db.find<Image>(secondary_image_left_id);
+  }
+  return *secondary_image_left;
+}
+
+Image Recipe::getSecondaryImageMiddle() {
+  if (secondary_image_middle == NULL) {
+    Image __record = Db::conn().db.find<Image>(secondary_image_middle_id);
+  }
+  return *secondary_image_middle;
+}
+
+Image Recipe::getSecondaryImageRight() {
+  if (secondary_image_right == NULL) {
+    Image __record = Db::conn().db.find<Image>(secondary_image_right_id);
+  }
+  return *secondary_image_right;
+}
+
+Recipe RecipeQuantity::getRecipe() {
+  if (recipe == NULL) {
+    Recipe __record = Db::conn().db.find<Recipe>(recipe_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find RecipeQuantity.recipe with recipe_id=" + std::to_string(recipe_id));
+    recipe = new Recipe(__record);
+  }
+  return *recipe;
+}
+
+Recipe RecipeQuantity::getComponent() {
+  if (component == NULL) {
+    Recipe __record = Db::conn().db.find<Recipe>(component_id);
+  }
+  return *component;
+}
+
+Unit RecipeQuantity::getUnit() {
+  if (unit == NULL) {
+    Unit __record = Db::conn().db.find<Unit>(unit_id);
+  }
+  return *unit;
+}
+
+Recipe RecipeTag::getRecipe() {
+  if (recipe == NULL) {
+    Recipe __record = Db::conn().db.find<Recipe>(recipe_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find RecipeTag.recipe with recipe_id=" + std::to_string(recipe_id));
+    recipe = new Recipe(__record);
+  }
+  return *recipe;
+}
+
+Tag RecipeTag::getTag() {
+  if (tag == NULL) {
+    Tag __record = Db::conn().db.find<Tag>(tag_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find RecipeTag.tag with tag_id=" + std::to_string(tag_id));
+    tag = new Tag(__record);
+  }
+  return *tag;
+}
+
+DetectedHRCode::~DetectedHRCode() {
+}
+
+Faq::~Faq() {
+}
+
+HedaConfig::~HedaConfig() {
+}
+
+Image::~Image() {
+}
+
+Ingredient::~Ingredient() {
+  if (unit != NULL) delete unit;
+}
+
+IngredientQuantity::~IngredientQuantity() {
+  if (recipe != NULL) delete recipe;
+  if (ingredient != NULL) delete ingredient;
+  if (unit != NULL) delete unit;
+}
+
+Item::~Item() {
+  if (parent != NULL) delete parent;
+  if (default_image != NULL) delete default_image;
+}
+
+Jar::~Jar() {
+  if (jar_format != NULL) delete jar_format;
+  if (ingredient != NULL) delete ingredient;
+}
+
+JarFormat::~JarFormat() {
+}
+
+Location::~Location() {
+  if (jar_format != NULL) delete jar_format;
+  if (jar != NULL) delete jar;
+  if (shelf != NULL) delete shelf;
+}
+
+Meal::~Meal() {
+  if (recipe != NULL) delete recipe;
+}
+
+Recipe::~Recipe() {
+  if (image != NULL) delete image;
+  if (item != NULL) delete item;
+  if (primary_image != NULL) delete primary_image;
+  if (secondary_image_left != NULL) delete secondary_image_left;
+  if (secondary_image_middle != NULL) delete secondary_image_middle;
+  if (secondary_image_right != NULL) delete secondary_image_right;
+}
+
+RecipeQuantity::~RecipeQuantity() {
+  if (recipe != NULL) delete recipe;
+  if (component != NULL) delete component;
+  if (unit != NULL) delete unit;
+}
+
+RecipeTag::~RecipeTag() {
+  if (recipe != NULL) delete recipe;
+  if (tag != NULL) delete tag;
+}
+
+Shelf::~Shelf() {
+}
+
+Spoon::~Spoon() {
+}
+
+Tag::~Tag() {
+}
+
+Text::~Text() {
+}
+
+Unit::~Unit() {
 }
 

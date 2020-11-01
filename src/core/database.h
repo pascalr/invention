@@ -5,17 +5,31 @@
 #include "schema_generated.h"
 #include <vector>
 #include <sstream>
-#include "SQLiteCpp/sqlite3/sqlite3.h"
+//#include "SQLiteCpp/sqlite3/sqlite3.h"
+//#include "sqlite3.h"
+#include <iostream>
 
-std::string sanitizeQuote(std::string val);
+#include <exception>
+
+template<class T>
+std::string sanitize(T val) {
+  std::stringstream ss; ss << val;
+  std::string s = ss.str();
+  for (unsigned int i = 0; i < s.length(); i++) {
+
+    char c = s.at(i);
+    if (!( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '<' || c == '=' || c == '>' )) {
+    //if (!( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '<' || c == '=' || c == '>' )) {
+      throw std::runtime_error("An invalid character was detected while sanitizing SQL: " + std::string(c,1)); 
+    }
+  }
+  return s;
+}
 
 template<class T>
 std::string sanitizeQuote(T val) {
-  std::stringstream ss; ss << val;
-  return sqlite3_mprintf("%q", ss.str().c_str());
+  return '"' + sanitize(val) + '"';
 }
-
-std::string sanitize(std::string str);
 
 class LogQuery {
   public:
@@ -29,7 +43,7 @@ class LogQuery {
       out << "[\"";
       out << info_query.getColumnName(index);
       out << "\", ";
-      out << sanitizeQuote(val);
+      out << val;
       out << "]";
     }
 
@@ -221,6 +235,28 @@ class Database {
       return query.getColumn(0);
     }
 
+};
+
+const char* getEnvDefault(const char* name, const char* def) {
+  char* r = std::getenv(name);
+  return r == NULL ? def : r;
+}
+
+// TODO: Merge this singleton class with Database
+// https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
+class Db {
+  public:
+    static Db& conn() {
+      static Db instance; // Guaranteed to be destroyed.
+                          // Instantiated on first use.
+      return instance;
+    }
+    Db() : db(getEnvDefault("HEDA_DB", "../heda-recipes/db/development.sqlite3")) {}
+
+    Db(Db const&)               = delete;
+    void operator=(Db const&)   = delete;
+
+    Database db;
 };
 
 #endif

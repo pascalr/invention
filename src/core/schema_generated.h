@@ -1,7 +1,39 @@
 #ifndef _SCHEMA_GENERATED_H
 #define _SCHEMA_GENERATED_H
 
+#include <exception>
+
 #include "model.h"
+
+
+class MissingAssociationException : public std::exception {
+  public:
+    MissingAssociationException(std::string msg) : message(msg) {}
+    const char* what() const throw() {
+      return message.c_str();
+    }
+    std::string message;
+};
+
+class DetectedHRCode;
+class Faq;
+class HedaConfig;
+class Image;
+class Ingredient;
+class IngredientQuantity;
+class Item;
+class Jar;
+class JarFormat;
+class Location;
+class Meal;
+class Recipe;
+class RecipeQuantity;
+class RecipeTag;
+class Shelf;
+class Spoon;
+class Tag;
+class Text;
+class Unit;
 
 class DetectedHRCode : public Model {
   public:
@@ -19,12 +51,22 @@ class DetectedHRCode : public Model {
     double lid_x;
     double lid_y;
     double lid_z;
+
+    ~DetectedHRCode();
+
+
+  private:
 };
 
 class Faq : public Model {
   public:
     std::string title;
     std::string content;
+
+    ~Faq();
+
+
+  private:
 };
 
 class HedaConfig : public Model {
@@ -62,11 +104,21 @@ class HedaConfig : public Model {
     double balance_x;
     double balance_z;
     double balance_offset;
+
+    ~HedaConfig();
+
+
+  private:
 };
 
 class Image : public Model {
   public:
     double width;
+
+    ~Image();
+
+
+  private:
 };
 
 class Ingredient : public Model {
@@ -81,6 +133,13 @@ class Ingredient : public Model {
     int unit_id;
     double unit_weight;
     double unit_volume;
+
+    ~Ingredient();
+
+    Unit getUnit();
+
+  private:
+    Unit* unit;
 };
 
 class IngredientQuantity : public Model {
@@ -89,6 +148,17 @@ class IngredientQuantity : public Model {
     int ingredient_id;
     double value;
     int unit_id;
+
+    ~IngredientQuantity();
+
+    Recipe getRecipe();
+    Ingredient getIngredient();
+    Unit getUnit();
+
+  private:
+    Recipe* recipe;
+    Ingredient* ingredient;
+    Unit* unit;
 };
 
 class Item : public Model {
@@ -96,6 +166,15 @@ class Item : public Model {
     std::string name;
     int default_image_id;
     int parent_id;
+
+    ~Item();
+
+    Item getParent();
+    Image getDefaultImage();
+
+  private:
+    Item* parent;
+    Image* default_image;
 };
 
 class Jar : public Model {
@@ -105,6 +184,15 @@ class Jar : public Model {
     int location_id;
     int jar_id;
     double weight;
+
+    ~Jar();
+
+    JarFormat getJarFormat();
+    Ingredient getIngredient();
+
+  private:
+    JarFormat* jar_format;
+    Ingredient* ingredient;
 };
 
 class JarFormat : public Model {
@@ -116,6 +204,11 @@ class JarFormat : public Model {
     double lid_diameter;
     double lid_weight;
     double grip_force;
+
+    ~JarFormat();
+
+
+  private:
 };
 
 class Location : public Model {
@@ -131,6 +224,17 @@ class Location : public Model {
     int jar_format_id;
     int jar_id;
     bool occupied;
+
+    ~Location();
+
+    JarFormat getJarFormat();
+    Jar getJar();
+    Shelf getShelf();
+
+  private:
+    JarFormat* jar_format;
+    Jar* jar;
+    Shelf* shelf;
 };
 
 class Meal : public Model {
@@ -138,6 +242,13 @@ class Meal : public Model {
     int recipe_id;
     time_t start_time;
     time_t end_time;
+
+    ~Meal();
+
+    Recipe getRecipe();
+
+  private:
+    Recipe* recipe;
 };
 
 class Recipe : public Model {
@@ -153,6 +264,23 @@ class Recipe : public Model {
     int secondary_image_right_id;
     int item_id;
     int image_id;
+
+    ~Recipe();
+
+    Image getImage();
+    Item getItem();
+    Image getPrimaryImage();
+    Image getSecondaryImageLeft();
+    Image getSecondaryImageMiddle();
+    Image getSecondaryImageRight();
+
+  private:
+    Image* image;
+    Item* item;
+    Image* primary_image;
+    Image* secondary_image_left;
+    Image* secondary_image_middle;
+    Image* secondary_image_right;
 };
 
 class RecipeQuantity : public Model {
@@ -161,12 +289,32 @@ class RecipeQuantity : public Model {
     int component_id;
     double value;
     int unit_id;
+
+    ~RecipeQuantity();
+
+    Recipe getRecipe();
+    Recipe getComponent();
+    Unit getUnit();
+
+  private:
+    Recipe* recipe;
+    Recipe* component;
+    Unit* unit;
 };
 
 class RecipeTag : public Model {
   public:
     int recipe_id;
     int tag_id;
+
+    ~RecipeTag();
+
+    Recipe getRecipe();
+    Tag getTag();
+
+  private:
+    Recipe* recipe;
+    Tag* tag;
 };
 
 class Shelf : public Model {
@@ -177,6 +325,11 @@ class Shelf : public Model {
     double offset_x;
     double offset_z;
     double moving_height;
+
+    ~Shelf();
+
+
+  private:
 };
 
 class Spoon : public Model {
@@ -184,12 +337,22 @@ class Spoon : public Model {
     double offset_y;
     double radius;
     double volume;
+
+    ~Spoon();
+
+
+  private:
 };
 
 class Tag : public Model {
   public:
     std::string name;
     double priority;
+
+    ~Tag();
+
+
+  private:
 };
 
 class Text : public Model {
@@ -198,6 +361,11 @@ class Text : public Model {
     std::string locale_name;
     int textable_id;
     std::string textable_type;
+
+    ~Text();
+
+
+  private:
 };
 
 class Unit : public Model {
@@ -207,6 +375,11 @@ class Unit : public Model {
     bool is_weight;
     bool is_volume;
     bool show_fraction;
+
+    ~Unit();
+
+
+  private:
 };
 
 template<typename T>

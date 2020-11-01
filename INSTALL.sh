@@ -1,3 +1,6 @@
+git submodule init
+git submodule update
+
 # opencv
 # Download latest opencv from their website.
 sudo apt-get install build-essential

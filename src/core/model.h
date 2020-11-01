@@ -2,12 +2,7 @@
 #define _MODEL_H
 
 #include "SQLiteCpp/SQLiteCpp.h"
-#include "position.h"
 #include <vector>
-#include <iostream>
-
-#include "../lib/opencv.h"
-#include "../lib/hr_code.h"
 
 class WrongModelTypeException : public std::exception {};
 
@@ -32,14 +27,14 @@ template <class T>
 double byLidY(const T& t) {
   return t.lid_coord.y;
 }
-template <class T>
-void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true) {
-  if (ascending) {
-    std::sort(items.begin(), items.end(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
-  } else {
-    std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
-  }
-}
+//template <class T>
+//void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true) {
+//  if (ascending) {
+//    std::sort(items.begin(), items.end(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
+//  } else {
+//    std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
+//  }
+//}
 
 class Model {
   public:
