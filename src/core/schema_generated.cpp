@@ -2,26 +2,51 @@
 
 #include <string>
 
-template <> std::string getTableName<HedaConfig>() { return "hedas"; }
-template <> std::string getTableName<Spoon>() { return "spoons"; }
-template <> std::string getTableName<Text>() { return "texts"; }
-template <> std::string getTableName<Shelf>() { return "shelves"; }
-template <> std::string getTableName<Location>() { return "locations"; }
-template <> std::string getTableName<RecipeQuantity>() { return "recipe_quantities"; }
-template <> std::string getTableName<Tag>() { return "tags"; }
-template <> std::string getTableName<Faq>() { return "faqs"; }
-template <> std::string getTableName<Jar>() { return "jars"; }
-template <> std::string getTableName<Item>() { return "items"; }
-template <> std::string getTableName<Unit>() { return "units"; }
-template <> std::string getTableName<Ingredient>() { return "ingredients"; }
-template <> std::string getTableName<TagOrder>() { return "tag_orders"; }
-template <> std::string getTableName<RecipeTag>() { return "recipe_tags"; }
-template <> std::string getTableName<IngredientQuantity>() { return "ingredient_quantities"; }
 template <> std::string getTableName<DetectedHRCode>() { return "detected_codes"; }
-template <> std::string getTableName<JarFormat>() { return "jar_formats"; }
+template <> std::string getTableName<Faq>() { return "faqs"; }
+template <> std::string getTableName<HedaConfig>() { return "hedas"; }
 template <> std::string getTableName<Image>() { return "images"; }
-template <> std::string getTableName<Recipe>() { return "recipes"; }
+template <> std::string getTableName<Ingredient>() { return "ingredients"; }
+template <> std::string getTableName<IngredientQuantity>() { return "ingredient_quantities"; }
+template <> std::string getTableName<Item>() { return "items"; }
+template <> std::string getTableName<Jar>() { return "jars"; }
+template <> std::string getTableName<JarFormat>() { return "jar_formats"; }
+template <> std::string getTableName<Location>() { return "locations"; }
 template <> std::string getTableName<Meal>() { return "meals"; }
+template <> std::string getTableName<Recipe>() { return "recipes"; }
+template <> std::string getTableName<RecipeQuantity>() { return "recipe_quantities"; }
+template <> std::string getTableName<RecipeTag>() { return "recipe_tags"; }
+template <> std::string getTableName<Shelf>() { return "shelves"; }
+template <> std::string getTableName<Spoon>() { return "spoons"; }
+template <> std::string getTableName<Tag>() { return "tags"; }
+template <> std::string getTableName<Text>() { return "texts"; }
+template <> std::string getTableName<Unit>() { return "units"; }
+
+void parseItem(SQLite::Statement& query, DetectedHRCode& i) {
+  i.h = query.getColumn(1);
+  i.v = query.getColumn(2);
+  i.t = query.getColumn(3);
+  i.centerX = query.getColumn(4);
+  i.centerY = query.getColumn(5);
+  i.scale = query.getColumn(6);
+  i.img = (const char*)query.getColumn(7);
+  i.created_at = query.getColumn(8);
+  i.updated_at = query.getColumn(9);
+  i.jar_id = (const char*)query.getColumn(10);
+  i.weight = (const char*)query.getColumn(11);
+  i.content_name = (const char*)query.getColumn(12);
+  i.content_id = (const char*)query.getColumn(13);
+  i.lid_x = query.getColumn(14);
+  i.lid_y = query.getColumn(15);
+  i.lid_z = query.getColumn(16);
+}
+
+void parseItem(SQLite::Statement& query, Faq& i) {
+  i.title = (const char*)query.getColumn(1);
+  i.content = (const char*)query.getColumn(2);
+  i.created_at = query.getColumn(3);
+  i.updated_at = query.getColumn(4);
+}
 
 void parseItem(SQLite::Statement& query, HedaConfig& i) {
   i.working_shelf_id = query.getColumn(1);
@@ -56,34 +81,69 @@ void parseItem(SQLite::Statement& query, HedaConfig& i) {
   i.bowl_x = query.getColumn(30);
   i.bowl_z = query.getColumn(31);
   i.scale_ratio = query.getColumn(32);
+  i.balance_x = query.getColumn(33);
+  i.balance_z = query.getColumn(34);
+  i.balance_offset = query.getColumn(35);
 }
 
-void parseItem(SQLite::Statement& query, Spoon& i) {
-  i.offset_y = query.getColumn(1);
-  i.radius = query.getColumn(2);
-  i.volume = query.getColumn(3);
-  i.created_at = query.getColumn(4);
-  i.updated_at = query.getColumn(5);
+void parseItem(SQLite::Statement& query, Image& i) {
+  i.width = query.getColumn(1);
+  i.created_at = query.getColumn(2);
+  i.updated_at = query.getColumn(3);
 }
 
-void parseItem(SQLite::Statement& query, Text& i) {
-  i.content = (const char*)query.getColumn(1);
-  i.locale_name = (const char*)query.getColumn(2);
+void parseItem(SQLite::Statement& query, Ingredient& i) {
+  i.name = (const char*)query.getColumn(1);
+  i.aliment_id = query.getColumn(2);
   i.created_at = query.getColumn(3);
   i.updated_at = query.getColumn(4);
-  i.textable_id = query.getColumn(5);
-  i.textable_type = (const char*)query.getColumn(6);
+  i.cost = query.getColumn(5);
+  i.quantity = query.getColumn(6);
+  i.density = query.getColumn(7);
+  i.is_external = (int)query.getColumn(8);
+  i.code = (const char*)query.getColumn(9);
+  i.unit_id = query.getColumn(10);
+  i.unit_weight = query.getColumn(11);
+  i.unit_volume = query.getColumn(12);
 }
 
-void parseItem(SQLite::Statement& query, Shelf& i) {
-  i.height = query.getColumn(1);
-  i.width = query.getColumn(2);
-  i.depth = query.getColumn(3);
-  i.offset_x = query.getColumn(4);
-  i.offset_z = query.getColumn(5);
-  i.created_at = query.getColumn(6);
-  i.updated_at = query.getColumn(7);
-  i.moving_height = query.getColumn(8);
+void parseItem(SQLite::Statement& query, IngredientQuantity& i) {
+  i.recipe_id = query.getColumn(1);
+  i.ingredient_id = query.getColumn(2);
+  i.value = query.getColumn(3);
+  i.created_at = query.getColumn(4);
+  i.updated_at = query.getColumn(5);
+  i.unit_id = query.getColumn(6);
+}
+
+void parseItem(SQLite::Statement& query, Item& i) {
+  i.name = (const char*)query.getColumn(1);
+  i.created_at = query.getColumn(2);
+  i.updated_at = query.getColumn(3);
+  i.default_image_id = query.getColumn(4);
+  i.parent_id = query.getColumn(5);
+}
+
+void parseItem(SQLite::Statement& query, Jar& i) {
+  i.jar_format_id = query.getColumn(1);
+  i.ingredient_id = query.getColumn(2);
+  i.created_at = query.getColumn(3);
+  i.updated_at = query.getColumn(4);
+  i.location_id = query.getColumn(5);
+  i.jar_id = query.getColumn(6);
+  i.weight = query.getColumn(7);
+}
+
+void parseItem(SQLite::Statement& query, JarFormat& i) {
+  i.empty_weight = query.getColumn(1);
+  i.height = query.getColumn(2);
+  i.diameter = query.getColumn(3);
+  i.created_at = query.getColumn(4);
+  i.updated_at = query.getColumn(5);
+  i.name = (const char*)query.getColumn(6);
+  i.lid_diameter = query.getColumn(7);
+  i.lid_weight = query.getColumn(8);
+  i.grip_force = query.getColumn(9);
 }
 
 void parseItem(SQLite::Statement& query, Location& i) {
@@ -102,129 +162,12 @@ void parseItem(SQLite::Statement& query, Location& i) {
   i.occupied = (int)query.getColumn(13);
 }
 
-void parseItem(SQLite::Statement& query, RecipeQuantity& i) {
+void parseItem(SQLite::Statement& query, Meal& i) {
   i.recipe_id = query.getColumn(1);
-  i.component_id = query.getColumn(2);
-  i.value = query.getColumn(3);
-  i.unit_id = query.getColumn(4);
-  i.created_at = query.getColumn(5);
-  i.updated_at = query.getColumn(6);
-}
-
-void parseItem(SQLite::Statement& query, Tag& i) {
-  i.name = (const char*)query.getColumn(1);
-  i.created_at = query.getColumn(2);
-  i.updated_at = query.getColumn(3);
-  i.priority = query.getColumn(4);
-}
-
-void parseItem(SQLite::Statement& query, Faq& i) {
-  i.title = (const char*)query.getColumn(1);
-  i.content = (const char*)query.getColumn(2);
-  i.created_at = query.getColumn(3);
-  i.updated_at = query.getColumn(4);
-}
-
-void parseItem(SQLite::Statement& query, Jar& i) {
-  i.jar_format_id = query.getColumn(1);
-  i.ingredient_id = query.getColumn(2);
-  i.created_at = query.getColumn(3);
-  i.updated_at = query.getColumn(4);
-  i.location_id = query.getColumn(5);
-  i.jar_id = query.getColumn(6);
-}
-
-void parseItem(SQLite::Statement& query, Item& i) {
-  i.name = (const char*)query.getColumn(1);
-  i.created_at = query.getColumn(2);
-  i.updated_at = query.getColumn(3);
-  i.default_image_id = query.getColumn(4);
-  i.parent_id = query.getColumn(5);
-}
-
-void parseItem(SQLite::Statement& query, Unit& i) {
-  i.name = (const char*)query.getColumn(1);
-  i.value = query.getColumn(2);
-  i.is_weight = (int)query.getColumn(3);
+  i.start_time = query.getColumn(2);
+  i.end_time = query.getColumn(3);
   i.created_at = query.getColumn(4);
   i.updated_at = query.getColumn(5);
-  i.is_volume = (int)query.getColumn(6);
-  i.show_fraction = (int)query.getColumn(7);
-}
-
-void parseItem(SQLite::Statement& query, Ingredient& i) {
-  i.name = (const char*)query.getColumn(1);
-  i.aliment_id = query.getColumn(2);
-  i.created_at = query.getColumn(3);
-  i.updated_at = query.getColumn(4);
-  i.cost = query.getColumn(5);
-  i.quantity = query.getColumn(6);
-  i.density = query.getColumn(7);
-  i.is_external = (int)query.getColumn(8);
-  i.code = (const char*)query.getColumn(9);
-  i.unit_id = query.getColumn(10);
-  i.unit_weight = query.getColumn(11);
-  i.unit_volume = query.getColumn(12);
-}
-
-void parseItem(SQLite::Statement& query, TagOrder& i) {
-  i.tag_id = query.getColumn(1);
-  i.priority = query.getColumn(2);
-  i.created_at = query.getColumn(3);
-  i.updated_at = query.getColumn(4);
-}
-
-void parseItem(SQLite::Statement& query, RecipeTag& i) {
-  i.recipe_id = query.getColumn(1);
-  i.tag_id = query.getColumn(2);
-  i.created_at = query.getColumn(3);
-  i.updated_at = query.getColumn(4);
-}
-
-void parseItem(SQLite::Statement& query, IngredientQuantity& i) {
-  i.recipe_id = query.getColumn(1);
-  i.ingredient_id = query.getColumn(2);
-  i.value = query.getColumn(3);
-  i.created_at = query.getColumn(4);
-  i.updated_at = query.getColumn(5);
-  i.unit_id = query.getColumn(6);
-}
-
-void parseItem(SQLite::Statement& query, DetectedHRCode& i) {
-  i.h = query.getColumn(1);
-  i.v = query.getColumn(2);
-  i.t = query.getColumn(3);
-  i.centerX = query.getColumn(4);
-  i.centerY = query.getColumn(5);
-  i.scale = query.getColumn(6);
-  i.img = (const char*)query.getColumn(7);
-  i.created_at = query.getColumn(8);
-  i.updated_at = query.getColumn(9);
-  i.jar_id = (const char*)query.getColumn(10);
-  i.weight = (const char*)query.getColumn(11);
-  i.content_name = (const char*)query.getColumn(12);
-  i.content_id = (const char*)query.getColumn(13);
-  i.lid_x = query.getColumn(14);
-  i.lid_y = query.getColumn(15);
-  i.lid_z = query.getColumn(16);
-}
-
-void parseItem(SQLite::Statement& query, JarFormat& i) {
-  i.empty_weight = query.getColumn(1);
-  i.height = query.getColumn(2);
-  i.diameter = query.getColumn(3);
-  i.created_at = query.getColumn(4);
-  i.updated_at = query.getColumn(5);
-  i.name = (const char*)query.getColumn(6);
-  i.lid_diameter = query.getColumn(7);
-  i.lid_weight = query.getColumn(8);
-  i.grip_force = query.getColumn(9);
-}
-
-void parseItem(SQLite::Statement& query, Image& i) {
-  i.width = query.getColumn(1);
-  i.created_at = query.getColumn(2);
-  i.updated_at = query.getColumn(3);
 }
 
 void parseItem(SQLite::Statement& query, Recipe& i) {
@@ -243,11 +186,64 @@ void parseItem(SQLite::Statement& query, Recipe& i) {
   i.image_id = query.getColumn(13);
 }
 
-void parseItem(SQLite::Statement& query, Meal& i) {
+void parseItem(SQLite::Statement& query, RecipeQuantity& i) {
   i.recipe_id = query.getColumn(1);
-  i.start_time = query.getColumn(2);
-  i.end_time = query.getColumn(3);
+  i.component_id = query.getColumn(2);
+  i.value = query.getColumn(3);
+  i.unit_id = query.getColumn(4);
+  i.created_at = query.getColumn(5);
+  i.updated_at = query.getColumn(6);
+}
+
+void parseItem(SQLite::Statement& query, RecipeTag& i) {
+  i.recipe_id = query.getColumn(1);
+  i.tag_id = query.getColumn(2);
+  i.created_at = query.getColumn(3);
+  i.updated_at = query.getColumn(4);
+}
+
+void parseItem(SQLite::Statement& query, Shelf& i) {
+  i.height = query.getColumn(1);
+  i.width = query.getColumn(2);
+  i.depth = query.getColumn(3);
+  i.offset_x = query.getColumn(4);
+  i.offset_z = query.getColumn(5);
+  i.created_at = query.getColumn(6);
+  i.updated_at = query.getColumn(7);
+  i.moving_height = query.getColumn(8);
+}
+
+void parseItem(SQLite::Statement& query, Spoon& i) {
+  i.offset_y = query.getColumn(1);
+  i.radius = query.getColumn(2);
+  i.volume = query.getColumn(3);
   i.created_at = query.getColumn(4);
   i.updated_at = query.getColumn(5);
+}
+
+void parseItem(SQLite::Statement& query, Tag& i) {
+  i.name = (const char*)query.getColumn(1);
+  i.created_at = query.getColumn(2);
+  i.updated_at = query.getColumn(3);
+  i.priority = query.getColumn(4);
+}
+
+void parseItem(SQLite::Statement& query, Text& i) {
+  i.content = (const char*)query.getColumn(1);
+  i.locale_name = (const char*)query.getColumn(2);
+  i.created_at = query.getColumn(3);
+  i.updated_at = query.getColumn(4);
+  i.textable_id = query.getColumn(5);
+  i.textable_type = (const char*)query.getColumn(6);
+}
+
+void parseItem(SQLite::Statement& query, Unit& i) {
+  i.name = (const char*)query.getColumn(1);
+  i.value = query.getColumn(2);
+  i.is_weight = (int)query.getColumn(3);
+  i.created_at = query.getColumn(4);
+  i.updated_at = query.getColumn(5);
+  i.is_volume = (int)query.getColumn(6);
+  i.show_fraction = (int)query.getColumn(7);
 }
 

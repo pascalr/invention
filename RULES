@@ -51,3 +51,10 @@ thisIsALocalVariable
 
 No getters and setters first. Every member variable is public. If you later need to add some logic, make
 the variable protected or private and add a getter and setter.
+
+
+
+
+
+NEVER STORE REFERENCES IN AN OBJECT TO AVOID DANGLING REFERENCES. IF YOU NEED TO STORE ONE,
+THAN MAYBE STORE A POINTER INSTEAD, THIS WAY YOU CAN CHECK IF THE POINTER IS OK?

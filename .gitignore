@@ -25,6 +25,7 @@ tmp/hrcode/parser/*
 !tmp/hrcode/.gitkeep
 !tmp/hrcode/finder/.gitkeep
 !tmp/hrcode/parser/.gitkeep
+client
 
 # See https://help.github.com/articles/ignoring-files for more about ignoring files.
 #
