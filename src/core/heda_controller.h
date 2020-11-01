@@ -717,6 +717,12 @@ double getWeight(Heda& heda) {
   return 0.0; // TODO: Parse the string to get the weight
 }
 
+void weightJar(Heda& heda, Jar& jar) {
+  
+  // Get on top of the scale
+  c = UserCoord(heda.config.balance_x, heda.working_shelf.height + heda.config.balance_offset, heda.config.balance_z);
+}
+
 class HedaController {
   public:
 
