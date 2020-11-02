@@ -567,6 +567,7 @@ void storeDetected(Heda& heda, DetectedHRCode& detected) {
   // Do a closeup first
   closeup(heda, detected);
 
+  // TODO: No need to this this anymore...
   // We must refresh the detected code because it was updated by the closeup and maybe by the action identify too.
   DetectedHRCode updated = heda.db.find<DetectedHRCode>(detected.id);
   ensure(updated.exists(), "Error the previously existing detected hr code was not found anymore. Aborting stored...");
@@ -714,13 +715,18 @@ double getWeight(Heda& heda) {
   heda.fixed_writer << "w";
   std::string w = readAllUntilDone(heda.fixed_reader);
   std::cout << w << "\n";
-  return 0.0; // TODO: Parse the string to get the weight
+  char* pEnd;
+  double val = strtod(number.c_str(), &pEnd);
+  ensure(strlen(pEnd) == 0, "Was unable the parse the weight with sentence=" + w);
+  return val;
 }
 
-void weightJar(Heda& heda, Jar& jar) {
+double weightJar(Heda& heda, Jar& jar) {
   
   // Get on top of the scale
-  c = UserCoord(heda.config.balance_x, heda.working_shelf.height + heda.config.balance_offset, heda.config.balance_z);
+  c = UserCoord(heda.config.balance_x, heda.working_shelf.height + heda.config.balance_offset + jar.getJarFormat().height, heda.config.balance_z);
+  openGrip(jar);
+  return getWeight(heda);
 }
 
 class HedaController {
