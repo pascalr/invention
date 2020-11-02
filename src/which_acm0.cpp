@@ -1,7 +1,7 @@
 #include "core/reader/serial_reader.h"
 #include "core/writer/serial_writer.h"
 #include "lib/lib.h"
-#include "common/comm.h"
+#include "core/comm.h"
 
 #include <thread>
 #include <chrono>
@@ -24,32 +24,9 @@ int main() {
   SerialWriter serialWriter(serialPort);
 
   clearSerial(serialReader);
+  std::string v = getArduinoVersion(serialWriter, serialReader);
 
-  if (!isArduinoReady(serialReader)) {
-    std::cerr << "Error arduino response timeout. Was not ready.\n";
-    return -1;
-  }
-
-  serialWriter << "#";
-  
-  double timeoutS = 20.0;
-  double sleepTimeMs = 50.0;
-  int nbAttempts = timeoutS * 1000.0 / sleepTimeMs;
-
-  for (int i = 0; i < nbAttempts; i++) {
-    if (serialReader.inputAvailable()) {
-      //std::string str = getAllAvailable(serialReader);
-      std::string cmd = getInputLine(serialReader);
-      trim(cmd);
-      if (cmd == "fixed" || cmd == "mobile") {
-        std::cout << cmd;
-        return 0;
-      }
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)sleepTimeMs));
-  }
-
-  std::cerr << "Timeout reached. Arduino did not respond to the version (#) request.\n";
+  std::cout << "ACM0: " << v << "\n";
   return -1;
 }
 

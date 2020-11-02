@@ -1,3 +1,6 @@
+PUT ALL LIBS IN A SINGLE FILE.
+ADD #ifdef ARDUINO for things ARDUINO CANNOT DO.
+
 Écrire un article et une librairie:
 Ruby on rails goodies in c++
 Avec ma librairie.

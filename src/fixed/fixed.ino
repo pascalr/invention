@@ -10,15 +10,10 @@ Hx711 scale(A1, A0);
 void setup() {
 
   Serial.begin(115200);
-  Serial.println("Setup...");
-  Serial.println("fixed");
 
   //pinMode(LED_BUILTIN, OUTPUT);
 
   calibrateEmpty();
-
-  Serial.println("ready");
-
 }
   
 ArduinoReader reader;
@@ -33,6 +28,7 @@ void calibrateEmpty() {
 
 void calibrateWithWeight(double weight) {
   float ratio = (scale.averageValue() - offset) / weight;
+  Serial.print("ratio: ");
   Serial.println(ratio);
   scale.setScale(ratio);
 }
@@ -50,7 +46,7 @@ void loop() {
     // ignore newline characters
     if (cmd == '\r' || cmd == '\n') return;
 
-    Serial.print("Received: ");
+    Serial.print("echo: ");
     Serial.println(cmd);
     
     double nb;
@@ -58,21 +54,25 @@ void loop() {
 
     // get weight
     if (cmd == 'w') {
+      Serial.print("weight: ");
       Serial.println(scale.getGram(), 1); // Print the gram value with one decimal precision
       
     } else if (cmd == 'c') {
       if (parseNumber(&input, nb) < 0) {
-        Serial.println("error"); Serial.println("Invalid number given."); return;
+        Serial.println("error: ");
+        Serial.println("Invalid number given.");
+        return;
       }
-      Serial.println(nb);
       calibrateWithWeight(nb);
     
     } else if (cmd == '#') { // Print the version
-      Serial.println("fixed");
+      Serial.println("#: fixed");
     
     } else if (cmd == 't') { // Set the ratio
       if (parseNumber(&input, nb) < 0) {
-        Serial.println("error"); Serial.println("Invalid number given."); return;
+        Serial.println("error: ");
+        Serial.println("Invalid number given.");
+        return;
       }
       scale.setScale(nb);
 
@@ -80,7 +80,7 @@ void loop() {
       calibrateEmpty();
     
     } else {
-      Serial.println("error");
+      Serial.println("error: ");
       Serial.println("Unkown command");
       return;
     }

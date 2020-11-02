@@ -39,6 +39,9 @@ void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true)
 //template<typename T>
 //void ensure(bool statement, T errorMessage);
 
+bool startsWith(std::string str, std::string prefix);
+bool startsWith(const char *str, const char *ptr);
+
 void ensure(bool statement, std::string errorMessage);
 
 // trim from start (in place)

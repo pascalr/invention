@@ -62,3 +62,12 @@ bool iequals(const string& a, const string& b)
             return false;
     return true;
 }
+
+
+bool startsWith(const std::string str, std::string pre) {
+  return str.rfind(pre, 0) == 0;
+}
+
+bool startsWith(const char *str, const char *pre) {
+  return strncmp(pre, str, strlen(pre)) == 0;
+}
