@@ -1,7 +1,7 @@
 #ifndef _HEDA_CONTROLLER_H
 #define _HEDA_CONTROLLER_H
 
-#include "../common/comm.h"
+#include "../core/comm.h"
 #include "pinpoint.h"
 #include "recipe_parser.h"
 #include "heda.h"
@@ -635,6 +635,8 @@ void bring(Heda& heda, Ingredient& ingredient) {
   loc.occupied = false;
   heda.db.update(loc);
 
+  weightJar(heda, jar);
+
   gotoPolar(heda, heda.toPolarCoord(UserCoord(dest.x,destShelf.moving_height,dest.z), heda.config.gripper_radius));
   putdown(heda,jar);
 
@@ -722,13 +724,14 @@ double getWeight(Heda& heda) {
   return val;
 }
 
-double weightJar(Heda& heda, Jar& jar) {
+void weightJar(Heda& heda, Jar& jar) {
   
   // Get on top of the scale
   UserCoord c(heda.config.balance_x, heda.working_shelf.height + heda.config.balance_offset + jar.getJarFormat().height, heda.config.balance_z);
   gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
   openGrip(heda, jar);
-  return getWeight(heda);
+  jar.weight = getWeight(heda);
+  heda.db.update(jar);
 }
 
 class HedaController {

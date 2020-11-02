@@ -8,7 +8,7 @@
 
 #include "../lib/opencv.h"
 #include "../lib/lib.h"
-#include "../common/comm.h"
+#include "../core/comm.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 using namespace std;
@@ -17,8 +17,8 @@ using namespace std;
 // This way there is no need to reupload to the arduino when the variable changes.
 void Heda::connectFixedSlave() {
   std::cout << "Connection to fixed slave...";
-  if (!isArduinoReady(fixed_reader)) {
-    throw TimeoutException("Error arduino response timeout. It was not ready.\n");
+  if (getArduinoVersion(fixed_writer, fixed_reader) != "fixed") {
+    throw runtime_error("The fixed arduino is not at the proper version. Confused with mobile?");
   }
   fixed_writer << "t" + to_string(config.scale_ratio);
   waitUntilDone(fixed_reader);
