@@ -126,7 +126,8 @@ void moveGrip(Program& p, double dest) {
 }
 
 void moveSpoon(Program& p, double dest) {
-  p.axisR.encoder.setUnitsPerTurn(360.0/90.0*4.0); // FIXME: Why multiply by 4???
+  p.axisR.encoder.setUnitsPerTurn(360.0/90.0);
+  //p.axisR.encoder.setUnitsPerTurn(360.0/90.0*4.0); // FIXME: Why multiply by 4???
   p.axisR.setReverseMotorDirection(true);
   p.axisR.getto(dest);
 }

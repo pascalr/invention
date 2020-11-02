@@ -11,7 +11,7 @@ class Encoder {
     }
 
     void setUnitsPerTurn(double unitsPerTurn) {
-      units_per_steps = wheel_nb_holes / unitsPerTurn;
+      units_per_steps = unitsPerTurn / wheel_nb_holes ;
     }
 
     void checkPosition(unsigned long currentTime, bool isForward) {
