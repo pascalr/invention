@@ -139,7 +139,7 @@ class Ingredient : public Model {
     Unit getUnit();
 
   private:
-    Unit* unit;
+    Unit* unit = NULL;
 };
 
 class IngredientQuantity : public Model {
@@ -156,9 +156,9 @@ class IngredientQuantity : public Model {
     Unit getUnit();
 
   private:
-    Recipe* recipe;
-    Ingredient* ingredient;
-    Unit* unit;
+    Recipe* recipe = NULL;
+    Ingredient* ingredient = NULL;
+    Unit* unit = NULL;
 };
 
 class Item : public Model {
@@ -173,8 +173,8 @@ class Item : public Model {
     Image getDefaultImage();
 
   private:
-    Item* parent;
-    Image* default_image;
+    Item* parent = NULL;
+    Image* default_image = NULL;
 };
 
 class Jar : public Model {
@@ -191,8 +191,8 @@ class Jar : public Model {
     Ingredient getIngredient();
 
   private:
-    JarFormat* jar_format;
-    Ingredient* ingredient;
+    JarFormat* jar_format = NULL;
+    Ingredient* ingredient = NULL;
 };
 
 class JarFormat : public Model {
@@ -232,9 +232,9 @@ class Location : public Model {
     Shelf getShelf();
 
   private:
-    JarFormat* jar_format;
-    Jar* jar;
-    Shelf* shelf;
+    JarFormat* jar_format = NULL;
+    Jar* jar = NULL;
+    Shelf* shelf = NULL;
 };
 
 class Meal : public Model {
@@ -248,7 +248,7 @@ class Meal : public Model {
     Recipe getRecipe();
 
   private:
-    Recipe* recipe;
+    Recipe* recipe = NULL;
 };
 
 class Recipe : public Model {
@@ -275,12 +275,12 @@ class Recipe : public Model {
     Image getSecondaryImageRight();
 
   private:
-    Image* image;
-    Item* item;
-    Image* primary_image;
-    Image* secondary_image_left;
-    Image* secondary_image_middle;
-    Image* secondary_image_right;
+    Image* image = NULL;
+    Item* item = NULL;
+    Image* primary_image = NULL;
+    Image* secondary_image_left = NULL;
+    Image* secondary_image_middle = NULL;
+    Image* secondary_image_right = NULL;
 };
 
 class RecipeQuantity : public Model {
@@ -297,9 +297,9 @@ class RecipeQuantity : public Model {
     Unit getUnit();
 
   private:
-    Recipe* recipe;
-    Recipe* component;
-    Unit* unit;
+    Recipe* recipe = NULL;
+    Recipe* component = NULL;
+    Unit* unit = NULL;
 };
 
 class RecipeTag : public Model {
@@ -313,8 +313,8 @@ class RecipeTag : public Model {
     Tag getTag();
 
   private:
-    Recipe* recipe;
-    Tag* tag;
+    Recipe* recipe = NULL;
+    Tag* tag = NULL;
 };
 
 class Shelf : public Model {
