@@ -1,9 +1,12 @@
 #ifndef _RECIPE_PARSER_H
 #define _RECIPE_PARSER_H
 
+#include <algorithm>
+
 #include "model.h"
 #include "database.h"
 #include "log.h"
+#include "../lib/lib.h"
 
 // Returns the substring until the next space. Updates the str parse what has been extracted.
 std::string parseWord(std::string& str) {
@@ -90,7 +93,7 @@ void parseRecipe(Database& db, Recipe& recipe) {
   db.deleteFrom<IngredientQuantity>("WHERE recipe_id = " + std::to_string(recipe.id));
 
   std::string str = recipe.instructions;
-  transform(str.begin(), str.end(), str.begin(), ::tolower); 
+  std::transform(str.begin(), str.end(), str.begin(), ::tolower); 
 
   debug();
 

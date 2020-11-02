@@ -12,6 +12,7 @@
 #include <opencv2/highgui.hpp>
 #include "log.h"
 #include "parser.h"
+#include "../lib/hr_code.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -716,7 +717,7 @@ double getWeight(Heda& heda) {
   std::string w = readAllUntilDone(heda.fixed_reader);
   std::cout << w << "\n";
   char* pEnd;
-  double val = strtod(number.c_str(), &pEnd);
+  double val = strtod(w.c_str(), &pEnd);
   ensure(strlen(pEnd) == 0, "Was unable the parse the weight with sentence=" + w);
   return val;
 }
@@ -724,8 +725,9 @@ double getWeight(Heda& heda) {
 double weightJar(Heda& heda, Jar& jar) {
   
   // Get on top of the scale
-  c = UserCoord(heda.config.balance_x, heda.working_shelf.height + heda.config.balance_offset + jar.getJarFormat().height, heda.config.balance_z);
-  openGrip(jar);
+  UserCoord c(heda.config.balance_x, heda.working_shelf.height + heda.config.balance_offset + jar.getJarFormat().height, heda.config.balance_z);
+  gotoPolar(heda, heda.toPolarCoord(c, heda.config.gripper_radius));
+  openGrip(heda, jar);
   return getWeight(heda);
 }
 

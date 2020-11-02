@@ -3,6 +3,8 @@
 
 #include <string>
 #include <exception>
+#include <vector>
+#include <algorithm>
 
 void debug();
 
@@ -24,6 +26,15 @@ class TimeoutException : public StringMessageException {
   public:
     TimeoutException(std::string msg) : StringMessageException(msg) {}
 };
+
+template <class T>
+void order(std::vector<T>& items, double (*func)(const T&), bool ascending=true) {
+  if (ascending) {
+    std::sort(items.begin(), items.end(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
+  } else {
+    std::sort(items.rbegin(), items.rend(), [func](const T& arg0, const T& arg1){return func(arg0) < func(arg1);});
+  }
+}
 
 //template<typename T>
 //void ensure(bool statement, T errorMessage);

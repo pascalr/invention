@@ -18,8 +18,7 @@ std::string sanitize(T val) {
   for (unsigned int i = 0; i < s.length(); i++) {
 
     char c = s.at(i);
-    if (!( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '<' || c == '=' || c == '>' )) {
-    //if (!( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '<' || c == '=' || c == '>' )) {
+    if (!( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '<' || c == '=' || c == '>' || c == ' ' || c == '_')) {
       throw std::runtime_error("An invalid character was detected while sanitizing SQL: " + std::string(c,1)); 
     }
   }
@@ -237,10 +236,7 @@ class Database {
 
 };
 
-const char* getEnvDefault(const char* name, const char* def) {
-  char* r = std::getenv(name);
-  return r == NULL ? def : r;
-}
+const char* getEnvDefault(const char* name, const char* def);
 
 // TODO: Merge this singleton class with Database
 // https://stackoverflow.com/questions/1008019/c-singleton-design-pattern

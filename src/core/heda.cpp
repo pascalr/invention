@@ -6,6 +6,8 @@
 #include "log.h"
 #include "parser.h"
 
+#include "../lib/opencv.h"
+#include "../lib/lib.h"
 #include "../common/comm.h"
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;

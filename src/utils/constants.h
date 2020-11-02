@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <math.h>
+
 #define SHAKE_SPEED_RPM 30.0 // tr/min
 #define REFERENCE_SPEED_RPM 30.0 // tr/min
 
@@ -15,9 +17,9 @@
 #define PI 3.1415926535897932384626433832795
 #endif
 
-#define asind(x) (asin(x * M_PI / 180))
-#define sind(x) (sin(fmod((x),360) * M_PI / 180))
-#define cosd(x) (cos(fmod((x),360) * M_PI / 180))
+#define asind(x) (asin(x * PI / 180))
+#define sind(x) (sin(fmod((x),360) * PI / 180))
+#define cosd(x) (cos(fmod((x),360) * PI / 180))
 
 #define FORWARD true
 #define REVERSE false

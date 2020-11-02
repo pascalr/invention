@@ -10,6 +10,7 @@ class Heda;
 #include "writer/log_writer.h"
 
 #include "database.h"
+#include "../lib/opencv.h"
 
 class StoppedException : public std::exception {};
 
