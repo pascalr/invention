@@ -121,6 +121,8 @@ target_link_libraries( test_stepper_motor ${MyLibs} ${SlaveLibs} )
 
 #add_executable( simulation src/simulation.cpp )
 
+add_executable( detect src/detect.cpp )
+
 add_executable( recipe_parser src/recipe_parser.cpp )
 
 add_executable( server src/server.cpp )

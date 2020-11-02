@@ -32,23 +32,30 @@ class Axis {
 class Heda {
   public:
 
-    Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader, Writer& fixedWriter, Reader& fixedReader) :
+    //Heda(Writer& writer, Reader& reader, Database &db, Writer& serverWriter, Reader& serverReader, Writer& fixedWriter, Reader& fixedReader) :
+    //          axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), axisP(AXIS_P),
+    //          m_reader(reader),
+    //          m_writer(writer),
+    //          server_reader(serverReader),
+    //          server_writer(serverWriter),
+    //          fixed_reader(fixedReader),
+    //          fixed_writer(fixedWriter),
+    //          stack_writer("\033[38;5;215mStack\033[0m"),
+    //          db(db) {
+    //
+    //  loadConfig();
+    //  connectFixedSlave();
+    //}
+    Heda(Database &db) :
               axisH(AXIS_H), axisV(AXIS_V), axisT(AXIS_T), axisR(AXIS_R), axisP(AXIS_P),
-              m_reader(reader),
-              m_writer(writer),
-              server_reader(serverReader),
-              server_writer(serverWriter),
-              fixed_reader(fixedReader),
-              fixed_writer(fixedWriter),
-              stack_writer("\033[38;5;215mStack\033[0m"),
               db(db) {
     
       loadConfig();
-      connectFixedSlave();
+      //connectFixedSlave();
     }
 
     void loadConfig();
-    void connectFixedSlave();
+    //void connectFixedSlave();
 
     Axis axisH;
     Axis axisV;
@@ -68,9 +75,9 @@ class Heda {
       askPosition();
     }
 
-    void info() {
-      m_writer << "?";
-    }
+    //void info() {
+    //  m_writer << "?";
+    //}
 
     double unitH(double unitX, double unitT, double reference) {
       return unitX - config.user_coord_offset_x + (cosd(unitT) * reference);
@@ -113,16 +120,16 @@ class Heda {
       return m_position;
     }
 
-    Reader& m_reader;
-    Writer& m_writer;
+    //Reader& m_reader;
+    //Writer& m_writer;
 
-    Reader& server_reader;
-    Writer& server_writer;
-    
-    Reader& fixed_reader;
-    Writer& fixed_writer;
+    //Reader& server_reader;
+    //Writer& server_writer;
+    //
+    //Reader& fixed_reader;
+    //Writer& fixed_writer;
 
-    LogWriter stack_writer;
+    //LogWriter stack_writer;
 
     PolarCoord m_position;
 
@@ -143,7 +150,7 @@ class Heda {
     // Checks if the server sent a "stop" message. Discards anything else.
     // Maybe it's OK for Heda to be only doing one command at a time.
     // The server can keep in memory what the stack of Heda commands.
-    void ensureActive();
+    //void ensureActive();
 
     std::string waiting_message;
     std::string fatal_message;

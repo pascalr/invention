@@ -13,30 +13,30 @@
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 using namespace std;
     
-// Heda sends the value of the calibration to the fixed slave every time it is started.
-// This way there is no need to reupload to the arduino when the variable changes.
-void Heda::connectFixedSlave() {
-  std::cout << "Connection to fixed slave...";
-  if (getArduinoVersion(fixed_writer, fixed_reader) != "fixed") {
-    throw runtime_error("The fixed arduino is not at the proper version. Confused with mobile?");
-  }
-  fixed_writer << "t" + to_string(config.scale_ratio);
-  waitUntilDone(fixed_reader);
-  fixed_writer << "e";
-  waitUntilDone(fixed_reader);
-  std::cout << "Done connection.";
-}
+//// Heda sends the value of the calibration to the fixed slave every time it is started.
+//// This way there is no need to reupload to the arduino when the variable changes.
+//void Heda::connectFixedSlave() {
+//  std::cout << "Connection to fixed slave...";
+//  if (getArduinoVersion(fixed_writer, fixed_reader) != "fixed") {
+//    throw runtime_error("The fixed arduino is not at the proper version. Confused with mobile?");
+//  }
+//  fixed_writer << "t" + to_string(config.scale_ratio);
+//  waitUntilDone(fixed_reader);
+//  fixed_writer << "e";
+//  waitUntilDone(fixed_reader);
+//  std::cout << "Done connection.";
+//}
 
-void Heda::stop() {
-
-  auto h5 = Header5("STOP");
-
-  //m_stack.clear();
-  //m_pending_commands.clear();
-  is_gripping = false;
-  m_writer << "s";
-  askPosition();
-}
+//void Heda::stop() {
+//
+//  auto h5 = Header5("STOP");
+//
+//  //m_stack.clear();
+//  //m_pending_commands.clear();
+//  is_gripping = false;
+//  m_writer << "s";
+//  askPosition();
+//}
 
 void Heda::captureFrame(cv::Mat& frame) {
 
@@ -68,45 +68,45 @@ void Heda::captureFrame(cv::Mat& frame) {
   //}
 }
 
-void Heda::askPosition() {
-  
-  m_writer << "@";
+//void Heda::askPosition() {
+//  
+//  m_writer << "@";
+//
+//  bool receivedMessagePosition = false;
+//
+//  while (true) {
+//    if (m_reader.inputAvailable()) {
+//      string str = getInputLine(m_reader);
+//
+//      if (str == MESSAGE_POSITION) {
+//        receivedMessagePosition = true; continue;
+//
+//      } else if (receivedMessagePosition) {
+//        cout << "Parsing position = " << str << endl;
+//        Parser parser;
+//        ParseResult result;
+//        parser.parse(result, "foo " + str); // FIXME: useless command at beginning
+//        double x = result.popScalaire();
+//        double y = result.popScalaire();
+//        double t = result.popScalaire();
+//        m_position = PolarCoord(x, y, t);
+//        cout << "Done parsing position. Result: " << m_position << endl;
+//        return;
+//      }
+//    }
+//    this_thread::sleep_for(chrono::milliseconds(10));
+//  }
+//}
 
-  bool receivedMessagePosition = false;
-
-  while (true) {
-    if (m_reader.inputAvailable()) {
-      string str = getInputLine(m_reader);
-
-      if (str == MESSAGE_POSITION) {
-        receivedMessagePosition = true; continue;
-
-      } else if (receivedMessagePosition) {
-        cout << "Parsing position = " << str << endl;
-        Parser parser;
-        ParseResult result;
-        parser.parse(result, "foo " + str); // FIXME: useless command at beginning
-        double x = result.popScalaire();
-        double y = result.popScalaire();
-        double t = result.popScalaire();
-        m_position = PolarCoord(x, y, t);
-        cout << "Done parsing position. Result: " << m_position << endl;
-        return;
-      }
-    }
-    this_thread::sleep_for(chrono::milliseconds(10));
-  }
-}
-
-void Heda::ensureActive() {
-  while(server_reader.inputAvailable()) {
-    string cmd = getInputLine(server_reader);
-    if (cmd == "stop") {
-      stop();
-      throw StoppedException();
-    }
-  }
-}
+//void Heda::ensureActive() {
+//  while(server_reader.inputAvailable()) {
+//    string cmd = getInputLine(server_reader);
+//    if (cmd == "stop") {
+//      stop();
+//      throw StoppedException();
+//    }
+//  }
+//}
 
 void Heda::shelfByHeight(Shelf& shelf, double userHeight) {
 

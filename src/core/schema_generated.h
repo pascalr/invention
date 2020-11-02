@@ -15,6 +15,7 @@ class MissingAssociationException : public std::exception {
     std::string message;
 };
 
+class Capture;
 class DetectedHRCode;
 class Faq;
 class HedaConfig;
@@ -25,6 +26,7 @@ class Item;
 class Jar;
 class JarFormat;
 class Location;
+class Master;
 class Meal;
 class Recipe;
 class RecipeQuantity;
@@ -34,6 +36,19 @@ class Spoon;
 class Tag;
 class Text;
 class Unit;
+
+class Capture : public Model {
+  public:
+    std::string filename;
+    double h;
+    double v;
+    double t;
+
+    ~Capture();
+
+
+  private:
+};
 
 class DetectedHRCode : public Model {
   public:
@@ -107,8 +122,10 @@ class HedaConfig : public Model {
 
     ~HedaConfig();
 
+    Shelf getWorkingShelf();
 
   private:
+    Shelf* working_shelf = NULL;
 };
 
 class Image : public Model {
@@ -235,6 +252,18 @@ class Location : public Model {
     JarFormat* jar_format = NULL;
     Jar* jar = NULL;
     Shelf* shelf = NULL;
+};
+
+class Master : public Model {
+  public:
+    double h;
+    double v;
+    double t;
+
+    ~Master();
+
+
+  private:
 };
 
 class Meal : public Model {
@@ -381,6 +410,16 @@ class Unit : public Model {
 
   private:
 };
+
+template<typename T>
+void bindQuery(T& query, const Capture& item) {
+  query.bind(1, item.filename);
+  query.bind(2, item.h);
+  query.bind(3, item.v);
+  query.bind(4, item.t);
+  query.bind(5, item.created_at);
+  query.bind(6, item.updated_at);
+}
 
 template<typename T>
 void bindQuery(T& query, const DetectedHRCode& item) {
@@ -533,6 +572,15 @@ void bindQuery(T& query, const Location& item) {
 }
 
 template<typename T>
+void bindQuery(T& query, const Master& item) {
+  query.bind(1, item.h);
+  query.bind(2, item.v);
+  query.bind(3, item.t);
+  query.bind(4, item.created_at);
+  query.bind(5, item.updated_at);
+}
+
+template<typename T>
 void bindQuery(T& query, const Meal& item) {
   query.bind(1, item.recipe_id);
   query.bind(2, item.start_time);
@@ -626,5 +674,5 @@ void bindQuery(T& query, const Unit& item) {
   query.bind(7, item.show_fraction);
 }
 
-void parseItem(SQLite::Statement& query, DetectedHRCode& i);void parseItem(SQLite::Statement& query, Faq& i);void parseItem(SQLite::Statement& query, HedaConfig& i);void parseItem(SQLite::Statement& query, Image& i);void parseItem(SQLite::Statement& query, Ingredient& i);void parseItem(SQLite::Statement& query, IngredientQuantity& i);void parseItem(SQLite::Statement& query, Item& i);void parseItem(SQLite::Statement& query, Jar& i);void parseItem(SQLite::Statement& query, JarFormat& i);void parseItem(SQLite::Statement& query, Location& i);void parseItem(SQLite::Statement& query, Meal& i);void parseItem(SQLite::Statement& query, Recipe& i);void parseItem(SQLite::Statement& query, RecipeQuantity& i);void parseItem(SQLite::Statement& query, RecipeTag& i);void parseItem(SQLite::Statement& query, Shelf& i);void parseItem(SQLite::Statement& query, Spoon& i);void parseItem(SQLite::Statement& query, Tag& i);void parseItem(SQLite::Statement& query, Text& i);void parseItem(SQLite::Statement& query, Unit& i);
+void parseItem(SQLite::Statement& query, Capture& i);void parseItem(SQLite::Statement& query, DetectedHRCode& i);void parseItem(SQLite::Statement& query, Faq& i);void parseItem(SQLite::Statement& query, HedaConfig& i);void parseItem(SQLite::Statement& query, Image& i);void parseItem(SQLite::Statement& query, Ingredient& i);void parseItem(SQLite::Statement& query, IngredientQuantity& i);void parseItem(SQLite::Statement& query, Item& i);void parseItem(SQLite::Statement& query, Jar& i);void parseItem(SQLite::Statement& query, JarFormat& i);void parseItem(SQLite::Statement& query, Location& i);void parseItem(SQLite::Statement& query, Master& i);void parseItem(SQLite::Statement& query, Meal& i);void parseItem(SQLite::Statement& query, Recipe& i);void parseItem(SQLite::Statement& query, RecipeQuantity& i);void parseItem(SQLite::Statement& query, RecipeTag& i);void parseItem(SQLite::Statement& query, Shelf& i);void parseItem(SQLite::Statement& query, Spoon& i);void parseItem(SQLite::Statement& query, Tag& i);void parseItem(SQLite::Statement& query, Text& i);void parseItem(SQLite::Statement& query, Unit& i);
 #endif

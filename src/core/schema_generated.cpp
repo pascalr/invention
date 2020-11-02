@@ -4,6 +4,7 @@
 
 #include "database.h"
 
+template <> std::string getTableName<Capture>() { return "captures"; }
 template <> std::string getTableName<DetectedHRCode>() { return "detected_codes"; }
 template <> std::string getTableName<Faq>() { return "faqs"; }
 template <> std::string getTableName<HedaConfig>() { return "hedas"; }
@@ -14,6 +15,7 @@ template <> std::string getTableName<Item>() { return "items"; }
 template <> std::string getTableName<Jar>() { return "jars"; }
 template <> std::string getTableName<JarFormat>() { return "jar_formats"; }
 template <> std::string getTableName<Location>() { return "locations"; }
+template <> std::string getTableName<Master>() { return "masters"; }
 template <> std::string getTableName<Meal>() { return "meals"; }
 template <> std::string getTableName<Recipe>() { return "recipes"; }
 template <> std::string getTableName<RecipeQuantity>() { return "recipe_quantities"; }
@@ -23,6 +25,15 @@ template <> std::string getTableName<Spoon>() { return "spoons"; }
 template <> std::string getTableName<Tag>() { return "tags"; }
 template <> std::string getTableName<Text>() { return "texts"; }
 template <> std::string getTableName<Unit>() { return "units"; }
+
+void parseItem(SQLite::Statement& query, Capture& i) {
+  i.filename = (const char*)query.getColumn(1);
+  i.h = query.getColumn(2);
+  i.v = query.getColumn(3);
+  i.t = query.getColumn(4);
+  i.created_at = query.getColumn(5);
+  i.updated_at = query.getColumn(6);
+}
 
 void parseItem(SQLite::Statement& query, DetectedHRCode& i) {
   i.h = query.getColumn(1);
@@ -164,6 +175,14 @@ void parseItem(SQLite::Statement& query, Location& i) {
   i.occupied = (int)query.getColumn(13);
 }
 
+void parseItem(SQLite::Statement& query, Master& i) {
+  i.h = query.getColumn(1);
+  i.v = query.getColumn(2);
+  i.t = query.getColumn(3);
+  i.created_at = query.getColumn(4);
+  i.updated_at = query.getColumn(5);
+}
+
 void parseItem(SQLite::Statement& query, Meal& i) {
   i.recipe_id = query.getColumn(1);
   i.start_time = query.getColumn(2);
@@ -247,6 +266,15 @@ void parseItem(SQLite::Statement& query, Unit& i) {
   i.updated_at = query.getColumn(5);
   i.is_volume = (int)query.getColumn(6);
   i.show_fraction = (int)query.getColumn(7);
+}
+
+Shelf HedaConfig::getWorkingShelf() {
+  if (working_shelf == NULL) {
+    Shelf __record = Db::conn().db.find<Shelf>(working_shelf_id);
+    if (!__record.exists()) throw MissingAssociationException("Could not find HedaConfig.working_shelf with working_shelf_id=" + std::to_string(working_shelf_id));
+    working_shelf = new Shelf(__record);
+  }
+  return *working_shelf;
 }
 
 Unit Ingredient::getUnit() {
@@ -434,6 +462,9 @@ Tag RecipeTag::getTag() {
   return *tag;
 }
 
+Capture::~Capture() {
+}
+
 DetectedHRCode::~DetectedHRCode() {
 }
 
@@ -441,6 +472,7 @@ Faq::~Faq() {
 }
 
 HedaConfig::~HedaConfig() {
+  if (working_shelf != NULL) delete working_shelf;
 }
 
 Image::~Image() {
@@ -473,6 +505,9 @@ Location::~Location() {
   if (jar_format != NULL) delete jar_format;
   if (jar != NULL) delete jar;
   if (shelf != NULL) delete shelf;
+}
+
+Master::~Master() {
 }
 
 Meal::~Meal() {
