@@ -523,6 +523,12 @@ void findHRCodes(cv::Mat& original, vector<HRCode> &detectedCodes) {
 
     bool correctDistance = abs(firstMarker.distanceMm(secondMarker, pixelsPerMm) - HRCODE_MARKERS_INTERSPACE)/HRCODE_MARKERS_INTERSPACE < 0.2; // HARDCODED. 20% is a little generous
     if (!correctDistance) {std::cout << "The interspace between the two markers was not at the correct distance." << std::endl; continue;}
+    
+    // Let's ignore detected codes beyond the edge of the picture
+    if (circle.center.x - circle.radius_px < 0.0) continue;
+    if (circle.center.y - circle.radius_px < 0.0) continue;
+    if (circle.center.x + circle.radius_px > srcGray.cols) continue;
+    if (circle.center.y + circle.radius_px > srcGray.rows) continue;
 
     cout << "Detected HRCode!" << endl;
 

@@ -104,42 +104,45 @@ void parseCode(Heda& heda, DetectedHRCode& code) {
   //code.content_id = lines[3];
 }
 
-int main() {
-  
-  Database db("../heda-recipes/db/development.sqlite3"); // FIXME: HARDCODED
-  Heda heda(db); 
+void processCapture(Heda& heda, Capture& capture, std::vector<DetectedHRCode> &detected) {
+
+  std::string filename = "../heda-recipes/" + capture.filename;
+  std::cout << "Processing file: " << filename << std::endl;
+  cv::Mat img = cv::imread(filename, cv::IMREAD_COLOR);
+
+  if (img.empty()) {std::cerr << "Ignoring empty capture\n"; return;}
+
+  vector<HRCode> positions;
+  findHRCodes(img, positions);
+
+  if (!positions.empty()) {
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
+      cout << "Detected one HRCode!!!" << endl;
+      DetectedHRCode d;
+      d.h = capture.h;
+      d.v = capture.v;
+      d.t = capture.t;
+      d.centerX = it->x;
+      d.centerY = it->y;
+      d.scale = it->scale;
+      d.img = it->imgFilename;
+
+      pinpointCode(heda, d);
+      parseCode(heda, d);
+
+      detected.push_back(d);
+    }
+  }
+}
+
+void detectAll(Heda& heda) {
 
   heda.db.clear<DetectedHRCode>();
   vector<DetectedHRCode> detected;
 
   std::vector<Capture> captures = heda.db.all<Capture>();
   for (Capture& capture : captures) {
-
-    std::string filename = "../heda-recipes/" + capture.filename;
-    std::cout << "Processing file: " << filename << std::endl;
-    cv::Mat img = cv::imread(filename, cv::IMREAD_COLOR);
-
-    vector<HRCode> positions;
-    findHRCodes(img, positions);
-
-    if (!positions.empty()) {
-      for (auto it = positions.begin(); it != positions.end(); ++it) {
-        cout << "Detected one HRCode!!!" << endl;
-        DetectedHRCode d;
-        d.h = capture.h;
-        d.v = capture.v;
-        d.t = capture.t;
-        d.centerX = it->x;
-        d.centerY = it->y;
-        d.scale = it->scale;
-        d.img = it->imgFilename;
-
-        pinpointCode(heda, d);
-        parseCode(heda, d);
-
-        detected.push_back(d);
-      }
-    }
+    processCapture(heda, capture, detected);
   }
   
   for (DetectedHRCode& it : detected) {
@@ -147,6 +150,36 @@ int main() {
   }
 
   removeNearDuplicates(heda);
+}
+
+int main(int argc, char** argv) {
+  
+  Database db("../heda-recipes/db/development.sqlite3"); // FIXME: HARDCODED
+  Heda heda(db); 
+
+  if (argc <= 1) {
+    detectAll(heda);
+  } else if (argc == 3) {
+
+    int captureId = std::stoi(argv[1]);
+    int detectedId = std::stoi(argv[2]);
+
+    Capture capture = heda.db.find<Capture>(captureId);
+    if (!capture.exists()) {return -4;}
+    DetectedHRCode code = heda.db.find<DetectedHRCode>(detectedId);
+    if (!code.exists()) {return -3;}
+
+    vector<DetectedHRCode> detected;
+    processCapture(heda, capture, detected);
+    if (detected.size() != 1) {return -1;}
+
+    DetectedHRCode updated = detected[0];
+    updated.id = detectedId;
+    heda.db.update(updated);
+    
+  } else {
+    return -2;
+  }
 
   return 0;
 }
