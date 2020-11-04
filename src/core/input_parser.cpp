@@ -247,6 +247,7 @@ void myLoop(Program& p) {
       p.getWriter() << p.axisH.getPosition() << " "
                     << p.axisV.getPosition() << " "
                     << p.axisT.getPosition() << "\n";
+      p.getWriter() << "done\n";
       
     // ignore
     } else if (cmd == '\r' || cmd == '\n') {
