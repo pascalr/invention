@@ -5,9 +5,10 @@
 #include "database.h"
 
 template <> std::string getTableName<Capture>() { return "captures"; }
+template <> std::string getTableName<HedaConfig>() { return "configs"; }
 template <> std::string getTableName<DetectedHRCode>() { return "detected_codes"; }
 template <> std::string getTableName<Faq>() { return "faqs"; }
-template <> std::string getTableName<HedaConfig>() { return "hedas"; }
+template <> std::string getTableName<Master>() { return "hedas"; }
 template <> std::string getTableName<Image>() { return "images"; }
 template <> std::string getTableName<Ingredient>() { return "ingredients"; }
 template <> std::string getTableName<IngredientQuantity>() { return "ingredient_quantities"; }
@@ -15,7 +16,6 @@ template <> std::string getTableName<Item>() { return "items"; }
 template <> std::string getTableName<Jar>() { return "jars"; }
 template <> std::string getTableName<JarFormat>() { return "jar_formats"; }
 template <> std::string getTableName<Location>() { return "locations"; }
-template <> std::string getTableName<Master>() { return "masters"; }
 template <> std::string getTableName<Meal>() { return "meals"; }
 template <> std::string getTableName<Recipe>() { return "recipes"; }
 template <> std::string getTableName<RecipeQuantity>() { return "recipe_quantities"; }
@@ -33,32 +33,6 @@ void parseItem(SQLite::Statement& query, Capture& i) {
   i.t = query.getColumn(4);
   i.created_at = query.getColumn(5);
   i.updated_at = query.getColumn(6);
-}
-
-void parseItem(SQLite::Statement& query, DetectedHRCode& i) {
-  i.h = query.getColumn(1);
-  i.v = query.getColumn(2);
-  i.t = query.getColumn(3);
-  i.centerX = query.getColumn(4);
-  i.centerY = query.getColumn(5);
-  i.scale = query.getColumn(6);
-  i.img = (const char*)query.getColumn(7);
-  i.created_at = query.getColumn(8);
-  i.updated_at = query.getColumn(9);
-  i.jar_id = (const char*)query.getColumn(10);
-  i.weight = (const char*)query.getColumn(11);
-  i.content_name = (const char*)query.getColumn(12);
-  i.content_id = (const char*)query.getColumn(13);
-  i.lid_x = query.getColumn(14);
-  i.lid_y = query.getColumn(15);
-  i.lid_z = query.getColumn(16);
-}
-
-void parseItem(SQLite::Statement& query, Faq& i) {
-  i.title = (const char*)query.getColumn(1);
-  i.content = (const char*)query.getColumn(2);
-  i.created_at = query.getColumn(3);
-  i.updated_at = query.getColumn(4);
 }
 
 void parseItem(SQLite::Statement& query, HedaConfig& i) {
@@ -97,6 +71,41 @@ void parseItem(SQLite::Statement& query, HedaConfig& i) {
   i.balance_x = query.getColumn(33);
   i.balance_z = query.getColumn(34);
   i.balance_offset = query.getColumn(35);
+}
+
+void parseItem(SQLite::Statement& query, DetectedHRCode& i) {
+  i.h = query.getColumn(1);
+  i.v = query.getColumn(2);
+  i.t = query.getColumn(3);
+  i.centerX = query.getColumn(4);
+  i.centerY = query.getColumn(5);
+  i.scale = query.getColumn(6);
+  i.img = (const char*)query.getColumn(7);
+  i.created_at = query.getColumn(8);
+  i.updated_at = query.getColumn(9);
+  i.jar_id = (const char*)query.getColumn(10);
+  i.weight = (const char*)query.getColumn(11);
+  i.content_name = (const char*)query.getColumn(12);
+  i.content_id = (const char*)query.getColumn(13);
+  i.lid_x = query.getColumn(14);
+  i.lid_y = query.getColumn(15);
+  i.lid_z = query.getColumn(16);
+}
+
+void parseItem(SQLite::Statement& query, Faq& i) {
+  i.title = (const char*)query.getColumn(1);
+  i.content = (const char*)query.getColumn(2);
+  i.created_at = query.getColumn(3);
+  i.updated_at = query.getColumn(4);
+}
+
+void parseItem(SQLite::Statement& query, Master& i) {
+  i.h = query.getColumn(1);
+  i.v = query.getColumn(2);
+  i.t = query.getColumn(3);
+  i.created_at = query.getColumn(4);
+  i.updated_at = query.getColumn(5);
+  i.is_stopping = (int)query.getColumn(6);
 }
 
 void parseItem(SQLite::Statement& query, Image& i) {
@@ -145,6 +154,7 @@ void parseItem(SQLite::Statement& query, Jar& i) {
   i.location_id = query.getColumn(5);
   i.jar_id = query.getColumn(6);
   i.weight = query.getColumn(7);
+  i.detected_at = query.getColumn(8);
 }
 
 void parseItem(SQLite::Statement& query, JarFormat& i) {
@@ -157,30 +167,18 @@ void parseItem(SQLite::Statement& query, JarFormat& i) {
   i.lid_diameter = query.getColumn(7);
   i.lid_weight = query.getColumn(8);
   i.grip_force = query.getColumn(9);
+  i.volume = query.getColumn(10);
 }
 
 void parseItem(SQLite::Statement& query, Location& i) {
   i.x = query.getColumn(1);
   i.z = query.getColumn(2);
-  i.move_command = (const char*)query.getColumn(3);
-  i.shelf_id = query.getColumn(4);
-  i.created_at = query.getColumn(5);
-  i.updated_at = query.getColumn(6);
-  i.diameter = query.getColumn(7);
-  i.is_storage = (int)query.getColumn(8);
-  i.name = (const char*)query.getColumn(9);
-  i.colonne_id = query.getColumn(10);
-  i.jar_format_id = query.getColumn(11);
-  i.jar_id = query.getColumn(12);
-  i.occupied = (int)query.getColumn(13);
-}
-
-void parseItem(SQLite::Statement& query, Master& i) {
-  i.h = query.getColumn(1);
-  i.v = query.getColumn(2);
-  i.t = query.getColumn(3);
+  i.shelf_id = query.getColumn(3);
   i.created_at = query.getColumn(4);
   i.updated_at = query.getColumn(5);
+  i.is_storage = (int)query.getColumn(6);
+  i.jar_id = query.getColumn(7);
+  i.occupied = (int)query.getColumn(8);
 }
 
 void parseItem(SQLite::Statement& query, Meal& i) {
@@ -341,15 +339,6 @@ Ingredient Jar::getIngredient() {
   return *ingredient;
 }
 
-JarFormat Location::getJarFormat() {
-  if (jar_format == NULL) {
-    JarFormat __record = Db::conn().db.find<JarFormat>(jar_format_id);
-    if (!__record.exists()) throw MissingAssociationException("Could not find Location.jar_format with jar_format_id=" + std::to_string(jar_format_id));
-    jar_format = new JarFormat(__record);
-  }
-  return *jar_format;
-}
-
 Jar Location::getJar() {
   if (jar == NULL) {
     Jar __record = Db::conn().db.find<Jar>(jar_id);
@@ -465,14 +454,17 @@ Tag RecipeTag::getTag() {
 Capture::~Capture() {
 }
 
+HedaConfig::~HedaConfig() {
+  if (working_shelf != NULL) delete working_shelf;
+}
+
 DetectedHRCode::~DetectedHRCode() {
 }
 
 Faq::~Faq() {
 }
 
-HedaConfig::~HedaConfig() {
-  if (working_shelf != NULL) delete working_shelf;
+Master::~Master() {
 }
 
 Image::~Image() {
@@ -502,12 +494,8 @@ JarFormat::~JarFormat() {
 }
 
 Location::~Location() {
-  if (jar_format != NULL) delete jar_format;
   if (jar != NULL) delete jar;
   if (shelf != NULL) delete shelf;
-}
-
-Master::~Master() {
 }
 
 Meal::~Meal() {

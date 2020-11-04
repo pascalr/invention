@@ -16,9 +16,10 @@ class MissingAssociationException : public std::exception {
 };
 
 class Capture;
+class HedaConfig;
 class DetectedHRCode;
 class Faq;
-class HedaConfig;
+class Master;
 class Image;
 class Ingredient;
 class IngredientQuantity;
@@ -26,7 +27,6 @@ class Item;
 class Jar;
 class JarFormat;
 class Location;
-class Master;
 class Meal;
 class Recipe;
 class RecipeQuantity;
@@ -45,40 +45,6 @@ class Capture : public Model {
     double t;
 
     ~Capture();
-
-
-  private:
-};
-
-class DetectedHRCode : public Model {
-  public:
-    double h;
-    double v;
-    double t;
-    double centerX;
-    double centerY;
-    double scale;
-    std::string img;
-    std::string jar_id;
-    std::string weight;
-    std::string content_name;
-    std::string content_id;
-    double lid_x;
-    double lid_y;
-    double lid_z;
-
-    ~DetectedHRCode();
-
-
-  private:
-};
-
-class Faq : public Model {
-  public:
-    std::string title;
-    std::string content;
-
-    ~Faq();
 
 
   private:
@@ -126,6 +92,53 @@ class HedaConfig : public Model {
 
   private:
     Shelf* working_shelf = NULL;
+};
+
+class DetectedHRCode : public Model {
+  public:
+    double h;
+    double v;
+    double t;
+    double centerX;
+    double centerY;
+    double scale;
+    std::string img;
+    std::string jar_id;
+    std::string weight;
+    std::string content_name;
+    std::string content_id;
+    double lid_x;
+    double lid_y;
+    double lid_z;
+
+    ~DetectedHRCode();
+
+
+  private:
+};
+
+class Faq : public Model {
+  public:
+    std::string title;
+    std::string content;
+
+    ~Faq();
+
+
+  private:
+};
+
+class Master : public Model {
+  public:
+    double h;
+    double v;
+    double t;
+    bool is_stopping;
+
+    ~Master();
+
+
+  private:
 };
 
 class Image : public Model {
@@ -201,6 +214,7 @@ class Jar : public Model {
     int location_id;
     int jar_id;
     double weight;
+    time_t detected_at;
 
     ~Jar();
 
@@ -221,6 +235,7 @@ class JarFormat : public Model {
     double lid_diameter;
     double lid_weight;
     double grip_force;
+    double volume;
 
     ~JarFormat();
 
@@ -232,38 +247,19 @@ class Location : public Model {
   public:
     double x;
     double z;
-    std::string move_command;
     int shelf_id;
-    double diameter;
     bool is_storage;
-    std::string name;
-    int colonne_id;
-    int jar_format_id;
     int jar_id;
     bool occupied;
 
     ~Location();
 
-    JarFormat getJarFormat();
     Jar getJar();
     Shelf getShelf();
 
   private:
-    JarFormat* jar_format = NULL;
     Jar* jar = NULL;
     Shelf* shelf = NULL;
-};
-
-class Master : public Model {
-  public:
-    double h;
-    double v;
-    double t;
-
-    ~Master();
-
-
-  private:
 };
 
 class Meal : public Model {
@@ -422,34 +418,6 @@ void bindQuery(T& query, const Capture& item) {
 }
 
 template<typename T>
-void bindQuery(T& query, const DetectedHRCode& item) {
-  query.bind(1, item.h);
-  query.bind(2, item.v);
-  query.bind(3, item.t);
-  query.bind(4, item.centerX);
-  query.bind(5, item.centerY);
-  query.bind(6, item.scale);
-  query.bind(7, item.img);
-  query.bind(8, item.created_at);
-  query.bind(9, item.updated_at);
-  query.bind(10, item.jar_id);
-  query.bind(11, item.weight);
-  query.bind(12, item.content_name);
-  query.bind(13, item.content_id);
-  query.bind(14, item.lid_x);
-  query.bind(15, item.lid_y);
-  query.bind(16, item.lid_z);
-}
-
-template<typename T>
-void bindQuery(T& query, const Faq& item) {
-  query.bind(1, item.title);
-  query.bind(2, item.content);
-  query.bind(3, item.created_at);
-  query.bind(4, item.updated_at);
-}
-
-template<typename T>
 void bindQuery(T& query, const HedaConfig& item) {
   query.bind(1, item.working_shelf_id);
   query.bind(2, item.created_at);
@@ -486,6 +454,44 @@ void bindQuery(T& query, const HedaConfig& item) {
   query.bind(33, item.balance_x);
   query.bind(34, item.balance_z);
   query.bind(35, item.balance_offset);
+}
+
+template<typename T>
+void bindQuery(T& query, const DetectedHRCode& item) {
+  query.bind(1, item.h);
+  query.bind(2, item.v);
+  query.bind(3, item.t);
+  query.bind(4, item.centerX);
+  query.bind(5, item.centerY);
+  query.bind(6, item.scale);
+  query.bind(7, item.img);
+  query.bind(8, item.created_at);
+  query.bind(9, item.updated_at);
+  query.bind(10, item.jar_id);
+  query.bind(11, item.weight);
+  query.bind(12, item.content_name);
+  query.bind(13, item.content_id);
+  query.bind(14, item.lid_x);
+  query.bind(15, item.lid_y);
+  query.bind(16, item.lid_z);
+}
+
+template<typename T>
+void bindQuery(T& query, const Faq& item) {
+  query.bind(1, item.title);
+  query.bind(2, item.content);
+  query.bind(3, item.created_at);
+  query.bind(4, item.updated_at);
+}
+
+template<typename T>
+void bindQuery(T& query, const Master& item) {
+  query.bind(1, item.h);
+  query.bind(2, item.v);
+  query.bind(3, item.t);
+  query.bind(4, item.created_at);
+  query.bind(5, item.updated_at);
+  query.bind(6, item.is_stopping);
 }
 
 template<typename T>
@@ -539,6 +545,7 @@ void bindQuery(T& query, const Jar& item) {
   query.bind(5, item.location_id);
   query.bind(6, item.jar_id);
   query.bind(7, item.weight);
+  query.bind(8, item.detected_at);
 }
 
 template<typename T>
@@ -552,32 +559,19 @@ void bindQuery(T& query, const JarFormat& item) {
   query.bind(7, item.lid_diameter);
   query.bind(8, item.lid_weight);
   query.bind(9, item.grip_force);
+  query.bind(10, item.volume);
 }
 
 template<typename T>
 void bindQuery(T& query, const Location& item) {
   query.bind(1, item.x);
   query.bind(2, item.z);
-  query.bind(3, item.move_command);
-  query.bind(4, item.shelf_id);
-  query.bind(5, item.created_at);
-  query.bind(6, item.updated_at);
-  query.bind(7, item.diameter);
-  query.bind(8, item.is_storage);
-  query.bind(9, item.name);
-  query.bind(10, item.colonne_id);
-  query.bind(11, item.jar_format_id);
-  query.bind(12, item.jar_id);
-  query.bind(13, item.occupied);
-}
-
-template<typename T>
-void bindQuery(T& query, const Master& item) {
-  query.bind(1, item.h);
-  query.bind(2, item.v);
-  query.bind(3, item.t);
+  query.bind(3, item.shelf_id);
   query.bind(4, item.created_at);
   query.bind(5, item.updated_at);
+  query.bind(6, item.is_storage);
+  query.bind(7, item.jar_id);
+  query.bind(8, item.occupied);
 }
 
 template<typename T>
@@ -674,5 +668,5 @@ void bindQuery(T& query, const Unit& item) {
   query.bind(7, item.show_fraction);
 }
 
-void parseItem(SQLite::Statement& query, Capture& i);void parseItem(SQLite::Statement& query, DetectedHRCode& i);void parseItem(SQLite::Statement& query, Faq& i);void parseItem(SQLite::Statement& query, HedaConfig& i);void parseItem(SQLite::Statement& query, Image& i);void parseItem(SQLite::Statement& query, Ingredient& i);void parseItem(SQLite::Statement& query, IngredientQuantity& i);void parseItem(SQLite::Statement& query, Item& i);void parseItem(SQLite::Statement& query, Jar& i);void parseItem(SQLite::Statement& query, JarFormat& i);void parseItem(SQLite::Statement& query, Location& i);void parseItem(SQLite::Statement& query, Master& i);void parseItem(SQLite::Statement& query, Meal& i);void parseItem(SQLite::Statement& query, Recipe& i);void parseItem(SQLite::Statement& query, RecipeQuantity& i);void parseItem(SQLite::Statement& query, RecipeTag& i);void parseItem(SQLite::Statement& query, Shelf& i);void parseItem(SQLite::Statement& query, Spoon& i);void parseItem(SQLite::Statement& query, Tag& i);void parseItem(SQLite::Statement& query, Text& i);void parseItem(SQLite::Statement& query, Unit& i);
+void parseItem(SQLite::Statement& query, Capture& i);void parseItem(SQLite::Statement& query, HedaConfig& i);void parseItem(SQLite::Statement& query, DetectedHRCode& i);void parseItem(SQLite::Statement& query, Faq& i);void parseItem(SQLite::Statement& query, Master& i);void parseItem(SQLite::Statement& query, Image& i);void parseItem(SQLite::Statement& query, Ingredient& i);void parseItem(SQLite::Statement& query, IngredientQuantity& i);void parseItem(SQLite::Statement& query, Item& i);void parseItem(SQLite::Statement& query, Jar& i);void parseItem(SQLite::Statement& query, JarFormat& i);void parseItem(SQLite::Statement& query, Location& i);void parseItem(SQLite::Statement& query, Meal& i);void parseItem(SQLite::Statement& query, Recipe& i);void parseItem(SQLite::Statement& query, RecipeQuantity& i);void parseItem(SQLite::Statement& query, RecipeTag& i);void parseItem(SQLite::Statement& query, Shelf& i);void parseItem(SQLite::Statement& query, Spoon& i);void parseItem(SQLite::Statement& query, Tag& i);void parseItem(SQLite::Statement& query, Text& i);void parseItem(SQLite::Statement& query, Unit& i);
 #endif
