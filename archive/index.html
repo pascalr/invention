@@ -1,0 +1,885 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1">
+<title>Anet A8 Firmware: Which to Choose &amp; How to Change It | All3DP</title>
+<link href="https://i.all3dp.com" rel="preconnect">
+<link href="https://cdn.iubenda.com" rel="preconnect">
+<link href="https://www.googletagmanager.com" rel="preconnect">
+<link rel="alternate" href="https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/" hreflang="x-default">
+<link rel="alternate" href="https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/" hreflang="en">
+<link rel="preload" href="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-v19-latin-regular.woff2" as="font">
+<link rel="preload" href="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-v19-latin-700.woff2" as="font">
+<link rel="preload" href="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-v19-latin-900.woff2" as="font">
+<link rel="preload" href="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-condensed-v17-latin-regular.woff2" as="font">
+<style>
+      @font-face {
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-display: fallback;
+        src: local('Roboto'), local('Roboto-Regular'),
+            url(https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-v19-latin-regular.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 700;
+        font-display: fallback;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+            url(https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-v19-latin-700.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 900;
+        font-display: fallback;
+        src: local('Roboto Black'), local('Roboto-Black'),
+            url(https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-v19-latin-900.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weight: 400;
+        font-display: fallback;
+        src: local('Roboto Condensed'), local('RobotoCondensed-Regular'),
+            url(https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/fonts/roboto-condensed-v17-latin-regular.woff2) format('woff2');
+      }
+    </style>
+<style>/*! normalize.css v6.0.0 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}article,aside,footer,header,nav,section{display:block}h1{font-size:2em;margin:.67em 0}figcaption,figure,main{display:block}figure{margin:1em 40px}hr{-webkit-box-sizing:content-box;box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent;-webkit-text-decoration-skip:objects}abbr[title]{border-bottom:none;text-decoration:underline;-webkit-text-decoration:underline dotted;text-decoration:underline dotted}b,strong{font-weight:inherit;font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}dfn{font-style:italic}mark{background-color:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}audio,video{display:inline-block}audio:not([controls]){display:none;height:0}img{border-style:none}svg:not(:root){overflow:hidden}button,input,optgroup,select,textarea{margin:0}button,input{overflow:visible}button,select{text-transform:none}[type=reset],[type=submit],button,html [type=button]{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}legend{-webkit-box-sizing:border-box;box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{display:inline-block;vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{-webkit-box-sizing:border-box;box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details,menu{display:block}summary{display:list-item}canvas{display:inline-block}[hidden],template{display:none}[type=button],[type=reset],[type=submit],button{background:transparent;border:0;color:inherit;font:inherit;margin:0;padding:0;width:auto;-webkit-appearance:none;-webkit-font-smoothing:antialiased;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{padding:0;border:0}html{-webkit-box-sizing:border-box;box-sizing:border-box}*,:after,:before{-webkit-box-sizing:inherit;box-sizing:inherit}button,label,option,select{cursor:pointer}body,figure{margin:0}body{font-size:17px;font-family:Roboto,sans-serif;font-weight:400;line-height:1.5;color:#4c4c4c;background:#fff;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.grecaptcha-badge{visibility:hidden}.icon{display:inline-block;width:1em;height:1em;fill:currentColor;vertical-align:middle}.icon__default{display:block}.icon__large,.icon__medium{display:none}@media (min-width:730px){.icon--responsive .icon__default{display:none}.icon--responsive .icon__medium{display:block}}@media (min-width:980px){.icon--responsive .icon__default{display:none}.icon--responsive .icon__large{display:block}}.link{color:#0078e2;text-decoration:none;outline:0;cursor:pointer}.link:focus,.link:hover{text-decoration:underline}.link--invert{color:#fff}.link--emphasized{font-weight:700}.link--minor{color:#9d9d9d;font-family:Roboto Condensed,sans-serif}.link--minor:focus{color:#9d9d9d;text-decoration:none}.link--minor:hover{color:#0078e2;text-decoration:none}.link--toc{color:#0078e2;font-family:Roboto Condensed,sans-serif}@media (min-width:1264px){.link--toc{color:#9d9d9d}}.link--toc:focus{color:#0078e2;text-decoration:none}@media (min-width:1264px){.link--toc:focus{color:#9d9d9d}}.link--toc:hover{color:#0078e2;text-decoration:none}.link--emphasized.link--toc{font-weight:700}@media (min-width:1264px){.link--emphasized.link--toc{color:#4c4c4c;font-weight:400}}.link--emphasized.link--toc:hover{color:#0078e2;text-decoration:none}.link--toc-active.link--toc,.link--toc-active.link--toc:focus,.link--toc-active.link--toc:hover{color:#0078e2}.link--unobtrusive{color:inherit;text-decoration:underline}.link--unobtrusive:focus,.link--unobtrusive:hover{color:#0078e2}.link--marketing{color:#e28b00}.link--category{text-transform:uppercase;color:#0078e2;font-weight:700}.link--menu{color:inherit}.link--menu:focus,.link--menu:hover{color:#0078e2;text-decoration:none}.link--menu-category{display:block;margin-bottom:8px;color:#d2d2d2;text-transform:uppercase;font-weight:700}.link--menu-category:focus,.link--menu-category:hover{color:#0078e2;text-decoration:none}.link--menu-emphasized{color:inherit;text-transform:uppercase;font-weight:700}.link--menu-emphasized:focus,.link--menu-emphasized:hover{color:#0078e2;text-decoration:none}.image{display:block;position:relative;padding-top:56.25%;height:0;overflow:hidden}.image :not(.image__img){position:static}.image__img{display:block;position:absolute;top:0;left:0;right:0;height:100%;width:auto;max-width:100%;opacity:0;-webkit-transition:opacity .15s ease-in;transition:opacity .15s ease-in}.image--loaded .image__img{opacity:1}.image--sync .image__img{opacity:1;-webkit-transition:none;transition:none}.image--center .image__img{margin-left:auto;margin-right:auto}.image--right .image__img{margin-left:auto}.image--shadow{overflow:visible}.image--shadow .image__img{-webkit-box-shadow:0 0 80px 0 #d2d2d2;box-shadow:0 0 80px 0 #d2d2d2}.image--shadow-minor{overflow:visible}.image--shadow-minor .image__img{-webkit-box-shadow:0 2px 4px 0 rgba(0,0,0,.2);box-shadow:0 2px 4px 0 rgba(0,0,0,.2)}.image--fixed-height{padding-top:0;height:100%}.image--fixed-height .image__img{position:relative;height:100%}.image--cover{width:100%;height:100%}.image--cover .image__img{-o-object-fit:cover;object-fit:cover}.loading-indicator{white-space:nowrap}.loading-indicator:after,.loading-indicator:before,.loading-indicator span{display:inline-block;background-color:#d2d2d2;border-radius:50%;vertical-align:middle;width:.75em;height:.75em;margin:0 .15em;-webkit-animation:loading-indicator 1.5s ease-in-out infinite;animation:loading-indicator 1.5s ease-in-out infinite}.loading-indicator:after,.loading-indicator:before{content:""}.loading-indicator span{-webkit-animation-delay:.2s;animation-delay:.2s}.loading-indicator:after{-webkit-animation-delay:.4s;animation-delay:.4s}@-webkit-keyframes loading-indicator{25%{background-color:#9d9d9d;-webkit-transform:scale(.8);transform:scale(.8)}50%{background-color:#d2d2d2;-webkit-transform:scale(1);transform:scale(1)}}@keyframes loading-indicator{25%{background-color:#9d9d9d;-webkit-transform:scale(.8);transform:scale(.8)}50%{background-color:#d2d2d2;-webkit-transform:scale(1);transform:scale(1)}}.paragraph{margin:0 0 24px}.paragraph>strong{font-weight:700}.paragraph--emphasized{font-style:italic;text-align:center;font-size:21px}.paragraph--minor{font-style:italic;text-align:center;font-size:14px;color:#9d9d9d}.paragraph--xminor{font-size:12px;color:#9d9d9d}.nav-link{display:inline-block;color:inherit;font-size:14px;font-weight:700;letter-spacing:.03125em;text-decoration:none;text-transform:uppercase;white-space:nowrap;line-height:64px;padding:0 24px}.nav-link--active,.nav-link:focus,.nav-link:hover{text-decoration:none;background-color:#fff;color:#0078e2}.nav-link--pro.nav-link--active,.nav-link--pro:focus,.nav-link--pro:hover{color:#005096}.headline{font-size:21px;font-weight:700;line-height:1.25;display:block;margin:0 0 24px}.headline .link:hover{text-decoration:none}.headline>strong{font-weight:inherit!important}.headline>.dash{margin-top:16px}.headline--xxs{font-family:Roboto Condensed,sans-serif;font-size:12px;font-weight:400}.headline--xs,.headline--xxs{line-height:1.25;margin:0 0 8px}.headline--xs{font-size:14px;font-weight:700}.headline--s{color:#9d9d9d;font-size:17px;font-weight:400;line-height:1.25;text-transform:uppercase;letter-spacing:.125em;margin:0 0 8px}.headline--l{margin:0 0 16px}.headline--l,.headline--xl{font-size:24px;font-weight:900;line-height:1.25}.headline--xl{margin:0 0 24px}@media (min-width:1264px){.headline--xl{font-size:32px}}.headline--xxl{font-size:32px;font-weight:700;line-height:1.25}@media (min-width:980px){.headline--xxl{font-size:42px}}.headline--wide{font-size:24px;font-weight:900;line-height:1.25;text-transform:uppercase;letter-spacing:.3125em}.headline--listicle-section{font-size:42px;color:#d2d2d2;letter-spacing:.125em;text-transform:uppercase;font-weight:400}.topline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9d9d9d;font-size:14px;font-weight:400;letter-spacing:.0625em;margin-bottom:8px}.topline--invert{color:#f4f4f4}.topline--s{font-size:12px}.star-rating{display:inline-block;color:#0078e2;margin:0;padding:0;list-style:none;font-size:0;white-space:nowrap}.star-rating__star,.star-rating__star-empty,.star-rating__star-half{font-size:17px;padding:0;display:inline-block}.star-rating__star-empty>.icon,.star-rating__star-half>.icon,.star-rating__star>.icon{vertical-align:middle}.star-rating__star-empty:not(:last-child),.star-rating__star-half:not(:last-child),.star-rating__star:not(:last-child){margin-right:.2em}.star-rating__star-empty{color:#d2d2d2}.star-rating--invert .star-rating__star{color:#fff}.star-rating--invert .star-rating__star-empty{color:#9d9d9d}.ab-test{width:100%;height:100%}.push-notification{display:inline-block}.push-notification__uninitialized{opacity:.5}.push-notification__blocked,.push-notification__subscribed,.push-notification__unsubscribed{display:none}.push-notification--initialized .push-notification__unsubscribed{display:block}.push-notification--initialized .push-notification__uninitialized,.push-notification--subscribed .push-notification__unsubscribed{display:none}.push-notification--subscribed .push-notification__subscribed{display:inline}.push-notification--blocked .push-notification__unsubscribed{display:none}.push-notification--blocked .push-notification__blocked{display:inline}.push-notification[aria-disabled=true]{opacity:.5}.select{color:#fff;position:relative;display:inline-block}.select__button{padding:0 24px;font-size:16px;line-height:64px;font-size:14px;font-weight:700;letter-spacing:.03125em;text-transform:uppercase;z-index:10;outline:none}.select__button:after{height:0;width:0;-webkit-transform:rotate(1turn);border-color:#fff transparent transparent;border-style:solid;border-width:6px 5px 0;content:"";display:inline-block;vertical-align:middle}.select__list{position:absolute;display:none;background-color:#1692ff;list-style:none;margin:0;padding:0;min-width:150px;bottom:1px;right:0;-webkit-transform:translateY(100%);transform:translateY(100%);z-index:20}.select__link{display:block;padding:8px 16px;color:inherit;white-space:nowrap;text-transform:uppercase;text-decoration:none;font-weight:700;font-size:14px}.select__link:active,.select__link:focus,.select__link:hover{background-color:#0086fc}.select:active .select__button,.select:focus .select__button,.select:hover .select__button{background-color:#1692ff}.select:active .select__list,.select:focus .select__list,.select:hover .select__list{display:block}.select--invert .select__list{background-color:#363636}.select--invert .select__link:active,.select--invert .select__link:focus,.select--invert .select__link:hover{background-color:#1d1d1d}.select--invert:active .select__button,.select--invert:focus .select__button,.select--invert:hover .select__button{background-color:#363636}.select--bright{color:#9d9d9d}.select--bright .select__button:after{display:inline-block;height:0;width:0;-webkit-transform:rotate(1turn);border-color:#9d9d9d transparent transparent;border-style:solid;border-width:6px 5px 0}.select--bright .select__list{background-color:#f4f4f4}.select--bright .select__link:active,.select--bright .select__link:focus,.select--bright .select__link:hover{background-color:#ebebeb}.select--bright:active,.select--bright:focus,.select--bright:hover{color:#4c4c4c;border-bottom:none}.select--bright:active .select__button,.select--bright:focus .select__button,.select--bright:hover .select__button{background-color:#f4f4f4}.select--bright:active .select__button:after,.select--bright:focus .select__button:after,.select--bright:hover .select__button:after{display:inline-block;height:0;width:0;-webkit-transform:rotate(1turn);border-color:#4c4c4c transparent transparent;border-style:solid;border-width:6px 5px 0}.select--disabled{opacity:.8}.select--disabled .select__button:after{display:none}.select--disabled:active .select__button,.select--disabled:focus .select__button,.select--disabled:hover .select__button{background:none;cursor:not-allowed}.select--disabled:active .select__button:after,.select--disabled:active .select__list,.select--disabled:focus .select__button:after,.select--disabled:focus .select__list,.select--disabled:hover .select__button:after,.select--disabled:hover .select__list{display:none}.select--wide .select__button{padding:0 24px}.ad-container{position:relative;-webkit-box-sizing:content-box;box-sizing:content-box;margin:0 auto 24px}.ad-container__label{position:absolute;bottom:100%;left:0;right:0;text-align:center;color:#9d9d9d;font-size:10px;text-transform:uppercase}.ad-container__ad{display:block;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;-ms-flex-item-align:center;align-self:center;overflow:hidden;text-align:center}.ad-container__ad,.ad-container__provider{width:100%;height:100%}.ad-container--horizontal{border-top:1px solid #ebebeb;border-bottom:1px solid #ebebeb;height:250px}@media (min-width:340px){.ad-container--horizontal{width:300px;height:250px}}@media (min-width:376px){.ad-container--horizontal{width:336px;height:280px}}@media (min-width:768px){.ad-container--horizontal{width:728px;height:90px}}@media (min-width:1010px){.ad-container--horizontal{width:970px;height:250px}}.ad-container--vertical{border-top:1px solid #ebebeb;border-bottom:1px solid #ebebeb;height:250px}@media (min-width:340px){.ad-container--vertical{width:300px;height:250px}}@media (min-width:376px){.ad-container--vertical{width:336px;height:280px}}@media (min-width:768px){.ad-container--vertical{width:728px;height:90px}}@media (min-width:827px){.ad-container--vertical{border-top:0;border-bottom:0;border-left:1px solid #ebebeb;border-right:1px solid #ebebeb;width:160px;height:600px}}@media (min-width:1010px){.ad-container--vertical{width:300px;height:600px}}.ad-container--autorelaxed{width:100%;height:485px}.ad-container--portrait{margin-bottom:0;width:300px;height:1050px}.ad-container--portrait .ad-container__ad{display:block;height:auto}.ad-container--portrait-small{margin-bottom:0;width:150px;height:525px}.ad-container--portrait-small .ad-container__ad{display:block;height:auto}.ad-container--rectangle-medium{height:250px}.ad-container--rectangle-medium,.ad-container--skyscraper-wide{border-top:1px solid #ebebeb;border-bottom:1px solid #ebebeb;width:300px}.ad-container--skyscraper-wide{height:600px}.ad-container--loaded[style*="height: 0px;"]{display:none}.author-teaser{position:relative;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;padding-left:64px;margin-bottom:24px;min-height:48px;color:#9d9d9d;font-size:12px;font-style:italic}.author-teaser__image{position:absolute;top:0;left:0;width:48px;border-radius:50%}.author-teaser--invert{color:#d2d2d2}.notification{background:#fff;color:#4c4c4c;padding:8px 0;font-size:17px;-webkit-box-shadow:0 0 5px 0 rgba(0,0,0,.2);box-shadow:0 0 5px 0 rgba(0,0,0,.2)}.notification__content{position:relative;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin:0 auto;padding:0 58px}.notification__content>*{-ms-flex-negative:0;flex-shrink:0}.notification__content>*+*{margin-left:24px}.notification__text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-ms-flex-negative:1;flex-shrink:1}.notification__close{position:absolute;top:50%;right:20px;-webkit-transform:translateY(-50%);transform:translateY(-50%);width:14px;height:14px;font-size:12px;outline:0}.notification__close>*{display:block}.expire--not-expired .expire__expired,.expire__unexpired{display:none}.expire--not-expired div.expire__unexpired{display:block}.expire--not-expired span.expire__unexpired{display:inline}.not-critical__content{display:none}.not-critical__loader{text-align:center;padding:64px}.not-critical--loaded .not-critical__content{display:block}.not-critical--loaded .not-critical__loader{display:none}.container{padding:0 20px;width:100%;max-width:1010px}.container,.container__indent{position:relative;margin:0 auto}.container__indent{max-width:772px}.container__edge-left,.container__edge-right{margin-bottom:24px}@media (min-width:1264px){.container__edge-left,.container__edge-right{position:absolute;width:123px}}.container__edge-left{left:0}@media (min-width:1264px){.container__edge-left{left:24px}}.container__edge-right{right:0;text-align:right}@media (min-width:1264px){.container__edge-right{right:24px}}.container__sticky-left,.container__sticky-left-bottom,.container__sticky-right,.container__sticky-right-bottom{margin-bottom:24px;overflow:hidden}@media (min-width:1264px){.container__sticky-left,.container__sticky-left-bottom,.container__sticky-right,.container__sticky-right-bottom{position:absolute;position:-webkit-sticky;position:sticky;width:123px;margin-bottom:0}.container__sticky-left-bottom>:last-child,.container__sticky-left>:last-child,.container__sticky-right-bottom>:last-child,.container__sticky-right>:last-child{margin-bottom:0}}@media (min-width:1264px){.container__sticky-left{float:left;top:128px;margin-left:-123px}}.container__sticky-right{text-align:right}@media (min-width:1264px){.container__sticky-right{float:right;top:128px;right:0;margin-right:-123px;margin-left:auto}}@media (min-width:1264px){.container__sticky-left-bottom{float:left;top:calc(100vh - 1em - 24px);margin-left:-123px}}.container__sticky-right-bottom{text-align:right}@media (min-width:1264px){.container__sticky-right-bottom{float:right;top:calc(100vh - 1em - 24px);right:0;margin-right:-123px;margin-left:auto}}@media (min-width:1264px){.container--edge{max-width:1264px;padding-left:147px;padding-right:147px}}.container--full{max-width:2560px;padding:0}.section{margin-bottom:64px}.section>.article-slider:last-child{margin-bottom:-38px}.page{position:relative;background:#fff;min-width:320px}.page>.navbar{position:-webkit-sticky;position:sticky;top:0;left:0;z-index:20}.page>.hover-menu{position:fixed;top:64px;left:0;z-index:30;display:none}.page>.overlay{z-index:40;position:absolute}.page>.modal-container,.page>.overlay{width:100vw;height:100vh;top:0;left:0;opacity:0;display:none}.page>.modal-container{z-index:50;position:fixed}.page>.cookie-consent{position:fixed;bottom:0;left:0;z-index:60}.page__content{position:relative;z-index:10}.page--invert{background:#282828;color:#f4f4f4}.page--overlay-open{overflow:hidden;height:100vh}.navbar{position:relative;height:64px;width:100%}.navbar__notification{position:absolute;left:0;right:0;top:100%;-webkit-transform:translateY(-150%);transform:translateY(-150%);-webkit-transition:-webkit-transform .3s ease-out;transition:-webkit-transform .3s ease-out;transition:transform .3s ease-out;transition:transform .3s ease-out,-webkit-transform .3s ease-out}.navbar__container{position:relative;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;width:100%;background-color:#0078e2;color:#fff}@media (min-width:621px){.navbar__container{visibility:visible}}.navbar__wrapper{width:100%;max-width:2560px}.navbar__content{width:100%;display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.navbar__pro{-webkit-box-align:center;-ms-flex-align:center;align-items:center;-ms-flex-negative:0;flex-shrink:0;background:#005096}.navbar__center,.navbar__pro{display:-webkit-box;display:-ms-flexbox;display:flex;height:64px}.navbar__center{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-negative:1;flex-shrink:1;visibility:hidden;opacity:0}@media (min-width:621px){.navbar__center{visibility:visible}}.navbar__link-list{overflow:hidden;font-size:0;text-align:right;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-negative:1;flex-shrink:1}.navbar__more{-ms-flex-negative:0;flex-shrink:0;-ms-flex-wrap:0;flex-wrap:0}.navbar__button{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:0 24px;color:inherit;height:64px;font-size:22px;text-decoration:none;outline:0}.navbar__button:active,.navbar__button:focus,.navbar__button:hover{background-color:#0086fc}.navbar__button[aria-disabled]{cursor:not-allowed;pointer-events:none}.navbar__tile{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-ms-flex-negative:0;flex-shrink:0;height:64px;border-left:1px solid hsla(0,0%,100%,.4);border-right:1px solid hsla(0,0%,100%,.4)}.navbar__tile+.navbar__tile,.navbar__tile:first-child{border-left:none}.navbar__tile:last-child{border-right:none}.navbar__logo{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-ms-flex-negative:0;flex-shrink:0;height:64px;padding:0 24px}.navbar__logo:active,.navbar__logo:focus,.navbar__logo:hover{background-color:#0086fc}.navbar__all3dp{height:28px}.navbar__get-it-printed{font-size:14px;line-height:14px;font-family:Roboto,sans-serif;display:inline-block;padding:8px;border:1px solid;margin:-12px}.navbar__craftcloud,.navbar__get-it-printed{font-weight:700;text-decoration:none;color:inherit;text-transform:uppercase}.navbar__craftcloud{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;height:64px;padding:0 24px;font-size:12px;letter-spacing:.03125em;white-space:nowrap}.navbar__craftcloud:active,.navbar__craftcloud:focus,.navbar__craftcloud:hover{background-color:#0086fc}.navbar__craftcloud>.icon{font-size:1.5em;margin-left:8px}.navbar__craftcloud-text{text-transform:uppercase;line-height:1}.navbar__craftcloud-logo{width:135px;margin-bottom:4px}.navbar__craftcloud-alternative{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;padding:0 24px;color:inherit;text-decoration:none;text-transform:uppercase;font-size:12px;font-weight:700;letter-spacing:.03125em;white-space:nowrap}.navbar__craftcloud-alternative:active,.navbar__craftcloud-alternative:focus,.navbar__craftcloud-alternative:hover{background-color:#0086fc}.navbar__craftcloud-alternative-logo{height:1em;margin-top:4px}.navbar--invert .navbar__container{background-color:#101010}.navbar--invert .navbar__button:active,.navbar--invert .navbar__button:focus,.navbar--invert .navbar__button:hover,.navbar--invert .navbar__craftcloud-alternative:active,.navbar--invert .navbar__craftcloud-alternative:focus,.navbar--invert .navbar__craftcloud-alternative:hover,.navbar--invert .navbar__craftcloud:active,.navbar--invert .navbar__craftcloud:focus,.navbar--invert .navbar__craftcloud:hover,.navbar--invert .navbar__logo:active,.navbar--invert .navbar__logo:focus,.navbar--invert .navbar__logo:hover{background-color:#363636}.navbar--bright{background-color:#ebebeb}.navbar--bright .navbar__container{background-color:#fff;color:#9d9d9d;border-bottom:2px solid #ebebeb}.navbar--bright .navbar__tile{border-left-color:hsla(0,0%,61.6%,.4);border-right-color:hsla(0,0%,61.6%,.4)}.navbar--bright .navbar__button:active,.navbar--bright .navbar__button:focus,.navbar--bright .navbar__button:hover{color:#4c4c4c;background-color:#ebebeb}.navbar--bright .navbar__craftcloud:active,.navbar--bright .navbar__craftcloud:focus,.navbar--bright .navbar__craftcloud:hover,.navbar--bright .navbar__logo:active,.navbar--bright .navbar__logo:focus,.navbar--bright .navbar__logo:hover{background-color:#ebebeb}.navbar--pro .navbar__container{background-color:#005096}.navbar--pro .navbar__pro{background-color:#0078e2}.navbar--notification .navbar__notification{-webkit-transform:none;transform:none;-webkit-transition-delay:.3s;transition-delay:.3s}.article-header{position:relative;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;margin-bottom:64px;background:#4c4c4c;color:#d2d2d2;font-size:12px;font-weight:400;letter-spacing:.0625em}@media (min-width:730px){.article-header{-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row}}.article-header__image{position:relative;-ms-flex-negative:0;flex-shrink:0;width:100%;overflow:hidden}.article-header__image>.image{display:block;width:100%}@media (min-width:730px){.article-header__image{width:50%}}@media (min-width:980px){.article-header__image{width:61.45251%;max-width:calc(177.778vh - 456.88946px);min-width:40%}}.article-header__badge{position:absolute;top:24px;right:24px;width:20%;max-width:117px}.article-header__content{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:100%;flex-basis:100%;padding:24px 0 24px 24px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end}.article-header__content>.headline{color:#fff}.article-header__content>:last-child{margin-bottom:0}.article-header__content .star-rating{margin-left:8px}@media (min-width:730px){.article-header__content{padding:38px 0 38px 38px}}@media (min-width:980px){.article-header__content>.headline{font-size:2.5vw}}@media (min-width:2560px){.article-header__content>.headline{font-size:64px}}.article-header__title{padding-right:24px}@media (min-width:730px){.article-header__title{padding-right:38px}}@media (min-width:980px){.article-header__title{padding-right:64px}}.article-header__disclaimer{margin-bottom:auto;padding-bottom:24px;padding-right:24px;color:#9d9d9d;font-size:12px;font-style:italic}@media (min-width:730px){.article-header__disclaimer{padding-right:38px}}.portrait-ad-container{display:-webkit-box;display:-ms-flexbox;display:flex;width:100%;max-width:2560px;margin:0 auto;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.portrait-ad-container__ad-wrapper{position:-webkit-sticky;position:sticky;top:64px;overflow:hidden;width:100%;max-width:300px}.portrait-ad-container__ad-wrapper>.ad-container{position:absolute;top:0}.portrait-ad-container__ad-left,.portrait-ad-container__ad-right{display:none;-ms-flex-negative:1;flex-shrink:1;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;max-width:300px}.portrait-ad-container__ad-left>.portrait-ad-container__ad-wrapper{height:1050px}.portrait-ad-container__ad-left>.portrait-ad-container__ad-wrapper>.ad-container{right:0}.portrait-ad-container__ad-right>.portrait-ad-container__ad-wrapper{height:1050px}.portrait-ad-container__ad-right>.portrait-ad-container__ad-wrapper>.ad-container{left:0}.portrait-ad-container__small-ad-left,.portrait-ad-container__small-ad-right{display:none;-ms-flex-negative:1;flex-shrink:1;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.portrait-ad-container__small-ad-left>.portrait-ad-container__ad-wrapper{height:525px}.portrait-ad-container__small-ad-left>.portrait-ad-container__ad-wrapper>.ad-container{right:0}.portrait-ad-container__small-ad-right>.portrait-ad-container__ad-wrapper{height:525px}.portrait-ad-container__small-ad-right>.portrait-ad-container__ad-wrapper>.ad-container{left:0}@media (min-width:1568px){.portrait-ad-container__ad-left,.portrait-ad-container__ad-right{display:block}}@media (min-width:1418px) and (max-width:1567px){.portrait-ad-container__small-ad-left,.portrait-ad-container__small-ad-right{display:block}}.portrait-ad-container__content{width:100%}@media (min-width:1418px) and (max-width:1567px){.portrait-ad-container__content{max-width:1264px;-ms-flex-negative:0;flex-shrink:0;-webkit-box-flex:0;-ms-flex-positive:0;flex-grow:0}}@media (min-width:1568px){.portrait-ad-container__content{max-width:1264px;-ms-flex-negative:0;flex-shrink:0;-webkit-box-flex:0;-ms-flex-positive:0;flex-grow:0}}.cookie-consent{width:100%;background-color:hsla(0,0%,100%,.9);-webkit-transform:translateY(100%);transform:translateY(100%);opacity:0;-webkit-transition-duration:.2s;transition-duration:.2s;-webkit-transition-timing-function:ease-in;transition-timing-function:ease-in;-webkit-transition-property:opacity,-webkit-transform;transition-property:opacity,-webkit-transform;transition-property:opacity,transform;transition-property:opacity,transform,-webkit-transform}.cookie-consent__body{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;min-height:40px}.cookie-consent__text{display:block;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;margin:0 24px 0 0;padding:8px 0}.cookie-consent>.button{-ms-flex-negative:0;flex-shrink:0}.cookie-consent--open{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}.u-hide{display:none}.u-hide-visually{border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.u-not-critical{visibility:hidden}.u-overflow-hidden{overflow:hidden}@media (min-width:621px) and (max-width:729px){.u-hide-small{display:none!important}}@media (max-width:620px){.u-show-small{display:none!important}}@media (min-width:730px) and (max-width:979px){.u-hide-medium{display:none!important}}@media (max-width:620px){.u-show-medium{display:none!important}}@media (min-width:621px) and (max-width:729px){.u-show-medium{display:none!important}}@media (min-width:980px){.u-hide-large{display:none!important}}@media (max-width:620px){.u-show-large{display:none!important}}@media (min-width:621px) and (max-width:729px){.u-show-large{display:none!important}}@media (min-width:730px) and (max-width:979px){.u-show-large{display:none!important}}@media (min-width:1264px){.u-hide-xlarge{display:none!important}}@media (max-width:620px){.u-show-xlarge{display:none!important}}@media (min-width:621px) and (max-width:729px){.u-show-xlarge{display:none!important}}@media (min-width:730px) and (max-width:979px){.u-show-xlarge{display:none!important}}@media (min-width:980px) and (max-width:1263px){.u-show-xlarge{display:none!important}}@media (min-width:1470px){.u-hide-xxlarge{display:none!important}}@media (max-width:620px){.u-show-xxlarge{display:none!important}}@media (min-width:621px) and (max-width:729px){.u-show-xxlarge{display:none!important}}@media (min-width:730px) and (max-width:979px){.u-show-xxlarge{display:none!important}}@media (min-width:980px) and (max-width:1263px){.u-show-xxlarge{display:none!important}}@media (min-width:1264px) and (max-width:1469px){.u-show-xxlarge{display:none!important}}.u-revert-section-padding{margin-left:-16px;margin-right:-16px}.u-no-space{margin-bottom:0}.u-space-base{margin-bottom:24px}.u-space-base-top{padding-top:24px}.u-space-xs-left{margin-left:8px}.u-space-xs{margin-bottom:8px}.u-space-s{margin-bottom:16px}.u-space-xl{margin-bottom:64px}.u-space-xxl{margin-bottom:100px}.u-space-xxxl-top{margin-top:260px}.u-space-xl-top{padding-top:64px}.u-text-left{text-align:left}.u-text-center{text-align:center}.u-text-right{text-align:right}.u-text-color-minor{color:#9d9d9d}</style><script type="text/javascript">
+window.NREUM||(NREUM={}),__nr_require=function(t,n,e){function r(e){if(!n[e]){var o=n[e]={exports:{}};t[e][0].call(o.exports,function(n){var o=t[e][1][n];return r(o||n)},o,o.exports)}return n[e].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<e.length;o++)r(e[o]);return r}({1:[function(t,n,e){function r(t){try{s.console&&console.log(t)}catch(n){}}var o,i=t("ee"),a=t(15),s={};try{o=localStorage.getItem("__nr_flags").split(","),console&&"function"==typeof console.log&&(s.console=!0,o.indexOf("dev")!==-1&&(s.dev=!0),o.indexOf("nr_dev")!==-1&&(s.nrDev=!0))}catch(c){}s.nrDev&&i.on("internal-error",function(t){r(t.stack)}),s.dev&&i.on("fn-err",function(t,n,e){r(e.stack)}),s.dev&&(r("NR AGENT IN DEVELOPMENT MODE"),r("flags: "+a(s,function(t,n){return t}).join(", ")))},{}],2:[function(t,n,e){function r(t,n,e,r,s){try{p?p-=1:o(s||new UncaughtException(t,n,e),!0)}catch(f){try{i("ierr",[f,c.now(),!0])}catch(d){}}return"function"==typeof u&&u.apply(this,a(arguments))}function UncaughtException(t,n,e){this.message=t||"Uncaught error with no additional information",this.sourceURL=n,this.line=e}function o(t,n){var e=n?null:c.now();i("err",[t,e])}var i=t("handle"),a=t(16),s=t("ee"),c=t("loader"),f=t("gos"),u=window.onerror,d=!1,l="nr@seenError",p=0;c.features.err=!0,t(1),window.onerror=r;try{throw new Error}catch(h){"stack"in h&&(t(8),t(7),"addEventListener"in window&&t(5),c.xhrWrappable&&t(9),d=!0)}s.on("fn-start",function(t,n,e){d&&(p+=1)}),s.on("fn-err",function(t,n,e){d&&!e[l]&&(f(e,l,function(){return!0}),this.thrown=!0,o(e))}),s.on("fn-end",function(){d&&!this.thrown&&p>0&&(p-=1)}),s.on("internal-error",function(t){i("ierr",[t,c.now(),!0])})},{}],3:[function(t,n,e){t("loader").features.ins=!0},{}],4:[function(t,n,e){function r(t){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var o=t("ee"),i=t("handle"),a=t(8),s=t(7),c="learResourceTimings",f="addEventListener",u="resourcetimingbufferfull",d="bstResource",l="resource",p="-start",h="-end",m="fn"+p,w="fn"+h,v="bstTimer",y="pushState",g=t("loader");g.features.stn=!0,t(6);var b=NREUM.o.EV;o.on(m,function(t,n){var e=t[0];e instanceof b&&(this.bstStart=g.now())}),o.on(w,function(t,n){var e=t[0];e instanceof b&&i("bst",[e,n,this.bstStart,g.now()])}),a.on(m,function(t,n,e){this.bstStart=g.now(),this.bstType=e}),a.on(w,function(t,n){i(v,[n,this.bstStart,g.now(),this.bstType])}),s.on(m,function(){this.bstStart=g.now()}),s.on(w,function(t,n){i(v,[n,this.bstStart,g.now(),"requestAnimationFrame"])}),o.on(y+p,function(t){this.time=g.now(),this.startPath=location.pathname+location.hash}),o.on(y+h,function(t){i("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),f in window.performance&&(window.performance["c"+c]?window.performance[f](u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["c"+c]()},!1):window.performance[f]("webkit"+u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["webkitC"+c]()},!1)),document[f]("scroll",r,{passive:!0}),document[f]("keypress",r,!1),document[f]("click",r,!1)}},{}],5:[function(t,n,e){function r(t){for(var n=t;n&&!n.hasOwnProperty(u);)n=Object.getPrototypeOf(n);n&&o(n)}function o(t){s.inPlace(t,[u,d],"-",i)}function i(t,n){return t[1]}var a=t("ee").get("events"),s=t(18)(a,!0),c=t("gos"),f=XMLHttpRequest,u="addEventListener",d="removeEventListener";n.exports=a,"getPrototypeOf"in Object?(r(document),r(window),r(f.prototype)):f.prototype.hasOwnProperty(u)&&(o(window),o(f.prototype)),a.on(u+"-start",function(t,n){var e=t[1],r=c(e,"nr@wrapped",function(){function t(){if("function"==typeof e.handleEvent)return e.handleEvent.apply(e,arguments)}var n={object:t,"function":e}[typeof e];return n?s(n,"fn-",null,n.name||"anonymous"):e});this.wrapped=t[1]=r}),a.on(d+"-start",function(t){t[1]=this.wrapped||t[1]})},{}],6:[function(t,n,e){var r=t("ee").get("history"),o=t(18)(r);n.exports=r,o.inPlace(window.history,["pushState","replaceState"],"-")},{}],7:[function(t,n,e){var r=t("ee").get("raf"),o=t(18)(r),i="equestAnimationFrame";n.exports=r,o.inPlace(window,["r"+i,"mozR"+i,"webkitR"+i,"msR"+i],"raf-"),r.on("raf-start",function(t){t[0]=o(t[0],"fn-")})},{}],8:[function(t,n,e){function r(t,n,e){t[0]=a(t[0],"fn-",null,e)}function o(t,n,e){this.method=e,this.timerDuration=isNaN(t[1])?0:+t[1],t[0]=a(t[0],"fn-",this,e)}var i=t("ee").get("timer"),a=t(18)(i),s="setTimeout",c="setInterval",f="clearTimeout",u="-start",d="-";n.exports=i,a.inPlace(window,[s,"setImmediate"],s+d),a.inPlace(window,[c],c+d),a.inPlace(window,[f,"clearImmediate"],f+d),i.on(c+u,r),i.on(s+u,o)},{}],9:[function(t,n,e){function r(t,n){d.inPlace(n,["onreadystatechange"],"fn-",s)}function o(){var t=this,n=u.context(t);t.readyState>3&&!n.resolved&&(n.resolved=!0,u.emit("xhr-resolved",[],t)),d.inPlace(t,y,"fn-",s)}function i(t){g.push(t),h&&(x?x.then(a):w?w(a):(E=-E,O.data=E))}function a(){for(var t=0;t<g.length;t++)r([],g[t]);g.length&&(g=[])}function s(t,n){return n}function c(t,n){for(var e in t)n[e]=t[e];return n}t(5);var f=t("ee"),u=f.get("xhr"),d=t(18)(u),l=NREUM.o,p=l.XHR,h=l.MO,m=l.PR,w=l.SI,v="readystatechange",y=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"],g=[];n.exports=u;var b=window.XMLHttpRequest=function(t){var n=new p(t);try{u.emit("new-xhr",[n],n),n.addEventListener(v,o,!1)}catch(e){try{u.emit("internal-error",[e])}catch(r){}}return n};if(c(p,b),b.prototype=p.prototype,d.inPlace(b.prototype,["open","send"],"-xhr-",s),u.on("send-xhr-start",function(t,n){r(t,n),i(n)}),u.on("open-xhr-start",r),h){var x=m&&m.resolve();if(!w&&!m){var E=1,O=document.createTextNode(E);new h(a).observe(O,{characterData:!0})}}else f.on("fn-end",function(t){t[0]&&t[0].type===v||a()})},{}],10:[function(t,n,e){function r(t){var n=this.params,e=this.metrics;if(!this.ended){this.ended=!0;for(var r=0;r<d;r++)t.removeEventListener(u[r],this.listener,!1);if(!n.aborted){if(e.duration=a.now()-this.startTime,4===t.readyState){n.status=t.status;var i=o(t,this.lastSize);if(i&&(e.rxSize=i),this.sameOrigin){var c=t.getResponseHeader("X-NewRelic-App-Data");c&&(n.cat=c.split(", ").pop())}}else n.status=0;e.cbTime=this.cbTime,f.emit("xhr-done",[t],t),s("xhr",[n,e,this.startTime])}}}function o(t,n){var e=t.responseType;if("json"===e&&null!==n)return n;var r="arraybuffer"===e||"blob"===e||"json"===e?t.response:t.responseText;return h(r)}function i(t,n){var e=c(n),r=t.params;r.host=e.hostname+":"+e.port,r.pathname=e.pathname,t.sameOrigin=e.sameOrigin}var a=t("loader");if(a.xhrWrappable){var s=t("handle"),c=t(11),f=t("ee"),u=["load","error","abort","timeout"],d=u.length,l=t("id"),p=t(14),h=t(13),m=window.XMLHttpRequest;a.features.xhr=!0,t(9),f.on("new-xhr",function(t){var n=this;n.totalCbs=0,n.called=0,n.cbTime=0,n.end=r,n.ended=!1,n.xhrGuids={},n.lastSize=null,p&&(p>34||p<10)||window.opera||t.addEventListener("progress",function(t){n.lastSize=t.loaded},!1)}),f.on("open-xhr-start",function(t){this.params={method:t[0]},i(this,t[1]),this.metrics={}}),f.on("open-xhr-end",function(t,n){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&n.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid)}),f.on("send-xhr-start",function(t,n){var e=this.metrics,r=t[0],o=this;if(e&&r){var i=h(r);i&&(e.txSize=i)}this.startTime=a.now(),this.listener=function(t){try{"abort"===t.type&&(o.params.aborted=!0),("load"!==t.type||o.called===o.totalCbs&&(o.onloadCalled||"function"!=typeof n.onload))&&o.end(n)}catch(e){try{f.emit("internal-error",[e])}catch(r){}}};for(var s=0;s<d;s++)n.addEventListener(u[s],this.listener,!1)}),f.on("xhr-cb-time",function(t,n,e){this.cbTime+=t,n?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof e.onload||this.end(e)}),f.on("xhr-load-added",function(t,n){var e=""+l(t)+!!n;this.xhrGuids&&!this.xhrGuids[e]&&(this.xhrGuids[e]=!0,this.totalCbs+=1)}),f.on("xhr-load-removed",function(t,n){var e=""+l(t)+!!n;this.xhrGuids&&this.xhrGuids[e]&&(delete this.xhrGuids[e],this.totalCbs-=1)}),f.on("addEventListener-end",function(t,n){n instanceof m&&"load"===t[0]&&f.emit("xhr-load-added",[t[1],t[2]],n)}),f.on("removeEventListener-end",function(t,n){n instanceof m&&"load"===t[0]&&f.emit("xhr-load-removed",[t[1],t[2]],n)}),f.on("fn-start",function(t,n,e){n instanceof m&&("onload"===e&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=a.now()))}),f.on("fn-end",function(t,n){this.xhrCbStart&&f.emit("xhr-cb-time",[a.now()-this.xhrCbStart,this.onload,n],n)})}},{}],11:[function(t,n,e){n.exports=function(t){var n=document.createElement("a"),e=window.location,r={};n.href=t,r.port=n.port;var o=n.href.split("://");!r.port&&o[1]&&(r.port=o[1].split("/")[0].split("@").pop().split(":")[1]),r.port&&"0"!==r.port||(r.port="https"===o[0]?"443":"80"),r.hostname=n.hostname||e.hostname,r.pathname=n.pathname,r.protocol=o[0],"/"!==r.pathname.charAt(0)&&(r.pathname="/"+r.pathname);var i=!n.protocol||":"===n.protocol||n.protocol===e.protocol,a=n.hostname===document.domain&&n.port===e.port;return r.sameOrigin=i&&(!n.hostname||a),r}},{}],12:[function(t,n,e){function r(){}function o(t,n,e){return function(){return i(t,[f.now()].concat(s(arguments)),n?null:this,e),n?void 0:this}}var i=t("handle"),a=t(15),s=t(16),c=t("ee").get("tracer"),f=t("loader"),u=NREUM;"undefined"==typeof window.newrelic&&(newrelic=u);var d=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",p=l+"ixn-";a(d,function(t,n){u[n]=o(l+n,!0,"api")}),u.addPageAction=o(l+"addPageAction",!0),u.setCurrentRouteName=o(l+"routeName",!0),n.exports=newrelic,u.interaction=function(){return(new r).get()};var h=r.prototype={createTracer:function(t,n){var e={},r=this,o="function"==typeof n;return i(p+"tracer",[f.now(),t,e],r),function(){if(c.emit((o?"":"no-")+"fn-start",[f.now(),r,o],e),o)try{return n.apply(this,arguments)}catch(t){throw c.emit("fn-err",[arguments,this,t],e),t}finally{c.emit("fn-end",[f.now()],e)}}}};a("setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(t,n){h[n]=o(p+n)}),newrelic.noticeError=function(t){"string"==typeof t&&(t=new Error(t)),i("err",[t,f.now()])}},{}],13:[function(t,n,e){n.exports=function(t){if("string"==typeof t&&t.length)return t.length;if("object"==typeof t){if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if(!("undefined"!=typeof FormData&&t instanceof FormData))try{return JSON.stringify(t).length}catch(n){return}}}},{}],14:[function(t,n,e){var r=0,o=navigator.userAgent.match(/Firefox[\/\s](\d+\.\d+)/);o&&(r=+o[1]),n.exports=r},{}],15:[function(t,n,e){function r(t,n){var e=[],r="",i=0;for(r in t)o.call(t,r)&&(e[i]=n(r,t[r]),i+=1);return e}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],16:[function(t,n,e){function r(t,n,e){n||(n=0),"undefined"==typeof e&&(e=t?t.length:0);for(var r=-1,o=e-n||0,i=Array(o<0?0:o);++r<o;)i[r]=t[n+r];return i}n.exports=r},{}],17:[function(t,n,e){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],18:[function(t,n,e){function r(t){return!(t&&t instanceof Function&&t.apply&&!t[a])}var o=t("ee"),i=t(16),a="nr@original",s=Object.prototype.hasOwnProperty,c=!1;n.exports=function(t,n){function e(t,n,e,o){function nrWrapper(){var r,a,s,c;try{a=this,r=i(arguments),s="function"==typeof e?e(r,a):e||{}}catch(f){l([f,"",[r,a,o],s])}u(n+"start",[r,a,o],s);try{return c=t.apply(a,r)}catch(d){throw u(n+"err",[r,a,d],s),d}finally{u(n+"end",[r,a,c],s)}}return r(t)?t:(n||(n=""),nrWrapper[a]=t,d(t,nrWrapper),nrWrapper)}function f(t,n,o,i){o||(o="");var a,s,c,f="-"===o.charAt(0);for(c=0;c<n.length;c++)s=n[c],a=t[s],r(a)||(t[s]=e(a,f?s+o:o,i,s))}function u(e,r,o){if(!c||n){var i=c;c=!0;try{t.emit(e,r,o,n)}catch(a){l([a,e,r,o])}c=i}}function d(t,n){if(Object.defineProperty&&Object.keys)try{var e=Object.keys(t);return e.forEach(function(e){Object.defineProperty(n,e,{get:function(){return t[e]},set:function(n){return t[e]=n,n}})}),n}catch(r){l([r])}for(var o in t)s.call(t,o)&&(n[o]=t[o]);return n}function l(n){try{t.emit("internal-error",n)}catch(e){}}return t||(t=o),e.inPlace=f,e.flag=a,e}},{}],ee:[function(t,n,e){function r(){}function o(t){function n(t){return t&&t instanceof r?t:t?c(t,s,i):i()}function e(e,r,o,i){if(!l.aborted||i){t&&t(e,r,o);for(var a=n(o),s=h(e),c=s.length,f=0;f<c;f++)s[f].apply(a,r);var d=u[y[e]];return d&&d.push([g,e,r,a]),a}}function p(t,n){v[t]=h(t).concat(n)}function h(t){return v[t]||[]}function m(t){return d[t]=d[t]||o(e)}function w(t,n){f(t,function(t,e){n=n||"feature",y[e]=n,n in u||(u[n]=[])})}var v={},y={},g={on:p,emit:e,get:m,listeners:h,context:n,buffer:w,abort:a,aborted:!1};return g}function i(){return new r}function a(){(u.api||u.feature)&&(l.aborted=!0,u=l.backlog={})}var s="nr@context",c=t("gos"),f=t(15),u={},d={},l=n.exports=o();l.backlog=u},{}],gos:[function(t,n,e){function r(t,n,e){if(o.call(t,n))return t[n];var r=e();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,n,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return t[n]=r,r}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(t,n,e){function r(t,n,e,r){o.buffer([t],r),o.emit(t,n,e)}var o=t("ee").get("handle");n.exports=r,r.ee=o},{}],id:[function(t,n,e){function r(t){var n=typeof t;return!t||"object"!==n&&"function"!==n?-1:t===window?0:a(t,i,function(){return o++})}var o=1,i="nr@id",a=t("gos");n.exports=r},{}],loader:[function(t,n,e){function r(){if(!x++){var t=b.info=NREUM.info,n=l.getElementsByTagName("script")[0];if(setTimeout(u.abort,3e4),!(t&&t.licenseKey&&t.applicationID&&n))return u.abort();f(y,function(n,e){t[n]||(t[n]=e)}),c("mark",["onload",a()+b.offset],null,"api");var e=l.createElement("script");e.src="https://"+t.agent,n.parentNode.insertBefore(e,n)}}function o(){"complete"===l.readyState&&i()}function i(){c("mark",["domContent",a()+b.offset],null,"api")}function a(){return E.exists&&performance.now?Math.round(performance.now()):(s=Math.max((new Date).getTime(),s))-b.offset}var s=(new Date).getTime(),c=t("handle"),f=t(15),u=t("ee"),d=window,l=d.document,p="addEventListener",h="attachEvent",m=d.XMLHttpRequest,w=m&&m.prototype;NREUM.o={ST:setTimeout,SI:d.setImmediate,CT:clearTimeout,XHR:m,REQ:d.Request,EV:d.Event,PR:d.Promise,MO:d.MutationObserver};var v=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1071.min.js"},g=m&&w&&w[p]&&!/CriOS/.test(navigator.userAgent),b=n.exports={offset:s,now:a,origin:v,features:{},xhrWrappable:g};t(12),l[p]?(l[p]("DOMContentLoaded",i,!1),d[p]("load",r,!1)):(l[h]("onreadystatechange",o),d[h]("onload",r)),c("mark",["firstbyte",s],null,"api");var x=0,E=t(17)},{}]},{},["loader",2,10,4,3]);
+;NREUM.info={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",licenseKey:"93f0273069",applicationID:"42787651",sa:1}
+</script>
+<link rel="prefetch" href="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/toolkit.css?v=8b35b6a2dbbafa067cf1d1365174d20aa21c1818">
+<link rel="prefetch" href="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/toolkit.js?v=e863a2a9cd7a527c1506b75bef8e7d2e0fc51d4d">
+<script>
+  var ALL3DP_ICONS = "https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/icons/all.svg?v=264f545f8e95466d886719f80cde3d4bb164f837";
+  var ALL3DP_SCRIPT_URL = "https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets";
+  var ALL3DP_ONESIGNAL_IFRAME = 'https://all3dp.com/en/onesignal-iframe/';
+var ALL3DP_ONESIGNAL_SUBSCRIBE = 'https://all3dp.com/en/onesignal-subscribe/';
+  var PAGE_STARTED_LOADING = Date.now();
+  var ALL3DP_SLOW_PAGE_THRESHOLD = 30 * 1000;
+  var ALL3DP_SHARE_THRESHOLD = -1;
+  var ALL3DP_SHARECOUNT_API_URL = 'https://all3dp.com/workers/sharecount/?url=${url}';
+  var ALL3DP_GOOGLE_RECAPTCHA_V3_SITE_KEY = '6Ldo_d8UAAAAAFHViF6sZmtT0s1z7fXi26z2dDEM';
+
+  var ALL3DP_STYLE_TOOLKIT_URL = 'https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/toolkit.css?v=8b35b6a2dbbafa067cf1d1365174d20aa21c1818';
+  var ALL3DP_SCRIPT_TOOLKIT_URL = 'https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/toolkit.js?v=e863a2a9cd7a527c1506b75bef8e7d2e0fc51d4d';
+  var ALL3DP_NOT_CRITICAL_DOM_HEADER_FIELD = 'all3dp-not-critical';
+  var LOAD_DOM_INNER_HEIGHT_THRESHOLD = 2732; 
+  var ALL3DP_IUB_PREFERENCES = {};
+  var ALL3DP_IUB_CALLBACK = function() {};
+
+    var ALL3DP_NEWSLETTER_EXIT_INTENT_TIMEOUT = 30000;
+
+    var ALL3DP_NEWSLETTER_EXIT_INTENT_TIMEOUT_FREQUENCY = 31536000000;
+  
+  var ALL3DP_TOOLKIT_API = {};
+
+    var ALL3DP_NOT_CRITICAL_CONTENT_SCROLL_DELAY = 1000;
+
+    var OneSignal = window.OneSignal || [];
+
+  var ALL3DP_NOT_CRITICAL_DOM_URL = '/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/?critical=1';
+
+!function(t){var n={};function e(r){if(n[r])return n[r].exports;var o=n[r]={i:r,l:!1,exports:{}};return t[r].call(o.exports,o,o.exports,e),o.l=!0,o.exports}e.m=t,e.c=n,e.d=function(t,n,r){e.o(t,n)||Object.defineProperty(t,n,{enumerable:!0,get:r})},e.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},e.t=function(t,n){if(1&n&&(t=e(t)),8&n)return t;if(4&n&&"object"==typeof t&&t&&t.__esModule)return t;var r=Object.create(null);if(e.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:t}),2&n&&"string"!=typeof t)for(var o in t)e.d(r,o,function(n){return t[n]}.bind(null,o));return r},e.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(n,"a",n),n},e.o=function(t,n){return Object.prototype.hasOwnProperty.call(t,n)},e.p="",e(e.s=411)}({0:function(t,n,e){var r=e(37)("wks"),o=e(20),i=e(1).Symbol,c="function"==typeof i;(t.exports=function(t){return r[t]||(r[t]=c&&i[t]||(c?i:o)("Symbol."+t))}).store=r},1:function(t,n){var e=t.exports="undefined"!=typeof window&&window.Math==Math?window:"undefined"!=typeof self&&self.Math==Math?self:Function("return this")();"number"==typeof __g&&(__g=e)},102:function(t,n,e){"use strict";n.a=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){},n=!1,e=function e(){n||(n=!0,t(),window.removeEventListener("touchstart",e,{passive:!0,capture:!1}),window.removeEventListener("click",e,!1),window.removeEventListener("mousemove",e,!1))};window.addEventListener("touchstart",e,{passive:!0,capture:!1}),window.addEventListener("click",e,!1),window.addEventListener("mousemove",e,!1)}},11:function(t,n,e){for(var r=e(18),o=e(17),i=e(13),c=e(1),u=e(12),a=e(23),f=e(0),s=f("iterator"),l=f("toStringTag"),d=a.Array,p={CSSRuleList:!0,CSSStyleDeclaration:!1,CSSValueList:!1,ClientRectList:!1,DOMRectList:!1,DOMStringList:!1,DOMTokenList:!0,DataTransferItemList:!1,FileList:!1,HTMLAllCollection:!1,HTMLCollection:!1,HTMLFormElement:!1,HTMLSelectElement:!1,MediaList:!0,MimeTypeArray:!1,NamedNodeMap:!1,NodeList:!0,PaintRequestList:!1,Plugin:!1,PluginArray:!1,SVGLengthList:!1,SVGNumberList:!1,SVGPathSegList:!1,SVGPointList:!1,SVGStringList:!1,SVGTransformList:!1,SourceBufferList:!1,StyleSheetList:!0,TextTrackCueList:!1,TextTrackList:!1,TouchList:!1},v=o(p),y=0;y<v.length;y++){var w,L=v[y],h=p[L],m=c[L],O=m&&m.prototype;if(O&&(O[s]||u(O,s,d),O[l]||u(O,l,L),a[L]=d,h))for(w in r)O[w]||i(O,w,r[w],!0)}},110:function(t,n,e){var r=e(111);t.exports=function(t,n){return new(r(t))(n)}},111:function(t,n,e){var r=e(3),o=e(75),i=e(0)("species");t.exports=function(t){var n;return o(t)&&("function"!=typeof(n=t.constructor)||n!==Array&&!o(n.prototype)||(n=void 0),r(n)&&null===(n=n[i])&&(n=void 0)),void 0===n?Array:n}},112:function(t,n,e){var r=e(33),o=e(29);t.exports=function(t){return function(n,e){var i,c,u=String(o(n)),a=r(e),f=u.length;return a<0||a>=f?t?"":void 0:(i=u.charCodeAt(a))<55296||i>56319||a+1===f||(c=u.charCodeAt(a+1))<56320||c>57343?t?u.charAt(a):i:t?u.slice(a,a+2):c-56320+(i-55296<<10)+65536}}},113:function(t,n,e){"use strict";var r=e(7),o=e(24);t.exports=function(t,n,e){n in t?r.f(t,n,o(0,e)):t[n]=e}},114:function(t,n,e){e(5)&&"g"!=/./g.flags&&e(7).f(RegExp.prototype,"flags",{configurable:!0,get:e(70)})},115:function(t,n,e){var r=e(17),o=e(16);t.exports=function(t,n){for(var e,i=o(t),c=r(i),u=c.length,a=0;u>a;)if(i[e=c[a++]]===n)return e}},116:function(t,n,e){var r=e(17),o=e(57),i=e(39);t.exports=function(t){var n=r(t),e=o.f;if(e)for(var c,u=e(t),a=i.f,f=0;u.length>f;)a.call(t,c=u[f++])&&n.push(c);return n}},117:function(t,n,e){var r=e(16),o=e(58).f,i={}.toString,c="object"==typeof window&&window&&Object.getOwnPropertyNames?Object.getOwnPropertyNames(window):[];t.exports.f=function(t){return c&&"[object Window]"==i.call(t)?function(t){try{return o(t)}catch(t){return c.slice()}}(t):o(r(t))}},118:function(t,n,e){var r=e(15),o=e(21),i=e(4);t.exports=function(t,n){var e=(o.Object||{})[t]||Object[t],c={};c[t]=n(e),r(r.S+r.F*i(function(){e(1)}),"Object",c)}},12:function(t,n,e){var r=e(7),o=e(24);t.exports=e(5)?function(t,n,e){return r.f(t,n,o(1,e))}:function(t,n,e){return t[n]=e,t}},13:function(t,n,e){var r=e(1),o=e(12),i=e(9),c=e(20)("src"),u=Function.toString,a=(""+u).split("toString");e(21).inspectSource=function(t){return u.call(t)},(t.exports=function(t,n,e,u){var f="function"==typeof e;f&&(i(e,"name")||o(e,"name",n)),t[n]!==e&&(f&&(i(e,c)||o(e,c,t[n]?""+t[n]:a.join(String(n)))),t===r?t[n]=e:u?t[n]?t[n]=e:o(t,n,e):(delete t[n],o(t,n,e)))})(Function.prototype,"toString",function(){return"function"==typeof this&&this[c]||u.call(this)})},132:function(t,n,e){var r=e(3),o=e(25),i=e(0)("match");t.exports=function(t){var n;return r(t)&&(void 0!==(n=t[i])?!!n:"RegExp"==o(t))}},139:function(t,n,e){var r=e(7).f,o=Function.prototype,i=/^\s*function ([^ (]*)/;"name"in o||e(5)&&r(o,"name",{configurable:!0,get:function(){try{return(""+this).match(i)[1]}catch(t){return""}}})},15:function(t,n,e){var r=e(1),o=e(21),i=e(12),c=e(13),u=e(19),a=function(t,n,e){var f,s,l,d,p=t&a.F,v=t&a.G,y=t&a.S,w=t&a.P,L=t&a.B,h=v?r:y?r[n]||(r[n]={}):(r[n]||{}).prototype,m=v?o:o[n]||(o[n]={}),O=m.prototype||(m.prototype={});for(f in v&&(e=n),e)l=((s=!p&&h&&void 0!==h[f])?h:e)[f],d=L&&s?u(l,r):w&&"function"==typeof l?u(Function.call,l):l,h&&c(h,f,l,t&a.U),m[f]!=l&&i(m,f,d),w&&O[f]!=l&&(O[f]=l)};r.core=o,a.F=1,a.G=2,a.S=4,a.P=8,a.B=16,a.W=32,a.U=64,a.R=128,t.exports=a},16:function(t,n,e){var r=e(49),o=e(29);t.exports=function(t){return r(o(t))}},17:function(t,n,e){var r=e(63),o=e(38);t.exports=Object.keys||function(t){return r(t,o)}},18:function(t,n,e){"use strict";var r=e(61),o=e(94),i=e(23),c=e(16);t.exports=e(62)(Array,"Array",function(t,n){this._t=c(t),this._i=0,this._k=n},function(){var t=this._t,n=this._k,e=this._i++;return!t||e>=t.length?(this._t=void 0,o(1)):o(0,"keys"==n?e:"values"==n?t[e]:[e,t[e]])},"values"),i.Arguments=i.Array,r("keys"),r("values"),r("entries")},187:function(t,n,e){"use strict";var r=e(15),o=e(74)(!0);r(r.P,"Array",{includes:function(t){return o(this,t,arguments.length>1?arguments[1]:void 0)}}),e(61)("includes")},188:function(t,n,e){"use strict";var r=e(15),o=e(336);r(r.P+r.F*e(337)("includes"),"String",{includes:function(t){return!!~o(this,t,"includes").indexOf(t,arguments.length>1?arguments[1]:void 0)}})},19:function(t,n,e){var r=e(34);t.exports=function(t,n,e){if(r(t),void 0===n)return t;switch(e){case 1:return function(e){return t.call(n,e)};case 2:return function(e,r){return t.call(n,e,r)};case 3:return function(e,r,o){return t.call(n,e,r,o)}}return function(){return t.apply(n,arguments)}}},20:function(t,n){var e=0,r=Math.random();t.exports=function(t){return"Symbol(".concat(void 0===t?"":t,")_",(++e+r).toString(36))}},21:function(t,n){var e=t.exports={version:"2.5.0"};"number"==typeof __e&&(__e=e)},22:function(t,n,e){var r=e(29);t.exports=function(t){return Object(r(t))}},23:function(t,n){t.exports={}},24:function(t,n){t.exports=function(t,n){return{enumerable:!(1&t),configurable:!(2&t),writable:!(4&t),value:n}}},25:function(t,n){var e={}.toString;t.exports=function(t){return e.call(t).slice(8,-1)}},26:function(t,n,e){var r=e(33),o=Math.min;t.exports=function(t){return t>0?o(r(t),9007199254740991):0}},27:function(t,n,e){var r=e(7).f,o=e(9),i=e(0)("toStringTag");t.exports=function(t,n,e){t&&!o(t=e?t:t.prototype,i)&&r(t,i,{configurable:!0,value:n})}},29:function(t,n){t.exports=function(t){if(null==t)throw TypeError("Can't call method on  "+t);return t}},3:function(t,n){t.exports=function(t){return"object"==typeof t?null!==t:"function"==typeof t}},30:function(t,n){t.exports=!1},31:function(t,n,e){"use strict";var r=e(112)(!0);e(62)(String,"String",function(t){this._t=String(t),this._i=0},function(){var t,n=this._t,e=this._i;return e>=n.length?{value:void 0,done:!0}:(t=r(n,e),this._i+=t.length,{value:t,done:!1})})},33:function(t,n){var e=Math.ceil,r=Math.floor;t.exports=function(t){return isNaN(t=+t)?0:(t>0?r:e)(t)}},336:function(t,n,e){var r=e(132),o=e(29);t.exports=function(t,n,e){if(r(n))throw TypeError("String#"+e+" doesn't accept regex!");return String(o(t))}},337:function(t,n,e){var r=e(0)("match");t.exports=function(t){var n=/./;try{"/./"[t](n)}catch(e){try{return n[r]=!1,!"/./"[t](n)}catch(t){}}return!0}},34:function(t,n){t.exports=function(t){if("function"!=typeof t)throw TypeError(t+" is not a function!");return t}},35:function(t,n,e){var r=e(37)("keys"),o=e(20);t.exports=function(t){return r[t]||(r[t]=o(t))}},36:function(t,n,e){var r=e(3);t.exports=function(t,n){if(!r(t))return t;var e,o;if(n&&"function"==typeof(e=t.toString)&&!r(o=e.call(t)))return o;if("function"==typeof(e=t.valueOf)&&!r(o=e.call(t)))return o;if(!n&&"function"==typeof(e=t.toString)&&!r(o=e.call(t)))return o;throw TypeError("Can't convert object to primitive value")}},37:function(t,n,e){var r=e(1),o=r["__core-js_shared__"]||(r["__core-js_shared__"]={});t.exports=function(t){return o[t]||(o[t]={})}},38:function(t,n){t.exports="constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf".split(",")},39:function(t,n){n.f={}.propertyIsEnumerable},4:function(t,n){t.exports=function(t){try{return!!t()}catch(t){return!0}}},40:function(t,n,e){var r=e(22),o=e(17);e(118)("keys",function(){return function(t){return o(r(t))}})},41:function(t,n,e){var r=e(3),o=e(1).document,i=r(o)&&r(o.createElement);t.exports=function(t){return i?o.createElement(t):{}}},411:function(t,n,e){"use strict";e.r(n);e(139),e(11);var r,o=function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:function(){};if(window.IntersectionObserver){var e=function(){var e=document.querySelector(t);if(e){var r=new IntersectionObserver(function(t){t.filter(function(t){return t.isIntersecting}).length>0&&(n(),r.disconnect())});r.observe(e)}else n()};"loading"!==document.readyState?e():document.addEventListener("DOMContentLoaded",e)}else n()},i=e(102),c=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};document.addEventListener("scroll",function n(){document.removeEventListener("scroll",n,{passive:!0,capture:!1}),t()},{passive:!0,capture:!1})},u=function(t){var n=document.querySelector(t);n&&n.scrollIntoView()},a=(e(90),e(187),e(188),window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame);e(31),e(55),e(52),e(42),e(43);window.ALL3DP_TOOLKIT_API=window.ALL3DP_TOOLKIT_API||{},window.ALL3DP_TOOLKIT_API.emittedEvents=function(t){if(Array.isArray(t)){for(var n=0,e=new Array(t.length);n<t.length;n++)e[n]=t[n];return e}}(r=window.ALL3DP_TOOLKIT_API.emittedEvents||[])||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(r)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}();var f=function(){if(window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:iubPreferenceExpressed")&&window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:notCriticalDomLoaded")&&window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:toolkitReady")){var t=new Event("all3dp:ready");window.dispatchEvent(t),window.ALL3DP_TOOLKIT_API.emittedEvents.push("all3dp:ready")}},s=function(t){window.ALL3DP_TOOLKIT_API.emittedEvents.push("all3dp:iubPreferenceExpressed");var n=new Event("all3dp:iubPreferenceExpressed");n.preference=t,window.dispatchEvent(n),f()},l=function(){window.ALL3DP_TOOLKIT_API.emittedEvents.push("all3dp:notCriticalDomLoaded");var t=new Event("all3dp:notCriticalDomLoaded");window.dispatchEvent(t),f()},d=function(){window.ALL3DP_TOOLKIT_API.emittedEvents.push("all3dp:notCriticalDomInjected");var t=new Event("all3dp:notCriticalDomInjected");window.dispatchEvent(t),f()};e(18),e(40);function p(t){for(var n=1;n<arguments.length;n++){var e=null!=arguments[n]?arguments[n]:{},r=Object.keys(e);"function"==typeof Object.getOwnPropertySymbols&&(r=r.concat(Object.getOwnPropertySymbols(e).filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.forEach(function(n){v(t,n,e[n])})}return t}function v(t,n,e){return n in t?Object.defineProperty(t,n,{value:e,enumerable:!0,configurable:!0,writable:!0}):t[n]=e,t}window.ALL3DP_TOOLKIT_API=window.ALL3DP_TOOLKIT_API||{},window.ALL3DP_TOOLKIT_API.state=p({interacted:!1,firstScroll:!1},window.ALL3DP_TOOLKIT_API.state||{}),window.ALL3DP_TOOLKIT_API.emittedEvents=function(t){return function(t){if(Array.isArray(t)){for(var n=0,e=new Array(t.length);n<t.length;n++)e[n]=t[n];return e}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}(window.ALL3DP_TOOLKIT_API.emittedEvents||[]),Object(i.a)(function(){window.ALL3DP_TOOLKIT_API.state=p({},window.ALL3DP_TOOLKIT_API.state||{},{interacted:!0})}),c(function(){window.ALL3DP_TOOLKIT_API.state=p({},window.ALL3DP_TOOLKIT_API.state||{},{firstScroll:!0})}),window.ALL3DP_TOOLKIT_API.onInteract=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.state.interacted?t():Object(i.a)(t)},window.ALL3DP_TOOLKIT_API.onFirstScroll=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.state.firstScroll?t():c(t)},window.ALL3DP_TOOLKIT_API.onReady=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:ready")?t():window.addEventListener("all3dp:ready",t)},window.ALL3DP_TOOLKIT_API.emitIubPreferenceExpressed=s,window.ALL3DP_TOOLKIT_API.emitNotCriticalDomLoaded=l,window.ALL3DP_TOOLKIT_API.emitNotCriticalDomInjected=d,window.ALL3DP_TOOLKIT_API.emitToolkitReady=function(){window.ALL3DP_TOOLKIT_API.emittedEvents.push("all3dp:toolkitReady");var t=new Event("all3dp:toolkitReady");window.dispatchEvent(t),f()},window.ALL3DP_TOOLKIT_API.onToolkitReady=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:toolkitReady")?t():window.addEventListener("all3dp:toolkitReady",t)},window.ALL3DP_TOOLKIT_API.onNotCriticalDomLoaded=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:notCriticalDomLoaded")?t():window.addEventListener("all3dp:notCriticalDomLoaded",t)},window.ALL3DP_TOOLKIT_API.onNotCriticalDomInjected=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:notCriticalDomInjected")?t():window.addEventListener("all3dp:notCriticalDomInjected",t)},window.ALL3DP_TOOLKIT_API.onIubPreferenceExpressed=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};window.ALL3DP_TOOLKIT_API.emittedEvents.includes("all3dp:iubPreferenceExpressed")?t(window.ALL3DP_IUB_PREFERENCES||{}):window.addEventListener("all3dp:iubPreferenceExpressed",function(n){t(n.preference)})};var y,w,L,h,m=!1,O=!1,g=!1,_=!1,A=!1,b=0,P="hidden"===document.visibilityState?0:1/0;try{window.document.addEventListener("visibilitychange",function(t){P=Math.min(P,t.timeStamp)},{once:!0}),window.document.addEventListener("visibilitychange",function t(){if("hidden"===document.visibilityState){if(window.document.removeEventListener("visibilitychange",t,!0),!window.atx)return;w&&window.atx("set",{metric3:Math.floor(w)}),L&&window.atx("set",{metric2:Math.floor(L)}),b&&window.atx("set",{metric4:Math.floor(1e3*b)}),h&&window.atx("set",{metric1:Math.floor(h)}),window.atx("send",{hitType:"event",eventCategory:"category",eventAction:"action",nonInteraction:!0})}},!0)}catch(t){}var T,I=function(){var t=arguments.length>0&&void 0!==arguments[0]&&arguments[0],n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:function(){},e=document.querySelector(".not-critical"),r=function(){e.classList.add("not-critical--loaded"),n()};t&&e?r():o(".not-critical__loader",function(){A?setTimeout(function(){r()},window.ALL3DP_NOT_CRITICAL_CONTENT_SCROLL_DELAY||500):r()})},E=function(){var t=arguments.length>0&&void 0!==arguments[0]&&arguments[0],n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:function(){};g||(g=!0,function(){var t=arguments.length>0&&void 0!==arguments[0]&&arguments[0],n=arguments.length>1?arguments[1]:void 0,e=document.querySelector(".not-critical"),r=document.querySelector(".not-critical__content");if(window.ALL3DP_NOT_CRITICAL_DOM_URL&&e&&!e.classList.contains("not-critical--loaded")){var o=new XMLHttpRequest;o.open("GET",window.ALL3DP_NOT_CRITICAL_DOM_URL),o.setRequestHeader(window.ALL3DP_NOT_CRITICAL_DOM_HEADER_FIELD,"1"),o.addEventListener("load",function(){d(),r?(r.innerHTML=o.responseText,I(t,n)):n()}),o.send()}else d(),e?I(!0,n):n()}(t,function(){l(),_=!0,y&&u(y),n()}))};!function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){},n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:function(){},e=window.PerformanceObserver;e&&e.supportedEntryTypes&&!0===e.supportedEntryTypes.includes("paint")?new window.PerformanceObserver(function(e){var r=e.getEntries();n(r),r.find(function(t){return"first-contentful-paint"===t.name})&&t()}).observe({entryTypes:["paint","largest-contentful-paint","first-input","layout-shift"]}):a?a(t):t()}(function(){!function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};if(m)t();else{m=!0;var n=document.createElement("link");n.setAttribute("href",window.ALL3DP_STYLE_TOOLKIT_URL),n.setAttribute("type","text/css"),n.setAttribute("rel","stylesheet"),n.onload=t,n.onerror=t,document.head.appendChild(n)}}(function(){!function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:function(){};if(O)t();else{O=!0;var n=document.createElement("script");n.setAttribute("src",window.ALL3DP_SCRIPT_TOOLKIT_URL),n.setAttribute("async",!0),n.onload=t,n.onerror=t,document.head.appendChild(n)}}(function(){})})},function(t){t.forEach(function(t){"largest-contentful-paint"===t.entryType&&t.startTime<P&&(w=t.startTime),"first-input"===t.entryType&&(L=t.duration),"layout-shift"!==t.entryType||t.hadRecentInput||(b+=t.value),"first-contentful-paint"===t.name&&(h=t.startTime)})}),T=function(t){y=t;var n=document.querySelector(".not-critical__loader");n&&!_?n.scrollIntoView():u(t)},window.addEventListener("hashchange",function(){T(window.location.hash)},!1),window.location.hash&&document.addEventListener("DOMContentLoaded",function(){T(window.location.hash)},!1),Object(i.a)(E),o(".not-critical",E),c(E),Object(i.a)(function(){A=!0}),c(function(){A=!0}),window.ALL3DP_IUB_CALLBACK=function(t){s(t)}},42:function(t,n,e){e(79)("asyncIterator")},43:function(t,n,e){"use strict";var r=e(1),o=e(9),i=e(5),c=e(15),u=e(13),a=e(50).KEY,f=e(4),s=e(37),l=e(27),d=e(20),p=e(0),v=e(80),y=e(79),w=e(115),L=e(116),h=e(75),m=e(8),O=e(16),g=e(36),_=e(24),A=e(54),b=e(117),P=e(81),T=e(7),I=e(17),E=P.f,S=T.f,x=b.f,D=r.Symbol,j=r.JSON,C=j&&j.stringify,K=p("_hidden"),M=p("toPrimitive"),R={}.propertyIsEnumerable,k=s("symbol-registry"),F=s("symbols"),N=s("op-symbols"),q=Object.prototype,G="function"==typeof D,U=r.QObject,V=!U||!U.prototype||!U.prototype.findChild,H=i&&f(function(){return 7!=A(S({},"a",{get:function(){return S(this,"a",{value:7}).a}})).a})?function(t,n,e){var r=E(q,n);r&&delete q[n],S(t,n,e),r&&t!==q&&S(q,n,r)}:S,B=function(t){var n=F[t]=A(D.prototype);return n._k=t,n},W=G&&"symbol"==typeof D.iterator?function(t){return"symbol"==typeof t}:function(t){return t instanceof D},J=function(t,n,e){return t===q&&J(N,n,e),m(t),n=g(n,!0),m(e),o(F,n)?(e.enumerable?(o(t,K)&&t[K][n]&&(t[K][n]=!1),e=A(e,{enumerable:_(0,!1)})):(o(t,K)||S(t,K,_(1,{})),t[K][n]=!0),H(t,n,e)):S(t,n,e)},Y=function(t,n){m(t);for(var e,r=L(n=O(n)),o=0,i=r.length;i>o;)J(t,e=r[o++],n[e]);return t},z=function(t){var n=R.call(this,t=g(t,!0));return!(this===q&&o(F,t)&&!o(N,t))&&(!(n||!o(this,t)||!o(F,t)||o(this,K)&&this[K][t])||n)},Q=function(t,n){if(t=O(t),n=g(n,!0),t!==q||!o(F,n)||o(N,n)){var e=E(t,n);return!e||!o(F,n)||o(t,K)&&t[K][n]||(e.enumerable=!0),e}},X=function(t){for(var n,e=x(O(t)),r=[],i=0;e.length>i;)o(F,n=e[i++])||n==K||n==a||r.push(n);return r},Z=function(t){for(var n,e=t===q,r=x(e?N:O(t)),i=[],c=0;r.length>c;)!o(F,n=r[c++])||e&&!o(q,n)||i.push(F[n]);return i};G||(u((D=function(){if(this instanceof D)throw TypeError("Symbol is not a constructor!");var t=d(arguments.length>0?arguments[0]:void 0),n=function(e){this===q&&n.call(N,e),o(this,K)&&o(this[K],t)&&(this[K][t]=!1),H(this,t,_(1,e))};return i&&V&&H(q,t,{configurable:!0,set:n}),B(t)}).prototype,"toString",function(){return this._k}),P.f=Q,T.f=J,e(58).f=b.f=X,e(39).f=z,e(57).f=Z,i&&!e(30)&&u(q,"propertyIsEnumerable",z,!0),v.f=function(t){return B(p(t))}),c(c.G+c.W+c.F*!G,{Symbol:D});for(var $="hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables".split(","),tt=0;$.length>tt;)p($[tt++]);for(var nt=I(p.store),et=0;nt.length>et;)y(nt[et++]);c(c.S+c.F*!G,"Symbol",{for:function(t){return o(k,t+="")?k[t]:k[t]=D(t)},keyFor:function(t){if(W(t))return w(k,t);throw TypeError(t+" is not a symbol!")},useSetter:function(){V=!0},useSimple:function(){V=!1}}),c(c.S+c.F*!G,"Object",{create:function(t,n){return void 0===n?A(t):Y(A(t),n)},defineProperty:J,defineProperties:Y,getOwnPropertyDescriptor:Q,getOwnPropertyNames:X,getOwnPropertySymbols:Z}),j&&c(c.S+c.F*(!G||f(function(){var t=D();return"[null]"!=C([t])||"{}"!=C({a:t})||"{}"!=C(Object(t))})),"JSON",{stringify:function(t){if(void 0!==t&&!W(t)){for(var n,e,r=[t],o=1;arguments.length>o;)r.push(arguments[o++]);return"function"==typeof(n=r[1])&&(e=n),!e&&h(n)||(n=function(t,n){if(e&&(n=e.call(this,t,n)),!W(n))return n}),r[1]=n,C.apply(j,r)}}}),D.prototype[M]||e(12)(D.prototype,M,D.prototype.valueOf),l(D,"Symbol"),l(Math,"Math",!0),l(r.JSON,"JSON",!0)},49:function(t,n,e){var r=e(25);t.exports=Object("z").propertyIsEnumerable(0)?Object:function(t){return"String"==r(t)?t.split(""):Object(t)}},5:function(t,n,e){t.exports=!e(4)(function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a})},50:function(t,n,e){var r=e(20)("meta"),o=e(3),i=e(9),c=e(7).f,u=0,a=Object.isExtensible||function(){return!0},f=!e(4)(function(){return a(Object.preventExtensions({}))}),s=function(t){c(t,r,{value:{i:"O"+ ++u,w:{}}})},l=t.exports={KEY:r,NEED:!1,fastKey:function(t,n){if(!o(t))return"symbol"==typeof t?t:("string"==typeof t?"S":"P")+t;if(!i(t,r)){if(!a(t))return"F";if(!n)return"E";s(t)}return t[r].i},getWeak:function(t,n){if(!i(t,r)){if(!a(t))return!0;if(!n)return!1;s(t)}return t[r].w},onFreeze:function(t){return f&&l.NEED&&a(t)&&!i(t,r)&&s(t),t}}},52:function(t,n,e){"use strict";e(114);var r=e(8),o=e(70),i=e(5),c=/./.toString,u=function(t){e(13)(RegExp.prototype,"toString",t,!0)};e(4)(function(){return"/a/b"!=c.call({source:"a",flags:"b"})})?u(function(){var t=r(this);return"/".concat(t.source,"/","flags"in t?t.flags:!i&&t instanceof RegExp?o.call(t):void 0)}):"toString"!=c.name&&u(function(){return c.call(this)})},54:function(t,n,e){var r=e(8),o=e(96),i=e(38),c=e(35)("IE_PROTO"),u=function(){},a=function(){var t,n=e(41)("iframe"),r=i.length;for(n.style.display="none",e(69).appendChild(n),n.src="javascript:",(t=n.contentWindow.document).open(),t.write("<script>document.F=Object<\/script>"),t.close(),a=t.F;r--;)delete a.prototype[i[r]];return a()};t.exports=Object.create||function(t,n){var e;return null!==t?(u.prototype=r(t),e=new u,u.prototype=null,e[c]=t):e=a(),void 0===n?e:o(e,n)}},55:function(t,n,e){"use strict";var r=e(19),o=e(15),i=e(22),c=e(91),u=e(76),a=e(26),f=e(113),s=e(77);o(o.S+o.F*!e(56)(function(t){Array.from(t)}),"Array",{from:function(t){var n,e,o,l,d=i(t),p="function"==typeof this?this:Array,v=arguments.length,y=v>1?arguments[1]:void 0,w=void 0!==y,L=0,h=s(d);if(w&&(y=r(y,v>2?arguments[2]:void 0,2)),null==h||p==Array&&u(h))for(e=new p(n=a(d.length));n>L;L++)f(e,L,w?y(d[L],L):d[L]);else for(l=h.call(d),e=new p;!(o=l.next()).done;L++)f(e,L,w?c(l,y,[o.value,L],!0):o.value);return e.length=L,e}})},56:function(t,n,e){var r=e(0)("iterator"),o=!1;try{var i=[7][r]();i.return=function(){o=!0},Array.from(i,function(){throw 2})}catch(t){}t.exports=function(t,n){if(!n&&!o)return!1;var e=!1;try{var i=[7],c=i[r]();c.next=function(){return{done:e=!0}},i[r]=function(){return c},t(i)}catch(t){}return e}},57:function(t,n){n.f=Object.getOwnPropertySymbols},58:function(t,n,e){var r=e(63),o=e(38).concat("length","prototype");n.f=Object.getOwnPropertyNames||function(t){return r(t,o)}},60:function(t,n,e){t.exports=!e(5)&&!e(4)(function(){return 7!=Object.defineProperty(e(41)("div"),"a",{get:function(){return 7}}).a})},61:function(t,n,e){var r=e(0)("unscopables"),o=Array.prototype;null==o[r]&&e(12)(o,r,{}),t.exports=function(t){o[r][t]=!0}},62:function(t,n,e){"use strict";var r=e(30),o=e(15),i=e(13),c=e(12),u=e(9),a=e(23),f=e(95),s=e(27),l=e(89),d=e(0)("iterator"),p=!([].keys&&"next"in[].keys()),v=function(){return this};t.exports=function(t,n,e,y,w,L,h){f(e,n,y);var m,O,g,_=function(t){if(!p&&t in T)return T[t];switch(t){case"keys":case"values":return function(){return new e(this,t)}}return function(){return new e(this,t)}},A=n+" Iterator",b="values"==w,P=!1,T=t.prototype,I=T[d]||T["@@iterator"]||w&&T[w],E=I||_(w),S=w?b?_("entries"):E:void 0,x="Array"==n&&T.entries||I;if(x&&(g=l(x.call(new t)))!==Object.prototype&&g.next&&(s(g,A,!0),r||u(g,d)||c(g,d,v)),b&&I&&"values"!==I.name&&(P=!0,E=function(){return I.call(this)}),r&&!h||!p&&!P&&T[d]||c(T,d,E),a[n]=E,a[A]=v,w)if(m={values:b?E:_("values"),keys:L?E:_("keys"),entries:S},h)for(O in m)O in T||i(T,O,m[O]);else o(o.P+o.F*(p||P),n,m);return m}},63:function(t,n,e){var r=e(9),o=e(16),i=e(74)(!1),c=e(35)("IE_PROTO");t.exports=function(t,n){var e,u=o(t),a=0,f=[];for(e in u)e!=c&&r(u,e)&&f.push(e);for(;n.length>a;)r(u,e=n[a++])&&(~i(f,e)||f.push(e));return f}},64:function(t,n,e){var r=e(19),o=e(49),i=e(22),c=e(26),u=e(110);t.exports=function(t,n){var e=1==t,a=2==t,f=3==t,s=4==t,l=6==t,d=5==t||l,p=n||u;return function(n,u,v){for(var y,w,L=i(n),h=o(L),m=r(u,v,3),O=c(h.length),g=0,_=e?p(n,O):a?p(n,0):void 0;O>g;g++)if((d||g in h)&&(w=m(y=h[g],g,L),t))if(e)_[g]=w;else if(w)switch(t){case 3:return!0;case 5:return y;case 6:return g;case 2:_.push(y)}else if(s)return!1;return l?-1:f||s?s:_}}},68:function(t,n,e){var r=e(33),o=Math.max,i=Math.min;t.exports=function(t,n){return(t=r(t))<0?o(t+n,0):i(t,n)}},69:function(t,n,e){var r=e(1).document;t.exports=r&&r.documentElement},7:function(t,n,e){var r=e(8),o=e(60),i=e(36),c=Object.defineProperty;n.f=e(5)?Object.defineProperty:function(t,n,e){if(r(t),n=i(n,!0),r(e),o)try{return c(t,n,e)}catch(t){}if("get"in e||"set"in e)throw TypeError("Accessors not supported!");return"value"in e&&(t[n]=e.value),t}},70:function(t,n,e){"use strict";var r=e(8);t.exports=function(){var t=r(this),n="";return t.global&&(n+="g"),t.ignoreCase&&(n+="i"),t.multiline&&(n+="m"),t.unicode&&(n+="u"),t.sticky&&(n+="y"),n}},74:function(t,n,e){var r=e(16),o=e(26),i=e(68);t.exports=function(t){return function(n,e,c){var u,a=r(n),f=o(a.length),s=i(c,f);if(t&&e!=e){for(;f>s;)if((u=a[s++])!=u)return!0}else for(;f>s;s++)if((t||s in a)&&a[s]===e)return t||s||0;return!t&&-1}}},75:function(t,n,e){var r=e(25);t.exports=Array.isArray||function(t){return"Array"==r(t)}},76:function(t,n,e){var r=e(23),o=e(0)("iterator"),i=Array.prototype;t.exports=function(t){return void 0!==t&&(r.Array===t||i[o]===t)}},77:function(t,n,e){var r=e(78),o=e(0)("iterator"),i=e(23);t.exports=e(21).getIteratorMethod=function(t){if(null!=t)return t[o]||t["@@iterator"]||i[r(t)]}},78:function(t,n,e){var r=e(25),o=e(0)("toStringTag"),i="Arguments"==r(function(){return arguments}());t.exports=function(t){var n,e,c;return void 0===t?"Undefined":null===t?"Null":"string"==typeof(e=function(t,n){try{return t[n]}catch(t){}}(n=Object(t),o))?e:i?r(n):"Object"==(c=r(n))&&"function"==typeof n.callee?"Arguments":c}},79:function(t,n,e){var r=e(1),o=e(21),i=e(30),c=e(80),u=e(7).f;t.exports=function(t){var n=o.Symbol||(o.Symbol=i?{}:r.Symbol||{});"_"==t.charAt(0)||t in n||u(n,t,{value:c.f(t)})}},8:function(t,n,e){var r=e(3);t.exports=function(t){if(!r(t))throw TypeError(t+" is not an object!");return t}},80:function(t,n,e){n.f=e(0)},81:function(t,n,e){var r=e(39),o=e(24),i=e(16),c=e(36),u=e(9),a=e(60),f=Object.getOwnPropertyDescriptor;n.f=e(5)?f:function(t,n){if(t=i(t),n=c(n,!0),a)try{return f(t,n)}catch(t){}if(u(t,n))return o(!r.f.call(t,n),t[n])}},89:function(t,n,e){var r=e(9),o=e(22),i=e(35)("IE_PROTO"),c=Object.prototype;t.exports=Object.getPrototypeOf||function(t){return t=o(t),r(t,i)?t[i]:"function"==typeof t.constructor&&t instanceof t.constructor?t.constructor.prototype:t instanceof Object?c:null}},9:function(t,n){var e={}.hasOwnProperty;t.exports=function(t,n){return e.call(t,n)}},90:function(t,n,e){"use strict";var r=e(15),o=e(64)(5),i=!0;"find"in[]&&Array(1).find(function(){i=!1}),r(r.P+r.F*i,"Array",{find:function(t){return o(this,t,arguments.length>1?arguments[1]:void 0)}}),e(61)("find")},91:function(t,n,e){var r=e(8);t.exports=function(t,n,e,o){try{return o?n(r(e)[0],e[1]):n(e)}catch(n){var i=t.return;throw void 0!==i&&r(i.call(t)),n}}},94:function(t,n){t.exports=function(t,n){return{value:n,done:!!t}}},95:function(t,n,e){"use strict";var r=e(54),o=e(24),i=e(27),c={};e(12)(c,e(0)("iterator"),function(){return this}),t.exports=function(t,n,e){t.prototype=r(c,{next:o(1,e)}),i(t,n+" Iterator")}},96:function(t,n,e){var r=e(7),o=e(8),i=e(17);t.exports=e(5)?Object.defineProperties:function(t,n){o(t);for(var e,c=i(n),u=c.length,a=0;u>a;)r.f(t,e=c[a++],n[e]);return t}}});
+</script>
+<link rel="preload" href="https://cdn.iubenda.com/cs/iubenda_cs.js" as="script">
+<script type="text/javascript">
+
+  var all3dpGetUserCountry = function() {
+    var name = 'country';
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) {
+      return parts.pop().split(";").shift();
+    } else {
+      return '';
+    }
+  }
+
+  var _iub = _iub || [];
+  _iub.cons_instructions = _iub.cons_instructions || [];
+  _iub.cons_instructions.push(["init", { api_key: "RyvGB1UIMK8iQ9Blvoi3Uk7jNCEyZr4u" }, function () {}]);
+
+  _iub.csConfiguration = {
+    "enableCcpa":true,
+    "countryDetection":true,
+    "lang":"en",
+    "siteId":1265318,
+    "cookiePolicyId": 45533713,
+    "purposes": "1,2,3,4,5",
+    "perPurposeConsent":true,
+    "consentOnContinuedBrowsing": false,
+    "gdprAppliesGlobally": false,
+    "banner":{
+      "slideDown":false,
+      "acceptButtonDisplay":true,
+      "customizeButtonDisplay":true,
+      "acceptButtonColor":"#0073CE",
+      "acceptButtonCaptionColor":"white",
+      "customizeButtonColor":"#DADADA",
+      "customizeButtonCaptionColor":"#4D4D4D",
+      "position":"float-center",
+      "textColor":"black",
+      "backgroundColor":"#ffffff",
+      "brandBackgroundColor":"none",
+      "brandTextColor": "black",
+      "logo": "https://all3dp.com/app/themes/all3dp/layout/static/images/all3dp_logo_121-56.svg",
+      "rejectButtonDisplay":all3dpGetUserCountry() === 'gb' ? true : false,
+      "rejectButtonColor":"#0073CE",
+      "rejectButtonCaptionColor":"white"
+    },
+    i18n: {
+      en: {
+        banner: {
+          title: 'Please allow cookies so that All3DP works properly.',
+          customize_button_caption: 'Customize'
+        }
+      },
+      pt: {
+        banner: {
+          accept_button_caption: 'Aceitar',
+          customize_button_caption: 'Personalizar'
+        }
+      }
+    },
+    callback: {
+      onPreferenceExpressedOrNotNeeded: function(preference) {
+
+        if (!preference) {
+          // IF no no consent is needed
+          window.ALL3DP_IUB_PREFERENCES = {
+            purposes: {
+              1: true,
+              2: true,
+              3: true,
+              4: true,
+              5: true
+            }
+          }
+        } else {
+          window.ALL3DP_IUB_PREFERENCES = preference;
+        }
+        window.ALL3DP_IUB_CALLBACK(window.ALL3DP_IUB_PREFERENCES);
+      }
+    }
+  };
+</script>
+<script type="text/javascript" src="https://cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+<script type="text/javascript" src="https://cdn.iubenda.com/cons/iubenda_cons.js" async></script>
+<script>
+        window.dataLayer = window.dataLayer || [];
+        dataLayer.push({"pageTitle":"Anet A8 Firmware: Which to Choose &amp; How to Change It | All3DP","pageType":"all3dp-cont-academy","pageNum":1,"pageID":"135953","postFormat":"standard","pagePostType":"all3dp-cont-academy","pageCategory":"basics","pageAttributes":["firmware","anet-a8"],"pagePostAuthorID":168,"pagePostAuthor":"Lovro \u0160verko","pagePostDate":"April 14, 2019","pagePostDateYear":"2019","pagePostDateMonth":"04","pagePostDateDay":"14","pagePostTerms":{"category":["Basics"],"post_tag":["3D Printer Firmware","Anet A8"],"language":["English"],"popular":["posts"]}});
+
+                window[atob('R29vZ2xlQW5hbHl0aWNzT2JqZWN0')] = 'atx';
+
+        (function(){
+          var src = "/kbcbqexpqvz8wrk88augy7b.js";
+          var s = document.createElement('script');
+            s.setAttribute('src', src);
+            s.setAttribute('async', true);
+          document.head.appendChild(s);
+        })();
+
+        window.atx = window.atx || function() {(atx.q = atx.q || []).push(arguments)};
+        atx.l=+new Date;
+        atx('create', 'UA-50765650-1', 'auto', {'allowLinker': true});
+        atx('set', 'anonymizeIp', true);
+        atx('require', 'linker');
+        atx('linker:autoLink', ['m.all3dp.com', 'all3dp.com']);
+        atx('set', 'contentGroup1', "basics");
+
+        
+        atx('set', {"dimension1":"April 14, 2019","dimension2":"basics","dimension3":"Lovro \u0160verko","dimension9":135953,"dimension10":"all3dp-cont-academy"});
+        atx('send', 'pageview');
+      </script>
+<script>
+  (function(){/*
+    Copyright The Closure Library Authors.
+    SPDX-License-Identifier: Apache-2.0
+    */
+    'use strict';var g=function(a){var b=0;return function(){return b<a.length?{done:!1,value:a[b++]}:{done:!0}}},l=this||self,m=/^[\w+/_-]+[=]{0,2}$/,p=null,q=function(){},r=function(a){var b=typeof a;if("object"==b)if(a){if(a instanceof Array)return"array";if(a instanceof Object)return b;var c=Object.prototype.toString.call(a);if("[object Window]"==c)return"object";if("[object Array]"==c||"number"==typeof a.length&&"undefined"!=typeof a.splice&&"undefined"!=typeof a.propertyIsEnumerable&&!a.propertyIsEnumerable("splice"))return"array";
+    if("[object Function]"==c||"undefined"!=typeof a.call&&"undefined"!=typeof a.propertyIsEnumerable&&!a.propertyIsEnumerable("call"))return"function"}else return"null";else if("function"==b&&"undefined"==typeof a.call)return"object";return b},u=function(a,b){function c(){}c.prototype=b.prototype;a.prototype=new c;a.prototype.constructor=a};var v=function(a,b){Object.defineProperty(l,a,{configurable:!1,get:function(){return b},set:q})};var y=function(a,b){this.b=a===w&&b||"";this.a=x},x={},w={};var aa=function(a,b){a.src=b instanceof y&&b.constructor===y&&b.a===x?b.b:"type_error:TrustedResourceUrl";if(null===p)b:{b=l.document;if((b=b.querySelector&&b.querySelector("script[nonce]"))&&(b=b.nonce||b.getAttribute("nonce"))&&m.test(b)){p=b;break b}p=""}b=p;b&&a.setAttribute("nonce",b)};var z=function(){return Math.floor(2147483648*Math.random()).toString(36)+Math.abs(Math.floor(2147483648*Math.random())^+new Date).toString(36)};var A=function(a,b){b=String(b);"application/xhtml+xml"===a.contentType&&(b=b.toLowerCase());return a.createElement(b)},B=function(a){this.a=a||l.document||document};B.prototype.appendChild=function(a,b){a.appendChild(b)};var C=function(a,b,c,d,e,f){try{var k=a.a,h=A(a.a,"SCRIPT");h.async=!0;aa(h,b);k.head.appendChild(h);h.addEventListener("load",function(){e();d&&k.head.removeChild(h)});h.addEventListener("error",function(){0<c?C(a,b,c-1,d,e,f):(d&&k.head.removeChild(h),f())})}catch(n){f()}};var ba=l.atob("aHR0cHM6Ly93d3cuZ3N0YXRpYy5jb20vaW1hZ2VzL2ljb25zL21hdGVyaWFsL3N5c3RlbS8xeC93YXJuaW5nX2FtYmVyXzI0ZHAucG5n"),ca=l.atob("WW91IGFyZSBzZWVpbmcgdGhpcyBtZXNzYWdlIGJlY2F1c2UgYWQgb3Igc2NyaXB0IGJsb2NraW5nIHNvZnR3YXJlIGlzIGludGVyZmVyaW5nIHdpdGggdGhpcyBwYWdlLg=="),da=l.atob("RGlzYWJsZSBhbnkgYWQgb3Igc2NyaXB0IGJsb2NraW5nIHNvZnR3YXJlLCB0aGVuIHJlbG9hZCB0aGlzIHBhZ2Uu"),ea=function(a,b,c){this.b=a;this.f=new B(this.b);this.a=null;this.c=[];this.g=!1;this.i=b;this.h=c},F=function(a){if(a.b.body&&!a.g){var b=
+    function(){D(a);l.setTimeout(function(){return E(a,3)},50)};C(a.f,a.i,2,!0,function(){l[a.h]||b()},b);a.g=!0}},D=function(a){for(var b=G(1,5),c=0;c<b;c++){var d=H(a);a.b.body.appendChild(d);a.c.push(d)}b=H(a);b.style.bottom="0";b.style.left="0";b.style.position="fixed";b.style.width=G(100,110).toString()+"%";b.style.zIndex=G(2147483544,2147483644).toString();b.style["background-color"]=I(249,259,242,252,219,229);b.style["box-shadow"]="0 0 12px #888";b.style.color=I(0,10,0,10,0,10);b.style.display=
+    "flex";b.style["justify-content"]="center";b.style["font-family"]="Roboto, Arial";c=H(a);c.style.width=G(80,85).toString()+"%";c.style.maxWidth=G(750,775).toString()+"px";c.style.margin="24px";c.style.display="flex";c.style["align-items"]="flex-start";c.style["justify-content"]="center";d=A(a.f.a,"IMG");d.className=z();d.src=ba;d.style.height="24px";d.style.width="24px";d.style["padding-right"]="16px";var e=H(a),f=H(a);f.style["font-weight"]="bold";f.textContent=ca;var k=H(a);k.textContent=da;J(a,
+    e,f);J(a,e,k);J(a,c,d);J(a,c,e);J(a,b,c);a.a=b;a.b.body.appendChild(a.a);b=G(1,5);for(c=0;c<b;c++)d=H(a),a.b.body.appendChild(d),a.c.push(d)},J=function(a,b,c){for(var d=G(1,5),e=0;e<d;e++){var f=H(a);b.appendChild(f)}b.appendChild(c);c=G(1,5);for(d=0;d<c;d++)e=H(a),b.appendChild(e)},G=function(a,b){return Math.floor(a+Math.random()*(b-a))},I=function(a,b,c,d,e,f){return"rgb("+G(Math.max(a,0),Math.min(b,255)).toString()+","+G(Math.max(c,0),Math.min(d,255)).toString()+","+G(Math.max(e,0),Math.min(f,
+    255)).toString()+")"},H=function(a){a=A(a.f.a,"DIV");a.className=z();return a},E=function(a,b){0>=b||null!=a.a&&0!=a.a.offsetHeight&&0!=a.a.offsetWidth||(fa(a),D(a),l.setTimeout(function(){return E(a,b-1)},50))},fa=function(a){var b=a.c;var c="undefined"!=typeof Symbol&&Symbol.iterator&&b[Symbol.iterator];b=c?c.call(b):{next:g(b)};for(c=b.next();!c.done;c=b.next())(c=c.value)&&c.parentNode&&c.parentNode.removeChild(c);a.c=[];(b=a.a)&&b.parentNode&&b.parentNode.removeChild(b);a.a=null};var ia=function(a,b,c,d,e){var f=ha(c),k=function(n){n.appendChild(f);l.setTimeout(function(){f?(0!==f.offsetHeight&&0!==f.offsetWidth?b():a(),f.parentNode&&f.parentNode.removeChild(f)):a()},d)},h=function(n){document.body?k(document.body):0<n?l.setTimeout(function(){h(n-1)},e):b()};h(3)},ha=function(a){var b=document.createElement("div");b.className=a;b.style.width="1px";b.style.height="1px";b.style.position="absolute";b.style.left="-10000px";b.style.top="-10000px";b.style.zIndex="-10000";return b};var K={},L=null;var M=function(){},N="function"==typeof Uint8Array,O=function(a,b){a.b=null;b||(b=[]);a.j=void 0;a.f=-1;a.a=b;a:{if(b=a.a.length){--b;var c=a.a[b];if(!(null===c||"object"!=typeof c||Array.isArray(c)||N&&c instanceof Uint8Array)){a.g=b-a.f;a.c=c;break a}}a.g=Number.MAX_VALUE}a.i={}},P=[],Q=function(a,b){if(b<a.g){b+=a.f;var c=a.a[b];return c===P?a.a[b]=[]:c}if(a.c)return c=a.c[b],c===P?a.c[b]=[]:c},R=function(a,b,c){a.b||(a.b={});if(!a.b[c]){var d=Q(a,c);d&&(a.b[c]=new b(d))}return a.b[c]};
+    M.prototype.h=N?function(){var a=Uint8Array.prototype.toJSON;Uint8Array.prototype.toJSON=function(){var b;void 0===b&&(b=0);if(!L){L={};for(var c="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""),d=["+/=","+/","-_=","-_.","-_"],e=0;5>e;e++){var f=c.concat(d[e].split(""));K[e]=f;for(var k=0;k<f.length;k++){var h=f[k];void 0===L[h]&&(L[h]=k)}}}b=K[b];c=[];for(d=0;d<this.length;d+=3){var n=this[d],t=(e=d+1<this.length)?this[d+1]:0;h=(f=d+2<this.length)?this[d+2]:0;k=n>>2;n=(n&
+    3)<<4|t>>4;t=(t&15)<<2|h>>6;h&=63;f||(h=64,e||(t=64));c.push(b[k],b[n],b[t]||"",b[h]||"")}return c.join("")};try{return JSON.stringify(this.a&&this.a,S)}finally{Uint8Array.prototype.toJSON=a}}:function(){return JSON.stringify(this.a&&this.a,S)};var S=function(a,b){return"number"!==typeof b||!isNaN(b)&&Infinity!==b&&-Infinity!==b?b:String(b)};M.prototype.toString=function(){return this.a.toString()};var T=function(a){O(this,a)};u(T,M);var U=function(a){O(this,a)};u(U,M);var ja=function(a,b){this.c=new B(a);var c=R(b,T,5);c=new y(w,Q(c,4)||"");this.b=new ea(a,c,Q(b,4));this.a=b},ka=function(a,b,c,d){b=new T(b?JSON.parse(b):null);b=new y(w,Q(b,4)||"");C(a.c,b,3,!1,c,function(){ia(function(){F(a.b);d(!1)},function(){d(!0)},Q(a.a,2),Q(a.a,3),Q(a.a,1))})};var la=function(a,b){V(a,"internal_api_load_with_sb",function(c,d,e){ka(b,c,d,e)});V(a,"internal_api_sb",function(){F(b.b)})},V=function(a,b,c){a=l.btoa(a+b);v(a,c)},W=function(a,b,c){for(var d=[],e=2;e<arguments.length;++e)d[e-2]=arguments[e];e=l.btoa(a+b);e=l[e];if("function"==r(e))e.apply(null,d);else throw Error("API not exported.");};var X=function(a){O(this,a)};u(X,M);var Y=function(a){this.h=window;this.a=a;this.b=Q(this.a,1);this.f=R(this.a,T,2);this.g=R(this.a,U,3);this.c=!1};Y.prototype.start=function(){ma();var a=new ja(this.h.document,this.g);la(this.b,a);na(this)};
+    var ma=function(){var a=function(){if(!l.frames.googlefcPresent)if(document.body){var b=document.createElement("iframe");b.style.display="none";b.style.width="0px";b.style.height="0px";b.style.border="none";b.style.zIndex="-1000";b.style.left="-1000px";b.style.top="-1000px";b.name="googlefcPresent";document.body.appendChild(b)}else l.setTimeout(a,5)};a()},na=function(a){var b=Date.now();W(a.b,"internal_api_load_with_sb",a.f.h(),function(){var c;var d=a.b,e=l[l.btoa(d+"loader_js")];if(e){e=l.atob(e);
+    e=parseInt(e,10);d=l.btoa(d+"loader_js").split(".");var f=l;d[0]in f||"undefined"==typeof f.execScript||f.execScript("var "+d[0]);for(;d.length&&(c=d.shift());)d.length?f[c]&&f[c]!==Object.prototype[c]?f=f[c]:f=f[c]={}:f[c]=null;c=Math.abs(b-e);c=1728E5>c?0:c}else c=-1;0!=c&&(W(a.b,"internal_api_sb"),Z(a,Q(a.a,6)))},function(c){Z(a,c?Q(a.a,4):Q(a.a,5))})},Z=function(a,b){a.c||(a.c=!0,a=new l.XMLHttpRequest,a.open("GET",b,!0),a.send())};(function(a,b){l[a]=function(c){for(var d=[],e=0;e<arguments.length;++e)d[e-0]=arguments[e];l[a]=q;b.apply(null,d)}})("__d3lUW8vwsKlB__",function(a){"function"==typeof window.atob&&(a=window.atob(a),a=new X(a?JSON.parse(a):null),(new Y(a)).start())});}).call(this);
+
+    window.__d3lUW8vwsKlB__("WyI4MGFkNjU2YTBkM2ZjNTAiLFtudWxsLG51bGwsbnVsbCwiaHR0cHM6Ly9mdW5kaW5nY2hvaWNlc21lc3NhZ2VzLmdvb2dsZS5jb20vZi9BR1NLV3hVS2drR1VQRFF6dV9RMDdoOE94WGZJVnZObDVDVzJKOU93N3Bxa01uUHF0Y05ueUNjTHNZX0VMaWhIaDBDVjZXejNyRkhldDRfVWd5YWFOVHJIdGdcdTAwM2RcdTAwM2QiXQosWzIwLCJkaXYtZ3B0LWFkIiwxMDAsIk9EQmhaRFkxTm1Fd1pETm1ZelV3IixbbnVsbCxudWxsLG51bGwsImh0dHBzOi8vd3d3LmdzdGF0aWMuY29tLzBlbW4vZi9wLzgwYWQ2NTZhMGQzZmM1MC5qcz91c3FwXHUwMDNkQ0FVIl0KXQosImh0dHBzOi8vZnVuZGluZ2Nob2ljZXNtZXNzYWdlcy5nb29nbGUuY29tL2wvQUdTS1d4WGhzeXA0d3VSa2xXZjN5NTZxRTNyWlkya2wxRHNRcTdxcGtMcmxfMkFQaHByeHp3ci0wZXBYWGsxVjAxSDgxRGhMZFZHUGl1MTlRTXQ0TVRRXHUwMDNkP2FiXHUwMDNkMSIsImh0dHBzOi8vZnVuZGluZ2Nob2ljZXNtZXNzYWdlcy5nb29nbGUuY29tL2wvQUdTS1d4VV9MS2RZZFhNTGN3Wm1yTnRVdFBYcEJnczBzZ1VnZGNUaVZ4M3dpWVhPWHM2c2Y4S2Z5eFdaMU83eDFhVVJjZXI5c2tTeHF0VlVSX1U0enZvXHUwMDNkP2FiXHUwMDNkMlx1MDAyNnNiZlx1MDAzZDEiLCJodHRwczovL2Z1bmRpbmdjaG9pY2VzbWVzc2FnZXMuZ29vZ2xlLmNvbS9sL0FHU0tXeFgtdl9tNmdwMWxiNlNESEdGM3EwOEU1LTF2U1J1dlJUX1EtZ0xLcVRJeTBtUExqRjJ3X3JYV1ZmUFI0RGg3bkl6R2MxLVJIVXlPa0dVcFcxOFx1MDAzZD9zYmZcdTAwM2QyIl0K");
+  </script>
+<script>
+
+    
+    window.OneSignal = window.OneSignal || [];
+    OneSignal.push(function() {
+
+      OneSignal.SERVICE_WORKER_UPDATER_PATH = "OneSignalSDKUpdaterWorker.js.php";
+      OneSignal.SERVICE_WORKER_PATH = "OneSignalSDKWorker.js.php";
+      OneSignal.SERVICE_WORKER_PARAM = { scope: '/' };
+
+      OneSignal.init({
+        appId: "b6701f44-a592-4414-aceb-9c870088ca48",
+        safari_web_id: "web.onesignal.auto.45e32f52-047f-48ea-8b6f-5a9d2fcde2db",
+        setDefaultNotificationUrl: "https://all3dp.com/wp",
+        path: "https://all3dp.com/app/plugins/onesignal-free-web-push-notifications/sdk_files/",
+        persistNotification: true,
+        welcomeNotification: {
+          title: "All3DP",
+          message: "Thanks for subscribing!",
+          url: "https://all3dp.com"
+        },
+        promptOptions: {
+          siteName: "All3DP",
+          actionMessage: "Do you want to stay informed? Subscribe to notifications from All3DP.",
+          acceptButtonText: "YES",
+          cancelButtonText: "NO THANKS",
+          slidedown: {
+            actionMessage: "Do you want to stay informed? Subscribe to notifications from All3DP.",
+            acceptButtonText: "OKAY",
+            cancelButtonText: "CANCEL",
+            enabled: true,
+            autoPrompt: true,
+            timeDelay: 60
+          }
+        }
+      });
+    });
+
+
+    window.ALL3DP_TOOLKIT_API.onReady(function(event) {
+
+      if(window.ALL3DP_IUB_PREFERENCES.purposes['5'] === true) {
+        var src = 'https://cdn.onesignal.com/sdks/OneSignalSDK.js';
+        var s = document.createElement('script');
+          s.setAttribute('src', src);
+          s.setAttribute('async', true);
+        document.head.appendChild(s);
+      }
+    });
+
+</script>
+<script>
+  var googletag = googletag || {}; googletag.cmd = googletag.cmd || [];
+
+  window.ALL3DP_TOOLKIT_API.onIubPreferenceExpressed(function(event) {
+    if(event.purposes['5'] === true) {
+      var src = 'https://www.googletagservices.com/tag/js/gpt.js';
+      var s = document.createElement('script');
+        s.setAttribute('src', src);
+        s.setAttribute('async', true);
+      document.head.appendChild(s);
+    }
+  });
+</script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-8044370825796563",
+    enable_page_level_ads: true
+  });
+
+  window.ALL3DP_TOOLKIT_API.onIubPreferenceExpressed(function(event) {
+
+    if(event.purposes['5'] === true) {
+      var src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+      var s = document.createElement('script');
+        s.setAttribute('src', src);
+        s.setAttribute('async', true);
+      document.head.appendChild(s);
+    }
+
+  });
+</script>
+<script>
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.'+'js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-TRWHF9');
+</script>
+<script>
+
+      window.disqus_config = function () {
+        this.page.url = 'https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/';
+        this.page.identifier = "article-135953"
+        this.page.title = "Anet A8 Firmware: Which to Choose &#038; How to Change It"
+      };
+
+      window.ALL3DP_TOOLKIT_API.onReady(function(evt) {
+        if(window.ALL3DP_IUB_PREFERENCES.purposes['3'] === true) {
+          var d = document, s = d.createElement('script');
+              s.src = 'https://all3dp.disqus.com/embed.js';
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+          }
+      });
+    </script>
+
+<meta name="description" content="The saying goes, &quot;If it ain&apos;t broke, don&apos;t fix it.&quot; Does that apply to the old Anet A8 firmware? Should you &quot;mess&quot; with the new firmware? We say yes, and for good reason.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Anet A8 Firmware: Which to Choose &amp; How to Change It | All3DP">
+<meta property="og:description" content="The saying goes, &quot;If it ain&apos;t broke, don&apos;t fix it.&quot; Does that apply to the old Anet A8 firmware? Should you &quot;mess&quot; with the new firmware? We say yes, and for good reason.">
+<meta property="og:url" content="https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/">
+<meta property="og:site_name" content="All3DP">
+<meta property="article:publisher" content="https://www.facebook.com/All3DP">
+<meta property="article:published_time" content="2019-04-14T16:58:30+00:00">
+<meta property="article:modified_time" content="2019-10-05T11:12:17+00:00">
+<meta property="og:image" content="https://i.all3dp.com/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="fb:app_id" content="794059620604226">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@all3dp">
+<meta name="twitter:site" content="@all3dp">
+<meta name="twitter:label1" content="Written by">
+<meta name="twitter:data1" content="Lovro &#x160;verko">
+<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://all3dp.com/#organization","name":"All3DP","url":"https://all3dp.com/","sameAs":["https://www.facebook.com/All3DP","https://www.youtube.com/all3dp","https://www.pinterest.com/all3dp/","https://twitter.com/all3dp"],"logo":{"@type":"ImageObject","@id":"https://all3dp.com/#logo","inLanguage":"en-US","url":"https://i.all3dp.com/wp-content/uploads/2017/05/27020745/all3dp-social-logo-1800.jpg","width":1002,"height":1002,"caption":"All3DP"},"image":{"@id":"https://all3dp.com/#logo"}},{"@type":"WebSite","@id":"https://all3dp.com/#website","url":"https://all3dp.com/","name":"All3DP","description":"World&#039;s #1 3D Printing Magazine","publisher":{"@id":"https://all3dp.com/#organization"},"potentialAction":[{"@type":"SearchAction","target":"https://all3dp.com/?s={search_term_string}","query-input":"required name=search_term_string"}],"inLanguage":"en-US"},{"@type":"ImageObject","@id":"https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/#primaryimage","inLanguage":"en-US","url":"https://i.all3dp.com/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg","width":1280,"height":720,"caption":"Anet A8 Custom Setup Source: Lovro \u0160verko"},{"@type":"WebPage","@id":"https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/#webpage","url":"https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/","name":"Anet A8 Firmware: Which to Choose & How to Change It | All3DP","isPartOf":{"@id":"https://all3dp.com/#website"},"primaryImageOfPage":{"@id":"https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/#primaryimage"},"datePublished":"2019-04-14T16:58:30+00:00","dateModified":"2019-10-05T11:12:17+00:00","description":"The saying goes, \"If it ain't broke, don't fix it.\" Does that apply to the old Anet A8 firmware? Should you \"mess\" with the new firmware? We say yes, and for good reason.","inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/"]}]}]}</script>
+
+<link rel="alternate" type="application/rss+xml" title="All3DP &#xBB; Feed" href="https://all3dp.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="All3DP &#xBB; Anet A8 Firmware: Which to Choose &amp; How to Change It Comments Feed" href="https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/feed/">
+<script type="text/javascript" id="wp-ajax-admin-control_js-js-extra">
+/* <![CDATA[ */
+var wpaac = {"ajax_url":"https:\/\/all3dp.com\/wp\/wp-admin\/admin-ajax.php"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="wp-ajax-admin-control_js-js-after">
+        ;(function() {
+
+          var getCookie = function (name) {
+            var value = '; ' + document.cookie;
+            var parts = value.split('; ' + name + '=');
+            if (parts.length == 2) return parts.pop().split(';').shift();
+          };
+
+          var appendControlScript = function() {
+
+            var src = 'https://all3dp.com/app/plugins/all3dp-wp-ajax-admin-control/assets/js/main.js?v=201107-160500';
+            var s = document.createElement('script');
+              s.setAttribute('src', src);
+              s.setAttribute('async', true);
+            document.head.appendChild(s);
+
+            var href = 'https://all3dp.com/app/plugins/all3dp-wp-ajax-admin-control/assets/styles/main.css?v=201107-160500';
+            var l = document.createElement('link');
+              l.setAttribute('href', href);
+              l.setAttribute('type', 'text/css');
+              l.setAttribute('rel', 'stylesheet');
+
+            document.head.appendChild(l);
+          };
+
+          document.addEventListener('readystatechange', function(event) {
+            if (event.target.readyState === 'interactive') {
+              if(getCookie('wordpress_wpaac') !== null) {
+                appendControlScript();
+              }
+            }
+          }, { capture: false, passive: true});
+        })();
+      
+
+          wpaac.post_id = '135953';
+        
+</script>
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="All3DP">
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="All3DP">
+<link rel="apple-touch-icon" sizes="57x57" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/favicon-16x16.png">
+<link rel="manifest" href="https://all3dp.com/app/themes/all3dp/layout/static/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="msapplication-TileImage" content="https://all3dp.com/app/themes/all3dp/layout/static/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#000000">
+<link rel="prefetch" href="/"> </head>
+<body id="top">
+<div class="page">
+<script type="text/template" id="modal-template-slow-page-load">
+  <div class="slow-page-modal">
+    <div class="slow-page-modal__content">
+      <strong class="slow-page-modal__headline">
+        Is this page loading too slow?      </strong>
+      <p class="slow-page-modal__paragraph">
+      Check out our mobile site:<br />
+        <strong>m.all3dp.com</strong>
+      </p>
+    </div>
+    <div class="slow-page-modal__buttons">
+      <a data-action="slow-page-modal-yes" class="button button--block button--invert" href="https://m.all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/">
+        <span class="button__label">
+          YES        </span>
+      </a>
+      <a data-action="slow-page-modal-no" class="button button--block button--minor" href="https://all3dp.com/2/anet-a8-firmware-which-to-choose-and-how-to-change-it/">
+        <span class="button__label">
+        NO        </span>
+      </a>
+    </div>
+  </div>
+</script>
+<script type="text/template" id="modal-template-newsletter">
+  <div class="newsletter-modal">
+    <div class="newsletter-modal__image">
+      <div class="image image--sync" style=" height: 400px;">
+    <img
+      class="image__img"
+      src="https://i.all3dp.com/wp-content/uploads/2020/09/28172500/optinmonster-flow-yes-no.jpg"
+    />
+  </div>
+
+  </div>
+    <div class="newsletter-modal__content">
+      <h1 class="headline headline--xl">LOVE 3D PRINTING?</h1>
+
+      <p class="paragraph u-text-color-minor">Join over 130,000 newsletter subscribers!</p>
+
+      <a
+        href=""
+        class="button button--block button--field-l"
+        data-action="modal-open"
+        data-modal-iframe="/en/modal/newsletter-signup/"
+        data-modal-iframe-max-width="720px"
+        data-modal-force data-modal-iframe-max-height="490px"
+      >
+        <span class="button__label">YES</span>
+      </a>
+
+      <a
+        class="button button--block button--minor button--field-l"
+        data-action="modal-close"
+      >
+        <span class="button__label">NO</span>
+      </a>
+    </div>
+  </div>
+</script>
+<script type="text/template" id="modal-template-shoplink">
+  <div class="shoplink-modal">
+    <div class="'shoplink-modal__content">
+      <h1 class="headline headline--l">Shopping Link</h1>
+
+      <p class="paragraph">This link is a shopping link where we get a small commission if you buy something.</p>
+
+      <a data-shoplink-button class="button button--block button--field-l">
+        <span class="button__label">Proceed</span>
+      </a>
+    </div>
+  </div>
+</script>
+<nav class="navbar ">
+<div class="navbar__notification" data-url="/en/notifications/content/135953/"></div>
+<div class="navbar__container">
+<div class="navbar__wrapper">
+<div class="navbar__content">
+<div class="navbar__tile">
+<a class="navbar__button" data-action="overlay-open" href="#menu">
+<svg class="icon icon--responsive">
+<use class="icon__default" href="#icon-menu" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__medium" href="#icon-menu-medium" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__large" href="#icon-menu-medium" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+<div class="navbar__title">
+<a class="navbar__logo" href="/">
+<img class="navbar__all3dp" src="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/images/logo.svg" alt="All3DP">
+</a>
+</div>
+<div class="navbar__center">
+<div class="navbar__link-list">
+<a href="https://all3dp.com/printables/" target class="nav-link">Printables</a><a href="https://all3dp.com/buyers-guides/" target class="nav-link">Buyer&apos;s Guides</a><a href="https://all3dp.com/basics/" target class="nav-link nav-link--active">Basics</a><a href="https://all3dp.com/reviews/" target class="nav-link">Reviews</a> </div>
+<div class="navbar__more">
+<div tabindex="0" class="select">
+<button title="More" type="button" class="select__button">
+More </button>
+<ul class="select__list">
+<li class="select__item"><a href="https://all3dp.com/printables/" target class="select__link">Printables</a></li><li class="select__item"><a href="https://all3dp.com/buyers-guides/" target class="select__link">Buyer&apos;s Guides</a></li><li class="select__item"><a href="https://all3dp.com/basics/" target class="select__link">Basics</a></li><li class="select__item"><a href="https://all3dp.com/reviews/" target class="select__link">Reviews</a></li> </ul>
+</div>
+</div>
+</div>
+<div class="navbar__pro">
+<a class="nav-link" href="/pro/">
+Pro </a>
+</div>
+<div class="navbar__tile u-show-large">
+<a class="navbar__button" title="Get It 3D Printed" href="https://www.craftcloud3d.com/?utm_source=all3dp&amp;utm_campaign=navbar1" target="_blank">
+<div class="navbar__get-it-printed">Get It 3D Printed</div>
+</a>
+</div>
+<div class="navbar__tile">
+<div class="push-notification">
+<div class="push-notification__uninitialized">
+<button aria-disabled="true" type="button" class="navbar__button" title="Notifications initializing">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-off" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</button>
+</div>
+<div class="push-notification__unsubscribed">
+<button type="button" class="navbar__button" title="Stay informed with notifications from All3DP.">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-off" xlink="http://www.w3.org/1999/xlink"/>
+<title>Stay informed with notifications from All3DP.</title>
+</svg>
+</button>
+</div>
+<div class="push-notification__subscribed">
+<button type="button" class="navbar__button" title="You get a notification when a new article is published.">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-on" xlink="http://www.w3.org/1999/xlink"/>
+<title>You get a notification when a new article is published.</title>
+</svg>
+</button>
+</div>
+<div class="push-notification__blocked">
+<a href="/push-notifications/" class="navbar__button" title="You can&#x2019;t subscribe to updates from All3DP. Learn more&#x2026;">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-blocked" xlink="http://www.w3.org/1999/xlink"/>
+<title>You can&#x2019;t subscribe to updates from All3DP. Learn more&#x2026;</title>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="navbar__tile">
+<a class="navbar__button" data-action="overlay-open" href="#search">
+<svg class="icon icon--responsive">
+<use class="icon__default" href="#icon-search" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__medium" href="#icon-search-medium" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__large" href="#icon-search-medium" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+<div class="navbar__tile">
+<a class="navbar__craftcloud u-show-large" href="https://www.craftcloud3d.com/?utm_source=all3dp&amp;utm_campaign=navbar2" title="Our 3D printing service marketplace" target="_blank">
+<img class="navbar__craftcloud-logo" src="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/images/craftcloud-logo.svg" alt="Craftcloud">
+<svg class="icon">
+<use class="icon__default" href="#icon-right" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="page__content">
+<div class="container container--full">
+<header class="article-header">
+<div class="article-header__image" style="background-color: #353129;">
+<div class="image image--sync image--cover" style="padding-top: 56.25%;">
+<img class="image__img" alt="Featured image of Anet A8 Firmware: Which to Choose &amp; How to Change It" src="https://i.all3dp.com/cdn-cgi/image/fit=cover,w=1284,h=722,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg" srcset="https://i.all3dp.com/cdn-cgi/image/fit=cover,w=1284,h=722,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg 1284w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=772,h=434,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg 772w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=642,h=434,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg 642w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=473,h=266,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg 473w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=309,h=173,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg 309w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=240,h=434,gravity=0.5x0.5,format=auto/wp-content/uploads/2019/04/11230049/anet-a8-custom-setup-lovro-sverko-190328.jpg 240w">
+</div>
+</div>
+<div class="article-header__content">
+<div class="article-header__disclaimer">
+All3DP is an editorially independent publication. Editorial content, on principle, can not be bought or influenced. To keep All3DP free and independent, we finance ourselves through advertising and affiliate revenues. When you purchase using a shopping link on our site we earn an affiliate commission. <a class="link link--unobtrusive" target="_blank" href="https://all3dp.com/content-policies/">Learn&#xA0;more</a></div>
+<div class="article-header__title">
+<div class="topline topline--invert">Added A8 Protection</div>
+<h1 class="headline headline--xl">Anet A8 Firmware: Which to Choose &amp; How to Change It</h1>
+<div class="author-teaser author-teaser--invert">
+<a class="link" href="https://all3dp.com/authors/lovrosverko/">
+<img class="author-teaser__image" src="https://i.all3dp.com/cdn-cgi/image/fit=cover,w=48,h=48,gravity=0.5x0.5,format=auto/wp-content/uploads/2018/01/26170332/all3dp-contributing-writer.png" srcset="https://i.all3dp.com/cdn-cgi/image/fit=cover,w=192,h=192,gravity=0.5x0.5,format=auto/wp-content/uploads/2018/01/26170332/all3dp-contributing-writer.png 192w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=96,h=96,gravity=0.5x0.5,format=auto/wp-content/uploads/2018/01/26170332/all3dp-contributing-writer.png 96w,https://i.all3dp.com/cdn-cgi/image/fit=cover,w=48,h=48,gravity=0.5x0.5,format=auto/wp-content/uploads/2018/01/26170332/all3dp-contributing-writer.png 48w" alt="Picture of Lovro &#x160;verko">
+</a>
+<div class="author-teaser__content">
+by <a class="link link--invert" href="https://all3dp.com/authors/lovrosverko/">Lovro &#x160;verko</a>
+<br>
+<span>Apr 14, 2019</span> </div>
+</div>
+</div>
+</div>
+</header>
+</div>
+<div class="container container--edge">
+<div class="section "> <div class="ad-container ad-container--horizontal "><div class="ad-container__label">Advertisement</div>
+<div class="ad-container__provider" data-ad-container-provider="adsense">
+<ins class="ad-container__ad" data-ad-client="ca-pub-8044370825796563" data-ad-slot="4674740333"></ins>
+</div>
+</div> </div>
+</div>
+<div class="not-critical">
+<div class="not-critical__loader">
+<noscript>
+      <p class="paragraph paragraph--emphasized">
+        Please activate JavaScript to read this article.      </p>
+    </noscript>
+<span class="loading-indicator"><span></span></span>
+</div>
+<div class="not-critical__content"></div>
+</div>
+</div>
+<div id="search" class="overlay" data-url="/en/ajax/snippet/search/?s=">
+<nav class="navbar navbar--bright">
+<div class="navbar__container">
+<div class="navbar__wrapper">
+<div class="navbar__content">
+<div class="navbar__tile">
+<a class="navbar__button" data-action="overlay-open" href="#menu">
+<svg class="icon icon--responsive">
+<use class="icon__default" href="#icon-menu" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__medium" href="#icon-menu-medium" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__large" href="#icon-menu-medium" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+<div class="navbar__title">
+<a class="navbar__logo" href="/">
+<img class="navbar__all3dp" src="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/images/logo-minor.svg" alt="All3DP">
+</a>
+</div>
+<div class="navbar__center" aria-hidden>
+</div>
+<div class="navbar__tile u-show-large">
+<a class="navbar__button" title="Get It 3D Printed" href="https://www.craftcloud3d.com/?utm_source=all3dp&amp;utm_campaign=navbar1" target="_blank">
+<div class="navbar__get-it-printed">Get It 3D Printed</div>
+</a>
+</div>
+<div class="navbar__tile">
+<div class="push-notification">
+<div class="push-notification__uninitialized">
+<button aria-disabled="true" type="button" class="navbar__button" title="Notifications initializing">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-off" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</button>
+</div>
+<div class="push-notification__unsubscribed">
+<button type="button" class="navbar__button" title="Stay informed with notifications from All3DP.">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-off" xlink="http://www.w3.org/1999/xlink"/>
+<title>Stay informed with notifications from All3DP.</title>
+</svg>
+</button>
+</div>
+<div class="push-notification__subscribed">
+<button type="button" class="navbar__button" title="You get a notification when a new article is published.">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-on" xlink="http://www.w3.org/1999/xlink"/>
+<title>You get a notification when a new article is published.</title>
+</svg>
+</button>
+</div>
+<div class="push-notification__blocked">
+<a href="/push-notifications/" class="navbar__button" title="You can&#x2019;t subscribe to updates from All3DP. Learn more&#x2026;">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-blocked" xlink="http://www.w3.org/1999/xlink"/>
+<title>You can&#x2019;t subscribe to updates from All3DP. Learn more&#x2026;</title>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="navbar__tile">
+<div tabindex="0" class="select select--bright">
+<button title="Select language" type="button" class="select__button">en </button>
+<ul class="select__list">
+<li class="select__item"><a href="https://all3dp.com/" class="select__link">English</a></li> <li class="select__item"><a href="https://all3dp.com/de/" class="select__link">Deutsch</a></li> <li class="select__item"><a href="https://all3dp.com/fr/" class="select__link">Fran&#xE7;ais</a></li> <li class="select__item"><a href="https://all3dp.com/es/" class="select__link">Espa&#xF1;ol</a></li> <li class="select__item"><a href="https://all3dp.com/pt/" class="select__link">Portugu&#xEA;s</a></li> </ul>
+</div>
+</div>
+<div class="navbar__tile">
+<a class="navbar__button" data-action="overlay-close" href="#">
+<svg class="icon icon--responsive">
+<use class="icon__default" href="#icon-close" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__medium" href="#icon-close-medium" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__large" href="#icon-close-medium" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+<div class="navbar__tile">
+<a class="navbar__craftcloud u-show-large" href="https://www.craftcloud3d.com/?utm_source=all3dp&amp;utm_campaign=navbar2" title="Our 3D printing service marketplace" target="_blank">
+<img class="navbar__craftcloud-logo" src="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/images/craftcloud-logo-minor.svg" alt="Craftcloud">
+<svg class="icon">
+<use class="icon__default" href="#icon-right" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="overlay__content">
+<span class="loading-indicator"><span></span></span>
+</div>
+</div>
+<div id="menu" class="overlay overlay--invert" data-url="/en/ajax/snippet/menu/default/ ">
+<nav class="navbar navbar--invert u-space-base">
+<div class="navbar__container">
+<div class="navbar__wrapper">
+<div class="navbar__content">
+<div class="navbar__tile">
+<a class="navbar__button" data-action="overlay-close" href="#">
+<svg class="icon icon--responsive">
+<use class="icon__default" href="#icon-close" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__medium" href="#icon-close-medium" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__large" href="#icon-close-medium" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+<div class="navbar__title">
+<a class="navbar__logo" href="/">
+<img class="navbar__all3dp" src="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/images/logo.svg" alt="All3DP">
+</a>
+</div>
+<div class="navbar__center" aria-hidden>
+</div>
+<div class="navbar__tile u-show-large">
+<a class="navbar__button" title="Get It 3D Printed" href="https://www.craftcloud3d.com/?utm_source=all3dp&amp;utm_campaign=navbar1" target="_blank">
+<div class="navbar__get-it-printed">Get It 3D Printed</div>
+</a>
+</div>
+<div class="navbar__tile">
+<div class="push-notification">
+<div class="push-notification__uninitialized">
+<button aria-disabled="true" type="button" class="navbar__button" title="Notifications initializing">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-off" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</button>
+</div>
+<div class="push-notification__unsubscribed">
+<button type="button" class="navbar__button" title="Stay informed with notifications from All3DP.">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-off" xlink="http://www.w3.org/1999/xlink"/>
+<title>Stay informed with notifications from All3DP.</title>
+</svg>
+</button>
+</div>
+<div class="push-notification__subscribed">
+<button type="button" class="navbar__button" title="You get a notification when a new article is published.">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-on" xlink="http://www.w3.org/1999/xlink"/>
+<title>You get a notification when a new article is published.</title>
+</svg>
+</button>
+</div>
+<div class="push-notification__blocked">
+<a href="/push-notifications/" class="navbar__button" title="You can&#x2019;t subscribe to updates from All3DP. Learn more&#x2026;">
+<svg class="icon" role="img">
+<use class="icon__default" href="#icon-notification-blocked" xlink="http://www.w3.org/1999/xlink"/>
+<title>You can&#x2019;t subscribe to updates from All3DP. Learn more&#x2026;</title>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<div class="navbar__tile">
+<div tabindex="0" class="select select--invert">
+<button title="Select language" type="button" class="select__button">en </button>
+<ul class="select__list">
+<li class="select__item"><a href="https://all3dp.com/" class="select__link">English</a></li> <li class="select__item"><a href="https://all3dp.com/de/" class="select__link">Deutsch</a></li> <li class="select__item"><a href="https://all3dp.com/fr/" class="select__link">Fran&#xE7;ais</a></li> <li class="select__item"><a href="https://all3dp.com/es/" class="select__link">Espa&#xF1;ol</a></li> <li class="select__item"><a href="https://all3dp.com/pt/" class="select__link">Portugu&#xEA;s</a></li> </ul>
+</div>
+</div>
+<div class="navbar__tile">
+<a class="navbar__button" data-action="overlay-open" href="#search">
+<svg class="icon icon--responsive">
+<use class="icon__default" href="#icon-search" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__medium" href="#icon-search-medium" xlink="http://www.w3.org/1999/xlink"/>
+<use class="icon__large" href="#icon-search-medium" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+<div class="navbar__tile">
+<a class="navbar__craftcloud u-show-large" href="https://www.craftcloud3d.com/?utm_source=all3dp&amp;utm_campaign=navbar2" title="Our 3D printing service marketplace" target="_blank">
+<img class="navbar__craftcloud-logo" src="https://all3dp.com/app/themes/all3dp-default-child/desktop/layout/static/assets/images/craftcloud-logo.svg" alt="Craftcloud">
+<svg class="icon">
+<use class="icon__default" href="#icon-right" xlink="http://www.w3.org/1999/xlink"/>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="overlay__content">
+<span class="loading-indicator"><span></span></span>
+</div>
+</div>
+<div class="modal-container">
+<span class="loading-indicator"><span></span></span>
+<div class="modal-container__content">
+<button type="button" class="modal-container__close">
+<svg class="icon">
+<use class="icon__default" href="#icon-close" xlink="http://www.w3.org/1999/xlink"/>
+<title>close</title>
+</svg>
+</button>
+<div class="modal-container__modal"></div>
+</div>
+</div>
+<div class="hover-menu" data-url="/en/ajax/snippet/hover-menu/default/"></div>
+</div>
+<script type="text/javascript">var algolia = {"debug":false,"application_id":"ZCHCU7ERWY","search_api_key":"348bb75d34f380b061d7e92d9151244d","powered_by_enabled":false,"query":"","autocomplete":{"sources":[],"input_selector":"input[name='s']:not('.no-autocomplete')"},"indices":[]};</script><script type="text/javascript">(function() {
+				var expirationDate = new Date();
+				expirationDate.setTime( expirationDate.getTime() + 31536000 * 1000 );
+				document.cookie = "pll_language=en; expires=" + expirationDate.toUTCString() + "; path=/; domain=.all3dp.com; secure";
+			}());</script><script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"All3DP - World&#039;s #1 3D Printing Magazine","item":"https:\/\/all3dp.com"},{"@type":"ListItem","position":2,"name":"Basics","item":"https:\/\/all3dp.com\/basics\/"}]}</script><script type="application/ld+json">[{"@context":"http:\/\/schema.org\/","@type":"Article","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/all3dp.com\/2\/anet-a8-firmware-which-to-choose-and-how-to-change-it"},"headline":"Anet A8 Firmware: Which to Choose &#038; How to Change It","image":{"@type":"ImageObject","url":"https:\/\/i.all3dp.com\/cdn-cgi\/image\/fit=cover,w=1284,h=722,gravity=0.5x0.5,format=auto\/wp-content\/uploads\/2019\/04\/11230049\/anet-a8-custom-setup-lovro-sverko-190328.jpg","width":1284,"height":722},"author":{"@type":"Person","name":"Lovro \u0160verko"},"publisher":{"@type":"Organization","name":"All3DP","logo":{"@type":"ImageObject","url":"https:\/\/all3dp.com\/app\/themes\/all3dp\/layout\/static\/images\/all3dp-site-logo-60x152.png","width":152,"height":60}},"description":"The saying goes, \"If it ain't broke, don't fix it.\" Does that apply to the old Anet A8 firmware? Should you \"mess\" with the new firmware? We say yes, and for good reason."}]</script><style>
+
+  #disqus_thread a {
+    font-size: 17px;
+    font-family: Roboto,sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #0078e2;
+    text-decoration: none;
+    outline: 0;
+    cursor: pointer;
+  }
+
+</style>
+
+<script type="text/javascript">
+
+  window.ALL3DP_TOOLKIT_API.onIubPreferenceExpressed(function(event) {
+    if(event.purposes['4'] === true) {
+      _atrk_opts = { atrk_acct:"x7Jli1agq800qS", domain:"all3dp.com",dynamic: true};
+      (function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://d31qbv1cthcecs.cloudfront.net/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+    }
+  });
+
+</script>
+
+<script src="/dfp.js" type="text/javascript" async></script>
+<script>
+document.addEventListener('readystatechange', (event) => {
+  if (document.readyState == "complete") {
+    var el = document.getElementById('C4fK2nYHKdWRQNM');
+    var active = el ? false : true
+    var dim4 = active ? 'true' : 'false';
+        atx('send', {
+      hitType: 'event',
+      eventCategory: 'ABU',
+      eventAction: active ? 'true' : 'false',
+      nonInteraction: true,
+      eventValue: 1,
+      dimension4: dim4
+    });
+  }
+}, { capture: false, passive: true});
+</script>
+<script>
+
+    window.ALL3DP_TOOLKIT_API.onToolkitReady(function(event) {
+      window.ALL3DP_TOOLKIT_API.onInteract(function() {
+        window.ALL3DP_TOOLKIT_API.registerIframeModal('/popup-iframe/197469', {"showOnExitIntent":true,"exitIntentTriggerTimeout":150000,"force":false,"localStorageKey":"popup-197469","iframeMaxWidth":"720px","iframeMaxHeight":"490px"});
+      });
+    });
+
+  </script>
+
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"5f00f20f19473f93","version":"2020.9.1","si":10}'></script>
+</body></html>
