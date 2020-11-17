@@ -1,3 +1,14 @@
+N37657
+
+M851 Z-2; Set z offset
+G28 Z0; Home z only
+G1 Z0; Move to z 0
+
+IN DEFAULT AND IN GEAR!
+Add this line at the beginning in Configuration, Print, G-Codes, Start G-Code:
+M851 Z-3.25; Set z offset
+
+
 M119: Pour voir l'état des limit switch/endstop
 M105: All temperatures
 

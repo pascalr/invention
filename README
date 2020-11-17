@@ -1,3 +1,9 @@
+Pour que le bras puisse bien tourner, l'avant-bras doit plier à plus de 90 degrés. Il doit plier de 240 degrés au lieu de 180 degrés.
+Sinon, le bras en diagonale est plus long (sqrt(l1^2+l2^2)), si l1 == l2, diago == l1*sqrt(2)
+
+
+
+
 2kg + 1kg (poids de la bouteille) à 3.25" (82.55 mm)
 3 kg * 9.81N/kg * 0.08255 m
 Je dois avoir 2.5 N*m de torque, ou 24.765 Kg*cm
