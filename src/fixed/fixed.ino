@@ -3,6 +3,13 @@
 
 // https://github.com/aguegu/ardulibs/tree/master/hx711 
 
+#define GRIP_PIN_DIR 8
+#define GRIP_PIN_PWM 9
+#define GRIP_RELEASE_STRENGTH 40 // From 0 to 255, 255 being 100% motor strength.
+
+// If you need to reverse the motor direction, you can also just interchange the two motor wires.
+#define GRIP_REVERSE_DIR false
+
 // Hx711.DOUT - pin #A1
 // Hx711.SCK - pin #A0
 Hx711 scale(A1, A0);
@@ -13,7 +20,7 @@ void setup() {
 
   //pinMode(LED_BUILTIN, OUTPUT);
 
-  calibrateEmpty();
+  //calibrateEmpty();
 }
   
 ArduinoReader reader;
@@ -31,6 +38,16 @@ void calibrateWithWeight(double weight) {
   Serial.print("ratio: ");
   Serial.println(ratio);
   scale.setScale(ratio);
+}
+
+void grab(double strength) {
+  digitalWrite(GRIP_PIN_DIR, GRIP_REVERSE_DIR ? LOW : HIGH);
+  analogWrite(GRIP_PIN_PWM, strength);
+}
+
+void release() {
+  digitalWrite(GRIP_PIN_DIR, GRIP_REVERSE_DIR ? HIGH : LOW);
+  analogWrite(GRIP_PIN_PWM, GRIP_RELEASE_STRENGTH);
 }
 
 #define BUF_SIZE 52
@@ -52,12 +69,11 @@ void loop() {
     double nb;
     char* input = buf; input++;
 
-    // get weight
-    if (cmd == 'w') {
+    if (cmd == 'w') { // Get weight
       Serial.print("weight: ");
       Serial.println(scale.getGram(), 1); // Print the gram value with one decimal precision
       
-    } else if (cmd == 'c') {
+    } else if (cmd == 'c') { // Calibrate with a weight 
       if (parseNumber(&input, nb) < 0) {
         Serial.println("error: ");
         Serial.println("Invalid number given.");
@@ -76,8 +92,19 @@ void loop() {
       }
       scale.setScale(nb);
 
-    } else if (cmd == 'e') {
+    } else if (cmd == 'e') { // Calibrate empty
       calibrateEmpty();
+
+    } else if (cmd == 'f') { // Release
+      release();
+    
+    } else if (cmd == 'g') { // Grab
+      if (parseNumber(&input, nb) < 0) {
+        Serial.println("error: ");
+        Serial.println("Invalid number given.");
+        return;
+      }
+      grab(nb);
     
     } else {
       Serial.println("error: ");

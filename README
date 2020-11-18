@@ -1,3 +1,11 @@
+Engrenage: Rack:
+https://khkgears.net/new/gear_knowledge/abcs_of_gears-b/basic_gear_terminology_calculation.html
+Thickness+Dedendum
+dedendum = 1.25 * module
+
+
+
+
 Pour que le bras puisse bien tourner, l'avant-bras doit plier à plus de 90 degrés. Il doit plier de 240 degrés au lieu de 180 degrés.
 Sinon, le bras en diagonale est plus long (sqrt(l1^2+l2^2)), si l1 == l2, diago == l1*sqrt(2)
 
