@@ -1,3 +1,16 @@
+Engrenage planétaire:
+Z3 = Z1 + 2Z2
+
+1: soleil
+2: planètes
+3: couronne
+
+Z3 = 93
+Z2 = 13
+Z1 = 93 - 26 = 67
+
+
+
 Engrenage: Rack:
 https://khkgears.net/new/gear_knowledge/abcs_of_gears-b/basic_gear_terminology_calculation.html
 Thickness+Dedendum
