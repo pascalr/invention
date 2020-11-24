@@ -7,8 +7,7 @@
 #define GRIP_PIN_PWM 9
 #define GRIP_RELEASE_STRENGTH 40 // From 0 to 255, 255 being 100% motor strength.
 
-// If you need to reverse the motor direction, you can also just interchange the two motor wires.
-#define GRIP_REVERSE_DIR false
+#define GRIP_REVERSE_DIR true
 
 // Hx711.DOUT - pin #A1
 // Hx711.SCK - pin #A0
@@ -30,22 +29,6 @@ void calibrateWithWeight(double weight) {
   Serial.println(ratio);
   scale.setScale(ratio);
 }
-
-class StepperConfig {
-  public:
-    int pin_dir;
-    int pin_step;
-    int pin_enable;
-
-    bool reverse_motor_direction;
-
-    double steps_per_unit;
-
-    int min_delay = 500;
-    int max_delay = 10000;
-
-    int nominal_delay = 5000; // Used for constant speed
-};
 
 bool askedToStop() {
   while (Serial.available() > 0) {
@@ -73,7 +56,7 @@ void moveConstantSpeed(StepperConfig stepper, double destination) {
 
   for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
 
-    if (askedToStop(p)) {
+    if (askedToStop()) {
       // TODO: When stopped, write at what position.
       break;
     }
@@ -184,31 +167,22 @@ void setup() {
 
   Serial.begin(115200);
 
-
-  //p.axisT.microsteps = 16;
-  p.axisT.setStepsPerUnit(200 * 2 * 16 / (360*12/61));
-  p.axisT.steps_per_turn = 200 * 2 * 16;
-  //p.axisT.limitSwitchPin = 12;
-  p.axisT.setupPins(8,2,3);
-  p.axisT.setReverseMotorDirection(true);
-  p.axisT.percent_p = 0.4;
-  p.axisT.min_delay = 100;
-  p.axisT.max_delay = 2000;
-
-  stepper_j.pin_dir = ;
-  stepper_j.pin_step = ;
-  stepper_j.pin_enable = ;
-  stepper_j.reverse_motor_direction = ;
+  stepper_j.pin_dir = 2;
+  stepper_j.pin_step = 3;
+  stepper_j.pin_enable = 8;
+  stepper_j.reverse_motor_direction = false;
   stepper_j.steps_per_unit = 200 * 2 * 16 / (360*12/61);
   stepper_j.min_delay = 500;
   stepper_j.max_delay = 10000;
   stepper_j.nominal_delay = 5000;
-};
 
+  pinMode(stepper_j.pin_dir, OUTPUT);
+  pinMode(stepper_j.pin_step, OUTPUT);
+  
   //pinMode(LED_BUILTIN, OUTPUT);
 
   //calibrateEmpty();
-}
+};
 
 void loop() {
 
@@ -277,6 +251,9 @@ void loop() {
         return;
       }
       grab(nb);
+
+    } else if (cmd == 's' || cmd == 'S') {
+      analogWrite(GRIP_PIN_PWM, 0.0);
     
     } else {
       Serial.print("error: ");
