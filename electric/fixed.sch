@@ -32,7 +32,7 @@ pintype=unknown
 T 50255 48895 5 10 1 1 0 0 1
 pinlabel=PWM2
 T 50105 48945 5 10 1 1 0 6 1
-pinnumber=0
+pinnumber=6
 T 49700 48900 5 10 0 0 0 0 1
 pinseq=0
 }
@@ -43,7 +43,7 @@ pintype=unknown
 T 50255 48595 5 10 1 1 0 0 1
 pinlabel=DIR2
 T 50105 48645 5 10 1 1 0 6 1
-pinnumber=0
+pinnumber=7
 T 49700 48600 5 10 0 0 0 0 1
 pinseq=0
 }
