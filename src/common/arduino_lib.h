@@ -2,6 +2,22 @@
 #include "../core/reader/reader.h"
 #include "../core/writer/writer.h"
 
+class StepperConfig {
+  public:
+    int pin_dir;
+    int pin_step;
+    int pin_enable;
+
+    bool reverse_motor_direction;
+
+    double steps_per_unit;
+
+    int min_delay = 500;
+    int max_delay = 10000;
+
+    int nominal_delay = 5000; // Used for constant speed
+};
+
 // Returns the number of bytes read.
 // Arduino already has a function that does this, but it was so slow I don't know why.
 int getInputLine(Reader& reader, char* buf, int bufSize) {
