@@ -188,7 +188,7 @@ void moveConstantSpeed(StepperConfig stepper, double destination) {
 int getInputLine(char* buf, int bufSize) {
   int i = 0;
   while (true) {
-    if (Serial.inputAvailable() > 0) {
+    if (Serial.available() > 0) {
 
       char ch = Serial.read();
 
@@ -226,9 +226,6 @@ int parseNumber(char** input, double& n) {
 // Hx711.DOUT - pin #A1
 // Hx711.SCK - pin #A0
 Hx711 scale(A1, A0);
-  
-ArduinoReader reader;
-ArduinoWriter writer;
 
 long offset;
 
@@ -281,52 +278,53 @@ void setup() {
   stepper_j.max_delay = 10000;
   stepper_j.nominal_delay = 5000;
 
-  //stepper_h.pin_dir = 2;
-  //stepper_h.pin_step = 3;
-  //stepper_h.pin_enable = 8;
-  //stepper_h.reverse_motor_direction = false;
-  //stepper_h.steps_per_unit = 200 * 2 * 16 / (360*12/61);
-  //stepper_h.min_delay = 500;
-  //stepper_h.max_delay = 10000;
-  //stepper_h.nominal_delay = 5000;
+  stepper_h.pin_dir = 2;
+  stepper_h.pin_step = 3;
+  stepper_h.pin_enable = 8;
+  stepper_h.reverse_motor_direction = true;
+  stepper_h.steps_per_unit = 200 * 2 * 8 / (12.2244*3.1416);
+  stepper_h.min_delay = 500;
+  stepper_h.max_delay = 10000;
+  stepper_h.nominal_delay = 1000;
 
-  //stepper_v.pin_dir = 2;
-  //stepper_v.pin_step = 3;
-  //stepper_v.pin_enable = 8;
-  //stepper_v.reverse_motor_direction = false;
-  //stepper_v.steps_per_unit = 200 * 2 * 16 / (360*12/61);
-  //stepper_v.min_delay = 500;
-  //stepper_v.max_delay = 10000;
-  //stepper_v.nominal_delay = 5000;
+  stepper_v.pin_dir = 2;
+  stepper_v.pin_step = 3;
+  stepper_v.pin_enable = 8;
+  stepper_v.reverse_motor_direction = true;
+  double unitPerTurnV = (2.625*25.4*3.1416 * 13/51);
+  stepper_v.steps_per_unit = 200 * 2 * 32 / (unitPerTurnV);
+  stepper_v.min_delay = 500;
+  stepper_v.max_delay = 10000;
+  stepper_v.nominal_delay = 5000;
 
-  //stepper_t.pin_dir = 2;
-  //stepper_t.pin_step = 3;
-  //stepper_t.pin_enable = 8;
-  //stepper_t.reverse_motor_direction = false;
-  //stepper_t.steps_per_unit = 200 * 2 * 16 / (360*12/61);
-  //stepper_t.min_delay = 500;
-  //stepper_t.max_delay = 10000;
-  //stepper_t.nominal_delay = 5000;
+  stepper_t.pin_dir = 2;
+  stepper_t.pin_step = 3;
+  stepper_t.pin_enable = 8;
+  stepper_t.reverse_motor_direction = true;
+  stepper_t.steps_per_unit = 200 * 2 * 16 / (360*12/61);
+  stepper_t.min_delay = 500;
+  stepper_t.max_delay = 10000;
+  stepper_t.nominal_delay = 5000;
 
-  //stepper_a.pin_dir = 2;
-  //stepper_a.pin_step = 3;
-  //stepper_a.pin_enable = 8;
-  //stepper_a.reverse_motor_direction = false;
-  //stepper_a.steps_per_unit = 200 * 2 * 16 / (360*12/61);
-  //stepper_a.min_delay = 500;
-  //stepper_a.max_delay = 10000;
-  //stepper_a.nominal_delay = 5000;
+  stepper_a.pin_dir = 2;
+  stepper_a.pin_step = 3;
+  stepper_a.pin_enable = 8;
+  stepper_a.reverse_motor_direction = false;
+  stepper_a.steps_per_unit = 200 * 2 * 16 / (360*12/61);
+  stepper_a.min_delay = 500;
+  stepper_a.max_delay = 10000;
+  stepper_a.nominal_delay = 5000;
 
   pinMode(stepper_j.pin_dir, OUTPUT);
   pinMode(stepper_j.pin_step, OUTPUT);
-  //pinMode(stepper_h.pin_dir, OUTPUT);
-  //pinMode(stepper_h.pin_step, OUTPUT);
-  //pinMode(stepper_v.pin_dir, OUTPUT);
-  //pinMode(stepper_v.pin_step, OUTPUT);
-  //pinMode(stepper_t.pin_dir, OUTPUT);
-  //pinMode(stepper_t.pin_dir, OUTPUT);
-  //pinMode(stepper_a.pin_step, OUTPUT);
-  //pinMode(stepper_a.pin_step, OUTPUT);
+  pinMode(stepper_h.pin_dir, OUTPUT);
+  pinMode(stepper_h.pin_step, OUTPUT);
+  pinMode(stepper_v.pin_dir, OUTPUT);
+  pinMode(stepper_v.pin_step, OUTPUT);
+  pinMode(stepper_t.pin_dir, OUTPUT);
+  pinMode(stepper_t.pin_dir, OUTPUT);
+  pinMode(stepper_a.pin_step, OUTPUT);
+  pinMode(stepper_a.pin_step, OUTPUT);
   
   //pinMode(LED_BUILTIN, OUTPUT);
 
@@ -335,9 +333,9 @@ void setup() {
 
 void loop() {
 
-  if (reader.inputAvailable()) {
+  if (Serial.available()) {
 
-    getInputLine(reader, buf, BUF_SIZE);
+    getInputLine(buf, BUF_SIZE);
     char cmd = buf[0];
 
     // ignore newline characters
@@ -396,14 +394,16 @@ void loop() {
         Serial.println("Invalid move destination. Not a number.");
         return;
       }
-      if (axis == 'j') { // FIXME: Hardcoded axis name
+      if (axis == 'h') { // FIXME: Hardcoded axis name
+        moveConstantSpeed(stepper_h, nb);
+      } else if (axis == 'v') {
+        moveConstantSpeed(stepper_v, nb);
+      } else if (axis == 't') {
+        moveConstantSpeed(stepper_t, nb);
+      } else if (axis == 'a') {
+        moveConstantSpeed(stepper_a, nb);
+      } else if (axis == 'j') {
         moveConstantSpeed(stepper_j, nb);
-      //} else if (axis == 'v') {
-      //  moveConstantSpeed(stepper_v, nb);
-      //} else if (axis == 't') {
-      //  moveConstantSpeed(stepper_t, nb);
-      //} else if (axis == 'a') {
-      //  moveConstantSpeed(stepper_a, nb);
       } else {
         Serial.print("error: ");
         Serial.println("Invalid axis name given.");
