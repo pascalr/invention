@@ -6,8 +6,11 @@
 #define GRIP_PIN_DIR 8
 #define GRIP_PIN_PWM 9
 #define GRIP_RELEASE_STRENGTH 40 // From 0 to 255, 255 being 100% motor strength.
-
 #define GRIP_REVERSE_DIR true
+
+#define TURN_PIN_DIR 7
+#define TURN_PIN_PWM 6
+#define TURN_REVERSE_DIR false
 
 // Hx711.DOUT - pin #A1
 // Hx711.SCK - pin #A0
@@ -158,6 +161,11 @@ void release() {
   analogWrite(GRIP_PIN_PWM, GRIP_RELEASE_STRENGTH);
 }
 
+void turn(double strength) {
+  digitalWrite(TURN_PIN_DIR, TURN_REVERSE_DIR ? HIGH : LOW);
+  analogWrite(TURN_PIN_PWM, strength);
+}
+
 #define BUF_SIZE 52
 char buf[BUF_SIZE];
 
@@ -214,6 +222,18 @@ void loop() {
     
     } else if (cmd == '#') { // Print the version
       Serial.println("#: fixed");
+
+    } else if (cmd == 'h') { // Print the help
+      Serial.println("#: version");
+      Serial.println("w: get weight");
+      Serial.println("c(float): calibrate with a given weight on the scale");
+      Serial.println("t: set the ratio of the scale (the value given by the command c)");
+      Serial.println("e: calibrate empty");
+      Serial.println("mj(relative destination): move the stepper j to a relative destination");
+      Serial.println("f: free/release the gripper");
+      Serial.println("r: not used anymore, for the other gripper...");
+      Serial.println("g(strengh): grab with a given strengh from 0 to 255");
+      Serial.println("s: stop everything! and send back when it was stopped at");
     
     } else if (cmd == 't') { // Set the ratio
       if (parseNumber(&input, nb) < 0) {
@@ -243,6 +263,14 @@ void loop() {
     
     } else if (cmd == 'f') { // Release
       release();
+
+    } else if (cmd == 'r') { // Turn
+      if (parseNumber(&input, nb) < 0) {
+        Serial.print("error: ");
+        Serial.println("Invalid number given.");
+        return;
+      }
+      turn(nb);
     
     } else if (cmd == 'g') { // Grab
       if (parseNumber(&input, nb) < 0) {
@@ -254,6 +282,7 @@ void loop() {
 
     } else if (cmd == 's' || cmd == 'S') {
       analogWrite(GRIP_PIN_PWM, 0.0);
+      analogWrite(TURN_PIN_PWM, 0.0);
     
     } else {
       Serial.print("error: ");
