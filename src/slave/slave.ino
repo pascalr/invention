@@ -2,14 +2,16 @@
 
 // https://github.com/aguegu/ardulibs/tree/master/hx711 
 
-#define GRIP_PIN_DIR 8
-#define GRIP_PIN_PWM 9
+#define GRIP_PIN_DIR 4
+#define GRIP_PIN_PWM 5
 #define GRIP_RELEASE_STRENGTH 40 // From 0 to 255, 255 being 100% motor strength.
-#define GRIP_REVERSE_DIR true
+#define GRIP_REVERSE_DIR false
 
-#define TURN_PIN_DIR 7
-#define TURN_PIN_PWM 6
-#define TURN_REVERSE_DIR false
+#define GRIP2_PIN_DIR 11
+#define GRIP2_PIN_PWM 6
+#define GRIP2_REVERSE_DIR false
+
+#define ENCODER_PIN 32
 
 //#define LIMIT_SWITCH_PIN_H A3
 //#define LIMIT_SWITCH_PIN_V A5
@@ -20,6 +22,10 @@
 #define H_STEP_PIN         54
 #define H_DIR_PIN          55
 #define H_ENABLE_PIN       38
+
+#define V_STEP_PIN         31
+#define V_DIR_PIN          35
+#define V_ENABLE_PIN       33
 
 #define H_MIN_PIN           3
 //#define X_MAX_PIN           2
@@ -39,6 +45,12 @@
 #define T_STEP_PIN         26
 #define T_DIR_PIN          28
 #define T_ENABLE_PIN       24
+
+class MotorConfig {
+  public:
+    int pin_dir;
+    int pin_pwm;
+};
 
 class StepperConfig {
   public:
@@ -300,11 +312,6 @@ void release() {
   analogWrite(GRIP_PIN_PWM, GRIP_RELEASE_STRENGTH);
 }
 
-void turn(double strength) {
-  digitalWrite(TURN_PIN_DIR, TURN_REVERSE_DIR ? HIGH : LOW);
-  analogWrite(TURN_PIN_PWM, strength);
-}
-
 #define BUF_SIZE 52
 char buf[BUF_SIZE];
 
@@ -315,9 +322,18 @@ StepperConfig stepper_t;
 StepperConfig stepper_a;
 StepperConfig stepper_b;
 
+MotorConfig gripper_1;
+MotorConfig gripper_2;
+
 void setup() {
 
   Serial.begin(115200);
+
+  gripper_1.pin_dir = GRIP_PIN_DIR;
+  gripper_1.pin_pwm = GRIP_PIN_PWM;
+
+  gripper_2.pin_dir = GRIP2_PIN_DIR;
+  gripper_2.pin_pwm = GRIP2_PIN_PWM;
 
   stepper_j.id = 'j';
   stepper_j.pin_dir = 8;
@@ -340,9 +356,9 @@ void setup() {
   stepper_h.nominal_delay = 1000;
 
   stepper_v.id = 'v';
-  stepper_v.pin_dir = 0;
-  stepper_v.pin_step = 1;
-  stepper_v.pin_enable = 8;
+  stepper_v.pin_dir = V_DIR_PIN;
+  stepper_v.pin_step = V_STEP_PIN;
+  stepper_v.pin_enable = V_ENABLE_PIN;
   stepper_v.reverse_motor_direction = true;
   double unitPerTurnV = (2.625*25.4*3.1416 * 13/51);
   stepper_v.steps_per_unit = 200 * 2 * 32 / (unitPerTurnV);
@@ -389,6 +405,7 @@ void setup() {
   
   pinMode(stepper_v.pin_dir, OUTPUT);
   pinMode(stepper_v.pin_step, OUTPUT);
+  pinMode(stepper_v.pin_enable, OUTPUT);
   
   pinMode(stepper_t.pin_dir, OUTPUT);
   pinMode(stepper_t.pin_step, OUTPUT);
@@ -403,11 +420,17 @@ void setup() {
   pinMode(stepper_b.pin_enable, OUTPUT);
 
   digitalWrite(stepper_h.pin_enable, LOW);
-  //digitalWrite(stepper_v.pin_enable, LOW);
   digitalWrite(stepper_a.pin_enable, LOW);
   digitalWrite(stepper_b.pin_enable, LOW);
   digitalWrite(stepper_t.pin_enable, LOW);
+  digitalWrite(stepper_v.pin_enable, LOW);
   //digitalWrite(stepper_t.pin_enable, LOW);
+
+  pinMode(GRIP_PIN_DIR, OUTPUT);
+  pinMode(GRIP_PIN_PWM, OUTPUT);
+  
+  pinMode(GRIP2_PIN_DIR, OUTPUT);
+  pinMode(GRIP2_PIN_PWM, OUTPUT);
 
   pinMode(H_MIN_PIN, INPUT_PULLUP);
   pinMode(V_MIN_PIN, INPUT_PULLUP);
@@ -513,7 +536,7 @@ void loop() {
 
     } else if (cmd == 's' || cmd == 'S') {
       analogWrite(GRIP_PIN_PWM, 0.0);
-      analogWrite(TURN_PIN_PWM, 0.0);
+      analogWrite(GRIP2_PIN_PWM, 0.0);
     
     } else {
       Serial.print("error: Unkown command: ");
