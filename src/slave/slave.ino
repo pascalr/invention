@@ -381,6 +381,8 @@ void setup() {
   pinMode(stepper_b.pin_step, OUTPUT);
 
   digitalWrite(stepper_h.pin_enable, LOW);
+
+  pinMode(H_MIN_PIN, INPUT_PULLUP);
   
   //pinMode(LED_BUILTIN, OUTPUT);
 
@@ -388,6 +390,10 @@ void setup() {
 };
 
 void loop() {
+
+  //Serial.println(digitalRead(H_MIN_PIN));
+  //delay(1000);
+  //return;
 
   if (Serial.available()) {
 
