@@ -20,11 +20,25 @@
 #define H_STEP_PIN         54
 #define H_DIR_PIN          55
 #define H_ENABLE_PIN       38
+
 #define H_MIN_PIN           3
-//#define H_MAX_PIN           2
-
+//#define X_MAX_PIN           2
 #define V_MIN_PIN          14
+//#define Y_MAX_PIN          15
 
+#define A_STEP_PIN         46
+#define A_DIR_PIN          48
+#define A_ENABLE_PIN       62
+
+#define B_STEP_PIN         60
+#define B_DIR_PIN          61
+#define B_ENABLE_PIN       56
+//#define Z_MIN_PIN          18
+//#define Z_MAX_PIN          19
+
+#define T_STEP_PIN         26
+#define T_DIR_PIN          28
+#define T_ENABLE_PIN       24
 
 class StepperConfig {
   public:
@@ -337,9 +351,9 @@ void setup() {
   stepper_v.nominal_delay = 5000;
 
   stepper_t.id = 't';
-  stepper_t.pin_dir = 4;
-  stepper_t.pin_step = 5;
-  stepper_t.pin_enable = 8;
+  stepper_t.pin_dir = T_DIR_PIN;
+  stepper_t.pin_step = T_STEP_PIN;
+  stepper_t.pin_enable = T_ENABLE_PIN;
   stepper_t.reverse_motor_direction = true;
   stepper_t.steps_per_unit = 200 * 2 * 16 / (360*12/61);
   stepper_t.min_delay = 500;
@@ -347,9 +361,9 @@ void setup() {
   stepper_t.nominal_delay = 5000;
 
   stepper_a.id = 'a';
-  stepper_a.pin_dir = 12;
-  stepper_a.pin_step = 13;
-  stepper_a.pin_enable = 8;
+  stepper_a.pin_dir = A_DIR_PIN;
+  stepper_a.pin_step = A_STEP_PIN;
+  stepper_a.pin_enable = A_ENABLE_PIN;
   stepper_a.reverse_motor_direction = false;
   stepper_a.steps_per_unit = 200 * 2 * 8 / (360*12/61);
   stepper_a.min_delay = 500;
@@ -357,9 +371,9 @@ void setup() {
   stepper_a.nominal_delay = 2000;
 
   stepper_b.id = 'b';
-  stepper_b.pin_dir = 10;
-  stepper_b.pin_step = 11;
-  stepper_b.pin_enable = 8;
+  stepper_b.pin_dir = B_DIR_PIN;
+  stepper_b.pin_step = B_STEP_PIN;
+  stepper_b.pin_enable = B_ENABLE_PIN;
   stepper_b.reverse_motor_direction = false;
   stepper_b.steps_per_unit = 200 * 2 * 8 / (360/60);
   stepper_b.min_delay = 500;
@@ -368,21 +382,35 @@ void setup() {
 
   pinMode(stepper_j.pin_dir, OUTPUT);
   pinMode(stepper_j.pin_step, OUTPUT);
+  
   pinMode(stepper_h.pin_dir, OUTPUT);
   pinMode(stepper_h.pin_step, OUTPUT);
   pinMode(stepper_h.pin_enable, OUTPUT);
+  
   pinMode(stepper_v.pin_dir, OUTPUT);
   pinMode(stepper_v.pin_step, OUTPUT);
+  
   pinMode(stepper_t.pin_dir, OUTPUT);
-  pinMode(stepper_t.pin_dir, OUTPUT);
+  pinMode(stepper_t.pin_step, OUTPUT);
+  pinMode(stepper_t.pin_enable, OUTPUT);
+  
+  pinMode(stepper_a.pin_dir, OUTPUT);
   pinMode(stepper_a.pin_step, OUTPUT);
-  pinMode(stepper_a.pin_step, OUTPUT);
+  pinMode(stepper_a.pin_enable, OUTPUT);
+  
+  pinMode(stepper_b.pin_dir, OUTPUT);
   pinMode(stepper_b.pin_step, OUTPUT);
-  pinMode(stepper_b.pin_step, OUTPUT);
+  pinMode(stepper_b.pin_enable, OUTPUT);
 
   digitalWrite(stepper_h.pin_enable, LOW);
+  //digitalWrite(stepper_v.pin_enable, LOW);
+  digitalWrite(stepper_a.pin_enable, LOW);
+  digitalWrite(stepper_b.pin_enable, LOW);
+  digitalWrite(stepper_t.pin_enable, LOW);
+  //digitalWrite(stepper_t.pin_enable, LOW);
 
   pinMode(H_MIN_PIN, INPUT_PULLUP);
+  pinMode(V_MIN_PIN, INPUT_PULLUP);
   
   //pinMode(LED_BUILTIN, OUTPUT);
 
