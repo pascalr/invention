@@ -11,11 +11,25 @@
 #define TURN_PIN_PWM 6
 #define TURN_REVERSE_DIR false
 
-#define LIMIT_SWITCH_PIN_H A3
-#define LIMIT_SWITCH_PIN_V A5
+//#define LIMIT_SWITCH_PIN_H A3
+//#define LIMIT_SWITCH_PIN_V A5
+
+#define REFERENCE_DELAY_H 10000
+#define REFERENCE_DELAY_V 10000
+
+#define H_STEP_PIN         54
+#define H_DIR_PIN          55
+#define H_ENABLE_PIN       38
+#define H_MIN_PIN           3
+//#define H_MAX_PIN           2
+
+#define V_MIN_PIN          14
+
 
 class StepperConfig {
   public:
+    char id;
+    
     int pin_dir;
     int pin_step;
     int pin_enable;
@@ -44,29 +58,47 @@ bool askedToStop() {
   return false;
 }
 
+bool referenceReachedH() {
+  return digitalRead(H_MIN_PIN) == LOW || askedToStop();
+}
+
+bool referenceReachedV() {
+  return digitalRead(V_MIN_PIN) == LOW || askedToStop();
+}
+
 // OPTIMIZE: Use interrupts instead of askedToStop I believe
 // Relative movement. Move from zero to destination.
-void moveConstantSpeed(StepperConfig stepper, double destination) {
+void moveConstantSpeed(StepperConfig stepper, double destination, long delay, bool (*stopCondition)() = askedToStop) {
 
   bool dir = destination > 0 ? LOW : HIGH;
   dir = stepper.reverse_motor_direction ? !dir : dir;
   digitalWrite(stepper.pin_dir, dir);
 
+  Serial.print("Moving stepper ");
+  Serial.print(stepper.id);
+  Serial.print(dir ? " clockwise " : " counter clockwise ");
+  Serial.print(" from 0 to ");
+  Serial.print(destination);
+  Serial.print(" step pin = ");
+  Serial.print(stepper.pin_step);
+  Serial.print(" dir pin = ");
+  Serial.print(stepper.pin_dir);
+  Serial.println("");
+
   bool isStepHigh = digitalRead(stepper.pin_step);
 
   for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
 
-    if (askedToStop()) {
+    if (stopCondition()) {
       // TODO: When stopped, write at what position.
       break;
     }
 
     digitalWrite(stepper.pin_step, isStepHigh ? LOW : HIGH);
     isStepHigh = !isStepHigh;
-    delayMicroseconds(stepper.nominal_delay);
+    delayMicroseconds(delay);
   }
 }
-
 
 //void shake(Program& p, Motor* motor) {
 //  
@@ -273,8 +305,9 @@ void setup() {
 
   Serial.begin(115200);
 
-  stepper_j.pin_dir = 2;
-  stepper_j.pin_step = 3;
+  stepper_j.id = 'j';
+  stepper_j.pin_dir = 8;
+  stepper_j.pin_step = 8;
   stepper_j.pin_enable = 8;
   stepper_j.reverse_motor_direction = false;
   stepper_j.steps_per_unit = 200 * 2 * 16 / (360*12/61);
@@ -282,17 +315,19 @@ void setup() {
   stepper_j.max_delay = 10000;
   stepper_j.nominal_delay = 5000;
 
-  stepper_h.pin_dir = 2;
-  stepper_h.pin_step = 3;
-  stepper_h.pin_enable = 8;
+  stepper_h.id = 'h';
+  stepper_h.pin_dir = H_DIR_PIN;
+  stepper_h.pin_step = H_STEP_PIN;
+  stepper_h.pin_enable = H_ENABLE_PIN;
   stepper_h.reverse_motor_direction = true;
   stepper_h.steps_per_unit = 200 * 2 * 8 / (12.2244*3.1416);
   stepper_h.min_delay = 500;
   stepper_h.max_delay = 10000;
   stepper_h.nominal_delay = 1000;
 
-  stepper_v.pin_dir = 2;
-  stepper_v.pin_step = 3;
+  stepper_v.id = 'v';
+  stepper_v.pin_dir = 0;
+  stepper_v.pin_step = 1;
   stepper_v.pin_enable = 8;
   stepper_v.reverse_motor_direction = true;
   double unitPerTurnV = (2.625*25.4*3.1416 * 13/51);
@@ -301,8 +336,9 @@ void setup() {
   stepper_v.max_delay = 10000;
   stepper_v.nominal_delay = 5000;
 
-  stepper_t.pin_dir = 2;
-  stepper_t.pin_step = 3;
+  stepper_t.id = 't';
+  stepper_t.pin_dir = 4;
+  stepper_t.pin_step = 5;
   stepper_t.pin_enable = 8;
   stepper_t.reverse_motor_direction = true;
   stepper_t.steps_per_unit = 200 * 2 * 16 / (360*12/61);
@@ -310,6 +346,7 @@ void setup() {
   stepper_t.max_delay = 10000;
   stepper_t.nominal_delay = 5000;
 
+  stepper_a.id = 'a';
   stepper_a.pin_dir = 12;
   stepper_a.pin_step = 13;
   stepper_a.pin_enable = 8;
@@ -319,6 +356,7 @@ void setup() {
   stepper_a.max_delay = 10000;
   stepper_a.nominal_delay = 2000;
 
+  stepper_b.id = 'b';
   stepper_b.pin_dir = 10;
   stepper_b.pin_step = 11;
   stepper_b.pin_enable = 8;
@@ -332,6 +370,7 @@ void setup() {
   pinMode(stepper_j.pin_step, OUTPUT);
   pinMode(stepper_h.pin_dir, OUTPUT);
   pinMode(stepper_h.pin_step, OUTPUT);
+  pinMode(stepper_h.pin_enable, OUTPUT);
   pinMode(stepper_v.pin_dir, OUTPUT);
   pinMode(stepper_v.pin_step, OUTPUT);
   pinMode(stepper_t.pin_dir, OUTPUT);
@@ -341,8 +380,7 @@ void setup() {
   pinMode(stepper_b.pin_step, OUTPUT);
   pinMode(stepper_b.pin_step, OUTPUT);
 
-  pinMode(LIMIT_SWITCH_PIN_H, INPUT_PULLUP);
-  pinMode(LIMIT_SWITCH_PIN_V, INPUT_PULLUP);
+  digitalWrite(stepper_h.pin_enable, LOW);
   
   //pinMode(LED_BUILTIN, OUTPUT);
 
@@ -357,7 +395,7 @@ void loop() {
     char cmd = buf[0];
 
     // ignore newline characters
-    if (cmd == '\r' || cmd == '\n') return;
+    if (cmd == '\r' || cmd == '\n' || cmd == 0) return;
 
     Serial.print("echo: ");
     Serial.println(cmd);
@@ -406,8 +444,8 @@ void loop() {
     } else if (cmd == 'r') { // Reference
       
       char axis = *input;
-      if (axis == 'h') { reference(stepper_h, LIMIT_SWITCH_PIN_H);
-      } else if (axis == 'v') { reference(stepper_v, LIMIT_SWITCH_PIN_V);
+      if (axis == 'h') { moveConstantSpeed(stepper_h, -9999, REFERENCE_DELAY_H, referenceReachedH);
+      } else if (axis == 'v') { moveConstantSpeed(stepper_v, -9999, REFERENCE_DELAY_V, referenceReachedV);
       } else {
         Serial.println("error: Invalid axis name given.");
       }
@@ -419,12 +457,12 @@ void loop() {
         Serial.println("error: Invalid move destination. Not a number.");
         return;
       }
-      if (axis == 'h') { moveConstantSpeed(stepper_h, nb);
-      } else if (axis == 'v') { moveConstantSpeed(stepper_v, nb);
-      } else if (axis == 't') { moveConstantSpeed(stepper_t, nb);
-      } else if (axis == 'a') { moveConstantSpeed(stepper_a, nb);
-      } else if (axis == 'b') { moveConstantSpeed(stepper_b, nb);
-      } else if (axis == 'j') { moveConstantSpeed(stepper_j, nb);
+      if (axis == 'h') { moveConstantSpeed(stepper_h, nb, stepper_h.nominal_delay);
+      } else if (axis == 'v') { moveConstantSpeed(stepper_v, nb, stepper_v.nominal_delay);
+      } else if (axis == 't') { moveConstantSpeed(stepper_t, nb, stepper_t.nominal_delay);
+      } else if (axis == 'a') { moveConstantSpeed(stepper_a, nb, stepper_a.nominal_delay);
+      } else if (axis == 'b') { moveConstantSpeed(stepper_b, nb, stepper_b.nominal_delay);
+      } else if (axis == 'j') { moveConstantSpeed(stepper_j, nb, stepper_j.nominal_delay);
       } else {
         Serial.println("error: Invalid axis name given.");
       }
@@ -444,8 +482,8 @@ void loop() {
       analogWrite(TURN_PIN_PWM, 0.0);
     
     } else {
-      Serial.print("error: ");
-      Serial.println("Unkown command");
+      Serial.print("error: Unkown command: ");
+      Serial.println(cmd);
       return;
     }
     Serial.println("done");
