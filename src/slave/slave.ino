@@ -13,9 +13,6 @@
 
 #define ENCODER_PIN 32
 
-//#define LIMIT_SWITCH_PIN_H A3
-//#define LIMIT_SWITCH_PIN_V A5
-
 #define REFERENCE_DELAY_H 10000
 #define REFERENCE_DELAY_V 10000
 
@@ -67,6 +64,8 @@ class StepperConfig {
     int min_delay = 500;
     int max_delay = 10000;
 
+    double percent_p = 0.4; // Acceleration
+
     int nominal_delay = 5000; // Used for constant speed
 };
 
@@ -92,6 +91,10 @@ bool referenceReachedV() {
   return digitalRead(V_MIN_PIN) == LOW || askedToStop();
 }
 
+void writeStopPosition() {
+  // TODO
+}
+
 // OPTIMIZE: Use interrupts instead of askedToStop I believe
 // Relative movement. Move from zero to destination.
 void moveConstantSpeed(StepperConfig stepper, double destination, long delay, bool (*stopCondition)() = askedToStop) {
@@ -115,10 +118,7 @@ void moveConstantSpeed(StepperConfig stepper, double destination, long delay, bo
 
   for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
 
-    if (stopCondition()) {
-      // TODO: When stopped, write at what position.
-      break;
-    }
+    if (stopCondition()) {writeSTopPosition(); break; }
 
     digitalWrite(stepper.pin_step, isStepHigh ? LOW : HIGH);
     isStepHigh = !isStepHigh;
@@ -163,86 +163,82 @@ void moveConstantSpeed(StepperConfig stepper, double destination, long delay, bo
 //  motor->stop();
 //}
 
-//// OPTIMIZE: Use interrupts instead of askedToStop I believe
-//// Relative movement. Move from zero to destination.
-//// TODO: When stopped, write at what position.
-//// Using percent per time, with a trapezoidal curve
-//void move(StepperConfig stepper, double destination) {
-//
-//  unsigned long startTime = micros();
-//  unsigned long timeSinceStart = 0;
-//
-//  bool dir = destination > 0 ? LOW : HIGH;
-//  dir = stepper.reverse_motor_direction ? !dir : dir;
-//  digitalWrite(stepper.pin_dir, dir);
-//
-//  double min_percent = (double) min_delay / (double) max_delay;
-//  double percent = min_percent; // Start at the minimum percentage of max speed
-//  int phaseNb = 1; // what phase the motor is in
-//
-//  bool isStepHigh = digitalRead(stepper.pin_step);
-//
-//  double max_percent_reached = 0;
-//  double timeSinceStartS = (timeSinceStart - lostTime) / 1000000.0;
-//  double time_started_decelerating = 0;
-//      
-//  //unsigned long dest = abs(destination) * stepper.steps_per_unit; // destination in steps
-//  //unsigned long pos = 0; // position in steps
-//  //while (pos < dest) {
-//  //pos++;
-//  for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
-//
-//    if (askedToStop(p)) {
-//      motor->stop(); break;
-//    }
-//
-//    digitalWrite(stepper.pin_step, isStepHigh ? LOW : HIGH);
-//    isStepHigh = !isStepHigh;
-//    lost_time = timeSinceStart - next_step_time;
-//
-//    // Accelerating
-//    if (phaseNb == 1) {
-//
-//      if (pos >= dest / 2.0) {
-//        phaseNb = 3;
-//        time_started_decelerating = timeSinceStartS;
-//        debug_time_finished_accelerating_s = timeSinceStartS;
-//        max_percent_reached = percent;
-//
-//      } else {
-//        percent = percent_p * timeSinceStartS;
-//        if (percent >= 1.0) {
-//          distance_accelerating = distanceTravelledSteps;
-//          max_percent_reached = 1.0;
-//          percent = 1.0;
-//          phaseNb = 2;
-//        }
-//      }
-//
-//    // Constant speed
-//    } else if (phaseNb == 2) {
-//
-//      if (pos > dest - distance_accelerating) {
-//        phaseNb = 3;
-//        time_started_decelerating = timeSinceStartS;
-//        debug_time_finished_accelerating_s = timeSinceStartS;
-//      }
-//
-//    // Decelerating
-//    } else {
-//
-//      percent = max_percent_reached - percent_p * (timeSinceStartS - time_started_decelerating);
-//
-//    }
-//
-//    next_step_delay = (percent <= min_percent) ? max_delay : min_delay / percent;
-//    
-//    next_step_time = timeSinceStart + next_step_delay;// - lost_time;
-//
-//    delayMicroseconds(motor->next_step_delay);
-//    timeSinceStart = timeDifference(startTime, p.getCurrentTime());
-//  }
-//}
+// OPTIMIZE: Use interrupts instead of askedToStop I believe
+// Relative movement. Move from zero to destination.
+// TODO: When stopped, write at what position.
+// Using percent per time, with a trapezoidal curve
+void move(StepperConfig stepper, double destination) {
+
+  bool dir = destination > 0 ? LOW : HIGH;
+  dir = stepper.reverse_motor_direction ? !dir : dir;
+  digitalWrite(stepper.pin_dir, dir);
+
+  double min_percent = (double) min_delay / (double) max_delay;
+  double percent = min_percent; // Start at the minimum percentage of max speed
+  int phaseNb = 1; // what phase the motor is in
+
+  bool isStepHigh = digitalRead(stepper.pin_step);
+
+  unsigned long startTime = micros();
+  unsigned long timeSinceStart = 0;
+
+  double max_percent_reached = 0;
+  double timeSinceStartS = (timeSinceStart - lostTime) / 1000000.0;
+  double time_started_decelerating = 0;
+  long distance_accelerating = 0;
+      
+  //unsigned long dest = abs(destination) * stepper.steps_per_unit; // destination in steps
+  for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
+
+    if (askedToStop()()) { writeStopPosition(); break; }
+
+    digitalWrite(stepper.pin_step, isStepHigh ? LOW : HIGH);
+    isStepHigh = !isStepHigh;
+    //unsigned long lost_time = timeSinceStart - next_step_time;
+
+    // Accelerating
+    if (phaseNb == 1) {
+
+      if (pos >= destination / 2.0) {
+        phaseNb = 3;
+        time_started_decelerating = timeSinceStartS;
+        //debug_time_finished_accelerating_s = timeSinceStartS;
+        max_percent_reached = percent;
+
+      } else {
+        percent = stepper.percent_p * timeSinceStartS;
+        if (percent >= 1.0) {
+          distance_accelerating = pos;
+          max_percent_reached = 1.0;
+          percent = 1.0;
+          phaseNb = 2;
+        }
+      }
+
+    // Constant speed
+    } else if (phaseNb == 2) {
+
+      if (pos > destination - distance_accelerating) {
+        phaseNb = 3;
+        time_started_decelerating = timeSinceStartS;
+        debug_time_finished_accelerating_s = timeSinceStartS;
+      }
+
+    // Decelerating
+    } else {
+
+      percent = max_percent_reached - stepper.percent_p * (timeSinceStartS - time_started_decelerating);
+
+    }
+
+    next_step_delay = (percent <= min_percent) ? max_delay : min_delay / percent;
+    
+    next_step_time = timeSinceStart + next_step_delay;// - lost_time;
+
+    delayMicroseconds(motor->next_step_delay);
+    timeSinceStart = timeDifference(startTime, p.getCurrentTime());
+  }
+}
 
 // Returns the number of bytes read.
 // Arduino already has a function that does this, but it was so slow I don't know why.
@@ -344,6 +340,7 @@ void setup() {
   stepper_j.min_delay = 500;
   stepper_j.max_delay = 10000;
   stepper_j.nominal_delay = 5000;
+  stepper_j.percent_p = 0.3;
 
   stepper_h.id = 'h';
   stepper_h.pin_dir = H_DIR_PIN;
@@ -351,9 +348,10 @@ void setup() {
   stepper_h.pin_enable = H_ENABLE_PIN;
   stepper_h.reverse_motor_direction = true;
   stepper_h.steps_per_unit = 200 * 2 * 8 / (12.2244*3.1416);
-  stepper_h.min_delay = 500;
-  stepper_h.max_delay = 10000;
+  stepper_h.min_delay = 200;
+  stepper_h.max_delay = 4000;
   stepper_h.nominal_delay = 1000;
+  stepper_h.percent_p = 0.3;
 
   stepper_v.id = 'v';
   stepper_v.pin_dir = V_DIR_PIN;
@@ -362,9 +360,10 @@ void setup() {
   stepper_v.reverse_motor_direction = true;
   double unitPerTurnV = (2.625*25.4*3.1416 * 13/51);
   stepper_v.steps_per_unit = 200 * 2 * 32 / (unitPerTurnV);
-  stepper_v.min_delay = 500;
-  stepper_v.max_delay = 10000;
-  stepper_v.nominal_delay = 5000;
+  stepper_v.min_delay = 40;
+  stepper_v.max_delay = 1000;
+  stepper_v.nominal_delay = 500;
+  stepper_v.percent_p = 0.3;
 
   stepper_t.id = 't';
   stepper_t.pin_dir = T_DIR_PIN;
@@ -372,9 +371,10 @@ void setup() {
   stepper_t.pin_enable = T_ENABLE_PIN;
   stepper_t.reverse_motor_direction = true;
   stepper_t.steps_per_unit = 200 * 2 * 16 / (360*12/61);
-  stepper_t.min_delay = 500;
-  stepper_t.max_delay = 10000;
-  stepper_t.nominal_delay = 5000;
+  stepper_t.min_delay = 200;
+  stepper_t.max_delay = 4000;
+  stepper_t.nominal_delay = 2000;
+  stepper_t.percent_p = 0.4;
 
   stepper_a.id = 'a';
   stepper_a.pin_dir = A_DIR_PIN;
@@ -385,6 +385,7 @@ void setup() {
   stepper_a.min_delay = 500;
   stepper_a.max_delay = 10000;
   stepper_a.nominal_delay = 2000;
+  stepper_a.percent_p = 0.3;
 
   stepper_b.id = 'b';
   stepper_b.pin_dir = B_DIR_PIN;
@@ -395,6 +396,7 @@ void setup() {
   stepper_b.min_delay = 500;
   stepper_b.max_delay = 10000;
   stepper_b.nominal_delay = 1000;
+  stepper_b.percent_p = 0.3;
 
   pinMode(stepper_j.pin_dir, OUTPUT);
   pinMode(stepper_j.pin_step, OUTPUT);
