@@ -69,6 +69,16 @@ class StepperConfig {
     int nominal_delay = 5000; // Used for constant speed
 };
 
+// Check if the time has wrapped around.
+unsigned long timeDifference(unsigned long oldTime, unsigned long currentTime) {
+  
+  if (currentTime < oldTime) {
+    unsigned long maxLong = 0; maxLong--;
+    return maxLong - oldTime + currentTime;
+  }
+  return currentTime - oldTime;
+}
+
 bool askedToStop() {
   while (Serial.available() > 0) {
     int incomingByte = Serial.read();
@@ -118,7 +128,7 @@ void moveConstantSpeed(StepperConfig stepper, double destination, long delay, bo
 
   for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
 
-    if (stopCondition()) {writeSTopPosition(); break; }
+    if (stopCondition()) {writeStopPosition(); break; }
 
     digitalWrite(stepper.pin_step, isStepHigh ? LOW : HIGH);
     isStepHigh = !isStepHigh;
@@ -163,38 +173,41 @@ void moveConstantSpeed(StepperConfig stepper, double destination, long delay, bo
 //  motor->stop();
 //}
 
+void move(StepperConfig stepper, double destination) {
+  moveConstantSpeed(stepper, destination, stepper.nominal_delay);
+}
+
 // OPTIMIZE: Use interrupts instead of askedToStop I believe
 // Relative movement. Move from zero to destination.
 // TODO: When stopped, write at what position.
 // Using percent per time, with a trapezoidal curve
-void move(StepperConfig stepper, double destination) {
+void moveWithAcceleration(StepperConfig stepper, double destination) {
 
   bool dir = destination > 0 ? LOW : HIGH;
   dir = stepper.reverse_motor_direction ? !dir : dir;
   digitalWrite(stepper.pin_dir, dir);
 
-  double min_percent = (double) min_delay / (double) max_delay;
+  double min_percent = (double) stepper.min_delay / (double) stepper.max_delay;
   double percent = min_percent; // Start at the minimum percentage of max speed
   int phaseNb = 1; // what phase the motor is in
 
   bool isStepHigh = digitalRead(stepper.pin_step);
 
-  unsigned long startTime = micros();
+  //unsigned long startTime = micros();
   unsigned long timeSinceStart = 0;
-
   double max_percent_reached = 0;
-  double timeSinceStartS = (timeSinceStart - lostTime) / 1000000.0;
   double time_started_decelerating = 0;
   long distance_accelerating = 0;
+  double timeSinceStartS = 0;
       
   //unsigned long dest = abs(destination) * stepper.steps_per_unit; // destination in steps
   for (unsigned long pos = 0; pos < abs(destination) * stepper.steps_per_unit; pos++) {
 
-    if (askedToStop()()) { writeStopPosition(); break; }
+    if (askedToStop()) { writeStopPosition(); break; }
 
     digitalWrite(stepper.pin_step, isStepHigh ? LOW : HIGH);
     isStepHigh = !isStepHigh;
-    //unsigned long lost_time = timeSinceStart - next_step_time;
+    //double timeSinceStartS = timeDifference(startTime, micros()) / 1000000.0;
 
     // Accelerating
     if (phaseNb == 1) {
@@ -221,22 +234,18 @@ void move(StepperConfig stepper, double destination) {
       if (pos > destination - distance_accelerating) {
         phaseNb = 3;
         time_started_decelerating = timeSinceStartS;
-        debug_time_finished_accelerating_s = timeSinceStartS;
+        //debug_time_finished_accelerating_s = timeSinceStartS;
       }
 
     // Decelerating
     } else {
 
       percent = max_percent_reached - stepper.percent_p * (timeSinceStartS - time_started_decelerating);
-
     }
 
-    next_step_delay = (percent <= min_percent) ? max_delay : min_delay / percent;
-    
-    next_step_time = timeSinceStart + next_step_delay;// - lost_time;
-
-    delayMicroseconds(motor->next_step_delay);
-    timeSinceStart = timeDifference(startTime, p.getCurrentTime());
+    long next_step_delay = (percent <= min_percent) ? stepper.max_delay : stepper.min_delay / percent;
+    delayMicroseconds(next_step_delay);
+    timeSinceStartS += next_step_delay/1000000.0;
   }
 }
 
@@ -350,7 +359,7 @@ void setup() {
   stepper_h.steps_per_unit = 200 * 2 * 8 / (12.2244*3.1416);
   stepper_h.min_delay = 200;
   stepper_h.max_delay = 4000;
-  stepper_h.nominal_delay = 1000;
+  stepper_h.nominal_delay = 500;
   stepper_h.percent_p = 0.3;
 
   stepper_v.id = 'v';
@@ -370,7 +379,7 @@ void setup() {
   stepper_t.pin_step = T_STEP_PIN;
   stepper_t.pin_enable = T_ENABLE_PIN;
   stepper_t.reverse_motor_direction = true;
-  stepper_t.steps_per_unit = 200 * 2 * 16 / (360*12/61);
+  stepper_t.steps_per_unit = 200 * 2 * 8 / (360*12/61);
   stepper_t.min_delay = 200;
   stepper_t.max_delay = 4000;
   stepper_t.nominal_delay = 2000;
@@ -516,12 +525,12 @@ void loop() {
         Serial.println("error: Invalid move destination. Not a number.");
         return;
       }
-      if (axis == 'h') { moveConstantSpeed(stepper_h, nb, stepper_h.nominal_delay);
-      } else if (axis == 'v') { moveConstantSpeed(stepper_v, nb, stepper_v.nominal_delay);
-      } else if (axis == 't') { moveConstantSpeed(stepper_t, nb, stepper_t.nominal_delay);
-      } else if (axis == 'a') { moveConstantSpeed(stepper_a, nb, stepper_a.nominal_delay);
-      } else if (axis == 'b') { moveConstantSpeed(stepper_b, nb, stepper_b.nominal_delay);
-      } else if (axis == 'j') { moveConstantSpeed(stepper_j, nb, stepper_j.nominal_delay);
+      if (axis == 'h') { move(stepper_h, nb);
+      } else if (axis == 'v') { move(stepper_v, nb);
+      } else if (axis == 't') { move(stepper_t, nb);
+      } else if (axis == 'a') { move(stepper_a, nb);
+      } else if (axis == 'b') { move(stepper_b, nb);
+      } else if (axis == 'j') { move(stepper_j, nb);
       } else {
         Serial.println("error: Invalid axis name given.");
       }
