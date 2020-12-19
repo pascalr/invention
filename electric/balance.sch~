@@ -69,7 +69,7 @@ P 49300 46400 51800 46400 1 0 0
 T 49300 46400 5 10 0 0 0 0 1
 pintype=unknown
 T 51855 46395 5 10 1 1 0 0 1
-pinlabel=DT - A1 - A5
+pinlabel=DT - A1
 T 49300 46400 5 10 0 0 0 0 1
 pinseq=0
 }
@@ -78,7 +78,7 @@ P 49300 45700 51600 45700 1 0 0
 T 49300 45700 5 10 0 0 0 0 1
 pintype=unknown
 T 51655 45695 5 10 1 1 0 0 1
-pinlabel=SCK - A0 - A9
+pinlabel=SCK - A0
 T 49300 45700 5 10 0 0 0 0 1
 pinseq=0
 }
