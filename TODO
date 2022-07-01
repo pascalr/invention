@@ -1,16 +1,20 @@
+Comment faire pour vider le pot? Ou le contenant de mélange?
+- Un cylindre avec une douille. Tu pousse le cyclindre d'un côté d'un côté et ça sors de l'autre.
+- Un cylindre de stainless? Déposer sur quoi?
+- Piston filler? https://www.npackfillers.com/piston-filler-work.html
+- servo positive displacement fillers? Pump filler?https://www.accutekpackaging.com/positive-displacement/
+- Sausage filler!!! https://www.youtube.com/watch?v=eDvIZwA5W74
 
-Bref,
-Donc,
-Mettre le contrepoids sur des poulies. Enlever le drum du contrepoids.
-Faire un contrepoids 
+- Le filler est sur un support qui se déplace librement? Le bras robotique prend le contenant et va en dessous insérer le contenant dans le piston. Ensuite il peut se déplacer librement avec pour aller déposer n'importe où sa pâte. Un support style SCARA.
 
-Tige 3/8" en haut, comme le câble d'acier ne bougera presque pas. 3/8 c'est 16NC. J'ai 13.89. C'est déjà beaucoup mieux il bougera pas beaucoup. 87% moins de mouvement.
+- Le filler peut se déplacer avec un rack et pinion, ou bien avec une tige filetée.
 
-Le truc est 6" de large. Le centre est à 3". Le drum est 2 5/8", donc l'axe du shaft sera à 3/8" du bord.
+En déposant de la pâte, il pourrait faire: Boulette hamburger végé, pain, crêpes, biscuits, gâteaux, muffins, ...
 
-Ca marche pas. Ça ferait visser d'un côtés et dévisser de l'autres.
+Quoi utiliser pour la valve en bas? Une valve à guillotine? Le plus grand prérequis est une valve qui se nettoie bien pour être sécuritaire.
 
-Les câble du cable tray vertical doivent arriver par le bas, parce que la boucle va ainsi être vers le haut, et vers le haut on s'en fou! Ou bien les câbles pendouille à partir du
-haut qui se ferait aussi. Anyway je veux rien en dessous. Si ça vient d'en haut, ça ne peut pas être avec un câble tray.
-
-remove boost dependency
+- Valve à guillotine?
+- Un bouchon de ketchup?
+- Rotary valve?
+- Check valve?
+https://handyfiller.com/product/fda-approved-high-viscosity-valve-assembly-thick-chunky/
